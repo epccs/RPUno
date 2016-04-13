@@ -3,6 +3,8 @@
 
   Loop Back test for the SPI port of an Arduino
 
+  NOTE the LED is on the SPI SCK pin on UNO so don't blink it.
+
   modified 30 Nov 2015
   by Ronald Sutherland
  */
@@ -12,22 +14,19 @@
 #define SPI_CLOCK     (1000000/6)
 uint8_t outByte;
 uint8_t inByte; 
-int led = 13;
 uint8_t error = 0; 
 
 
 void setup() {
-  pinMode(led, OUTPUT); // setting the LED pin as output
-  Serial.begin(9600);
+  Serial.begin(115200);
   SPI.begin(); // initialize the SPI port as master
   SPI.beginTransaction(SPISettings(SPI_CLOCK, MSBFIRST, SPI_MODE0));
   delay(100);  
 }
 
 void loop() {
-  digitalWrite(led, HIGH);
   error = 0;   
-  for(outByte = 0; outByte <= 255; outByte++)
+  for(outByte = 0; outByte <= 254; outByte++)
   {
     inByte = SPI.transfer(outByte);
     if( inByte != outByte) 
@@ -44,12 +43,14 @@ void loop() {
     Serial.print(inByte, DEC);
     Serial.println();
   }
-  else 
+  else
   {
-    Serial.println("no errors");
+    Serial.print("no errors outByte=");
+    Serial.print(outByte, DEC);
+    Serial.print(" inByte=");
+    Serial.print(inByte, DEC);
+    Serial.println();
   }
 
-  delay(1000);
-  digitalWrite(led, LOW); 
-  delay(1000);
+  delay(2000);
 }

@@ -3,7 +3,7 @@
     
     Timer 1 Input Capture, Arduino Uno pin 8 ICP1 facility, 
     referance
-    https: //gist.github.com/mpflaga/4404996
+    https://gist.github.com/mpflaga/4404996
     http://forum.arduino.cc/index.php/topic,146497.0.html
     note: volatile will force compiler to load/store variable every time it is used.
     

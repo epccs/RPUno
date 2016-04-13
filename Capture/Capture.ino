@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014  Ronald Sutherland
+    Copyright (C) 2016  Ronald Sutherland
 
     Capture is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -14,11 +14,13 @@
     You should have received a copy of the GNU General Public License
     along with Capture.  If not, see <http://www.gnu.org/licenses/>.
 
+    http://forum.arduino.cc/index.php?topic=260172.0
+
     Capture 
-    Arduino Uno (ATmega328) Input Capture Unit Example
+    ATmega328p (e.g. Arduino Uno) Input Capture Unit Example
     PWM from pin 11 may be used as a signal to capture with pin 8, plug a 10k Ohm resistor
     between them to be safe.
-    updates may be found at http://epccs.org/hg/epccs/Software/file/tip/Embeded/Capture
+    updates may be found at http://epccs.org/hg/open/RPUno/file/tip/Capture
 
     INPUT COMMAND STRUCTURE:
     position            usage 

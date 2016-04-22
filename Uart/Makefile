@@ -1,6 +1,7 @@
 # Makefile 
 TARGET = Uart
-OBJECTS = main.o uart.o
+LIBDIR = ../lib
+OBJECTS = main.o $(LIBDIR)/uart.o
 
 ## Chip and project-specific global definitions
 MCU   =  atmega328p
@@ -11,6 +12,7 @@ CPPFLAGS = -DF_CPU=$(F_CPU) -DBAUD=$(BAUD) -I.
 ## Cross-compilation
 CC = avr-gcc
 OBJCOPY = avr-objcopy
+SIZE = avr-size
 
 ## programing ports. the FTDI on my board shows as ttyUSBx, while an Uno shows as ttyACMx
 BOOT_PORT = /dev/ttyUSB0
@@ -51,6 +53,7 @@ bootload: $(TARGET).hex
 
 $(TARGET).elf: $(OBJECTS)
 	$(CC) $(LDFLAGS) $(TARGET_ARCH) $^ -o $@
+	$(SIZE) $@
 	rm -f $(TARGET).o $(OBJECTS)
 
 clean: 

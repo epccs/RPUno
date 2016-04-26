@@ -1,5 +1,5 @@
 /*
-Uart is a demonstration of Interrupt-Driven UART with stdio redirect. 
+Demonstration of serial Parsing for textual commands and arguments.
 Copyright (C) 2016 Ronald Sutherland
 
 This program is free software; you can redistribute it and/or
@@ -33,7 +33,7 @@ int main(void) {
     stdout = stdin = uartstream0_init(BAUD);
     initCommandBuffer();
        
-    sei(); // Enable global interrupts
+    sei(); // Enable global interrupts starts the UART
     
     // non-blocking code in loop
     while(1) 
@@ -48,7 +48,13 @@ int main(void) {
             StartEchoWhenAddressed('0');
         }
         
-        // finish echo of the command line befor starting a reply (or the next part of reply)
+        // check if character is available, and stop the command in proccess if so.
+        if ( command_done && uart0_available() )
+        {
+            initCommandBuffer();
+        }
+        
+        // finish echo of the command line befor starting a reply (or the next part of reply), also non-blocking.
         if ( command_done && (uart0_availableForWrite() == UART_TX0_BUFFER_SIZE) )
         {
             if ( !echo_on  )
@@ -63,42 +69,78 @@ int main(void) {
                 if (command_done == 1)  
                 {
                     findCommand();
-                    command_done = 10;
+                    command_done = 2;
                 }
-                
-                // commands that would overflow the serial buffer are done in steps to prevent blocking
-                // avr-libc has strcmp_P which is simular to strcmp but the second string is in program space.
-                if ( (command_done >= 10) && (strcmp_P( command, PSTR("/id?")) == 0) )
+                if (command_done == 2)
                 {
-                    // /id? name 
-                    // /id?
-                    if ( (command_done == 10) && ( (arg_count == 0) || ( (arg_count == 1) && (strcmp_P( arg[0], PSTR("name")) == 0) ) ) )
+                    printf_P(PSTR("{\"cmd\": \"%s\"}\r\n"),command);
+                    command_done = 3;
+                }
+                if (command_done == 3)
+                {
+                    printf_P(PSTR("{\"arg_count\": \"%d\"}\r\n"),arg_count);
+                    if (arg_count > 0)
                     {
-                        printf_P(PSTR("{\"id\":{\"name\":\"RPUno\"}}\r\n"));
-                        initCommandBuffer();
+                        command_done = 4;
                     }
-                    // /id? desc
-                    if ( (command_done == 10) && (arg_count == 1) && (strcmp_P( arg[0], PSTR("desc")) == 0) )
+                    else
                     {
-                        printf_P(PSTR("{\"id\":{\"desc\":\"Devl Board /w " ));
-                        command_done = 11;
-                    }
-                    if ( (command_done == 11) && (arg_count == 1) && (strcmp_P( arg[0], PSTR("desc")) == 0) )
-                    {
-                        printf_P(PSTR("ATmega328p and LT3652\"}}\r\n"));
-                        initCommandBuffer();
-                    }
-                    // /id? avr-gcc
-                    if ( (command_done == 10) && (arg_count == 1) && (strcmp_P( arg[0], PSTR("avr-gcc")) == 0) )
-                    {
-                        printf_P(PSTR("{\"id\":{\"avr-gcc\":\"%d.%d\"}}\r\n"),__GNUC__,__GNUC_MINOR__);
                         initCommandBuffer();
                     }
                 }
-                else 
+                if (command_done == 4)
                 {
+                    printf_P(PSTR("{\"arg[0]\": \"%s\"}\r\n"),arg[0]);
+                    if (arg_count > 1)
+                    {
+                        command_done = 5;
+                    }
+                    else
+                    {
+                        initCommandBuffer();
+                    }
+                }
+                if (command_done == 5)
+                {
+                    printf_P(PSTR("{\"arg[1]\": \"%s\"}\r\n"),arg[1]);
+                    if (arg_count > 2)
+                    {
+                        command_done = 6;
+                    }
+                    else
+                    {
+                        initCommandBuffer();
+                    }
+                }
+                if (command_done == 6)
+                {
+                    printf_P(PSTR("{\"arg[2]\": \"%s\"}\r\n"),arg[2]);
+                    if (arg_count > 3)
+                    {
+                        command_done = 7;
+                    }
+                    else
+                    {
+                        initCommandBuffer();
+                    }
+                }   
+                if (command_done == 7)
+                {
+                    printf_P(PSTR("{\"arg[3]\": \"%s\"}\r\n"),arg[3]);
+                    if (arg_count > 4)
+                    {
+                        command_done = 8;
+                    }
+                    else
+                    {
+                        initCommandBuffer();
+                    }
+                }   
+                if (command_done == 8)
+                {
+                    printf_P(PSTR("{\"arg[4]\": \"%s\"}\r\n"),arg[4]);
                     initCommandBuffer();
-                }
+                }                   
             }
          }
     }        

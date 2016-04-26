@@ -1,5 +1,5 @@
 # Makefile 
-TARGET = Uart
+TARGET = Parsing
 LIBDIR = ../lib
 OBJECTS = main.o $(LIBDIR)/uart.o $(LIBDIR)/parse.o
 

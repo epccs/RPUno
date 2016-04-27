@@ -8,7 +8,7 @@ Referance ATmega328 datasheet 20.0 USART0 Universal Synchronous and Asynchronous
 
 Toolchain setup http://epccs.org/indexes/Document/DvlpNotes/LinuxBoxCrossCompiler.html
 
-Makefile based. Without the extras to increase transparentcly. The tools work in the way they were designed. 
+Makefile based. Without the extras to increase transparency. The tools work in the way they were designed. 
 
 Minimalized Interrupt-driven UART code from <https://github.com/hwstar/avr-uart>, and added streams from <https://github.com/andygock/avr-uart>
 

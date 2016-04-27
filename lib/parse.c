@@ -118,22 +118,30 @@ uint8_t findArgument(uint8_t at_command_buf_offset)
         { 
             lastAlphaNum++;
         }
-        
-        // end of command line, without a argument 
+
+        // after command+space but the char is not alphanumeric so is not an argument 
         if( (command_buf[lastAlphaNum] == '\0') ) 
         {
-            if (echo_on) printf_P(PSTR("{\"err\": \"SpAftrCmdWthoutArg\"}\r\n"));
+            if (echo_on) printf_P(PSTR("{\"err\": \"ArgAftrCmd+Sp!Valid\"}\r\n"));
             initCommandBuffer();
             return 0;
-        } 
+        }
         
         //for each valid argument add it to the arg array of strings
-        for (arg_count = 0; isalnum(command_buf[lastAlphaNum]) && (arg_count < MAX_ARGUMENT_COUNT); arg_count++) 
-        { 
+        for (arg_count = 0; command_buf[lastAlphaNum] != '\0' ; arg_count++) 
+        {
+            // to many arguments
+            if( !(arg_count < MAX_ARGUMENT_COUNT) ) 
+            {
+                if (echo_on) printf_P(PSTR("{\"err\": \"ArgCnt%dAt%d\"}\r\n"), arg_count, lastAlphaNum);
+                initCommandBuffer();
+                return 0;
+            }   
+            
             arg[arg_count] = command_buf + lastAlphaNum;
             
             //  skip through the argument
-            while (isalnum(command_buf[lastAlphaNum]) && (lastAlphaNum < (COMMAND_BUFFER_SIZE-1)) ) 
+            while( isalnum(command_buf[lastAlphaNum]) && (lastAlphaNum < (COMMAND_BUFFER_SIZE-1)) ) 
             { 
                 lastAlphaNum++;
             }
@@ -141,6 +149,14 @@ uint8_t findArgument(uint8_t at_command_buf_offset)
             {
                 if ( lastAlphaNum < (COMMAND_BUFFER_SIZE-2) ) 
                 {
+                    // check if char after delimiter is alphanumeric 
+                    if( !isalnum(command_buf[lastAlphaNum+1]) ) 
+                    {
+                        if (echo_on) printf_P(PSTR("{\"err\": \"ArgAftrDelimit!Valid\"}\r\n"));
+                        initCommandBuffer();
+                        return 0;
+                    }  
+                    
                     // null terminate the argument, e.g. replace the delimiter
                     command_buf[lastAlphaNum] = '\0';
                     lastAlphaNum++;
@@ -152,6 +168,15 @@ uint8_t findArgument(uint8_t at_command_buf_offset)
                     initCommandBuffer();
                     return 0;
                 }
+            }
+            
+            // only EOL or delimiter is valid after argument (e.g. do add a space befor the end of line)
+            else if (command_buf[lastAlphaNum] != '\0')
+            {
+                // do not index past command buffer
+                if (echo_on) printf_P(PSTR("{\"err\": \"!DelimAftrArg_%c\"}\r\n"), command_buf[lastAlphaNum]);
+                initCommandBuffer();
+                return 0;
             }
         }
         return arg_count;
@@ -210,13 +235,20 @@ uint8_t findCommand(void)
             // replace the space with a null so command works as a null terminated string.
             command_buf[lastAlpha] = '\0';
         }
+        else
+        {
+            // isspace() found after command but argument was not valid 
+            if (echo_on) printf_P(PSTR("{\"err\": \"CharAftrCmdBad '%c'\"}\r\n"),command_buf[lastAlpha+1]);
+            initCommandBuffer();
+            return 0;
+        }
     }
     else
     {
         if (command_buf[lastAlpha] != '\0')
         {
-            // a null ends command and only a valid isspace() is allowed between command and argument. 
-            if (echo_on) printf_P(PSTR("{\"err\": \"CharAftrCmdBad '%c'\"}\r\n"),command_buf[lastAlpha]);
+            // null must end command. 
+            if (echo_on) printf_P(PSTR("{\"err\": \"MissNullAftrCmd '%c'\"}\r\n"),command_buf[lastAlpha]);
             initCommandBuffer();
             return 0;
         }

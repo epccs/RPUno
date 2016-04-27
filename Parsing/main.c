@@ -73,8 +73,15 @@ int main(void) {
                 }
                 if (command_done == 2)
                 {
-                    printf_P(PSTR("{\"cmd\": \"%s\"}\r\n"),command);
-                    command_done = 3;
+                    if (command != '\0' )
+                    {
+                        printf_P(PSTR("{\"cmd\": \"%s\"}\r\n"),command);
+                        command_done = 3;
+                    }
+                    else
+                    {
+                        initCommandBuffer();
+                    }
                 }
                 if (command_done == 3)
                 {

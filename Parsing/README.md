@@ -6,7 +6,7 @@ Demonstration of command parsing with the redirected stdio functions (e.g. print
 
 Toolchain setup http://epccs.org/indexes/Document/DvlpNotes/LinuxBoxCrossCompiler.html
 
-Makefile based. Without the extras to increase transparentcly. The tools work in the way they were designed. 
+Makefile based. Without the extras to increase transparency. The tools work in the way they were designed. 
 
 # Command Line
 

@@ -16,11 +16,10 @@ For a copy of the GNU General Public License use
 http://www.gnu.org/licenses/gpl-2.0.html
 
 */
-#include <string.h>
 #include <ctype.h>
 #include <avr/pgmspace.h>
-#include "../lib/parse.h"
-#include "../lib/uart.h"
+#include "parse.h"
+#include "uart.h"
 
 // used to assemble command line
 char command_buf[COMMAND_BUFFER_SIZE];
@@ -119,10 +118,10 @@ uint8_t findArgument(uint8_t at_command_buf_offset)
             lastAlphaNum++;
         }
 
-        // after command+space but the char is not alphanumeric so is not an argument 
+        // after command+space but the char is null
         if( (command_buf[lastAlphaNum] == '\0') ) 
         {
-            if (echo_on) printf_P(PSTR("{\"err\": \"ArgAftrCmd+Sp!Valid\"}\r\n"));
+            if (echo_on) printf_P(PSTR("{\"err\": \"NullArgAftrCmd+Sp\"}\r\n"));
             initCommandBuffer();
             return 0;
         }
@@ -141,7 +140,7 @@ uint8_t findArgument(uint8_t at_command_buf_offset)
             arg[arg_count] = command_buf + lastAlphaNum;
             
             //  skip through the argument
-            while( isalnum(command_buf[lastAlphaNum]) && (lastAlphaNum < (COMMAND_BUFFER_SIZE-1)) ) 
+            while( (isalnum(command_buf[lastAlphaNum]) || (command_buf[lastAlphaNum] == '-')) && (lastAlphaNum < (COMMAND_BUFFER_SIZE-1)) ) 
             { 
                 lastAlphaNum++;
             }
@@ -149,10 +148,10 @@ uint8_t findArgument(uint8_t at_command_buf_offset)
             {
                 if ( lastAlphaNum < (COMMAND_BUFFER_SIZE-2) ) 
                 {
-                    // check if char after delimiter is alphanumeric 
-                    if( !isalnum(command_buf[lastAlphaNum+1]) ) 
+                    // check if char after delimiter is valid for an arg 
+                    if( !(isalnum(command_buf[lastAlphaNum+1]) || (command_buf[lastAlphaNum+1] == '-')) ) 
                     {
-                        if (echo_on) printf_P(PSTR("{\"err\": \"ArgAftrDelimit!Valid\"}\r\n"));
+                        if (echo_on) printf_P(PSTR("{\"err\": \"ArgAftr'%c@%d!Valid\"}\r\n"),command_buf[lastAlphaNum],lastAlphaNum);
                         initCommandBuffer();
                         return 0;
                     }  
@@ -170,11 +169,11 @@ uint8_t findArgument(uint8_t at_command_buf_offset)
                 }
             }
             
-            // only EOL or delimiter is valid after argument (e.g. do add a space befor the end of line)
+            // only EOL or delimiter is valid way to terminate an argument (e.g. a space befor end of line is not valid)
             else if (command_buf[lastAlphaNum] != '\0')
             {
                 // do not index past command buffer
-                if (echo_on) printf_P(PSTR("{\"err\": \"!DelimAftrArg_%c\"}\r\n"), command_buf[lastAlphaNum]);
+                if (echo_on) printf_P(PSTR("{\"err\": \"!DelimAftrArg'%c@%d\"}\r\n"), command_buf[lastAlphaNum],lastAlphaNum);
                 initCommandBuffer();
                 return 0;
             }

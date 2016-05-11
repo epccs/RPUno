@@ -1,12 +1,22 @@
 # Makefile 
-TARGET = Parsing
+TARGET = Capture
 LIBDIR = ../lib
-OBJECTS = main.o $(LIBDIR)/uart.o $(LIBDIR)/parse.o
+OBJECTS = main.o \
+	process.o \
+	id.o \
+	pwm.o \
+	count.o \
+	duty.o \
+	$(LIBDIR)/timers.o \
+	$(LIBDIR)/uart.o \
+	$(LIBDIR)/adc.o \
+	$(LIBDIR)/icp1.o \
+	$(LIBDIR)/parse.o
 
 ## Chip and project-specific global definitions
 MCU   =  atmega328p
 F_CPU = 16000000UL  
-BAUD  =  9600UL
+BAUD  =  115200UL
 CPPFLAGS = -DF_CPU=$(F_CPU) -DBAUD=$(BAUD) -I. 
 
 ## Cross-compilation
@@ -39,7 +49,7 @@ $(TARGET).hex: $(TARGET).elf
 
 ## http://eleccelerator.com/fusecalc/fusecalc.php?chip=atmega328p&LOW=FF&HIGH=DE&EXTENDED=05&LOCKBIT=2F
 ## stk500v1 is for Arduino as ISP (e.g. it is an example in the Arduino.cc IDE 1.6.7+)
-## lock is from optiboot's Makefile.isp, It helps to prevent the bootloader from nuking itself.
+## lock is from optiboot's Makefile.isp, it helps to prevent the bootloader from nuking itself.
 fuse: 
 	avrdude -v -p $(MCU) -c stk500v1 -P $(ISP_PORT) -b 19200 -U lock:w:0x3f:m -U lfuse:w:0xFF:m -U hfuse:w:0xDE:m -U efuse:w:0xFD:m
 

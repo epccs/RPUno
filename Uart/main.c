@@ -21,9 +21,8 @@ https://github.com/npat-efault/picocom
 picocom -b 9600 /dev/ttyUSB0
 exit is C-a, C-x
 */
-#include <avr/interrupt.h>
 #include <avr/pgmspace.h>
-#include <string.h>
+#include <util/atomic.h>
 #include "../lib/uart.h"
 #include "../lib/parse.h"
 
@@ -46,6 +45,16 @@ int main(void) {
 
             // address is the ascii value for '0' note: a null address will terminate the command string. 
             StartEchoWhenAddressed('0');
+        }
+        
+        // check if the character is available, and if so stop transmit and the command in process.
+        // a multi-drop bus can have another device start transmitting after the second received byte so
+        // there is little time to detect a possible collision
+        if ( command_done && uart0_available() )
+        {
+            // dump the transmit buffer to limit a collision 
+            uart0_flush(); 
+            initCommandBuffer();
         }
         
         // finish echo of the command line befor starting a reply (or the next part of reply)
@@ -74,13 +83,13 @@ int main(void) {
                     // /id?
                     if ( (command_done == 10) && ( (arg_count == 0) || ( (arg_count == 1) && (strcmp_P( arg[0], PSTR("name")) == 0) ) ) )
                     {
-                        printf_P(PSTR("{\"id\":{\"name\":\"RPUno\"}}\r\n"));
+                        printf_P(PSTR("{\"id\":{\"name\":\"Uart\"}}\r\n"));
                         initCommandBuffer();
                     }
                     // /id? desc
                     if ( (command_done == 10) && (arg_count == 1) && (strcmp_P( arg[0], PSTR("desc")) == 0) )
                     {
-                        printf_P(PSTR("{\"id\":{\"desc\":\"Devl Board /w " ));
+                        printf_P(PSTR("{\"id\":{\"desc\":\"RPUno Board /w " ));
                         command_done = 11;
                     }
                     if ( (command_done == 11) && (arg_count == 1) && (strcmp_P( arg[0], PSTR("desc")) == 0) )

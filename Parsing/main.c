@@ -21,9 +21,8 @@ https://github.com/npat-efault/picocom
 picocom -b 9600 /dev/ttyUSB0
 exit is C-a, C-x
 */
-#include <avr/interrupt.h>
 #include <avr/pgmspace.h>
-#include <string.h>
+#include <util/atomic.h>
 #include "../lib/uart.h"
 #include "../lib/parse.h"
 
@@ -48,9 +47,13 @@ int main(void) {
             StartEchoWhenAddressed('0');
         }
         
-        // check if character is available, and stop the command in proccess if so.
+        // check if the character is available, and if so stop transmit and the command in process.
+        // a multi-drop bus can have another device start transmitting after the second received byte so
+        // there is little time to detect a possible collision
         if ( command_done && uart0_available() )
         {
+            // dump the transmit buffer to limit a collision 
+            uart0_flush(); 
             initCommandBuffer();
         }
         
@@ -130,7 +133,7 @@ int main(void) {
                     {
                         initCommandBuffer();
                     }
-                }   
+                }
                 if (command_done == 7)
                 {
                     printf_P(PSTR("{\"arg[3]\": \"%s\"}\r\n"),arg[3]);
@@ -142,12 +145,12 @@ int main(void) {
                     {
                         initCommandBuffer();
                     }
-                }   
+                }
                 if (command_done == 8)
                 {
                     printf_P(PSTR("{\"arg[4]\": \"%s\"}\r\n"),arg[4]);
                     initCommandBuffer();
-                }                   
+                }
             }
          }
     }        

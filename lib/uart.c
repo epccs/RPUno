@@ -24,9 +24,8 @@
 
 *************************************************************************/
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
-//#include <avr/pgmspace.h>
+#include <stdio.h>
+#include <util/atomic.h>
 #include "uart.h"
 
 //  constants and macros
@@ -323,6 +322,18 @@
     #endif
 #endif
 
+/* the bootloader connects pins to UART0  disconnect them
+    so they can be used as normal digital i/o; they may be
+    reconnected by uart0_init() */
+void init_uart0_after_bootloader()
+{
+#if defined(UCSRB)
+	UCSRB = 0;
+#elif defined(UCSR0B)
+	UCSR0B = 0;
+#endif
+}
+
 #if defined(AT90_UART) || defined(ATMEGA_USART) || defined(ATMEGA_USART0) 
 
 ISR(UART0_RECEIVE_INTERRUPT)
@@ -503,6 +514,15 @@ void uart0_putc(uint8_t data)
     UART0_CONTROL    |= _BV(UART0_UDRIE);
 
 } /* uart0_putc */
+
+/* Flush bytes from the transmit buffer  */
+void uart0_flush(void)
+{
+    ATOMIC_BLOCK ( ATOMIC_RESTORESTATE ) // may not be needed
+    {
+        UART0_TxHead = UART0_TxTail;
+    }
+} /* uart0_flush */
 
 /* number of bytes available in the receive buffer */
 uint16_t uart0_available(void)
@@ -685,11 +705,26 @@ void uart1_putc(uint8_t data)
 
 } /* uart1_putc */
 
+/* Flush bytes from the transmit buffer  */
+void uart1_flush(void)
+{
+    ATOMIC_BLOCK ( ATOMIC_RESTORESTATE ) // may not be needed
+    {
+        UART1_TxHead = UART1_TxTail;
+    }
+} /* uart1_flush */
+
 /* number of bytes waiting in the receive buffer */
 uint16_t uart1_available(void)
 {
     return (UART_RX1_BUFFER_SIZE + UART1_RxHead - UART1_RxTail) & UART_RX1_BUFFER_MASK;
 } /* uart1_available */
+
+/* number of bytes available for writing to the transmit buffer without blocking */
+uint16_t uart1_availableForWrite(void)
+{
+    return (UART_TX1_BUFFER_SIZE - ( (UART_TX1_BUFFER_SIZE + UART1_TxHead - UART1_TxTail) & UART_TX1_BUFFER_MASK ) );
+} /* uart1_availableForWrite*/
 
 /* Allow UART1 to be used as a stream for printf, scanf, etc... */
 static int uartstream1_putchar(char c, FILE *stream);
@@ -863,14 +898,28 @@ void uart2_putc(uint8_t data)
 
     /* enable UDRE interrupt */
     UART2_CONTROL    |= _BV(UART2_UDRIE);
-
 } /* uart2_putc */
+
+/* Flush bytes from the transmit buffer  */
+void uart2_flush(void)
+{
+    ATOMIC_BLOCK ( ATOMIC_RESTORESTATE ) // may not be needed
+    {
+        UART2_TxHead = UART2_TxTail;
+    }
+} /* uart2_flush */
 
 /* number of bytes waiting in the receive buffer */
 uint16_t uart2_available(void)
 {
     return (UART_RX2_BUFFER_SIZE + UART2_RxHead - UART2_RxTail) & UART_RX2_BUFFER_MASK;
 } /* uart2_available */
+
+/* number of bytes available for writing to the transmit buffer without blocking */
+uint16_t uart2_availableForWrite(void)
+{
+    return (UART_TX2_BUFFER_SIZE - ( (UART_TX2_BUFFER_SIZE + UART2_TxHead - UART2_TxTail) & UART_TX2_BUFFER_MASK ) );
+} /* uart2_availableForWrite*/
 
 /* Allow UART2 to be used as a stream for printf, scanf, etc... */
 static int uartstream2_putchar(char c, FILE *stream);
@@ -1044,11 +1093,26 @@ void uart3_putc(uint8_t data)
     UART3_CONTROL    |= _BV(UART3_UDRIE);
 } /* uart3_putc */
 
+/* Flush bytes from the transmit buffer  */
+void uart3_flush(void)
+{
+    ATOMIC_BLOCK ( ATOMIC_RESTORESTATE ) // may not be needed
+    {
+        UART3_TxHead = UART3_TxTail;
+    }
+} /* uart3_flush */
+
 /* number of bytes waiting in the receive buffer */
 uint16_t uart3_available(void)
 {
     return (UART_RX3_BUFFER_SIZE + UART3_RxHead - UART3_RxTail) & UART_RX3_BUFFER_MASK;
 } /* uart3_available */
+
+/* number of bytes available for writing to the transmit buffer without blocking */
+uint16_t uart3_availableForWrite(void)
+{
+    return (UART_TX3_BUFFER_SIZE - ( (UART_TX3_BUFFER_SIZE + UART3_TxHead - UART3_TxTail) & UART_TX3_BUFFER_MASK ) );
+} /* uart3_availableForWrite*/
 
 /* Allow UART3 to be used as a stream for printf, scanf, etc... */
 static int uartstream3_putchar(char c, FILE *stream);

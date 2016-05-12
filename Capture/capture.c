@@ -51,13 +51,13 @@ void Capture(void)
         {
             event_pair = 1;
         }
-        else if (arg_count == 1)
-        {
-            event_pair = atoi(arg[0]);
+        else if (arg_count == 2)
+        { // arg[0] should say icp1, other mcu's may have icp3...
+            event_pair = atoi(arg[1]);
         }
         else
         {
-            printf_P(PSTR("{\"err\":\"IcpOneArgOnly\"}\r\n"));
+            printf_P(PSTR("{\"err\":\"IcpArg_icp1,%s\"}\r\n"),arg[0]);
             initCommandBuffer();   
         }
         

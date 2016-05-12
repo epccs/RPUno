@@ -1,4 +1,4 @@
-# AVR  Interrupt-Driven UART with stdio redirect
+# Makefile based Blink
 
 ## Overview
 

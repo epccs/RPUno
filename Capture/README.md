@@ -24,7 +24,7 @@ Count of ICP1 (ATmega328 pin PB0. Uno pin 8) event captures.
 
 JSON {"icp1":{"count":"4294967295"}}
 
-## /0/capture? [icp1[,1 thru 15]] 
+## /0/capture? [icp1,1..15] 
 
 return ICP1 timer count delta(s) as a pair of low and high counts from the buffered capture events. These can be used to find the duty or period. The index value is the count of event captures.
 

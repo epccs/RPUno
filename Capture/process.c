@@ -39,7 +39,7 @@ void ProcessCmd()
     {
         Count();
     }
-    if ( (strcmp_P( command, PSTR("/capture?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
+    if ( (strcmp_P( command, PSTR("/capture?")) == 0) && ( (arg_count == 0 ) || ( (arg_count == 2) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
     {
         Capture();
     }

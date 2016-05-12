@@ -32,7 +32,7 @@ volatile uint8_t event_Byt2[EVENT_BUFF_SIZE];
 volatile uint8_t event_Byt3[EVENT_BUFF_SIZE];
 volatile uint8_t event_rising[EVENT_BUFF_SIZE];
 volatile uint8_t icp1_head; 
-volatile uint32_t icp1_event_count;     // was  chCount
+volatile uint32_t icp1_event_count; 
 volatile uint32_t icp1_rising_event_count;
 volatile uint32_t icp1_falling_event_count;
 volatile uint8_t rising; 
@@ -105,10 +105,10 @@ void initIcp1(void)
     //   1    0    0  :   /256  prescaler
     //   1    0    1  :   /1024 prescaler */
     TCCR1A = 0;
-    TCCR1B = (0<<ICNC1) | (0<<ICES1) | (1<<CS10);
+    TCCR1B = (0<<ICNC1) | (1<<CS10);
     TCCR1C = 0;
 
-    // initialize to catch Falling Edge
+    // initialize to catch Falling Edge (this line is also used in ISR to swap from rising to falling edge)
     { TCCR1B &= ~(1<<ICES1); TIFR1 |= (1<<ICF1); rising = 0; }
 
     // Interrupt setup

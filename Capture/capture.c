@@ -21,7 +21,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include <stdlib.h> 
 #include "../lib/parse.h"
 #include "../lib/icp1.h"
-#include "duty.h"
+#include "capture.h"
 
 static uint32_t low;
 static uint32_t high;
@@ -33,7 +33,7 @@ static uint8_t cpy_event_Byt2[EVENT_BUFF_SIZE];
 static uint8_t cpy_event_Byt3[EVENT_BUFF_SIZE];
 static uint8_t cpy_event_rising[EVENT_BUFF_SIZE];
 static uint8_t cpy_icp1_head;
-static uint8_t cpy_icp1_event_count;
+static uint32_t cpy_icp1_event_count;
 
 static int event_pair;
 static int event_pair_output;
@@ -43,7 +43,7 @@ static int event_pair_output;
     High value is the counts between a rising edge and falling edge.
     The ratio may be used to determine the duty.
     No artuments needed*/
-void Duty(void)
+void Capture(void)
 {
     if ( (command_done == 10) )
     {
@@ -57,13 +57,13 @@ void Duty(void)
         }
         else
         {
-            printf_P(PSTR("{\"err\":\"DutyOneArgOnly\"}\r\n"));
+            printf_P(PSTR("{\"err\":\"IcpOneArgOnly\"}\r\n"));
             initCommandBuffer();   
         }
         
         if ((event_pair < 1) || (event_pair >= (EVENT_BUFF_SIZE/2)) )
         {
-            printf_P(PSTR("{\"err\":\"DutyMaxArg%d\"}\r\n"),EVENT_BUFF_SIZE/2);
+            printf_P(PSTR("{\"err\":\"IcpMaxArg%d\"}\r\n"),(EVENT_BUFF_SIZE/2)-1);
             initCommandBuffer();
         }
         else
@@ -95,7 +95,7 @@ void Duty(void)
             }
             else
             {
-                printf_P(PSTR("{\"err\":\"DutyEvntCntSmall\"}\r\n"));
+                printf_P(PSTR("{\"err\":\"IcpEvntCnt@%d\"}\r\n"), icp1_event_count);
                 initCommandBuffer();
             }
         }
@@ -161,7 +161,7 @@ void Duty(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"DutyCmdDoneWTF\"}\r\n"));
+        printf_P(PSTR("{\"err\":\"IcpCmdDoneWTF\"}\r\n"));
         initCommandBuffer();
     }
 }

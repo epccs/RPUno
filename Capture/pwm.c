@@ -23,38 +23,73 @@ http://www.gnu.org/licenses/gpl-2.0.html
 
 /* use ../lib/timers.c to initTimers().
    Timer2 is then in Phase-correct PWM mode, the timer goes up from 0 to 255 and down to 0. 
-   The duty can be controled from 0 to 255 by setting the OCR2A register.
+   The duty can be controled from 0 to 255 by setting the OCR2A or OCR2B register.
    And the output frequency is 16 MHz / 64 / 255 / 2 = 490.196Hz   */
 void Pwm(void)
 {
     int duty;
     
-    // set Data Direction Register (its what pinMode(11, OUTPUT)  more or less does)
+    if (arg_count == 2)
+    {
+        duty = atoi(arg[1]);
+        if ( (command_done == 10) && (duty >=0) && (duty <= 255) )
+        {
+            if (strcmp_P( arg[0], PSTR("oc2a")) == 0)
+            {
+                // set Data Direction Register (its what pinMode(11, OUTPUT) does more or less does)
 #if defined (__AVR_ATmega328P__) || defined (__AVR_ATmega328__)
-    if ( !(DDRB & _BV(PB3)) ) // if bit PB3 is set then it is already an output 
-    {
-        DDRB |= _BV(PB3);
-    }
-    
-    // connect PB3 pin to OC2A output (pwm) from timer 2, channel A set in Clear on Compare Match mode.
-    if ( !(TCCR2A & _BV(COM2A1)) ) 
-    {
-        TCCR2A |= _BV(COM2A1);
-    }
+        
+                if ( !(DDRB & _BV(PB3)) ) // if bit PB3 is set then it is already an output 
+                {
+                    DDRB |= _BV(PB3);
+                }
+
+                // connect PB3 pin to OC2A output (pwm) from timer 2, channel A set in Clear on Compare Match mode.
+                if ( !(TCCR2A & _BV(COM2A1)) ) 
+                {
+                    TCCR2A |= _BV(COM2A1);
+                }
 #else
 #   error mega328[p] has OC2A on PB3, check Datasheet for your mcu and then fix this file
 #endif
-    
-    duty = atoi(arg[0]);
-    if ( (command_done == 10) && (duty >=0) && (duty <= 255) )
-    {
-        OCR2A = (uint8_t)(duty & 0xFF);
-        printf_P(PSTR("{\"pwm\":{\"duty\":\"%d\"}}\r\n"),OCR2A);
-        initCommandBuffer();
+                
+                OCR2A = (uint8_t)(duty & 0xFF);
+                printf_P(PSTR("{\"pwm\":{\"OCR2A\":\"%d\"}}\r\n"),OCR2A);
+                initCommandBuffer();
+            }
+            else if (strcmp_P( arg[0], PSTR("oc2b")) == 0)
+            {
+                // set Data Direction Register (its what pinMode(3, OUTPUT) does more or less does)
+#if defined (__AVR_ATmega328P__) || defined (__AVR_ATmega328__)
+        
+                if ( !(DDRD & _BV(PD3)) ) // if bit PD3 is set then it is already an output 
+                {
+                    DDRD |= _BV(PD3);
+                }
+
+                // connect PD3 pin to OC2B output (pwm) from timer 2, channel A set in Clear on Compare Match mode.
+                if ( !(TCCR2A & _BV(COM2B1)) ) 
+                {
+                    TCCR2A |= _BV(COM2B1);
+                }
+#else
+#   error mega328[p] has OC2B on PD3, check Datasheet for your mcu and then fix this file
+#endif
+                
+                OCR2B = (uint8_t)(duty & 0xFF);
+                printf_P(PSTR("{\"pwm\":{\"OCR2B\":\"%d\"}}\r\n"),OCR2B);
+                initCommandBuffer();
+            }
+        }
+        else
+        {
+            printf_P(PSTR("{\"err\":\"pwmRange_%d\"}\r\n"),duty);
+            initCommandBuffer();
+        }
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"pwmRange_%d\"}\r\n"),duty);
+        printf_P(PSTR("{\"err\":\"pwmNeed2Arg\"}\r\n"));
         initCommandBuffer();
     }
 }

@@ -6,7 +6,7 @@ OBJECTS = main.o \
 	id.o \
 	pwm.o \
 	count.o \
-	duty.o \
+	capture.o \
 	$(LIBDIR)/timers.o \
 	$(LIBDIR)/uart.o \
 	$(LIBDIR)/adc.o \

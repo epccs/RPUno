@@ -18,20 +18,20 @@ Commands are interactive over the serial interface at 115200 baud rate. The echo
 
 identify 
 
-## /0/count?
+## /0/count? [icp1]
 
-event count on ICP1 (Uno pin 8). 
+Count of ICP1 (ATmega328 pin PB0. Uno pin 8) event captures. 
 
 JSON {"icp1":{"count":"4294967295"}}
 
-## /0/duty? [1 thru 15] 
+## /0/capture? [icp1[,1 thru 15]] 
 
-return ICP1 timer count delta(s) as a pair of low and high counts from the buffered capture events. These can be used to find the duty or period. The index value is the event count.
+return ICP1 timer count delta(s) as a pair of low and high counts from the buffered capture events. These can be used to find the duty or period. The index value is the count of event captures.
 
 JSON {"icp1":{"10000":{"low":"3001","high":"2999"}[,"9999":{"low":"3002","high":"2998"}[,..."9986":{"low":"30016","high":"2984"}]]}}
     
 The JSON can be turned into a CSV with the web tool at https://json-csv.com/
 
-## pwm [3 thru 252]
+## pwm oc2a|oc2b,0..255
 
-pulse width modulation using OC2A (B3, or pin 11) can be used to feed the ICP1 input. Note that  timer2 is use with OC2A since it is not needed for ICP1, timer1 is needed for use with ICP1.
+Pulse width modulation using OC2A (ATmega328 pin PB3. Uno pin 11) or OC2B (ATmega328 pin PD3. Uno pin 3) can be used to feed the ICP1 input. Note that timer2 is used with OC2[A|B], while timer1 is needed for ICP1.

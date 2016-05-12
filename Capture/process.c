@@ -23,7 +23,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "id.h"
 #include "pwm.h"
 #include "count.h"
-#include "duty.h"
+#include "capture.h"
 
 void ProcessCmd()
 { 
@@ -31,16 +31,16 @@ void ProcessCmd()
     {
         Id();
     }
-    if ( (strcmp_P( command, PSTR("/pwm")) == 0) && (arg_count == 1) )
+    if ( (strcmp_P( command, PSTR("/pwm")) == 0) )
     {
         Pwm();
     }
-    if ( (strcmp_P( command, PSTR("/count?")) == 0) && (arg_count == 0) )
+    if ( (strcmp_P( command, PSTR("/count?")) == 0) &&  ( (arg_count == 0) || ( (arg_count == 1) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
     {
         Count();
     }
-    if ( (strcmp_P( command, PSTR("/duty?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
+    if ( (strcmp_P( command, PSTR("/capture?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
     {
-        Duty();
+        Capture();
     }
 }

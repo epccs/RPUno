@@ -1,5 +1,5 @@
 /*
-duty is part of Capture, it returns the ICP1 timing counts for the high and low signal state, 
+capture is part of Capture, it returns the ICP1 timing counts for the high and low signal state, 
 Copyright (C) 2016 Ronald Sutherland
 
 This program is free software; you can redistribute it and/or

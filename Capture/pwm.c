@@ -67,7 +67,7 @@ void Pwm(void)
                     DDRD |= _BV(PD3);
                 }
 
-                // connect PD3 pin to OC2B output (pwm) from timer 2, channel A set in Clear on Compare Match mode.
+                // connect PD3 pin to OC2B output (pwm) from timer 2, channel B set in Clear on Compare Match mode.
                 if ( !(TCCR2A & _BV(COM2B1)) ) 
                 {
                     TCCR2A |= _BV(COM2B1);

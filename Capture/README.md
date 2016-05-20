@@ -12,7 +12,7 @@ Makefile based. Without the extras to increase transparency. The tools work in t
 
 # Commands
 
-Commands are interactive over the serial interface at 115200 baud rate. The echo will start after second charactor of a new line line. 
+Commands are interactive over the serial interface at 115200 baud rate. The echo will start after second charactor of a new line. 
 
 ## /0/id? [name|desc|avr-gcc]
 
@@ -32,6 +32,6 @@ JSON {"icp1":{"10000":{"low":"3001","high":"2999"}[,"9999":{"low":"3002","high":
     
 The JSON can be turned into a CSV with the web tool at https://json-csv.com/
 
-## pwm oc2a|oc2b,0..255
+## /0/pwm oc2a|oc2b,0..255
 
 Pulse width modulation using OC2A (ATmega328 pin PB3. Uno pin 11) or OC2B (ATmega328 pin PD3. Uno pin 3) can be used to feed the ICP1 input. Note that timer2 is used with OC2[A|B], while timer1 is needed for ICP1.

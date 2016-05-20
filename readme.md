@@ -11,8 +11,4 @@ The Board is an ATmega328p with an LT3652 solar charge controller and Arduino Un
 
 [RPUno](http://epccs.org/indexes/Board/RPUno/) Board development and hardware.
 
-This repository is a mix of stuff for Arduino IDE and Makefile. Makefile setup <http://epccs.org/indexes/Document/DvlpNotes/LinuxBoxCrossCompiler.html>
-
-When I start to learn/relearn something I get preachy about it, and so... Makefiles are helpful when projects grow beyond what is reasonable in a single file. I could say something like 400 lines is the max, but it is really a matter of when I am having trouble keeping a clear view of all the workings in the file. 
-
-<http://www.gamedev.net/page/resources/_/technical/general-programming/organizing-code-files-in-c-and-c-r1798>
+This repository has some Arduino.cc IDE projects and some Makefile projects. Makefile setup <http://epccs.org/indexes/Document/DvlpNotes/LinuxBoxCrossCompiler.html>

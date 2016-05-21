@@ -21,7 +21,11 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include <stdlib.h> 
 #include "../lib/parse.h"
 #include "../lib/icp1.h"
+#include "../lib/timers.h"
 #include "capture.h"
+
+#define SERIAL_PRINT_DELAY_SEC 10
+static unsigned long serial_print_started_at;
 
 static uint32_t low;
 static uint32_t high;
@@ -89,8 +93,9 @@ void Capture(void)
                     }
                 }
                 
-                // print in steps otherwise the serial buffer will fill and block the program from running
-                printf_P(PSTR("{\"icp1\":{"));
+                // used to delay serial printing
+                serial_print_started_at = millis();
+                
                 command_done = 11;
             }
             else
@@ -102,14 +107,10 @@ void Capture(void)
     }
     else if ( (command_done == 11) )
     { // use the event_count for indexing the time stamps
-        printf_P(PSTR("\"%lu\":{"),(cpy_icp1_event_count - 2*(event_pair_output) ) );
+        printf_P(PSTR("{\"icp1\":{\"count\":\"%lu\","),(cpy_icp1_event_count - 2*(event_pair_output) ) );
         command_done = 12;
     }
-    
-    // event_pair_output added
-    // I think it needs to offset the cpy_icp1_head value (by 2x) to find the low and high counts
-    
-    
+
     else if ( (command_done == 12) )
     {
         // cast to int to use two's complement math then cast back into a uint8_t and mask to the buffer size.
@@ -148,15 +149,22 @@ void Capture(void)
     }
     else if ( (command_done == 13) )
     {
+        printf_P(PSTR("\"high\":\"%lu\"}}\r\n"),high);
         if ( (++event_pair_output) >= event_pair) 
         {
-            printf_P(PSTR("\"high\":\"%lu\"}}}\r\n"),high);
-            initCommandBuffer();
+            command_done = 14;
         }
         else
         {
-            printf_P(PSTR("\"high\":\"%lu\"},"),high);
             command_done = 11;
+        }
+    }
+    else if ( (command_done == 14) )
+    { // delay between JSON printing
+        unsigned long kRuntime= millis() - serial_print_started_at;
+        if ((kRuntime) > ((unsigned long)SERIAL_PRINT_DELAY_SEC * 1000))
+        {
+            command_done = 10; /* This keeps looping the output forever (until a Rx char anyway) */
         }
     }
     else

@@ -47,7 +47,7 @@ $(TARGET).hex: $(TARGET).elf
 ## stk500v1 is for Arduino as ISP (e.g. it is an example in the Arduino.cc IDE 1.6.7+)
 ## lock is from optiboot's Makefile.isp, If I understand it then overwriting an existing bootloader requires two steps
 fuse: 
-	avrdude -v -p $(MCU) -c stk500v1 -P $(ISP_PORT) -b 19200 -U lock:w:0x3f:m -U lfuse:w:0xFF:m -U hfuse:w:0xDE:m -U efuse:w:0xFD:m
+	avrdude -v -p $(MCU) -c stk500v1 -P $(ISP_PORT) -b 19200 -e -U lock:w:0x3f:m -U lfuse:w:0xFF:m -U hfuse:w:0xDE:m -U efuse:w:0xFD:m
 
 ## 328p can lock the bootloader section, which is a good idea even if it is not used
 isp: $(TARGET).hex

@@ -20,14 +20,14 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include <stdio.h>
 #include "../lib/parse.h"
 #include "process.h"
-#include "id.h"
+#include "../Uart/id.h"
 #include "analog.h"
 
 void ProcessCmd()
 { 
     if ( (strcmp_P( command, PSTR("/id?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
     {
-        Id();
+        Id("Adc");
     }
     if ( (strcmp_P( command, PSTR("/analog?")) == 0) && ( (arg_count >= 1 ) || (arg_count <= 5) ) )
     {

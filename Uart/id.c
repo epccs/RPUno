@@ -1,5 +1,5 @@
 /*
-id is part of Capture, it uses a command line and optinal arguemnt to provide device info, 
+id is part of Adc, it uses a command line and optinal arguemnt to provide device info, 
 Copyright (C) 2016 Ronald Sutherland
 
 This program is free software; you can redistribute it and/or
@@ -21,13 +21,13 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/parse.h"
 #include "id.h"
 
-void Id(void)
+void Id(char name[])
 { 
     // /id? name 
     // /id?
     if ( (command_done == 10) && ( (arg_count == 0) || ( (arg_count == 1) && (strcmp_P( arg[0], PSTR("name")) == 0) ) ) )
     {
-        printf_P(PSTR("{\"id\":{\"name\":\"Capture\"}}\r\n"));
+        printf_P(PSTR("{\"id\":{\"name\":\"%s\"}}\r\n"), name);
         initCommandBuffer();
     }
     // /id? desc

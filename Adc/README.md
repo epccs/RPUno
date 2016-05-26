@@ -114,9 +114,7 @@ avrdude done.  Thank you.
 
 ``` 
 
-Now connect with picocom (or ilk). Note I am often at another 
-computer doing this through SSH. The Samba folder is for
-editing the files from Windows.
+Now connect with picocom (or ilk). Note I am often at another computer doing this through SSH. The Samba folder is for editing the files from Windows.
 
 
 ``` 

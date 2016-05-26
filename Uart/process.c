@@ -1,5 +1,5 @@
 /*
-process is part of Capture, it is used to select command functions from the command line
+process is part of Uart, it is used to select command functions from the command line
 Copyright (C) 2016 Ronald Sutherland
 
 This program is free software; you can redistribute it and/or
@@ -20,27 +20,14 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include <stdio.h>
 #include "../lib/parse.h"
 #include "process.h"
-#include "../Uart/id.h"
-#include "pwm.h"
-#include "count.h"
-#include "capture.h"
+#include "id.h"
+
+
 
 void ProcessCmd()
 { 
     if ( (strcmp_P( command, PSTR("/id?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
     {
-        Id("Capture");
-    }
-    if ( (strcmp_P( command, PSTR("/pwm")) == 0) )
-    {
-        Pwm();
-    }
-    if ( (strcmp_P( command, PSTR("/count?")) == 0) &&  ( (arg_count == 0) || ( (arg_count == 1) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
-    {
-        Count();
-    }
-    if ( (strcmp_P( command, PSTR("/capture?")) == 0) && ( (arg_count == 0 ) || ( (arg_count == 2) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
-    {
-        Capture();
+        Id("Uart");
     }
 }

@@ -5,7 +5,7 @@ From <http://epccs.org/hg/open/RPUno>
 
 ![Status](http://epccs.org/indexes/Board/RPUno/status_icon.png "RPUno Status")
 
-The Board is an ATmega328p with an LT3652 solar charge controller and Arduino Uno R3 pin compatible header. It does not have USB.
+The Board is an ATmega328p[b] with an LT3652 solar charge controller and Arduino Uno R3 pin compatible header. It does not have USB.
 
 ![Schematic](http://epccs.org/indexes/Board/RPUno/Documents/14140,Schematic.png "RPUno Schematic")
 

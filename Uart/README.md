@@ -2,18 +2,38 @@
 
 ## Overview
 
-Demonstration of stdio to interrupt-driven UART redirect. 
+Uart is an interactive command line program that demonstrates stdio redirect of an interrupt-driven UART. 
 
 Referance ATmega328 datasheet 20.0 USART0 Universal Synchronous and Asynchronous serial Receiver and Transmitter.
 
-Toolchain setup http://epccs.org/indexes/Document/DvlpNotes/LinuxBoxCrossCompiler.html
+For how I setup my Makefile toolchain <http://epccs.org/indexes/Document/DvlpNotes/LinuxBoxCrossCompiler.html>.
 
-Makefile based. Without the extras to increase transparency. The tools work in the way they were designed. 
+Minimalized Interrupt-driven UART code based in part on <https://github.com/hwstar/avr-uart>, with added streams based in part on <https://github.com/andygock/avr-uart>
 
-Minimalized Interrupt-driven UART code from <https://github.com/hwstar/avr-uart>, and added streams from <https://github.com/andygock/avr-uart>
+With optiboot installed run 'make bootload' and it will compile and then flash the MCU the same way Arduino does, but without any Arduino stuff.
 
-# /0/id? [name|desc|avr-gcc]
+``` 
+rsutherland@conversion:~/Samba/RPUno/Uart$ make bootload
+avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o main.o main.c
+...
+avrdude done.  Thank you.
+``` 
 
-Just somthing to see it gives a JSON reply.
+Now connect with picocom (or ilk). Note I am often at another computer doing this through SSH. The Samba folder is for editing the files from Windows.
 
-Type /0 to see an echo, then it is somewhat keyboard friendly.
+``` 
+#exit is C-a, C-x
+picocom -b 115200 /dev/ttyUSB0
+``` 
+
+# Commands
+
+Commands are interactive over the serial interface at 115200 baud rate. The echo will start after second charactor of a new line. 
+
+## /0/id? [name|desc|avr-gcc]
+
+identify 
+
+``` 
+/0/id?
+{"id":{"name":"Adc"}}.

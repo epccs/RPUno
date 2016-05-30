@@ -43,4 +43,8 @@ void ProcessCmd()
     {
         Capture();
     }
+    if ( (strcmp_P( command, PSTR("/event?")) == 0) && ( (arg_count == 0 ) || ( (arg_count == 2) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
+    {
+        Event();
+    }
 }

@@ -36,12 +36,15 @@ ISR(ADC_vect){
     {
         adc_channel = 0;
     }
-    // select next channel to do conversion on
-    ADMUX &= ~(1<<MUX3) & ~(1<<MUX2) & ~(1<<MUX1) & ~(1<<MUX0);
-    ADMUX = (((ADMUX & ~(1<<REFS1)) | (1<<REFS0)) & ~(1<<ADLAR)) + adc_channel;
+    else
+    {
+        // select next channel to do conversion on
+        ADMUX &= ~(1<<MUX3) & ~(1<<MUX2) & ~(1<<MUX1) & ~(1<<MUX0);
+        ADMUX = (((ADMUX & ~(1<<REFS1)) | (1<<REFS0)) & ~(1<<ADLAR)) + adc_channel;
 
-    // set ADSC in ADCSRA, ADC Start Conversion
-    ADCSRA |= (1<<ADSC);
+        // set ADSC in ADCSRA, ADC Start Conversion
+        ADCSRA |= (1<<ADSC);
+    }
 }
 
 
@@ -94,13 +97,8 @@ void init_ADC_single_conversion(uint8_t reference)
 }
 
 
-/* This changes the ADC to Auto Trigger mode, so it will continusly take readings 
-    Why? AnalogRead() starts a single conversion and then blocks the program for 
-    over 1600 clocks as it waits for the reading, which will break icp1.c and may 
-    cause uart.c some issues. 
-
-    Once AutoConversion is running the Analog value is accessed by reading the adc[] 
-    array which does not block, although the reading could be 14,000 clock counts old.*/
+/* This changes the ADC to Auto Trigger mode. It will take readings on each 
+    channel and hold them in an array. The array value is accessed by reading from adc[]  */
 void enable_ADC_auto_conversion()
 {
     adc_channel = 0;

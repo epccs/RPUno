@@ -48,9 +48,13 @@ exit is C-a, C-x
 #include "../lib/timers.h"
 #include "../lib/adc.h"
 
+// running the ADC burns power, which can be saved by delaying its use
+#define ADC_DELAY_MILSEC 10000
+static unsigned long adc_started_at;
+
 
 int main(void) 
-{    
+{
     // Initialize Timers, ADC, and clear bootloader, Arduino does these with init() in wiring.c 
     initTimers(); //Timer0 Fast PWM mode, Timer1 & Timer2 Phase Correct PWM mode.
     init_ADC_single_conversion(EXTERNAL_AVCC); // warning AREF should only have a bypass cap
@@ -58,8 +62,10 @@ int main(void)
     
     // setup()
 
-    // put ADC in Auto Trigger mode and clear the memory array used to hold each channels conversion
+    // put ADC in Auto Trigger mode and fetch any array of channels
     enable_ADC_auto_conversion();
+    adc_started_at = millis();
+    
     
     /* Initialize UART, it returns a pointer to FILE so redirect of stdin and stdout works*/
     stdout = stdin = uartstream0_init(BAUD);
@@ -72,6 +78,8 @@ int main(void)
     // loop() 
     while(1) /* I am tyring to use non-blocking code */
     { 
+        unsigned long kRuntime;
+        
         // check if character is available to assemble a command, e.g. non-blocking
         if ( (!command_done) && uart0_available() ) // command_done is an extern from parse.h
         {
@@ -91,6 +99,14 @@ int main(void)
             uart0_flush(); 
             initCommandBuffer();
         }
+        
+        // delay between ADC reading
+        kRuntime= millis() - adc_started_at;
+        if ((kRuntime) > ((unsigned long)ADC_DELAY_MILSEC))
+        {
+            enable_ADC_auto_conversion();
+            adc_started_at = millis();
+        } 
         
         // finish echo of the command line befor starting a reply (or the next part of a reply)
         if ( command_done && (uart0_availableForWrite() == UART_TX0_BUFFER_SIZE) )

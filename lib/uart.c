@@ -552,8 +552,6 @@ FILE *uartstream0_init(uint32_t baudrate)
 
 static int uartstream0_putchar(char c, FILE *stream)
 {
-	if (c == '\n') 
-		uartstream0_putchar('\r', stream);
 	uart0_putc((uint8_t) c);
 	return 0;
 }
@@ -742,8 +740,6 @@ FILE *uartstream1_init(uint32_t baudrate)
 
 static int uartstream1_putchar(char c, FILE *stream)
 {
-	if (c == '\n') 
-		uartstream1_putchar('\r', stream);
 	uart1_putc((uint8_t) c);
 	return 0;
 }
@@ -937,8 +933,6 @@ FILE *uartstream2_init(uint32_t baudrate)
 
 static int uartstream2_putchar(char c, FILE *stream)
 {
-	if (c == '\n') 
-		uartstream2_putchar('\r', stream);
 	uart2_putc((uint8_t) c);
 	return 0;
 }
@@ -1130,8 +1124,6 @@ FILE *uartstream3_init(uint32_t baudrate)
 
 static int uartstream3_putchar(char c, FILE *stream)
 {
-	if (c == '\n') 
-		uartstream1_putchar('\r', stream);
 	uart3_putc((uint8_t) c);
 	return 0;
 }

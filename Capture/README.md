@@ -166,6 +166,20 @@ return ICP1 timer delta(s) as a pair of low and high timing values from the buff
 {"icp1":{"count":"881003","low":"1735","high":"531"}}
 ```
 
+## /0/event? [icp1,1..31] 
+
+return ICP1 event timer values as a 32 bit unsign integer, which continuously rolls over.
+
+``` 
+/0/event? icp1,3
+{"icp1":{"count":"2124622","event":"2128443871","rising":"1"}}
+{"icp1":{"count":"2124621","event":"2128442275","rising":"0"}}
+{"icp1":{"count":"2124620","event":"2128441867","rising":"1"}}
+```
+
+Perhaps that is confusing. The event with a count of 2124620 had a rising edge and happened before the event with count 2124621 which had a falling edge. The difference of the event times is the number of clocks spent high (2128442275 - 2128441867 = 408). And the difference between the middle and most recent events is the number of clocks spent low (2128443871 - 2128442275 = 1596).
+
+
 ## /0/pwm oc2a|oc2b,0..255
 
 Pulse width modulation using OC2A (ATmega328 pin PB3. Uno pin 11) or OC2B (ATmega328 pin PD3. Uno pin 3) can be used to feed the ICP1 input. Note that timer2 is used with OC2[A|B], while timer1 is needed for ICP1.

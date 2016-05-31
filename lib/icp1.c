@@ -25,7 +25,6 @@
 #include <util/atomic.h>
 #include "icp1.h"
 
-volatile WORD_2_BYTE t1vc;
 volatile uint8_t event_Byt0[EVENT_BUFF_SIZE];
 volatile uint8_t event_Byt1[EVENT_BUFF_SIZE];
 volatile uint8_t event_Byt2[EVENT_BUFF_SIZE];
@@ -36,6 +35,9 @@ volatile uint32_t icp1_event_count;
 volatile uint32_t icp1_rising_event_count;
 volatile uint32_t icp1_falling_event_count;
 volatile uint8_t rising; 
+
+// timer 1 virtual counter
+volatile static WORD_2_BYTE t1vc;
 
 /* 
 Input Capture Unit 1 interrupt handler (Timing Pulse Interpolation)
@@ -85,7 +87,11 @@ ISR(TIMER1_CAPT_vect) {
     e.g. 2^32 clocks (about 4.3E9, thus will overflow after 4.3 minutes) */
 ISR(TIMER1_OVF_vect) 
 {
-  ++t1vc.word;
+	// copy to local variable so it can be stored in registers
+	// (volatile variables must be read from memory on every access)
+    uint16_t local = t1vc.word;
+    local++;
+    t1vc.word = local;
 }
 
 void initIcp1(void) 

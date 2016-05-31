@@ -25,7 +25,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/timers.h"
 #include "analog.h"
 
-#define SERIAL_PRINT_DELAY_MILSEC 100
+#define SERIAL_PRINT_DELAY_MILSEC 60000
 static unsigned long serial_print_started_at;
 
 static uint8_t adc_arg_index;

@@ -39,7 +39,7 @@ extern volatile uint8_t event_Byt3[EVENT_BUFF_SIZE];
 extern volatile uint8_t event_rising[EVENT_BUFF_SIZE];
 
 // head of icp1 buffer
-extern volatile uint8_t icp1_head; //was ring
+extern volatile uint8_t icp1_head;
 
 //used as bool to tell if a rising edge will cause capture event, false is falling edge
 extern volatile uint8_t rising;
@@ -51,8 +51,5 @@ extern volatile uint32_t icp1_falling_event_count;
 
 typedef union { uint16_t word; uint8_t byte[2]; } WORD_2_BYTE; 
 typedef union { uint32_t dword; uint16_t word[2]; } LONG_2_WORD;   
-
-// timer 1 virtual counter
-extern volatile WORD_2_BYTE t1vc;
-  
+ 
 #endif // Icp1_h

@@ -35,6 +35,7 @@ static uint8_t cpy_event_Byt0[EVENT_BUFF_SIZE];
 static uint8_t cpy_event_Byt1[EVENT_BUFF_SIZE];
 static uint8_t cpy_event_Byt2[EVENT_BUFF_SIZE];
 static uint8_t cpy_event_Byt3[EVENT_BUFF_SIZE];
+static uint8_t cpy_event_BytChk[EVENT_BUFF_SIZE];
 static uint8_t cpy_event_rising[EVENT_BUFF_SIZE];
 static uint8_t cpy_icp1_head;
 static uint32_t cpy_icp1_event_count;
@@ -81,23 +82,26 @@ void Capture(void)
             // buffer has enough readings
             if (icp1_event_count > ((event_pair * 2) +1) ) 
             { 
+                uint8_t num_of_events_needed=((event_pair * 2) +1);
+                
                 // copy at least enough events for the report
                 // cast to integers allows use of two's-complement math
-                cpy_icp1_head =(uint8_t)( (int8_t)(icp1_head) - (int8_t)((event_pair * 2)+2) ) & (EVENT_BUFF_MASK);
+                cpy_icp1_head =(uint8_t)( (int8_t)(icp1_head) - (int8_t)(num_of_events_needed+1) ) & (EVENT_BUFF_MASK);
                 
                 // now copy the event buffer, icp1_head may advance but when we catch up to it the copy is done
                 {
                     uint8_t i=0;
-                    while ((cpy_icp1_head != icp1_head) | (i < event) ) 
+                    while ((cpy_icp1_head != icp1_head) | (i < num_of_events_needed) ) 
                     {
                         cpy_icp1_head = (cpy_icp1_head +1 ) & (EVENT_BUFF_MASK);
                         cpy_event_Byt0[cpy_icp1_head] = event_Byt0[cpy_icp1_head];
                         cpy_event_Byt1[cpy_icp1_head] = event_Byt1[cpy_icp1_head];
                         cpy_event_Byt2[cpy_icp1_head] = event_Byt2[cpy_icp1_head];
                         cpy_event_Byt3[cpy_icp1_head] = event_Byt3[cpy_icp1_head];
+                        cpy_event_BytChk[cpy_icp1_head] = (cpy_event_Byt3[cpy_icp1_head]^ cpy_event_Byt2[cpy_icp1_head]^cpy_event_Byt1[cpy_icp1_head]^cpy_event_Byt0[cpy_icp1_head]);
                         cpy_event_rising[cpy_icp1_head] = event_rising[cpy_icp1_head];
                         cpy_icp1_event_count = icp1_event_count;
-                        if (i < event) i++;
+                        if (i < num_of_events_needed) i++;
                     }
                 }
                 
@@ -138,6 +142,27 @@ void Capture(void)
         period_event = (((uint32_t)cpy_event_Byt3[period_event_index]) <<24) + (((uint32_t)cpy_event_Byt2[period_event_index]) <<16) + \
                                 (((uint32_t)cpy_event_Byt1[period_event_index]) <<8) + ((uint32_t)cpy_event_Byt0[period_event_index]);
 
+        // check if a byte has changed
+        // somthing is going out of bounds and messing up the buffer copy
+        if ( (cpy_event_Byt3[high2low_event_index]^ cpy_event_Byt2[high2low_event_index]^cpy_event_Byt1[high2low_event_index]^cpy_event_Byt0[high2low_event_index]) != cpy_event_BytChk[high2low_event_index])
+        {
+            printf_P(PSTR("{\"err\":\"IcpChkByt@[%d]\"}\r\n"),high2low_event_index);
+            initCommandBuffer();  
+            return;
+        }
+        if ( (cpy_event_Byt3[low2high_event_index]^ cpy_event_Byt2[low2high_event_index]^cpy_event_Byt1[low2high_event_index]^cpy_event_Byt0[low2high_event_index]) != cpy_event_BytChk[low2high_event_index])
+        {
+            printf_P(PSTR("{\"err\":\"IcpChkByt@[%d]\"}\r\n"),low2high_event_index);
+            initCommandBuffer();  
+            return;
+        }
+        if ( (cpy_event_Byt3[period_event_index]^ cpy_event_Byt2[period_event_index]^cpy_event_Byt1[period_event_index]^cpy_event_Byt0[period_event_index]) != cpy_event_BytChk[period_event_index])
+        {
+            printf_P(PSTR("{\"err\":\"IcpChkByt@[%d]\"}\r\n"),period_event_index);
+            initCommandBuffer();  
+            return;
+        }
+        
         // Now find counts between events while ICP1 was low and then when it was high
         // cast to int causes two's complement math to be used which gives correct result through a roll over
         low = (uint32_t)((int32_t)high2low_event - (int32_t)low2high_event);

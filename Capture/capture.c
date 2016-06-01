@@ -24,7 +24,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/timers.h"
 #include "capture.h"
 
-#define SERIAL_PRINT_DELAY_MILSEC 1000
+#define SERIAL_PRINT_DELAY_MILSEC 60000
 static unsigned long serial_print_started_at;
 
 static uint32_t low;

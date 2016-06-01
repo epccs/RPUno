@@ -50,37 +50,51 @@ Double-Timing Pulse Interpolation (API 4.6) which uses a clock to time flow mete
 another clock to time volume events from a calibrated Prover (a volume measurement device) 
 during a calibration of a custody transfer flow meter (it can then be certified to that standard). */
 ISR(TIMER1_CAPT_vect) {
-    
-    // put the next timestamp onto the buffer
-    icp1_head++;
-    if (icp1_head >= EVENT_BUFF_SIZE) icp1_head = 0;
-    
-    event_Byt0[icp1_head] = ICR1L;   // timer1 low byte
-    event_Byt1[icp1_head] = ICR1H;   // timer1 high byte
-    
-    event_Byt2[icp1_head] = t1vc.byte[0];   // Virtual timer low byte
-    event_Byt3[icp1_head] = t1vc.byte[1];   // Virtual timer high byte
-
-    event_rising[icp1_head] = rising;
-    
-    // count all edges
-    icp1_event_count++;
-
-    // edge tracking: rising or falling
-    // ATmega328p datasheet said to clear ICF1 after edge direction change 
-    // setup to catch rising edge: TCCR1B |= (1<<ICES1); TIFR1 |= (1<<ICF1); rising = 1;
-    // setup to catch falling edge: TCCR1B &= ~(1<<ICES1); TIFR1 |= (1<<ICF1); rising = 0; 
-    // swap edge setup to catch the next edge
-    if (rising) 
-    { 
-        icp1_rising_event_count++;
-        TCCR1B &= ~(1<<ICES1); TIFR1 |= (1<<ICF1); rising = 0; 
-    }
-    else 
+	// copy the gloable volatile to a local variable so they are stored in registers
+	// (if the ISR uses the local stack it can fragment the dynamic memory allocation (heap and stack)
+    // of the normal flow and cause memory corruption)
+    uint8_t local_rising = rising;
     {
-        icp1_falling_event_count++;
-        TCCR1B |= (1<<ICES1); TIFR1 |= (1<<ICF1); rising = 1;
+        uint8_t buffer_head = icp1_head;
+        uint8_t t1vc_lb = t1vc.byte[0]; // load the virtual timer low byte into a register explicitly
+        uint8_t t1vc_hb = t1vc.byte[1]; // load the virtual timer high byte into a register explicitly
+        
+        // put the next timestamp onto the buffer
+        buffer_head++;
+        if (buffer_head >= EVENT_BUFF_SIZE) buffer_head = 0;
+        
+        event_Byt0[buffer_head] = ICR1L;   // timer1 low byte
+        event_Byt1[buffer_head] = ICR1H;   // timer1 high byte
+        
+        event_Byt2[buffer_head] = t1vc_lb;   // Virtual timer low byte
+        event_Byt3[buffer_head] = t1vc_hb;   // Virtual timer high byte
+        
+        event_rising[buffer_head] = local_rising;
+        icp1_head = buffer_head;
+    } // free up a few  registers
+    
+    {
+        uint32_t local_icp1_event_count = icp1_event_count;
+        
+        // count all edges
+        local_icp1_event_count++;
+
+        // edge tracking: rising or falling
+        // ATmega328p datasheet said to clear ICF1 after edge direction change 
+        // setup to catch rising edge: TCCR1B |= (1<<ICES1); TIFR1 |= (1<<ICF1); rising = 1;
+        // setup to catch falling edge: TCCR1B &= ~(1<<ICES1); TIFR1 |= (1<<ICF1); rising = 0; 
+        // swap edge setup to catch the next edge
+        if (local_rising) 
+        { 
+            TCCR1B &= ~(1<<ICES1); TIFR1 |= (1<<ICF1); local_rising = 0; 
+        }
+        else 
+        {
+            TCCR1B |= (1<<ICES1); TIFR1 |= (1<<ICF1); local_rising = 1;
+        }
+        icp1_event_count = local_icp1_event_count;
     }
+    rising = local_rising;
 }
 
 /* Virtual timer counts each Timer1 overflow.

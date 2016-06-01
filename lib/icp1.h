@@ -46,8 +46,6 @@ extern volatile uint8_t rising;
 
 // icp1 pulse count
 extern volatile uint32_t icp1_event_count;
-extern volatile uint32_t icp1_rising_event_count; 
-extern volatile uint32_t icp1_falling_event_count; 
 
 typedef union { uint16_t word; uint8_t byte[2]; } WORD_2_BYTE; 
 typedef union { uint32_t dword; uint16_t word[2]; } LONG_2_WORD;   

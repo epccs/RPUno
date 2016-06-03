@@ -36,7 +36,14 @@ extern volatile uint8_t event_Byt0[EVENT_BUFF_SIZE];
 extern volatile uint8_t event_Byt1[EVENT_BUFF_SIZE];
 extern volatile uint8_t event_Byt2[EVENT_BUFF_SIZE];
 extern volatile uint8_t event_Byt3[EVENT_BUFF_SIZE];
-extern volatile uint8_t event_rising[EVENT_BUFF_SIZE];
+extern volatile uint8_t event_BytChk[EVENT_BUFF_SIZE];
+
+// status bit zero tells if event is a rising/falling edge or how the capture value is likly damaged 
+#define RISING 0
+#define TOV1_WHILE_IN_CAPT_ISR 1
+#define ICF1_WHILE_IN_OVF_ISR 2
+#define BYTCHK_ERROR_AT_USR_CPY 3
+extern volatile uint8_t event_status[EVENT_BUFF_SIZE];
 
 // head of icp1 buffer
 extern volatile uint8_t icp1_head;

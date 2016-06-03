@@ -191,12 +191,12 @@ Pulse width modulation using OC2A (ATmega328 pin PB3. Uno pin 11) or OC2B (ATmeg
 
 # Notes
 
-## Interrupts
+## Corrupted Capture
 
-Something is going on that I don't fully understand. From time to time the captured data is corrupted. It is normally a capture value that is huge like the high order byte was changed. Some clues include the corruption is too much to be from blocking (e.g. it is over 240 Sec while the output keeps spitting out data as though nothing had happened). Also, the pulse count keeps the correct value after the corruption (e.g. during the serial dump). 
+From time to time the captured data is corrupted. I have added byte checks at the time of capture and the time of copying the captures to a buffer for reporting. This was done to check if the memory gets corrupted in place but that does not seem to be the case. 
 
-Before dumping the capture a copy is made of all four 32 byte buffers. During the copy, I have added a XOR byte to check if the data gets changed between the copy process and the serial dump (which takes a long time). Nothing has tripped the XOR test, but it changed how the corruption was showing up. 
+The corruption seems to be prssent at the time the ISR records the data.
 
-Dean Camron has an excellent AVR related How-To guide, about Interrupts. I have gotten a lot from it, e.g. I tried using an atomic block to protect the data copy and another usage, however, that did not aid, and may have increased the corruption rate.
+I have now added some test that check if the overflow flag is set while in the capture ISR and if the capture flag is set while in the overflow ISR, the flags are not yet getting reported (somthing is still broken) but I think this is the cause of the problem.
 
-I think the corruption happens when an ISR fiddles with memory in a place the compiler thought was safe at the time the ISR was compiled. The timers.c file has a ISR(TIMER0_OVF_vect) function that is the same in Wiring's init() function from Arduino. Inside it they make a point of copying the volatile to a local before using the values. The comments do not make sense, why would volatiles need to be put in local variables in an ISR. 
+

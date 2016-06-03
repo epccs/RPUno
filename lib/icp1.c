@@ -16,7 +16,7 @@
     License along with this library; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-    Capture can skip pulses if the next event is about 300 counts (or less), 
+    Capture can skip pulses if the next event is less then about 300 counts, 
     e.g. about 19% duty at 10kHz or 1.9% duty at 1kHz (assuming a 16MHz MCU).
     
     http://forum.arduino.cc/index.php?topic=260172.0
@@ -29,7 +29,8 @@ volatile uint8_t event_Byt0[EVENT_BUFF_SIZE];
 volatile uint8_t event_Byt1[EVENT_BUFF_SIZE];
 volatile uint8_t event_Byt2[EVENT_BUFF_SIZE];
 volatile uint8_t event_Byt3[EVENT_BUFF_SIZE];
-volatile uint8_t event_rising[EVENT_BUFF_SIZE];
+volatile uint8_t event_BytChk[EVENT_BUFF_SIZE];
+volatile uint8_t event_status[EVENT_BUFF_SIZE];
 volatile uint8_t icp1_head; 
 volatile uint32_t icp1_event_count; 
 volatile uint32_t icp1_rising_event_count;
@@ -38,6 +39,7 @@ volatile uint8_t rising;
 
 // timer 1 virtual counter
 volatile static WORD_2_BYTE t1vc;
+volatile static uint8_t icf1_flag_warning;
 
 /* 
 Input Capture Unit 1 interrupt handler (Timing Pulse Interpolation)
@@ -51,25 +53,35 @@ another clock to time volume events from a calibrated Prover (a volume measureme
 during a calibration of a custody transfer flow meter (it can then be certified to that standard). */
 ISR(TIMER1_CAPT_vect) {
 	// copy the gloable volatile to a local variable so they are stored in registers
-	// (if the ISR uses the local stack it can fragment the dynamic memory allocation (heap and stack)
-    // of the normal flow and cause memory corruption)
+	// (if the ISR uses the local stack it can fragment the dynamic memory system (heap and stack)
     uint8_t local_rising = rising;
     {
         uint8_t buffer_head = icp1_head;
         uint8_t t1vc_lb = t1vc.byte[0]; // load the virtual timer low byte into a register explicitly
         uint8_t t1vc_hb = t1vc.byte[1]; // load the virtual timer high byte into a register explicitly
-        
+
         // put the next timestamp onto the buffer
-        buffer_head++;
-        if (buffer_head >= EVENT_BUFF_SIZE) buffer_head = 0;
+        buffer_head = (buffer_head+1) & EVENT_BUFF_MASK;
         
-        event_Byt0[buffer_head] = ICR1L;   // timer1 low byte
-        event_Byt1[buffer_head] = ICR1H;   // timer1 high byte
+        // Capture Register bytes
+        event_Byt0[buffer_head] = ICR1L; 
+        event_Byt1[buffer_head] = ICR1H; 
+
+        // Virtual timer bytes
+        event_Byt2[buffer_head] = t1vc_lb;   
+        event_Byt3[buffer_head] = t1vc_hb; 
         
-        event_Byt2[buffer_head] = t1vc_lb;   // Virtual timer low byte
-        event_Byt3[buffer_head] = t1vc_hb;   // Virtual timer high byte
-        
-        event_rising[buffer_head] = local_rising;
+        // Simple XOR check for data changes should an array be indexed out of bounds. 
+        event_BytChk[buffer_head]= event_Byt3[buffer_head] ^ event_Byt2[buffer_head] ^ event_Byt1[buffer_head] ^ event_Byt0[buffer_head];
+
+        // capture interrupt is higher priority than overflow interrupt
+        // if T1 overflows just befor the capture its ISR may not have run
+        // if TOV1 is set and the capture ICR1H is zero then that is proof
+        // that the virtual timer has not incremented.  When I read TOV1 
+        // I sure hope it does not clear 
+        event_status[buffer_head] = (local_rising & (1<<RISING)) & 
+                                                (((TIFR1 & (1<<TOV1))>>TOV1)<<TOV1_WHILE_IN_CAPT_ISR) &
+                                                (icf1_flag_warning<<ICF1_WHILE_IN_OVF_ISR);
         icp1_head = buffer_head;
     } // free up a few  registers
     
@@ -101,11 +113,11 @@ ISR(TIMER1_CAPT_vect) {
     e.g. 2^32 clocks (about 4.3E9, thus will overflow after 4.3 minutes) */
 ISR(TIMER1_OVF_vect) 
 {
-	// copy to local variable so it can be stored in registers
-	// (volatile variables must be read from memory on every access)
+	// explicitly copy to local (e.g. a register, which most likly would have happon anyway)
     uint16_t local = t1vc.word;
     local++;
     t1vc.word = local;
+    icf1_flag_warning = (TIFR1 & (1<<ICF1))>>ICF1;
 }
 
 void initIcp1(void) 

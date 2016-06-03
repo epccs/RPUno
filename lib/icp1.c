@@ -79,9 +79,10 @@ ISR(TIMER1_CAPT_vect) {
         // if TOV1 is set and the capture ICR1H is zero then that is proof
         // that the virtual timer has not incremented.  When I read TOV1 
         // I sure hope it does not clear 
-        event_status[buffer_head] = (local_rising & (1<<RISING)) & 
-                                                (((TIFR1 & (1<<TOV1))>>TOV1)<<TOV1_WHILE_IN_CAPT_ISR) &
-                                                (icf1_flag_warning<<ICF1_WHILE_IN_OVF_ISR);
+        event_status[buffer_head] = (local_rising & (1<<RISING)) | 
+                                                (((TIFR1 & (1<<TOV1))>>TOV1)<<TOV1_WHILE_IN_CAPT_ISR) |
+                                                ((icf1_flag_warning&0x01)<<ICF1_WHILE_IN_OVF_ISR);
+        icf1_flag_warning = 0;
         icp1_head = buffer_head;
     } // free up a few  registers
     

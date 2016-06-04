@@ -31,15 +31,15 @@ AVR Memory Usage
 ----------------
 Device: atmega328p
 
-Program:    9650 bytes (29.4% Full)
+Program:    8162 bytes (24.9% Full)
 (.text + .data + .bootloader)
 
-Data:        607 bytes (29.6% Full)
+Data:        406 bytes (19.8% Full)
 (.data + .bss + .noinit)
 
 ...
 avrdude: verifying ...
-avrdude: 9650 bytes of flash verified
+avrdude: 8162 bytes of flash verified
 
 avrdude: safemode: hfuse reads as 0
 avrdude: safemode: efuse reads as 0
@@ -85,32 +85,33 @@ return ICP1 timer delta(s) as a pair of low and high timing values from the buff
 
 ``` 
 /0/capture? icp1,3
-{"icp1":{"count":"571415","low":"1643","high":"435","status":"0"}}
-{"icp1":{"count":"571413","low":"1646","high":"435","status":"0"}}
-{"icp1":{"count":"571411","low":"1646","high":"435","status":"0"}}
-{"icp1":{"count":"586795","low":"1646","high":"435","status":"0"}}
-{"icp1":{"count":"586793","low":"1647","high":"437","status":"0"}}
-{"icp1":{"count":"586791","low":"1646","high":"437","status":"0"}}
-{"icp1":{"count":"602193","low":"1645","high":"435","status":"64"}}
-{"icp1":{"count":"602191","low":"1645","high":"437","status":"4"}}
-{"icp1":{"count":"602189","low":"1645","high":"436","status":"0"}}
+{"icp1":{"count":"11642055","low":"1606","high":"349","status":"0"}}
+{"icp1":{"count":"11642053","low":"1609","high":"349","status":"0"}}
+{"icp1":{"count":"11642051","low":"1603","high":"349","status":"0"}}
+{"icp1":{"count":"11805739","low":"1606","high":"349","status":"0"}}
+{"icp1":{"count":"11805737","low":"1603","high":"348","status":"0"}}
+{"icp1":{"count":"11805735","low":"1607","high":"349","status":"0"}}
+{"icp1":{"count":"11969471","low":"1607","high":"348","status":"1"}}
+{"icp1":{"count":"11969469","low":"1603","high":"349","status":"1"}}
+{"icp1":{"count":"11969467","low":"1607","high":"349","status":"1"}}
+
 
 ```
 
-The status of 64 means the last event of the capture report had an ICF1 (capture) flag set while running the overflow ISR. The status of 4 means the first event of the capture report had its ICF1 flag set while running the overflow ISR. It takes three events to aggregate the data for a capture report, so the flag status can show in two reports (as the first and last event). The flag will only show once if it is in a middle event. 
+It takes three events to aggregate the data for a capture report. The status reports only the most recent event status since the other two events can be inferred. 
 
 ## /0/event? [icp1,1..31] 
 
-return ICP1 event timer values as a 32 bit unsign integer, which continuously rolls over. The status bit 0 shows rising (0 is falling) edge, bit 1 is for TOV1 (overflow flag) set while in capture ISR, bit 2 is for ICF1 (capture) set while in overflow ISR, bit 3 is set when a memory check byte fails (e.g. capture data was changed by a user program or hardware error).
+return ICP1 event timer values as a 16 bit unsign integer, which continuously rolls over. The status bit 0 shows rising (0 is falling) edge.
 
 ``` 
 /0/event? icp1,3
-{"icp1":{"count":"12300654","event":"4236314232","status":"1"}}
-{"icp1":{"count":"12300653","event":"4236312588","status":"4"}}
-{"icp1":{"count":"12300652","event":"4236312143","status":"1"}}
+{"icp1":{"count":"2880842","event":"850","status":"1"}}
+{"icp1":{"count":"2880841","event":"64779","status":"0"}}
+{"icp1":{"count":"2880840","event":"64426","status":"1"}}
 ```
 
-Perhaps that is confusing. The event with a count of 12300652 had a rising edge and happened before the event with count 12300653 which had a falling edge. The difference of the event times is the number of clocks spent high (4236312588 - 4236312143 = 445). And the difference between the middle and most recent events is the number of clocks spent low (4236314232 - 4236312588 = 1644). The status 4 means an ICF1 (capture) flag was set while runing the overflow ISR.
+Perhaps that is confusing. The event with a count of 2880840 had a rising edge and happened before the event with count 2880841 which had a falling edge. The difference of the event times is the number of clocks spent high (64779 - 64426 = 353). And the difference between the middle and most recent events is the number of clocks spent low ((850+2^16) - 64779 = 1607).
 
 
 ## /0/pwm oc2a|oc2b,0..255
@@ -124,12 +125,26 @@ Pulse width modulation using OC2A (ATmega328 pin PB3. Uno pin 11) or OC2B (ATmeg
 
 # Notes
 
-## Corrupted Capture
+## Pulse Skipping
 
-From time to time the captured data is corrupted. I have added byte checks at the time of capture and the time of copying the captures to a buffer for reporting. This was done to check if the memory gets corrupted in place but that does not seem to be the case. 
+With an HT as the temperature goes up the high count goes down for example near Room temp I see 
 
-The corruption seems to be prssent at the time the ISR records the data.
+``` 
+{"icp1":{"count":"519107161","low":"1669","high":"550","status":"0"}}
+``` 
 
-I have now added status that shows if the overflow flag is set while running the capture ISR and if the capture flag is set while running the overflow ISR. It is not yet clear if this can be used to fix a broken event but I think it points out the cause of the problem.
+As the heat is turned up the capture looks like 
 
+``` 
+{"icp1":{"count":"514717561","low":"1646","high":"199","status":"0"}}
+``` 
 
+and some start to show skipping
+
+``` 
+{"icp1":{"count":"514717563","low":"1645","high":"2045","status":"0"}}
+``` 
+
+The short pulse is the one that skips because the ISR is not able to change edge detection in time to see the falling edge of the short high pulse so it has to wait for the next falling edge. It takes about 50 machine cycles to enter an interrupt (since all registers used have to be preserved) and then a similar amount of time to restore the interrupted process. 
+
+Unfortuanly it is the Timer 0 (zero) ISR used of millis() timing that is causing the skips. When the ADC ISR is used it may add skips as well. I need millis() so this is going to be somthing I will live with. The minimum pulse width that will insure a capture is about 300 counts or 18.75 uSec. 

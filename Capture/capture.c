@@ -24,18 +24,15 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/timers.h"
 #include "capture.h"
 
-#define SERIAL_PRINT_DELAY_MILSEC 10000
+#define SERIAL_PRINT_DELAY_MILSEC 60000
 static unsigned long serial_print_started_at;
 
-static uint32_t low;
-static uint32_t high;
+static uint16_t low;
+static uint16_t high;
 
 // copy of the event buffer for serial output
 static uint8_t cpy_event_Byt0[EVENT_BUFF_SIZE];
 static uint8_t cpy_event_Byt1[EVENT_BUFF_SIZE];
-static uint8_t cpy_event_Byt2[EVENT_BUFF_SIZE];
-static uint8_t cpy_event_Byt3[EVENT_BUFF_SIZE];
-static uint8_t cpy_event_BytChk[EVENT_BUFF_SIZE];
 static uint8_t cpy_event_status[EVENT_BUFF_SIZE];
 static uint8_t cpy_icp1_head;
 static uint32_t cpy_icp1_event_count;
@@ -99,18 +96,10 @@ void Capture(void)
                             cpy_icp1_head = (cpy_icp1_head +1 ) & (EVENT_BUFF_MASK);
                             cpy_event_Byt0[cpy_icp1_head] = event_Byt0[cpy_icp1_head];
                             cpy_event_Byt1[cpy_icp1_head] = event_Byt1[cpy_icp1_head];
-                            cpy_event_Byt2[cpy_icp1_head] = event_Byt2[cpy_icp1_head];
-                            cpy_event_Byt3[cpy_icp1_head] = event_Byt3[cpy_icp1_head];
-                            cpy_event_BytChk[cpy_icp1_head] = event_BytChk[cpy_icp1_head] ;
                             cpy_event_status[cpy_icp1_head] = event_status[cpy_icp1_head];
                             cpy_icp1_event_count = icp1_event_count;
                         }
                         if (i < num_of_events_needed) i++;
-                        if (cpy_event_BytChk[cpy_icp1_head] != (cpy_event_Byt3[cpy_icp1_head]^ cpy_event_Byt2[cpy_icp1_head]^cpy_event_Byt1[cpy_icp1_head]^cpy_event_Byt0[cpy_icp1_head]) )
-                        {
-                            //Memory check has failed so set a status bit
-                            cpy_event_status[cpy_icp1_head] = cpy_event_status[cpy_icp1_head] | (1<<BYTCHK_ERROR_AT_USR_CPY);
-                        }
                     }
                 }
                 
@@ -139,92 +128,44 @@ void Capture(void)
         uint8_t low2high_event_index = ((uint8_t)(((int8_t)high2low_event_index) - 1)) & (EVENT_BUFF_MASK);
         uint8_t period_event_index = ((uint8_t)(((int8_t)low2high_event_index) - 1)) & (EVENT_BUFF_MASK);
 
-        // the event time is keep in four byte arrays to make the ISR fast and 
+        // the event time is keep in two byte arrays to make the ISR fast and 
         // allow up to 32 events with quick access of the AVR ldd instruction.
-        uint32_t high2low_event;
-        uint32_t low2high_event;
-        uint32_t period_event;
-        high2low_event = (((uint32_t)cpy_event_Byt3[high2low_event_index]) << 24 ) + (((uint32_t)cpy_event_Byt2[high2low_event_index]) << 16 ) + \
-                                (((uint32_t)cpy_event_Byt1[high2low_event_index]) <<8) + ((uint32_t)cpy_event_Byt0[high2low_event_index]);
-        low2high_event = (((uint32_t)cpy_event_Byt3[low2high_event_index]) <<24) + (((uint32_t)cpy_event_Byt2[low2high_event_index]) << 16 ) + \
-                                (((uint32_t)cpy_event_Byt1[low2high_event_index]) <<8) + ((uint32_t)cpy_event_Byt0[low2high_event_index]);
-        period_event = (((uint32_t)cpy_event_Byt3[period_event_index]) <<24) + (((uint32_t)cpy_event_Byt2[period_event_index]) <<16) + \
-                                (((uint32_t)cpy_event_Byt1[period_event_index]) <<8) + ((uint32_t)cpy_event_Byt0[period_event_index]);
+        uint16_t high2low_event;
+        uint16_t low2high_event;
+        uint16_t period_event;
+        high2low_event = (((uint16_t)cpy_event_Byt1[high2low_event_index]) <<8) + ((uint16_t)cpy_event_Byt0[high2low_event_index]);
+        low2high_event = (((uint16_t)cpy_event_Byt1[low2high_event_index]) <<8) + ((uint16_t)cpy_event_Byt0[low2high_event_index]);
+        period_event = (((uint16_t)cpy_event_Byt1[period_event_index]) <<8) + ((uint16_t)cpy_event_Byt0[period_event_index]);
 
-        // check if a byte changed between the ISR and when my copy was made
-        if ( cpy_event_status[high2low_event_index] & (1<<BYTCHK_ERROR_AT_USR_CPY) )
-        {
-            printf_P(PSTR("{\"err\":\"IcpChkBytIsr@[%ul]\"}\r\n"),(cpy_icp1_event_count - 2*(event_pair_output) ));
-            initCommandBuffer();  
-            return;
-        }
-        if ( cpy_event_status[low2high_event_index] & (1<<BYTCHK_ERROR_AT_USR_CPY) )
-        {
-            printf_P(PSTR("{\"err\":\"IcpChkBytIsr@[%ul]\"}\r\n"),(cpy_icp1_event_count - 2*(event_pair_output) ));
-            initCommandBuffer();  
-            return;
-        }
-        if ( cpy_event_status[period_event_index] & (1<<BYTCHK_ERROR_AT_USR_CPY) )
-        {
-            printf_P(PSTR("{\"err\":\"IcpChkBytIsr@[%ul]\"}\r\n"),(cpy_icp1_event_count - 2*(event_pair_output) ));
-            initCommandBuffer();  
-            return;
-        }
-        
-        // check if a byte has changed in my copy
-        if ( (cpy_event_Byt3[high2low_event_index]^ cpy_event_Byt2[high2low_event_index]^cpy_event_Byt1[high2low_event_index]^cpy_event_Byt0[high2low_event_index]) != cpy_event_BytChk[high2low_event_index])
-        {
-            printf_P(PSTR("{\"err\":\"IcpChkBytCp@[%ul]\"}\r\n"),(cpy_icp1_event_count - 2*(event_pair_output) ));
-            initCommandBuffer();  
-            return;
-        }
-        if ( (cpy_event_Byt3[low2high_event_index]^ cpy_event_Byt2[low2high_event_index]^cpy_event_Byt1[low2high_event_index]^cpy_event_Byt0[low2high_event_index]) != cpy_event_BytChk[low2high_event_index])
-        {
-            printf_P(PSTR("{\"err\":\"IcpChkBytCp@[%ul]\"}\r\n"),(cpy_icp1_event_count - 2*(event_pair_output) ));
-            initCommandBuffer();  
-            return;
-        }
-        if ( (cpy_event_Byt3[period_event_index]^ cpy_event_Byt2[period_event_index]^cpy_event_Byt1[period_event_index]^cpy_event_Byt0[period_event_index]) != cpy_event_BytChk[period_event_index])
-        {
-            printf_P(PSTR("{\"err\":\"IcpChkBytCp@[%ul]\"}\r\n"),(cpy_icp1_event_count - 2*(event_pair_output) ));
-            initCommandBuffer();  
-            return;
-        }
-        
         // Now find counts between events while ICP1 was low and then when it was high
         // cast to int causes two's complement math to be used which gives correct result through a roll over
-        low = (uint32_t)((int32_t)high2low_event - (int32_t)low2high_event);
-        high = (uint32_t)((int32_t)low2high_event - (int32_t)period_event);
+        low = (uint16_t)((int16_t)high2low_event - (int16_t)low2high_event);
+        high = (uint16_t)((int16_t)low2high_event - (int16_t)period_event);
         
         // if the last capture was on a falling event, swap low and high count
         if ( (cpy_event_status[high2low_event_index] & (1<<RISING)) == 0)
         { 
-            uint32_t temp = low;
+            uint16_t temp = low;
             low = high;
             high = temp;
         }
         
-        // status of the threee events are combined, only the ISR flags are kept for two of the events
-        // bit 6 and 5 have the period_event_index status (<< 4) bits from ICF1_WHILE_IN_OVF_ISR and TOV1_WHILE_IN_CAPT_ISR
-        // bit 4 and 3 have the low2high_event_index status (<< 2) bits from ICF1_WHILE_IN_OVF_ISR and TOV1_WHILE_IN_CAPT_ISR
-        // bit 2, 1 and 0 have high2low_event_index status bits from ICF1_WHILE_IN_OVF_ISR, TOV1_WHILE_IN_CAPT_ISR, and RISING
-        // Question: can a bad event value be fixed... TBD
-        event_pair_status = ((cpy_event_status[high2low_event_index] & (0x07))) |
-                                    ((cpy_event_status[low2high_event_index] & (0x06)) <<2) |
-                                    ((cpy_event_status[period_event_index] & (0x06)) <<4);
+        // status of the three events are combined... only the most recent RISING flag is given 
+        // bit 0 has RISING status bit from  high2low_event_index 
+        event_pair_status = (cpy_event_status[high2low_event_index] & (0x1)) ;
         
         // print in  steps otherwise the buffer will fill and block the program from running
-        printf_P(PSTR("\"low\":\"%lu\","),low);
+        printf_P(PSTR("\"low\":\"%u\","),(unsigned int)low);
         command_done = 13;
     }
     else if ( (command_done == 13) )
     {
-        printf_P(PSTR("\"high\":\"%lu\","),high);
+        printf_P(PSTR("\"high\":\"%u\","),(unsigned int)high);
         command_done = 14;
     }
     else if ( (command_done == 14) )
     {
-        printf_P(PSTR("\"status\":\"%d\"}}\r\n"),event_pair_status);
+        printf_P(PSTR("\"status\":\"%u\"}}\r\n"),(unsigned int)event_pair_status);
         if ( (++event_pair_output) >= event_pair) 
         {
             command_done = 15;
@@ -296,18 +237,10 @@ void Event(void)
                             cpy_icp1_head = (cpy_icp1_head +1 ) & (EVENT_BUFF_MASK);
                             cpy_event_Byt0[cpy_icp1_head] = event_Byt0[cpy_icp1_head];
                             cpy_event_Byt1[cpy_icp1_head] = event_Byt1[cpy_icp1_head];
-                            cpy_event_Byt2[cpy_icp1_head] = event_Byt2[cpy_icp1_head];
-                            cpy_event_Byt3[cpy_icp1_head] = event_Byt3[cpy_icp1_head];
-                            cpy_event_BytChk[cpy_icp1_head] = event_BytChk[cpy_icp1_head] ;
                             cpy_event_status[cpy_icp1_head] = event_status[cpy_icp1_head];
                             cpy_icp1_event_count = icp1_event_count;
                         }
                         if (i < event_report) i++;
-                        if (cpy_event_BytChk[cpy_icp1_head] != (cpy_event_Byt3[cpy_icp1_head]^ cpy_event_Byt2[cpy_icp1_head]^cpy_event_Byt1[cpy_icp1_head]^cpy_event_Byt0[cpy_icp1_head]) )
-                        {
-                            //Memory check has failed so set a status bit
-                            cpy_event_status[cpy_icp1_head] = cpy_event_status[cpy_icp1_head] | (1<<BYTCHK_ERROR_AT_USR_CPY);
-                        }
                     }
                 }
 
@@ -334,21 +267,20 @@ void Event(void)
         // cast to int to use two's complement math then cast back into a uint8_t and mask to the buffer size.
         uint8_t event_index = ( (uint8_t)(((int8_t)cpy_icp1_head) - ((int8_t)(event_report_output))) ) & (EVENT_BUFF_MASK);
 
-        // the event time is keep in four byte arrays to make the ISR fast and 
+        // the event time is keep in two byte arrays to make the ISR fast and 
         // allow up to 32 events with quick access of the AVR ldd instruction.
-        uint32_t uint32_event;
-        uint32_event = (((uint32_t)cpy_event_Byt3[event_index]) << 24 ) + (((uint32_t)cpy_event_Byt2[event_index]) << 16 ) + \
-                                (((uint32_t)cpy_event_Byt1[event_index]) <<8) + ((uint32_t)cpy_event_Byt0[event_index]);
+        uint16_t uint16_event;
+        uint16_event = (((uint16_t)cpy_event_Byt1[event_index]) <<8) + ((uint16_t)cpy_event_Byt0[event_index]);
 
         event_report_status = cpy_event_status[event_index] ;
 
         // print in  steps otherwise the buffer will fill and block the program from running
-        printf_P(PSTR("\"event\":\"%lu\","),uint32_event);
+        printf_P(PSTR("\"event\":\"%u\","),(unsigned int)uint16_event);
         command_done = 13;
     }
     else if ( (command_done == 13) )
     {
-        printf_P(PSTR("\"status\":\"%d\"}}\r\n"),event_report_status);
+        printf_P(PSTR("\"status\":\"%u\"}}\r\n"),(unsigned int)event_report_status);
         if ( (++event_report_output) >= event_report) 
         {
             command_done = 14;

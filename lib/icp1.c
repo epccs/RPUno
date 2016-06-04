@@ -27,19 +27,14 @@
 
 volatile uint8_t event_Byt0[EVENT_BUFF_SIZE];
 volatile uint8_t event_Byt1[EVENT_BUFF_SIZE];
-volatile uint8_t event_Byt2[EVENT_BUFF_SIZE];
-volatile uint8_t event_Byt3[EVENT_BUFF_SIZE];
-volatile uint8_t event_BytChk[EVENT_BUFF_SIZE];
 volatile uint8_t event_status[EVENT_BUFF_SIZE];
 volatile uint8_t icp1_head; 
 volatile uint32_t icp1_event_count; 
-volatile uint32_t icp1_rising_event_count;
-volatile uint32_t icp1_falling_event_count;
+volatile uint32_t icp1_event_count_at_OVF; 
 volatile uint8_t rising; 
 
 // timer 1 virtual counter
-volatile static WORD_2_BYTE t1vc;
-volatile static uint8_t icf1_flag_warning;
+volatile WORD_2_BYTE t1vc;
 
 /* 
 Input Capture Unit 1 interrupt handler (Timing Pulse Interpolation)
@@ -52,73 +47,39 @@ Double-Timing Pulse Interpolation (API 4.6) which uses a clock to time flow mete
 another clock to time volume events from a calibrated Prover (a volume measurement device) 
 during a calibration of a custody transfer flow meter (it can then be certified to that standard). */
 ISR(TIMER1_CAPT_vect) {
-	// copy the gloable volatile to a local variable so they are stored in registers
-	// (if the ISR uses the local stack it can fragment the dynamic memory system (heap and stack)
-    uint8_t local_rising = rising;
-    {
-        uint8_t buffer_head = icp1_head;
-        uint8_t t1vc_lb = t1vc.byte[0]; // load the virtual timer low byte into a register explicitly
-        uint8_t t1vc_hb = t1vc.byte[1]; // load the virtual timer high byte into a register explicitly
 
-        // put the next timestamp onto the buffer
-        buffer_head = (buffer_head+1) & EVENT_BUFF_MASK;
-        
-        // Capture Register bytes
-        event_Byt0[buffer_head] = ICR1L; 
-        event_Byt1[buffer_head] = ICR1H; 
-
-        // Virtual timer bytes
-        event_Byt2[buffer_head] = t1vc_lb;   
-        event_Byt3[buffer_head] = t1vc_hb; 
-        
-        // Simple XOR check for data changes should an array be indexed out of bounds. 
-        event_BytChk[buffer_head]= event_Byt3[buffer_head] ^ event_Byt2[buffer_head] ^ event_Byt1[buffer_head] ^ event_Byt0[buffer_head];
-
-        // capture interrupt is higher priority than overflow interrupt
-        // if T1 overflows just befor the capture its ISR may not have run
-        // if TOV1 is set and the capture ICR1H is zero then that is proof
-        // that the virtual timer has not incremented.  When I read TOV1 
-        // I sure hope it does not clear 
-        event_status[buffer_head] = (local_rising & (1<<RISING)) | 
-                                                (((TIFR1 & (1<<TOV1))>>TOV1)<<TOV1_WHILE_IN_CAPT_ISR) |
-                                                ((icf1_flag_warning&0x01)<<ICF1_WHILE_IN_OVF_ISR);
-        icf1_flag_warning = 0;
-        icp1_head = buffer_head;
-    } // free up a few  registers
+    // put the next timestamp onto the buffer
+    icp1_head = (icp1_head+1) & EVENT_BUFF_MASK;
     
-    {
-        uint32_t local_icp1_event_count = icp1_event_count;
-        
-        // count all edges
-        local_icp1_event_count++;
+    // Capture Register bytes
+    event_Byt0[icp1_head] = ICR1L; 
+    event_Byt1[icp1_head] = ICR1H; 
+    event_status[icp1_head] = (rising & (1<<RISING));
+    
+    // count all edges
+    icp1_event_count++;
 
-        // edge tracking: rising or falling
-        // ATmega328p datasheet said to clear ICF1 after edge direction change 
-        // setup to catch rising edge: TCCR1B |= (1<<ICES1); TIFR1 |= (1<<ICF1); rising = 1;
-        // setup to catch falling edge: TCCR1B &= ~(1<<ICES1); TIFR1 |= (1<<ICF1); rising = 0; 
-        // swap edge setup to catch the next edge
-        if (local_rising) 
-        { 
-            TCCR1B &= ~(1<<ICES1); TIFR1 |= (1<<ICF1); local_rising = 0; 
-        }
-        else 
-        {
-            TCCR1B |= (1<<ICES1); TIFR1 |= (1<<ICF1); local_rising = 1;
-        }
-        icp1_event_count = local_icp1_event_count;
+    // edge tracking: rising or falling
+    // ATmega328p datasheet said to clear ICF1 after edge direction change 
+    // setup to catch rising edge: TCCR1B |= (1<<ICES1); TIFR1 |= (1<<ICF1); rising = 1;
+    // setup to catch falling edge: TCCR1B &= ~(1<<ICES1); TIFR1 |= (1<<ICF1); rising = 0; 
+    // swap edge setup to catch the next edge
+    if (rising) 
+    { 
+        TCCR1B &= ~(1<<ICES1); TIFR1 |= (1<<ICF1); rising = 0; 
     }
-    rising = local_rising;
+    else 
+    {
+        TCCR1B |= (1<<ICES1); TIFR1 |= (1<<ICF1); rising = 1;
+    }
 }
 
 /* Virtual timer counts each Timer1 overflow.
     e.g. 2^32 clocks (about 4.3E9, thus will overflow after 4.3 minutes) */
 ISR(TIMER1_OVF_vect) 
 {
-	// explicitly copy to local (e.g. a register, which most likly would have happon anyway)
-    uint16_t local = t1vc.word;
-    local++;
-    t1vc.word = local;
-    icf1_flag_warning = (TIFR1 & (1<<ICF1))>>ICF1;
+    t1vc.word++;
+    icp1_event_count_at_OVF = icp1_event_count;
 }
 
 void initIcp1(void) 
@@ -167,3 +128,4 @@ void initIcp1(void)
 #   error mega328[p] has ICP1 on PB0, check Datasheet for your mcu and then fix this file
 #endif
 }
+

@@ -53,11 +53,12 @@ void Count(void)
     {
         serial_print_started_at = millis();
         // the count must not change while reading chCount
+        uint32_t local_cpy_icp1_event_count;
         ATOMIC_BLOCK ( ATOMIC_RESTORESTATE )
         {
-            // printf conversion specification for an unsigned long is %lu
-            printf_P(PSTR("{\"icp1\":{\"count\":\"%lu\"}}\r\n"),icp1_event_count);
+            local_cpy_icp1_event_count = icp1_event_count;
         }
+        printf_P(PSTR("{\"icp1\":{\"count\":\"%lu\"}}\r\n"),local_cpy_icp1_event_count);
         command_done = 11;
     }
     else if ( (command_done == 11) )
@@ -331,6 +332,59 @@ void Event(void)
     else
     {
         printf_P(PSTR("{\"err\":\"IcpCmdDoneWTF\"}\r\n"));
+        initCommandBuffer();
+    }
+}
+
+InitICP()
+{
+     if ( (command_done == 10) )
+    {
+        int prescale;
+        // arg[0] should say icp1, other mcu's may have icp3...
+        if (arg_count == 3)
+        { 
+            prescale = atoi(arg[2]);
+        }
+        else
+        {
+            printf_P(PSTR("{\"err\":\"IcpArgCnt@%d!=3\"}\r\n"),arg_count);
+            initCommandBuffer();   
+        }
+
+        if ((prescale < 0) || (prescale > 0x7) )
+        {
+            printf_P(PSTR("{\"err\":\"IcpPrescalBad\"}\r\n"));
+            initCommandBuffer();
+        }
+        
+        if ( !( (strcmp_P( arg[1], PSTR("rise")) == 0) | 
+                 (strcmp_P( arg[1], PSTR("fall")) == 0) | 
+                 (strcmp_P( arg[1], PSTR("both")) == 0) ) )
+       {
+            printf_P(PSTR("{\"err\":\"IcpRiseFallBoth\"}\r\n"));
+            initCommandBuffer();
+        }
+        printf_P(PSTR("{\"icp1\":{\"edgSel\":\"%s\","),arg[1]);
+        command_done = 11;
+    }
+    else if ( (command_done == 11) )
+    { 
+        uint8_t prescale;
+        prescale = (uint8_t)(atoi(arg[2]) & 0x7);
+        if (strcmp_P( arg[1], PSTR("rise")) == 0)
+        {
+            initIcp1(TRACK_RISING, prescale) ;
+        }
+        if (strcmp_P( arg[1], PSTR("fall")) == 0)
+        {
+            initIcp1(TRACK_FALLING, prescale) ;
+        }
+        if (strcmp_P( arg[1], PSTR("both")) == 0)
+        {
+            initIcp1(TRACK_BOTH, prescale) ;
+        }
+        printf_P(PSTR("\"preScalr\":\"%d\"}}\r\n"),prescale);
         initCommandBuffer();
     }
 }

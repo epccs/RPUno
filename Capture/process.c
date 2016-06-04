@@ -46,4 +46,8 @@ void ProcessCmd()
     {
         Event();
     }
+    if ( (strcmp_P( command, PSTR("/initICP")) == 0) && ( ( (arg_count == 3) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
+    {
+        InitICP();
+    }
 }

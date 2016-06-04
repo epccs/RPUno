@@ -22,7 +22,6 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "process.h"
 #include "../Uart/id.h"
 #include "pwm.h"
-#include "count.h"
 #include "capture.h"
 
 void ProcessCmd()

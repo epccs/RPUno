@@ -45,6 +45,36 @@ static int event_report;
 static int event_report_output;
 static uint8_t event_report_status; 
 
+/* event count of ICP1 
+    no artuments needed*/
+void Count(void)
+{
+    if ( (command_done == 10) )
+    {
+        serial_print_started_at = millis();
+        // the count must not change while reading chCount
+        ATOMIC_BLOCK ( ATOMIC_RESTORESTATE )
+        {
+            // printf conversion specification for an unsigned long is %lu
+            printf_P(PSTR("{\"icp1\":{\"count\":\"%lu\"}}\r\n"),icp1_event_count);
+        }
+        command_done = 11;
+    }
+    else if ( (command_done == 11) )
+    { // delay between JSON printing
+        unsigned long kRuntime= millis() - serial_print_started_at;
+        if ((kRuntime) > ((unsigned long)SERIAL_PRINT_DELAY_MILSEC))
+        {
+            command_done = 10; /* This keeps looping the output forever (until a Rx char anyway) */
+        }
+    }
+    else
+    {
+        printf_P(PSTR("{\"err\":\"CntCmdDoneWTF\"}\r\n"));
+        initCommandBuffer();
+    }
+}
+
 /* return ICP1 timer count for both low and high signal timing.
     Low value is the counts between a falling edge and a rising edge.
     High value is the counts between a rising edge and falling edge.

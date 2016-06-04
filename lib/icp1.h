@@ -27,7 +27,21 @@
     #error event buffer size is not a power of 2
 #endif
 
-extern void initIcp1(void);
+extern void initIcp1(uint8_t mode, uint8_t prescaler);
+
+// mode Input Capture Edge Select
+#define TRACK_FALLING 0
+#define TRACK_RISING 1
+#define TRACK_BOTH 2
+extern volatile uint8_t icp1_edge_mode;
+
+// prescaler Input Capture Clock Select
+#define ICP1_NOCLOCK 0
+#define ICP1_MCUCLOCK 1
+#define ICP1_MCUDIV8 2
+#define ICP1_MCUDIV64 3
+#define ICP1_MCUDIV256 4
+#define ICP1_MCUDIV1024 5
 
 // only the first 32 bytes can be accessed quickly using the AVR ldd instruction.
 // this means that the total array size needs to be held bellow that
@@ -47,6 +61,8 @@ extern volatile uint8_t rising;
 
 // icp1 pulse count
 extern volatile uint32_t icp1_event_count;
+
+// a timer1 overflow records the icp1 event count
 extern volatile uint32_t icp1_event_count_at_OVF;
 
 typedef union { uint16_t word; uint8_t byte[2]; } WORD_2_BYTE; 

@@ -348,13 +348,13 @@ ISR(UART0_RECEIVE_INTERRUPT)
     data = UART0_DATA;
     
 #if defined( AT90_UART )
-    lastRxError = (usr & (_BV(FE)|_BV(DOR)) );
+    lastRxError = (usr & ((1<<FE)|(1<<DOR)) );
 #elif defined( ATMEGA_USART )
-    lastRxError = (usr & (_BV(FE)|_BV(DOR)) );
+    lastRxError = (usr & ((1<<FE)|(1<<DOR)) );
 #elif defined( ATMEGA_USART0 )
-    lastRxError = (usr & (_BV(FE0)|_BV(DOR0)) );
+    lastRxError = (usr & ((1<<FE0)|(1<<DOR0)) );
 #elif defined ( ATMEGA_UART )
-    lastRxError = (usr & (_BV(FE)|_BV(DOR)) );
+    lastRxError = (usr & ((1<<FE)|(1<<DOR)) );
 #endif
         
     /* calculate buffer index */ 
@@ -385,7 +385,7 @@ ISR(UART0_TRANSMIT_INTERRUPT)
         UART0_DATA = UART_TxBuf[tmptail];  /* start transmission */
     } else {
         /* tx buffer empty, disable UDRE interrupt */
-        UART0_CONTROL &= ~_BV(UART0_UDRIE);
+        UART0_CONTROL &= ~(1<<UART0_UDRIE);
     }
 }
 
@@ -401,7 +401,7 @@ void uart0_init(uint16_t baudrate)
     UBRR = (uint8_t)baudrate;
 
     /* enable UART receiver and transmitter and receive complete interrupt */
-    UART0_CONTROL = _BV(RXCIE)|_BV(RXEN)|_BV(TXEN);
+    UART0_CONTROL = (1<<RXCIE)|(1<<RXEN)|(1<<TXEN);
 
 #elif defined (ATMEGA_USART)
     /* Set baud rate */
@@ -413,7 +413,7 @@ void uart0_init(uint16_t baudrate)
     UBRRL = (uint8_t) baudrate;
 
     /* Enable USART receiver and transmitter and receive complete interrupt */
-    UART0_CONTROL = _BV(RXCIE)|(1<<RXEN)|(1<<TXEN);
+    UART0_CONTROL = (1<<RXCIE)|(1<<RXEN)|(1<<TXEN);
 
     /* Set frame format: asynchronous, 8data, no parity, 1stop bit */
 #ifdef URSEL
@@ -432,7 +432,7 @@ void uart0_init(uint16_t baudrate)
     UBRR0L = (uint8_t) baudrate;
 
     /* Enable USART receiver and transmitter and receive complete interrupt */
-    UART0_CONTROL = _BV(RXCIE0)|(1<<RXEN0)|(1<<TXEN0);
+    UART0_CONTROL = (1<<RXCIE0)|(1<<RXEN0)|(1<<TXEN0);
 
     /* Set frame format: asynchronous, 8data, no parity, 1stop bit */
 #ifdef URSEL0
@@ -451,7 +451,7 @@ void uart0_init(uint16_t baudrate)
     UBRR   = (uint8_t) baudrate;
 
     /* Enable UART receiver and transmitter and receive complete interrupt */
-    UART0_CONTROL = _BV(RXCIE)|(1<<RXEN)|(1<<TXEN);
+    UART0_CONTROL = (1<<RXCIE)|(1<<RXEN)|(1<<TXEN);
 
 #endif  /* defined( ATMEGA_UART ) */
 
@@ -511,7 +511,7 @@ void uart0_putc(uint8_t data)
     UART0_TxHead = tmphead;
 
     /* enable UDRE interrupt */
-    UART0_CONTROL    |= _BV(UART0_UDRIE);
+    UART0_CONTROL    |= (1<<UART0_UDRIE);
 
 } /* uart0_putc */
 
@@ -585,7 +585,7 @@ ISR(UART1_RECEIVE_INTERRUPT)
     usr  = UART1_STATUS;
     data = UART1_DATA;
 
-    lastRxError = (usr & (_BV(FE1)|_BV(DOR1)) );
+    lastRxError = (usr & ((1<<FE1)|(1<<DOR1)) );
 
     /* calculate buffer index */
     tmphead = ( UART1_RxHead + 1) & UART_RX1_BUFFER_MASK;
@@ -614,7 +614,7 @@ ISR(UART1_TRANSMIT_INTERRUPT)
         UART1_DATA = UART1_TxBuf[tmptail];  /* start transmission */
     } else {
         /* tx buffer empty, disable UDRE interrupt */
-        UART1_CONTROL &= ~_BV(UART1_UDRIE);
+        UART1_CONTROL &= ~(1<<UART1_UDRIE);
     }
 }
 
@@ -634,7 +634,7 @@ void uart1_init(uint16_t baudrate)
     UBRR1L = (uint8_t) baudrate;
 
     /* Enable USART receiver and transmitter and receive complete interrupt */
-    UART1_CONTROL = _BV(RXCIE1)|(1<<RXEN1)|(1<<TXEN1);
+    UART1_CONTROL = (1<<RXCIE1)|(1<<RXEN1)|(1<<TXEN1);
 
     /* Set frame format: asynchronous, 8data, no parity, 1stop bit */
 #ifdef URSEL1
@@ -699,7 +699,7 @@ void uart1_putc(uint8_t data)
     UART1_TxHead = tmphead;
 
     /* enable UDRE interrupt */
-    UART1_CONTROL    |= _BV(UART1_UDRIE);
+    UART1_CONTROL    |= (1<<UART1_UDRIE);
 
 } /* uart1_putc */
 
@@ -775,7 +775,7 @@ ISR(UART2_RECEIVE_INTERRUPT)
     usr  = UART2_STATUS;
     data = UART2_DATA;
 
-    lastRxError = (usr & (_BV(FE2)|_BV(DOR2)) );
+    lastRxError = (usr & ((1<<FE2)|(1<<DOR2)) );
 
     /* calculate buffer index */
     tmphead = ( UART2_RxHead + 1) & UART_RX2_BUFFER_MASK;
@@ -806,7 +806,7 @@ ISR(UART2_TRANSMIT_INTERRUPT)
         UART2_DATA = UART2_TxBuf[tmptail];  /* start transmission */
     } else {
         /* tx buffer empty, disable UDRE interrupt */
-        UART2_CONTROL &= ~_BV(UART2_UDRIE);
+        UART2_CONTROL &= ~(1<<UART2_UDRIE);
     }
 }
 
@@ -827,7 +827,7 @@ void uart2_init(uint16_t baudrate)
     UBRR2L = (uint8_t) baudrate;
 
     /* Enable USART receiver and transmitter and receive complete interrupt */
-    UART2_CONTROL = _BV(RXCIE2)|(1<<RXEN2)|(1<<TXEN2);
+    UART2_CONTROL = (1<<RXCIE2)|(1<<RXEN2)|(1<<TXEN2);
 
     /* Set frame format: asynchronous, 8data, no parity, 1stop bit */
 #ifdef URSEL2
@@ -893,7 +893,7 @@ void uart2_putc(uint8_t data)
     UART2_TxHead = tmphead;
 
     /* enable UDRE interrupt */
-    UART2_CONTROL    |= _BV(UART2_UDRIE);
+    UART2_CONTROL    |= (1<<UART2_UDRIE);
 } /* uart2_putc */
 
 /* Flush bytes from the transmit buffer  */
@@ -969,7 +969,7 @@ ISR(UART3_RECEIVE_INTERRUPT)
     usr  = UART3_STATUS;
     data = UART3_DATA;
 
-    lastRxError = (usr & (_BV(FE3)|_BV(DOR3)) );
+    lastRxError = (usr & ((1<<FE3)|(1<<DOR3)) );
 
     /* calculate buffer index */
     tmphead = ( UART3_RxHead + 1) & UART_RX3_BUFFER_MASK;
@@ -998,7 +998,7 @@ ISR(UART3_TRANSMIT_INTERRUPT)
         UART3_DATA = UART3_TxBuf[tmptail];  /* start transmission */
     } else {
         /* tx buffer empty, disable UDRE interrupt */
-        UART3_CONTROL &= ~_BV(UART3_UDRIE);
+        UART3_CONTROL &= ~(1<<UART3_UDRIE);
     }
 }
 
@@ -1018,7 +1018,7 @@ void uart3_init(uint16_t baudrate)
     UBRR3L = (uint8_t) baudrate;
 
     /* Enable USART receiver and transmitter and receive complete interrupt */
-    UART3_CONTROL = _BV(RXCIE3)|(1<<RXEN3)|(1<<TXEN3);
+    UART3_CONTROL = (1<<RXCIE3)|(1<<RXEN3)|(1<<TXEN3);
 
     /* Set frame format: asynchronous, 8data, no parity, 1stop bit */
 #ifdef URSEL3
@@ -1084,7 +1084,7 @@ void uart3_putc(uint8_t data)
     UART3_TxHead = tmphead;
 
     /* enable UDRE interrupt */
-    UART3_CONTROL    |= _BV(UART3_UDRIE);
+    UART3_CONTROL    |= (1<<UART3_UDRIE);
 } /* uart3_putc */
 
 /* Flush bytes from the transmit buffer  */

@@ -25,6 +25,7 @@
 #include <util/atomic.h>
 #include "icp1.h"
 
+volatile uint8_t icp1_edge_mode;
 volatile uint8_t event_Byt0[EVENT_BUFF_SIZE];
 volatile uint8_t event_Byt1[EVENT_BUFF_SIZE];
 volatile uint8_t event_status[EVENT_BUFF_SIZE];
@@ -64,13 +65,12 @@ ISR(TIMER1_CAPT_vect) {
     // setup to catch rising edge: TCCR1B |= (1<<ICES1); TIFR1 |= (1<<ICF1); rising = 1;
     // setup to catch falling edge: TCCR1B &= ~(1<<ICES1); TIFR1 |= (1<<ICF1); rising = 0; 
     // swap edge setup to catch the next edge
-    if (rising) 
-    { 
-        TCCR1B &= ~(1<<ICES1); TIFR1 |= (1<<ICF1); rising = 0; 
-    }
-    else 
+    if (icp1_edge_mode == TRACK_BOTH)
     {
-        TCCR1B |= (1<<ICES1); TIFR1 |= (1<<ICF1); rising = 1;
+        if (rising) 
+        { TCCR1B &= ~(1<<ICES1); TIFR1 |= (1<<ICF1); rising = 0; }
+        else 
+        { TCCR1B |= (1<<ICES1); TIFR1 |= (1<<ICF1); rising = 1; }
     }
 }
 
@@ -82,14 +82,20 @@ ISR(TIMER1_OVF_vect)
     icp1_event_count_at_OVF = icp1_event_count;
 }
 
-void initIcp1(void) 
+// mode { TRACK_FALLING: 0, TRACK_RISING: 1, TRACK_BOTH: 2)
+// prescaler { masked with 0x7 so only lower 3 bits are used see CS12, CS11, and CS10}
+//          1 sets Timer1 to CPU clock, 2 sets Timer1 prescaler /8 ... 
+void initIcp1(uint8_t mode, uint8_t prescaler) 
 {
     icp1_event_count = 0;
     rising = 0;
     icp1_head = 0;
     t1vc.word = 0;
+    icp1_edge_mode = mode;
     
     // Input Capture setup
+    TCCR1A = 0;
+    
     // ICNC1: Enable Input Capture Noise Canceler
     // ICES1: = 1 for trigger on rising edge
     // CS12 CS11 CS10 : set prescaler from system clock (F_CPU)
@@ -98,11 +104,12 @@ void initIcp1(void)
     //   0    1    1  :   /64   prescaler
     //   1    0    0  :   /256  prescaler
     //   1    0    1  :   /1024 prescaler */
-    TCCR1A = 0;
-    TCCR1B = (0<<ICNC1) | (1<<CS10);
+    TCCR1B = (prescaler & 0x7);
     TCCR1C = 0;
 
-    // initialize to catch Falling Edge (this line is also used in ISR to swap from rising to falling edge)
+    if (icp1_edge_mode) // initialize to TRACK_BOTH orTRACK_RISING
+    { TCCR1B |= (1<<ICES1); TIFR1 |= (1<<ICF1); rising = 1; }
+    else // initialize to TRACK_FALLING
     { TCCR1B &= ~(1<<ICES1); TIFR1 |= (1<<ICF1); rising = 0; }
 
     // Interrupt setup
@@ -113,16 +120,16 @@ void initIcp1(void)
 
     // Set up the Input Capture pin, ICP1, Arduino Uno pinMode(8, INPUT)
 #if defined (__AVR_ATmega328P__) || defined (__AVR_ATmega328__)
-    if ( (DDRB & _BV(PB0)) ) // if bit PB0 is set then it is an OUTPUT
+    if ( (DDRB & (1<<PB0)) ) // if bit PB0 is set then it is an OUTPUT
     {
-        DDRB &= ~_BV(PB0);
+        DDRB &= ~(1<<PB0);
     }
     
     // floating may have 60 Hz noise on it (I'll assume it is connected to a pulse source). 
-    PORTB &= ~_BV(PB0); //Arduino Uno digitalWrite(8, 0) 
+    PORTB &= ~(1<<PB0); //Arduino Uno digitalWrite(8, 0) 
     
     // or enable the pullup by setting bit PB0 high in PORTB register. 
-    // PORTB |= _BV(PB0); // Arduino Uno digitalWrite(8, 1) 
+    // PORTB |= (1<<PB0); // Arduino Uno digitalWrite(8, 1) 
     
 #else
 #   error mega328[p] has ICP1 on PB0, check Datasheet for your mcu and then fix this file

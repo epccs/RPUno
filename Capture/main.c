@@ -67,7 +67,7 @@ int main(void)
     // setup()
 
     /* Initialize Input Capture Unit 1 */
-    initIcp1() ;
+    initIcp1(TRACK_BOTH, ICP1_MCUCLOCK) ;
     
     /* Initialize UART, it returns a pointer to FILE so redirect of stdin and stdout works*/
     stdout = stdin = uartstream0_init(BAUD);

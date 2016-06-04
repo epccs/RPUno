@@ -68,6 +68,15 @@ identify
 {"id":{"name":"Capture"}}
 ```
 
+## /0/initICP icp1,(rise|fall|both),(0..7)
+
+Initialize Input Capture ICP1. Set the Input Capture Edge Select mode. Set the prescale (0 = no clock, 1 = MCU clock, 2 = MCU clock/8... see datasheet for others. Note some are not based on the MCU clock)
+
+``` 
+/0/initICP icp1,both,1
+{"icp1":{"edgSel":"both", "preScalr":"1"}}
+```
+
 ## /0/count? [icp1]
 
 Return count of ICP1 (ATmega328 pin PB0. Uno pin 8) event captures. A zero means icp1 captures are not happening (because I forgot to connect a sensor).
@@ -145,6 +154,8 @@ and some start to show skipping
 {"icp1":{"count":"514717563","low":"1645","high":"2045","status":"0"}}
 ``` 
 
-The short pulse is the one that skips because the ISR is not able to change edge detection in time to see the falling edge of the short high pulse so it has to wait for the next falling edge. It takes about 50 machine cycles to enter an interrupt (since all registers used have to be preserved) and then a similar amount of time to restore the interrupted process. 
+The short pulse is the one that skips because the ISR is not able to change edge detection in time to see the falling edge of the short high pulse so it has to wait for the next falling edge. It takes about 50 machine cycles to enter an interrupt (since all registers used have to be preserved) and then a similar amount of time to restore the interrupted process to its original state. 
 
-Unfortuanly it is the Timer 0 (zero) ISR used of millis() timing that is causing the skips. When the ADC ISR is used it may add skips as well. I need millis() so this is going to be somthing I will live with. The minimum pulse width that will insure a capture is about 300 counts or 18.75 uSec. 
+Unfortunately, it is the other ISR's like Timer 0 (zero) used for millis() timing that is causing the skips. I need those interrupts to run so this is going to be something I will live with. The minimum pulse width that will ensure a capture is about 300 counts or 18.75 uSec. It will still gather data down to about 150 counts but some skipping will show up so the data will need outliers tossed. 
+
+Some sensors like flow meters do not need both edges tracked, so the capture can be initialized to track one edge, which may allow pulse events to be gathered at up to about 30kHz. The "capture?" command will not work with only one edge.

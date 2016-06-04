@@ -4,7 +4,6 @@ LIBDIR = ../lib
 OBJECTS = main.o \
 	process.o \
 	pwm.o \
-	count.o \
 	capture.o \
 	../Uart/id.o \
 	$(LIBDIR)/timers.o \

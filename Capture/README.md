@@ -55,6 +55,13 @@ Now connect with picocom (or ilk). Note I am often at another computer doing thi
 picocom -b 115200 /dev/ttyUSB0
 ``` 
 
+or log the terminal session
+
+``` 
+script -f -c "picocom -b 115200 /dev/ttyUSB0" stuff,capture.log
+``` 
+
+
 # Commands
 
 Commands are interactive over the serial interface at 115200 baud rate. The echo will start after second charactor of a new line. 

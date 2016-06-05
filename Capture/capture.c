@@ -82,6 +82,12 @@ void Count(void)
     The ratio may be used to determine the duty.*/
 void Capture(void)
 {
+    if ( icp1_edge_mode != TRACK_BOTH)
+    {
+        printf_P(PSTR("{\"err\":\"IcpWrongMode\"}\r\n"));
+        initCommandBuffer();
+        return;
+    }
     if ( (command_done == 10) )
     {
         if (arg_count == 0)
@@ -336,21 +342,12 @@ void Event(void)
     }
 }
 
-InitICP()
+void InitICP(void)
 {
      if ( (command_done == 10) )
     {
-        int prescale;
-        // arg[0] should say icp1, other mcu's may have icp3...
-        if (arg_count == 3)
-        { 
-            prescale = atoi(arg[2]);
-        }
-        else
-        {
-            printf_P(PSTR("{\"err\":\"IcpArgCnt@%d!=3\"}\r\n"),arg_count);
-            initCommandBuffer();   
-        }
+        // call with arg[0] == icp1 and three arguments
+        int prescale = atoi(arg[2]);
 
         if ((prescale < 0) || (prescale > 0x7) )
         {

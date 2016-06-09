@@ -4,9 +4,21 @@
 
 Demonstration of command parsing with the redirected stdio functions (e.g. printf() and simular)  from avr-libc. 
 
-Toolchain setup http://epccs.org/indexes/Document/DvlpNotes/LinuxBoxCrossCompiler.html
+For how I setup my Makefile toolchain <http://epccs.org/indexes/Document/DvlpNotes/LinuxBoxCrossCompiler.html>.
 
-Makefile based. Without the extras to increase transparency. The tools work in the way they were designed. 
+With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
+
+``` 
+rsutherland@straightneck:~/Samba/RPUno/Capture$ make bootload
+TBD
+``` 
+
+Now connect with picocom (or ilk). Note I am often at another computer doing this through SSH. The Samba folder is for editing the files from Windows.
+
+``` 
+#exit is C-a, C-x
+picocom -b 9600 /dev/ttyUSB0
+``` 
 
 # Command Line
 

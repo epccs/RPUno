@@ -10,7 +10,7 @@ For how I setup my Makefile toolchain <http://epccs.org/indexes/Document/DvlpNot
 
 Minimalized Interrupt-driven UART code based in part on <https://github.com/hwstar/avr-uart>, with added streams based in part on <https://github.com/andygock/avr-uart>
 
-With optiboot installed run 'make bootload' and it will compile and then flash the MCU the same way Arduino does, but without any Arduino stuff.
+With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
 
 ``` 
 rsutherland@conversion:~/Samba/RPUno/Uart$ make bootload
@@ -36,4 +36,5 @@ identify
 
 ``` 
 /0/id?
-{"id":{"name":"Adc"}}.
+{"id":{"name":"Uart","desc":"RPUno Board /w ATmega328p and LT3652","avr-gcc":"4.9"}}
+``` 

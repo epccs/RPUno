@@ -23,28 +23,69 @@ http://www.gnu.org/licenses/gpl-2.0.html
 
 void Id(char name[])
 { 
-    // /id? name 
-    // /id?
-    if ( (command_done == 10) && ( (arg_count == 0) || ( (arg_count == 1) && (strcmp_P( arg[0], PSTR("name")) == 0) ) ) )
+    // /id? 
+    if ( (command_done == 10) && (arg_count == 0) )
     {
-        printf_P(PSTR("{\"id\":{\"name\":\"%s\"}}\r\n"), name);
-        initCommandBuffer();
+        printf_P(PSTR("{\"id\":{"));
+        command_done = 11;
+    }
+    // /id? name 
+    else if ( (command_done == 10) && (arg_count == 1) && (strcmp_P( arg[0], PSTR("name")) == 0) ) 
+    {
+        printf_P(PSTR("{\"id\":{"));
+        command_done = 11;
     }
     // /id? desc
     else if ( (command_done == 10) && (arg_count == 1) && (strcmp_P( arg[0], PSTR("desc")) == 0) )
     {
-        printf_P(PSTR("{\"id\":{\"desc\":\"RPUno Board /w " ));
-        command_done = 11;
-    }
-    else if ( (command_done == 11) && (arg_count == 1) && (strcmp_P( arg[0], PSTR("desc")) == 0) )
-    {
-        printf_P(PSTR("ATmega328p and LT3652\"}}\r\n"));
-        initCommandBuffer();
+        printf_P(PSTR("{\"id\":{" ));
+        command_done = 12;
     }
     // /id? avr-gcc
     else if ( (command_done == 10) && (arg_count == 1) && (strcmp_P( arg[0], PSTR("avr-gcc")) == 0) )
     {
-        printf_P(PSTR("{\"id\":{\"avr-gcc\":\"%d.%d\"}}\r\n"),__GNUC__,__GNUC_MINOR__);
+        printf_P(PSTR("{\"id\":{"));
+        command_done = 14;
+    }
+    else if ( command_done == 11 )
+    {
+        printf_P(PSTR("\"name\":\"%s\"" ),name);
+        if (arg_count == 1) 
+        { 
+            command_done = 15;  
+        }
+        else 
+        { 
+            printf_P(PSTR("," ));
+            command_done = 12; 
+        }
+    }
+    else if ( command_done == 12 )
+    {
+        printf_P(PSTR("\"desc\":\"RPUno Board /w " ));
+        command_done = 13;
+    }
+    else if ( command_done == 13 )
+    {
+        printf_P(PSTR("atmega328p and LT3652\""));
+        if (arg_count == 1) 
+        { 
+            command_done = 15; 
+        }
+        else 
+        { 
+            printf_P(PSTR("," ));
+            command_done = 14; 
+        }
+    }
+    else if ( command_done == 14 )
+    {
+        printf_P(PSTR("\"avr-gcc\":\"%d.%d\""),__GNUC__,__GNUC_MINOR__);
+        command_done = 15; 
+    }
+    else if ( command_done == 15 )
+    {
+        printf_P(PSTR("}}\r\n"));
         initCommandBuffer();
     }
     else

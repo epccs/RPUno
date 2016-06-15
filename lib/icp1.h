@@ -20,12 +20,11 @@
 #ifndef Icp1_h
 #define Icp1_h
 
-#define EVENT_BUFF_SIZE 32
-#define EVENT_BUFF_MASK (EVENT_BUFF_SIZE - 1)
-
-#if ( EVENT_BUFF_SIZE & EVENT_BUFF_MASK )
-    #error event buffer size is not a power of 2
+#ifdef  __cplusplus
+extern "C" {
 #endif
+
+#include "icp_buf.h"
 
 extern void initIcp1(uint8_t mode, uint8_t prescaler);
 
@@ -43,24 +42,10 @@ extern volatile uint8_t icp1_edge_mode;
 #define ICP1_MCUDIV256 4
 #define ICP1_MCUDIV1024 5
 
-// only the first 32 bytes can be accessed quickly using the AVR ldd instruction.
-// this means that the total array size needs to be held bellow that
-// however I want to capture up to 32 events so a struct is not helpful
-extern volatile uint8_t event_Byt0[EVENT_BUFF_SIZE];
-extern volatile uint8_t event_Byt1[EVENT_BUFF_SIZE];
-
-// status bit zero tells if event is a rising/falling edge
-#define RISING 0
-extern volatile uint8_t event_status[EVENT_BUFF_SIZE];
-
-// head of icp1 buffer
-extern volatile uint8_t icp1_head;
+extern ICP_ISR icp1;
 
 //used as bool to tell if a rising edge will cause capture event, false is falling edge
 extern volatile uint8_t rising;
-
-// icp1 pulse count
-extern volatile uint32_t icp1_event_count;
 
 // a timer1 overflow records the icp1 event count
 extern volatile uint32_t icp1_event_count_at_OVF;
@@ -70,5 +55,9 @@ typedef union { uint32_t dword; uint16_t word[2]; } LONG_2_WORD;
  
 // timer 1 virtual counter
 extern volatile WORD_2_BYTE t1vc;
+
+#ifdef  __cplusplus
+}
+#endif
 
 #endif // Icp1_h

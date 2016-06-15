@@ -20,6 +20,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include <stdio.h>
 #include <stdlib.h> 
 #include "../lib/parse.h"
+#include "../lib/icp_buf.h"
 #include "../lib/icp1.h"
 #include "../lib/timers.h"
 #include "capture.h"
@@ -30,12 +31,8 @@ static unsigned long serial_print_started_at;
 static uint16_t low;
 static uint16_t high;
 
-// copy of the event buffer for serial output
-static uint8_t cpy_event_Byt0[EVENT_BUFF_SIZE];
-static uint8_t cpy_event_Byt1[EVENT_BUFF_SIZE];
-static uint8_t cpy_event_status[EVENT_BUFF_SIZE];
-static uint8_t cpy_icp1_head;
-static uint32_t cpy_icp1_event_count;
+// a double buffer of the event capture is used for serial output
+ICP icp1_db;
 
 static int event_pair;
 static int event_pair_output;
@@ -56,7 +53,7 @@ void Count(void)
         uint32_t local_cpy_icp1_event_count;
         ATOMIC_BLOCK ( ATOMIC_RESTORESTATE )
         {
-            local_cpy_icp1_event_count = icp1_event_count;
+            local_cpy_icp1_event_count = icp1.count;
         }
         printf_P(PSTR("{\"icp1\":{\"count\":\"%lu\"}}\r\n"),local_cpy_icp1_event_count);
         command_done = 11;
@@ -104,9 +101,9 @@ void Capture(void)
             initCommandBuffer();   
         }
 
-        if ((event_pair < 1) || (event_pair >= (EVENT_BUFF_SIZE/2)) )
+        if ((event_pair < 1) || (event_pair >= (ICP_EVENT_BUFF_SIZE/2)) )
         {
-            printf_P(PSTR("{\"err\":\"IcpMaxArg%d\"}\r\n"),(EVENT_BUFF_SIZE/2)-1);
+            printf_P(PSTR("{\"err\":\"IcpMaxArg%d\"}\r\n"),(ICP_EVENT_BUFF_SIZE/2)-1);
             initCommandBuffer();
         }
         else
@@ -115,30 +112,12 @@ void Capture(void)
             event_pair_output =0;
             
             // buffer has enough readings
-            if (icp1_event_count > ((event_pair * 2) +1) ) 
+            if (icp1.count > ((event_pair * 2) +1) ) 
             { 
                 uint8_t num_of_events_needed=((event_pair * 2) +1);
                 
-                // copy at least enough events for the report
-                // cast to integers allows use of two's-complement math
-                cpy_icp1_head =(uint8_t)( (int8_t)(icp1_head) - (int8_t)(num_of_events_needed+1) ) & (EVENT_BUFF_MASK);
-                
-                // now copy the event buffer, icp1_head may advance but when we catch up to it the copy is done
-                {
-                    uint8_t i=0;
-                    while ((cpy_icp1_head != icp1_head) | (i < num_of_events_needed) ) 
-                    {
-                        ATOMIC_BLOCK ( ATOMIC_RESTORESTATE )
-                        {
-                            cpy_icp1_head = (cpy_icp1_head +1 ) & (EVENT_BUFF_MASK);
-                            cpy_event_Byt0[cpy_icp1_head] = event_Byt0[cpy_icp1_head];
-                            cpy_event_Byt1[cpy_icp1_head] = event_Byt1[cpy_icp1_head];
-                            cpy_event_status[cpy_icp1_head] = event_status[cpy_icp1_head];
-                            cpy_icp1_event_count = icp1_event_count;
-                        }
-                        if (i < num_of_events_needed) i++;
-                    }
-                }
+                // copy from icp1 to icp1_db
+                double_buffer_copy(&icp1, &icp1_db, num_of_events_needed);
                 
                 // used to delay serial printing
                 serial_print_started_at = millis();
@@ -147,32 +126,32 @@ void Capture(void)
             }
             else
             {
-                printf_P(PSTR("{\"err\":\"IcpEvntCnt@%d\"}\r\n"), icp1_event_count);
+                printf_P(PSTR("{\"err\":\"IcpEvntCnt@%d\"}\r\n"), icp1.count);
                 initCommandBuffer();
             }
         }
     }
     else if ( (command_done == 11) )
     { // use the event_count for indexing the time stamps
-        printf_P(PSTR("{\"icp1\":{\"count\":\"%lu\","),(cpy_icp1_event_count - 2*(event_pair_output) ) );
+        printf_P(PSTR("{\"icp1\":{\"count\":\"%lu\","),(icp1_db.count - 2*(event_pair_output) ) );
         command_done = 12;
     }
 
     else if ( (command_done == 12) )
     {
         // cast to int to use two's complement math then cast back into a uint8_t and mask to the buffer size.
-        uint8_t high2low_event_index = ((uint8_t)(((int8_t)cpy_icp1_head) - ((int8_t)2*(event_pair_output)))) & (EVENT_BUFF_MASK);
-        uint8_t low2high_event_index = ((uint8_t)(((int8_t)high2low_event_index) - 1)) & (EVENT_BUFF_MASK);
-        uint8_t period_event_index = ((uint8_t)(((int8_t)low2high_event_index) - 1)) & (EVENT_BUFF_MASK);
+        uint8_t high2low_event_index = ((uint8_t)(((int8_t)icp1_db.head) - ((int8_t)2*(event_pair_output)))) & (ICP_EVENT_BUFF_MASK);
+        uint8_t low2high_event_index = ((uint8_t)(((int8_t)high2low_event_index) - 1)) & (ICP_EVENT_BUFF_MASK);
+        uint8_t period_event_index = ((uint8_t)(((int8_t)low2high_event_index) - 1)) & (ICP_EVENT_BUFF_MASK);
 
         // the event time is keep in two byte arrays to make the ISR fast and 
         // allow up to 32 events with quick access of the AVR ldd instruction.
         uint16_t high2low_event;
         uint16_t low2high_event;
         uint16_t period_event;
-        high2low_event = (((uint16_t)cpy_event_Byt1[high2low_event_index]) <<8) + ((uint16_t)cpy_event_Byt0[high2low_event_index]);
-        low2high_event = (((uint16_t)cpy_event_Byt1[low2high_event_index]) <<8) + ((uint16_t)cpy_event_Byt0[low2high_event_index]);
-        period_event = (((uint16_t)cpy_event_Byt1[period_event_index]) <<8) + ((uint16_t)cpy_event_Byt0[period_event_index]);
+        high2low_event = (((uint16_t)icp1_db.event.Byt1[high2low_event_index]) <<8) + ((uint16_t)icp1_db.event.Byt0[high2low_event_index]);
+        low2high_event = (((uint16_t)icp1_db.event.Byt1[low2high_event_index]) <<8) + ((uint16_t)icp1_db.event.Byt0[low2high_event_index]);
+        period_event = (((uint16_t)icp1_db.event.Byt1[period_event_index]) <<8) + ((uint16_t)icp1_db.event.Byt0[period_event_index]);
 
         // Now find counts between events while ICP1 was low and then when it was high
         // cast to int causes two's complement math to be used which gives correct result through a roll over
@@ -180,7 +159,7 @@ void Capture(void)
         high = (uint16_t)((int16_t)low2high_event - (int16_t)period_event);
         
         // if the last capture was on a falling event, swap low and high count
-        if ( (cpy_event_status[high2low_event_index] & (1<<RISING)) == 0)
+        if ( (icp1_db.event.status[high2low_event_index] & (1<<RISING)) == 0)
         { 
             uint16_t temp = low;
             low = high;
@@ -189,7 +168,7 @@ void Capture(void)
         
         // status of the three events are combined... only the most recent RISING flag is given 
         // bit 0 has RISING status bit from  high2low_event_index 
-        event_pair_status = (cpy_event_status[high2low_event_index] & (0x1)) ;
+        event_pair_status = (icp1_db.event.status[high2low_event_index] & (0x1)) ;
         
         // print in  steps otherwise the buffer will fill and block the program from running
         printf_P(PSTR("\"low\":\"%u\","),(unsigned int)low);
@@ -247,9 +226,9 @@ void Event(void)
             initCommandBuffer();   
         }
 
-        if ((event_report < 1) || (event_report >= (EVENT_BUFF_SIZE)) )
+        if ((event_report < 1) || (event_report >= (ICP_EVENT_BUFF_SIZE)) )
         {
-            printf_P(PSTR("{\"err\":\"IcpMaxEvents@%d\"}\r\n"),(EVENT_BUFF_SIZE-1));
+            printf_P(PSTR("{\"err\":\"IcpMaxEvents@%d\"}\r\n"),(ICP_EVENT_BUFF_SIZE-1));
             initCommandBuffer();
         }
         else
@@ -258,29 +237,11 @@ void Event(void)
             event_report_output =0;
             
             // buffer has enough readings
-            if (icp1_event_count > event_report) 
+            if (icp1.count > event_report) 
             { 
-                // copy at least enough events for the report
-                // cast to integers allows use of two's-complement math
-                cpy_icp1_head =(uint8_t)( (int8_t)(icp1_head) - (int8_t)(event_report+1) ) & (EVENT_BUFF_MASK);
+                // copy from icp1 to icp1_db
+                double_buffer_copy(&icp1, &icp1_db, (uint8_t)event_report);
                 
-                // now copy the event buffer, icp1_head may advance but when we catch up to it the copy is done
-                {
-                    uint8_t i=0;
-                    while ((cpy_icp1_head != icp1_head) | (i < event_report) ) 
-                    {
-                        ATOMIC_BLOCK ( ATOMIC_RESTORESTATE )
-                        {
-                            cpy_icp1_head = (cpy_icp1_head +1 ) & (EVENT_BUFF_MASK);
-                            cpy_event_Byt0[cpy_icp1_head] = event_Byt0[cpy_icp1_head];
-                            cpy_event_Byt1[cpy_icp1_head] = event_Byt1[cpy_icp1_head];
-                            cpy_event_status[cpy_icp1_head] = event_status[cpy_icp1_head];
-                            cpy_icp1_event_count = icp1_event_count;
-                        }
-                        if (i < event_report) i++;
-                    }
-                }
-
                 // used to delay serial printing
                 serial_print_started_at = millis();
                 
@@ -288,28 +249,28 @@ void Event(void)
             }
             else
             {
-                printf_P(PSTR("{\"err\":\"IcpEvntCnt@%d\"}\r\n"), icp1_event_count);
+                printf_P(PSTR("{\"err\":\"IcpEvntCnt@%d\"}\r\n"), icp1.count);
                 initCommandBuffer();
             }
         }
     }
     else if ( (command_done == 11) )
     { // use the event_count for indexing the time stamps
-        printf_P(PSTR("{\"icp1\":{\"count\":\"%lu\","),(cpy_icp1_event_count - event_report_output) );
+        printf_P(PSTR("{\"icp1\":{\"count\":\"%lu\","),(icp1_db.count - event_report_output) );
         command_done = 12;
     }
 
     else if ( (command_done == 12) )
     {
         // cast to int to use two's complement math then cast back into a uint8_t and mask to the buffer size.
-        uint8_t event_index = ( (uint8_t)(((int8_t)cpy_icp1_head) - ((int8_t)(event_report_output))) ) & (EVENT_BUFF_MASK);
+        uint8_t event_index = ( (uint8_t)(((int8_t)icp1_db.head) - ((int8_t)(event_report_output))) ) & (ICP_EVENT_BUFF_MASK);
 
         // the event time is keep in two byte arrays to make the ISR fast and 
         // allow up to 32 events with quick access of the AVR ldd instruction.
         uint16_t uint16_event;
-        uint16_event = (((uint16_t)cpy_event_Byt1[event_index]) <<8) + ((uint16_t)cpy_event_Byt0[event_index]);
+        uint16_event = (((uint16_t)icp1_db.event.Byt1[event_index]) <<8) + ((uint16_t)icp1_db.event.Byt0[event_index]);
 
-        event_report_status = cpy_event_status[event_index] ;
+        event_report_status = icp1_db.event.status[event_index] ;
 
         // print in  steps otherwise the buffer will fill and block the program from running
         printf_P(PSTR("\"event\":\"%u\","),(unsigned int)uint16_event);

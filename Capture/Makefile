@@ -9,6 +9,7 @@ OBJECTS = main.o \
 	$(LIBDIR)/timers.o \
 	$(LIBDIR)/uart.o \
 	$(LIBDIR)/adc.o \
+	$(LIBDIR)/icp_buf.o \
 	$(LIBDIR)/icp1.o \
 	$(LIBDIR)/parse.o
 

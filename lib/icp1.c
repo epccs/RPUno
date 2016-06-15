@@ -23,14 +23,12 @@
 */
 
 #include <util/atomic.h>
+#include "icp_buf.h"
 #include "icp1.h"
 
 volatile uint8_t icp1_edge_mode;
-volatile uint8_t event_Byt0[EVENT_BUFF_SIZE];
-volatile uint8_t event_Byt1[EVENT_BUFF_SIZE];
-volatile uint8_t event_status[EVENT_BUFF_SIZE];
-volatile uint8_t icp1_head; 
-volatile uint32_t icp1_event_count; 
+ICP_ISR icp1;
+
 volatile uint32_t icp1_event_count_at_OVF; 
 volatile uint8_t rising; 
 
@@ -49,16 +47,17 @@ another clock to time volume events from a calibrated Prover (a volume measureme
 during a calibration of a custody transfer flow meter (it can then be certified to that standard). */
 ISR(TIMER1_CAPT_vect) {
 
-    // put the next timestamp onto the buffer
-    icp1_head = (icp1_head+1) & EVENT_BUFF_MASK;
+    // index to next buffer location 
+    uint8_t loacal_head = (icp1.head+1) & ICP_EVENT_BUFF_MASK;
     
-    // Capture Register bytes
-    event_Byt0[icp1_head] = ICR1L; 
-    event_Byt1[icp1_head] = ICR1H; 
-    event_status[icp1_head] = (rising & (1<<RISING));
+    // put the Capture Register bytes of timestamp onto the buffer
+    icp1.event.Byt0[loacal_head] = ICR1L; 
+    icp1.event.Byt1[loacal_head] = ICR1H; 
+    icp1.event.status[loacal_head] = (rising & (1<<RISING));
+    icp1.head = loacal_head;
     
-    // count all edges
-    icp1_event_count++;
+    // count each timestamp
+    icp1.count++;
 
     // edge tracking: rising or falling
     // ATmega328p datasheet said to clear ICF1 after edge direction change 
@@ -79,7 +78,7 @@ ISR(TIMER1_CAPT_vect) {
 ISR(TIMER1_OVF_vect) 
 {
     t1vc.word++;
-    icp1_event_count_at_OVF = icp1_event_count;
+    icp1_event_count_at_OVF = icp1.count;
 }
 
 // mode { TRACK_FALLING: 0, TRACK_RISING: 1, TRACK_BOTH: 2)
@@ -87,9 +86,9 @@ ISR(TIMER1_OVF_vect)
 //          1 sets Timer1 to CPU clock, 2 sets Timer1 prescaler /8 ... 
 void initIcp1(uint8_t mode, uint8_t prescaler) 
 {
-    icp1_event_count = 0;
+    icp1.count = 0;
     rising = 0;
-    icp1_head = 0;
+    icp1.head = 0;
     t1vc.word = 0;
     icp1_edge_mode = mode;
     

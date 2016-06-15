@@ -118,7 +118,7 @@ It takes three events to aggregate the data for a capture report. The status rep
 
 ## /0/event? [icp1,1..31] 
 
-return ICP1 event timer values as a 16 bit unsign integer, which continuously rolls over. The status bit 0 shows rising (0 is falling) edge.
+return ICP1 event timer values as a 16 bit unsigned integer, which continuously rolls over. The status bit 0 shows rising (0 is falling) edge.
 
 ``` 
 /0/event? icp1,3
@@ -163,6 +163,6 @@ and some start to show skipping
 
 The short pulse is the one that skips because the ISR is not able to change edge detection in time to see the falling edge of the short high pulse so it has to wait for the next falling edge. It takes about 50 machine cycles to enter an interrupt (since all registers used have to be preserved) and then a similar amount of time to restore the interrupted process to its original state. 
 
-Unfortunately, it is the other ISR's like Timer 0 (zero) used for millis() timing that is causing the skips. I need those interrupts to run so this is going to be something I will live with. The minimum pulse width that will ensure a capture is about 300 counts or 18.75 uSec. It will still gather data down to about 150 counts but some skipping will show up so the data will need outliers tossed. 
+Unfortunately, it is the other ISR's like Timer 0 (zero) used for millis() timing that is causing the skips. I need those interrupts to run so this is going to be something I will live with. The minimum pulse width that will ensure a capture is about 50 counts more than the longest interrupt, I am not seeing skips on pulses above 300 counts (18.75 uSec). The program will still gather data down to about 130 counts but some skipping will show up need tossed (they are sampling errors, e.g. outlier). 
 
 Some sensors like flow meters do not need both edges tracked, so the capture can be initialized to track one edge, which may allow pulse events to be gathered at up to about 30kHz. The "capture?" command will not work with only one edge.

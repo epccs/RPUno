@@ -1,5 +1,5 @@
 /*
-Adc is a command line controled demonstration of Interrupt Driven Analog Conversion
+Ht is a command line controled demonstration of the HT sensor usage
 Copyright (C) 2016 Ronald Sutherland
 
 This program is free software; you can redistribute it and/or
@@ -15,30 +15,6 @@ GNU General Public License for more details.
 For a copy of the GNU General Public License use
 http://www.gnu.org/licenses/gpl-2.0.html
 
-    Adc is an interactive command line program that demonstrates
-    control of an ATmega328p (e.g. Arduino Uno) Analog-to-Digital Converter
-    from pins PC0 through PC7. Warning Arduino marked there board as A0 
-    though A5, which is somtimes confused as PA0, I think they wanted it to 
-    mean the ADMUX value. 
-
-    COMMAND LINE STRUCTURE: e.g. /0/id?
-    position            usage 
-    '/'                 first char will flush the transmit buffer and nuke any command in process
-    '0'                 second char will address a (multi-drop) device and start echo
-    command             is a string of isalpha() or '/' or '?' only 
-    [space]             use an isspace() char between command and arguments
-    [arg[,arg[...]]]    one or more comma delimited arguments e.g. "13,high"  
-    [\r]\n              end of comand line
-            
-
-    id? [name|desc|avr-gcc]       sends back device info (name is the default)
-    analog? 0..7[,0..7[,0..7[,0..7[,0..7]]]]    adc reading from up to 5 channels.
-                        The reading repeats until the Rx buffer has a character.
-
-On Linux picocom can be used as a minimal serial terminal
-
-picocom -b 115200 /dev/ttyUSB0
-exit is C-a, C-x
 */
 #include <avr/pgmspace.h>
 #include <util/atomic.h>
@@ -47,17 +23,17 @@ exit is C-a, C-x
 #include "../lib/parse.h"
 #include "../lib/timers.h"
 #include "../lib/adc.h"
+#include "../lib/icp1.h"
 
 // running the ADC burns power, which can be saved by delaying its use
 #define ADC_DELAY_MILSEC 10000
 static unsigned long adc_started_at;
 
-
 int main(void) 
-{
+{    
     // Initialize Timers, ADC, and clear bootloader, Arduino does these with init() in wiring.c 
     initTimers(); //Timer0 Fast PWM mode, Timer1 & Timer2 Phase Correct PWM mode.
-    init_ADC_single_conversion(EXTERNAL_AVCC); // warning AREF should only have a bypass cap
+    init_ADC_single_conversion(EXTERNAL_AVCC); // warning AREF must not be connected to anything
     init_uart0_after_bootloader(); // bootloader may have the UART setup
     
     // setup()
@@ -66,6 +42,8 @@ int main(void)
     enable_ADC_auto_conversion();
     adc_started_at = millis();
     
+    /* Initialize Input Capture Unit 1 */
+    initIcp1(TRACK_BOTH, ICP1_MCUCLOCK) ;
     
     /* Initialize UART, it returns a pointer to FILE so redirect of stdin and stdout works*/
     stdout = stdin = uartstream0_init(BAUD);
@@ -73,11 +51,11 @@ int main(void)
     /* Clear and setup the command buffer, (probably not needed at this point) */
     initCommandBuffer();
 
-    sei(); // Enable global interrupts starts TIMER0, UART0, ADC and any other ISR's
+    sei(); // Enable global interrupts starts TIMER0, UART0, ICP1 and other ISR's
     
-    // loop() 
-    while(1) /* I am tyring to use non-blocking code */
-    { 
+    // loop() /* I am tyring to use non-blocking code */
+    while(1) 
+    {
         unsigned long kRuntime;
         
         // check if character is available to assemble a command, e.g. non-blocking

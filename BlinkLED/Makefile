@@ -59,7 +59,7 @@ bootload: $(TARGET).hex
 
 $(TARGET).elf: $(OBJECTS)
 	$(CC) $(LDFLAGS) $(TARGET_ARCH) $^ -o $@
-	$(SIZE) $@
+	$(SIZE) -C --mcu=$(MCU) $@
 	rm -f $(TARGET).o $(OBJECTS)
 
 clean: 

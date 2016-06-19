@@ -8,23 +8,32 @@ Note Arduino marked there Uno board as A0 though A5, which is somtimes confused 
 
 For how I setup my Makefile toolchain <http://epccs.org/indexes/Document/DvlpNotes/LinuxBoxCrossCompiler.html>.
 
-With optiboot installed run 'make bootload' and it will compile and then flash the MCU the same way Arduino does, but without any Arduino stuff.
+With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
 
 ``` 
 rsutherland@straightneck:~/Samba/RPUno/Adc$ make bootload
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o main.o main.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o process.o process.c
-avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o id.o id.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o analog.o analog.c
+avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../Uart/id.o ../Uart/id.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/timers.o ../lib/timers.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/uart.o ../lib/uart.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/adc.o ../lib/adc.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/parse.o ../lib/parse.c
-avr-gcc -Wl,-Map,Adc.map  -Wl,--gc-sections  -Wl,-u,vfprintf -lprintf_flt -lm -mmcu=atmega328p main.o process.o id.o analog.o ../lib/timers.o ../lib/uart.o ../lib/adc.o ../lib/parse.o -o Adc.elf
-avr-size Adc.elf
-   text    data     bss     dec     hex filename
-   8232      16     156    8404    20d4 Adc.elf
-rm -f Adc.o main.o process.o id.o analog.o ../lib/timers.o ../lib/uart.o ../lib/adc.o ../lib/parse.o
+avr-gcc -Wl,-Map,Adc.map  -Wl,--gc-sections  -Wl,-u,vfprintf -lprintf_flt -lm -mmcu=atmega328p main.o process.o analog.o ../Uart/id.o ../lib/timers.o ../lib/uart.o ../lib/adc.o ../lib/parse.o -o Adc.elf
+avr-size -C --mcu=atmega328p Adc.elf
+AVR Memory Usage
+----------------
+Device: atmega328p
+
+Program:    8472 bytes (25.9% Full)
+(.text + .data + .bootloader)
+
+Data:        180 bytes (8.8% Full)
+(.data + .bss + .noinit)
+
+
+rm -f Adc.o main.o process.o analog.o ../Uart/id.o ../lib/timers.o ../lib/uart.o ../lib/adc.o ../lib/parse.o
 avr-objcopy -j .text -j .data -O ihex Adc.elf Adc.hex
 rm -f Adc.elf
 avrdude -v -p atmega328p -c arduino -P /dev/ttyUSB0 -b 115200 -U flash:w:Adc.hex
@@ -90,28 +99,27 @@ avrdude: NOTE: "flash" memory has been specified, an erase cycle will be perform
 avrdude: erasing chip
 avrdude: reading input file "Adc.hex"
 avrdude: input file Adc.hex auto detected as Intel Hex
-avrdude: writing flash (8248 bytes):
+avrdude: writing flash (8472 bytes):
 
-Writing | ################################################## | 100% 1.17s
+Writing | ################################################## | 100% 1.27s
 
-avrdude: 8248 bytes of flash written
+avrdude: 8472 bytes of flash written
 avrdude: verifying flash memory against Adc.hex:
 avrdude: load data flash data from input file Adc.hex:
 avrdude: input file Adc.hex auto detected as Intel Hex
-avrdude: input file Adc.hex contains 8248 bytes
+avrdude: input file Adc.hex contains 8472 bytes
 avrdude: reading on-chip flash data:
 
-Reading | ################################################## | 100% 0.84s
+Reading | ################################################## | 100% 1.01s
 
 avrdude: verifying ...
-avrdude: 8248 bytes of flash verified
+avrdude: 8472 bytes of flash verified
 
 avrdude: safemode: hfuse reads as 0
 avrdude: safemode: efuse reads as 0
 avrdude: safemode: Fuses OK (E:00, H:00, L:00)
 
 avrdude done.  Thank you.
-
 ``` 
 
 Now connect with picocom (or ilk). Note I am often at another computer doing this through SSH. The Samba folder is for editing the files from Windows.
@@ -121,6 +129,13 @@ Now connect with picocom (or ilk). Note I am often at another computer doing thi
 #exit is C-a, C-x
 picocom -b 115200 /dev/ttyUSB0
 ``` 
+
+or log the terminal session
+
+``` 
+script -f -c "picocom -b 115200 /dev/ttyUSB0" stuff.log
+``` 
+
 
 # Commands
 

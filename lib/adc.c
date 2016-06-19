@@ -38,9 +38,15 @@ ISR(ADC_vect){
     }
     else
     {
-        // select next channel to do conversion on
+#if defined(ADMUX)
+        // clear the mux to select the next channel to do conversion without changing the reference
         ADMUX &= ~(1<<MUX3) & ~(1<<MUX2) & ~(1<<MUX1) & ~(1<<MUX0);
-        ADMUX = (((ADMUX & ~(1<<REFS1)) | (1<<REFS0)) & ~(1<<ADLAR)) + adc_channel;
+        
+        // use a stack register to reset the referance, most likly it is not changed and fliping the hardware bit would mess up the reading.
+        ADMUX = ( (ADMUX & ~(ADREFSMASK) & ~(1<<ADLAR) ) | analog_reference ) + adc_channel;
+#else
+#   error missing ADMUX register which is used to sellect the reference and channel
+#endif
 
         // set ADSC in ADCSRA, ADC Start Conversion
         ADCSRA |= (1<<ADSC);
@@ -52,46 +58,54 @@ ISR(ADC_vect){
     a reference is selected at initialization (and it only needs avr-libc).  */
 void init_ADC_single_conversion(uint8_t reference)
 {
-    /* The user has to select the reference they want to
-        initialization the ADC with, it is not automagic.  
-        If smoke is let out because AREF was connected to
-        to another source while AVCC was selected ... 
-        AREF should probably never have been broken out 
-        as a user pin */
-    volatile uint8_t analog_reference = reference;
+    // The user must select the reference they want to initialization the ADC with, 
+    // it should not be automagic. Smoke will get let out if AREF is connected to
+    // another source while AVCC is selected. AREF should not be run to a pin.
+    analog_reference = reference;
+
+#if defined(ADMUX)
+    // clear the channel select MUX
+    uint8_t local_ADMUX = ADMUX & ~(1<<MUX3) & ~(1<<MUX2) & ~(1<<MUX1) & ~(1<<MUX0);
+
+    // clear the reference bits REFS0, REFS1[,REFS2]
+    local_ADMUX = (local_ADMUX & ~(ADREFSMASK));
     
     // select the reference so it has time to stabalize.
-    ADMUX = (analog_reference << 6);
+    ADMUX = local_ADMUX | reference ;
+#else
+#   error missing ADMUX register which is used to sellect the reference and channel
+#endif
+    
     
 #if defined(ADCSRA)
 	// set a2d prescaler so we are inside the desired 50-200 KHz range.
 	#if F_CPU >= 16000000 // 16 MHz / 128 = 125 KHz
-		ADCSRA |= _BV(ADPS2);
-		ADCSRA |= _BV(ADPS1);
-		ADCSRA |= _BV(ADPS0);
+		ADCSRA |= (1<<ADPS2);
+		ADCSRA |= (1<<ADPS1);
+		ADCSRA |= (1<<ADPS0);
 	#elif F_CPU >= 8000000 // 8 MHz / 64 = 125 KHz
-		ADCSRA |= _BV(ADPS2);
-		ADCSRA |= _BV(ADPS1);
-		ADCSRA &= ~_BV(ADPS0);
+		ADCSRA |= (1<<ADPS2);
+		ADCSRA |= (1<<ADPS1);
+		ADCSRA &= ~(1<<ADPS0);
 	#elif F_CPU >= 4000000 // 4 MHz / 32 = 125 KHz
-		ADCSRA |= _BV(ADPS2);
-		ADCSRA &= ~_BV(ADPS1);
-		ADCSRA |= _BV(ADPS0);
+		ADCSRA |= (1<<ADPS2);
+		ADCSRA &= ~(1<<ADPS1);
+		ADCSRA |= (1<<ADPS0);
 	#elif F_CPU >= 2000000 // 2 MHz / 16 = 125 KHz
-		ADCSRA |= _BV(ADPS2);
-		ADCSRA &= ~_BV(ADPS1);
-		ADCSRA &= ~_BV(ADPS0);
+		ADCSRA |= (1<<ADPS2);
+		ADCSRA &= ~(1<<ADPS1);
+		ADCSRA &= ~(1<<ADPS0);
 	#elif F_CPU >= 1000000 // 1 MHz / 8 = 125 KHz
-		ADCSRA &= ~_BV(ADPS2);
-		ADCSRA |= _BV(ADPS1);
-		ADCSRA |= _BV(ADPS0);
+		ADCSRA &= ~(1<<ADPS2);
+		ADCSRA |= (1<<ADPS1);
+		ADCSRA |= (1<<ADPS0);
 	#else // 128 kHz / 2 = 64 KHz -> This is the closest you can get, the prescaler is 2
-		ADCSRA &= ~_BV(ADPS2);
-		ADCSRA &= ~_BV(ADPS1);
-        ADCSRA |= _BV(ADPS0);
+		ADCSRA &= ~(1<<ADPS2);
+		ADCSRA &= ~(1<<ADPS1);
+        ADCSRA |= (1<<ADPS0);
 	#endif
 	// enable a2d conversions
-	ADCSRA |= _BV(ADEN);
+	ADCSRA |= (1<<ADEN);
 #endif
     ADC_auto_conversion = 0;
 }
@@ -114,7 +128,14 @@ void enable_ADC_auto_conversion()
     //      EXTERNAL_AVCC (1<<REFS0)
     //      INTERNAL_1V1 (1<<REFS1) | (1<<REFS0)
 #if defined(ADMUX)
-    ADMUX = ( ( (ADMUX & ~(ADREFSMASK)) & ~(0x07)) | analog_reference );
+    // clear the channel select MUX
+    uint8_t local_ADMUX = ADMUX & ~(1<<MUX3) & ~(1<<MUX2) & ~(1<<MUX1) & ~(1<<MUX0);
+
+    // clear the reference bits REFS0, REFS1[,REFS2]
+    local_ADMUX = (local_ADMUX & ~(ADREFSMASK));
+    
+    // select the reference so it has time to stabalize.
+    ADMUX = local_ADMUX | analog_reference ;
 #else
 #   error missing ADMUX register which is used to sellect the reference and channel
 #endif
@@ -125,10 +146,38 @@ void enable_ADC_auto_conversion()
     // set ADIE, Interrupt Enable
     // set ADPS[2:0], Prescaler division factor (128, thus 16M/128 = 125kHz ADC clock)
     // Note, the first instruction takes 25 ADC clocks to execute, next takes 13 clocks
-#if defined(ADCSRA) && defined(ADCL)
-    ADCSRA = ( (ADCSRA | (1<<ADEN)) & ~(1<<ADATE) ) | (1 << ADIE) | (1<<ADPS2) | (1<<ADPS1) | (1<<ADPS0);
+#if defined(ADCSRA)
+	// set a2d prescaler so we are inside the desired 50-200 KHz range.
+	#if F_CPU >= 16000000 // 16 MHz / 128 = 125 KHz
+		ADCSRA |= (1<<ADPS2);
+		ADCSRA |= (1<<ADPS1);
+		ADCSRA |= (1<<ADPS0);
+	#elif F_CPU >= 8000000 // 8 MHz / 64 = 125 KHz
+		ADCSRA |= (1<<ADPS2);
+		ADCSRA |= (1<<ADPS1);
+		ADCSRA &= ~(1<<ADPS0);
+	#elif F_CPU >= 4000000 // 4 MHz / 32 = 125 KHz
+		ADCSRA |= (1<<ADPS2);
+		ADCSRA &= ~(1<<ADPS1);
+		ADCSRA |= (1<<ADPS0);
+	#elif F_CPU >= 2000000 // 2 MHz / 16 = 125 KHz
+		ADCSRA |= (1<<ADPS2);
+		ADCSRA &= ~(1<<ADPS1);
+		ADCSRA &= ~(1<<ADPS0);
+	#elif F_CPU >= 1000000 // 1 MHz / 8 = 125 KHz
+		ADCSRA &= ~(1<<ADPS2);
+		ADCSRA |= (1<<ADPS1);
+		ADCSRA |= (1<<ADPS0);
+	#else // 128 kHz / 2 = 64 KHz -> This is the closest you can get, the prescaler is 2
+		ADCSRA &= ~(1<<ADPS2);
+		ADCSRA &= ~(1<<ADPS1);
+        ADCSRA |= (1<<ADPS0);
+	#endif
+    
+	// Power up the ADC and set it for a single conversion with interrupts enabled
+    ADCSRA = ( (ADCSRA | (1<<ADEN) ) & ~(1<<ADATE) ) | (1 << ADIE);
 
-    // set ADSC in ADCSRA, ADC Start Conversion
+    // Start an ADC Conversion 
     ADCSRA |= (1<<ADSC);
 #else
 #   error missing ADCSRA register which has ADSC bit that is used to start a conversion
@@ -139,11 +188,15 @@ void enable_ADC_auto_conversion()
 
 // select the reference so it can stabalize, if it smokes now
 // it would smoke when analogRead() was done anyway.
-void analogReference(uint8_t mode)
+void analogReference(uint8_t reference)
 {
-	analog_reference = mode;
+	analog_reference = reference;
 #if defined(ADMUX)
-        ADMUX = ( (ADMUX & ~(ADREFSMASK)) | analog_reference );
+    // clear the reference bits REFS0, REFS1[,REFS2]
+    uint8_t local_ADMUX = (ADMUX & ~(ADREFSMASK));
+    
+    // select the reference so it has time to stabalize.
+    ADMUX = local_ADMUX | reference ;
 #else
 #   error missing ADMUX register which is used to sellect the reference and channel
 #endif
@@ -171,10 +224,18 @@ int analogRead(uint8_t channel)
         ADCSRB = (ADCSRB & ~(1 << MUX5)) | (((channel >> 3) & 0x01) << MUX5);
 #endif
       
-        // mask reference select (REFS) and channel MUX off,  then set referenc and select the
-        // channel (low 4 bits).  ADLAR is not changed (0 is the default).
 #if defined(ADMUX)
-        ADMUX = ( ( (ADMUX & ~(ADREFSMASK)) & ~(0x07)) | analog_reference ) | (channel & 0x07);
+        // clear the channel select MUX, ADLAR is not changed (0 is the default).
+        uint8_t local_ADMUX = ADMUX & ~(1<<MUX3) & ~(1<<MUX2) & ~(1<<MUX1) & ~(1<<MUX0);
+
+        // clear the reference bits REFS0, REFS1[,REFS2]
+        local_ADMUX = (local_ADMUX & ~(ADREFSMASK));
+        
+        // select the reference
+        local_ADMUX = local_ADMUX | analog_reference ;
+    
+        // select the channel (note MUX4 has some things for advanced users).
+        ADMUX = local_ADMUX | (channel & 0x07) ;
 #else
 #   error missing ADMUX register which is used to sellect the reference and channel
 #endif

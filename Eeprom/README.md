@@ -6,9 +6,9 @@ Eeprom is an interactive command line program that demonstrates the control of a
 
 Depends on avr/eeprom.h from avr-libc <http://www.nongnu.org/avr-libc/user-manual/group__avr__eeprom.html>.
 
-For how I setup my Makefile toolchain see <http://epccs.org/indexes/Document/DvlpNotes/LinuxBoxCrossCompiler.html>.
+For how I setup my Makefile toolchain <http://epccs.org/indexes/Document/DvlpNotes/LinuxBoxCrossCompiler.html>.
 
-With optiboot installed run 'make bootload' and it will compile and then flash the MCU the same way Arduino does, but without any Arduino stuff.
+With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
 
 ``` 
 rsutherland@straightneck:~/Samba/RPUno/Eeprom$ make bootload

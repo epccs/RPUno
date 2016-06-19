@@ -4,7 +4,7 @@
 
 Combines Capture and Adc to track tempeture, humidity, and solar power. 
 
-Referance <../Capture> and <../Adc>.
+Referance [Capture](../Capture) and [Adc](../Adc).
 
 This adds an Adc ISR to check if more than 300 machine cycles are needed to reliably capture without skipping events.
 

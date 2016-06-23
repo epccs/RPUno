@@ -3,11 +3,6 @@
 
 #include <stdio.h>
 
-// Got your attention,  just so you know it may or not work with other versions.
-#if (__GNUC__ * 100 + __GNUC_MINOR__) != 409
-#error "This library was used with gcc-avr package (4.9.2+Atmel3.5.0-1) on Ubuntu 16.04"
-#endif
-
 /* Enable USART 1, 2, 3 as required */
 #define USART0_ENABLED
 //#define USART1_ENABLED

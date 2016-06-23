@@ -41,7 +41,7 @@ void EEread(void)
             return;
         }
         
-        printf_P(PSTR("{\"EE[%s]\",:"),arg[0]);
+        printf_P(PSTR("{\"EE[%s]\":"),arg[0]);
         ee_mem = -1;
         command_done = 11;
     }
@@ -86,7 +86,7 @@ void EEwrite(void)
             return;
         }
         
-        printf_P(PSTR("{\"EE[%s]\",:"),arg[0]);
+        printf_P(PSTR("{\"EE[%s]\":"),arg[0]);
         ee_mem = -1;
         command_done = 11;
     }

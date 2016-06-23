@@ -10,6 +10,8 @@ Reads a Fluke 80TK Thermocouple Module (1mV/deg F) on channel zero.
 
 ![Profile](https://raw.githubusercontent.com/epccs/RPUno/master/Reflow/profile/walmartBD,160622.png "Profile for Black & Decker Model NO. TO1303SB")
 
+Do not modify the oven, if you do and it burns down your house the insurance may be able to deny payment. Turn the knobs so it is always on (as shown in the image) and set the temperature high enough that it will not turn off the oven. Now the Solid State Relay (SSR) can modulate power to the heating elements, the modulation does not need to be fast since they have a five-second thermal response, in fact, a two second PWM is fine. The SSR needs to be placed in a certified electrical enclosure to make sure insurance will pay (I'm not an expert, and there are always more rules). 
+
 ![Setup](https://raw.githubusercontent.com/epccs/RPUno/master/Reflow/profile/WalmartBD,TO1303SB.jpg "Setup of Black & Decker Model NO. TO1303SB")
 
 A 255 value in EEPROM will turn on the buzzer on pin 6 for two seconds, while two consecutive values will terminate the profile. The program will otherwise run to the end of EEPROM memory.

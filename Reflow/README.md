@@ -10,7 +10,7 @@ Reads a Fluke 80TK Thermocouple Module (1mV/deg F) on channel zero.
 
 ![Profile](https://raw.githubusercontent.com/epccs/RPUno/master/Reflow/profile/walmartBD,160622.png "Profile for Black & Decker Model NO. TO1303SB")
 
-![Setup](https://raw.githubusercontent.com/epccs/RPUno/master/Reflow/profile/WalmartBD,160622.jpg "Setup of Black & Decker Model NO. TO1303SB")
+![Setup](https://raw.githubusercontent.com/epccs/RPUno/master/Reflow/profile/WalmartBD,TO1303SB.jpg "Setup of Black & Decker Model NO. TO1303SB")
 
 A 255 value in EEPROM will turn on the buzzer on pin 6 for two seconds, while two consecutive values will terminate the profile. The program will otherwise run to the end of EEPROM memory.
 

@@ -12,14 +12,14 @@ int main(void)
 {
 	// RPUuno has no LED, but B5 is Arduino pin 13.
     //b5_output;
-    PinMode(13,OUTPUT);
+    pinMode(13,OUTPUT);
     
     while (1) 
     {
-        DigitalWrite(13,HIGH);
+        digitalWrite(13,HIGH);
         //b5_high;
         _delay_ms(1000);
-        DigitalWrite(13,LOW);
+        digitalWrite(13,LOW);
         //b5_low;
         _delay_ms(1000);
     }    

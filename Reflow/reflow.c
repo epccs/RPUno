@@ -43,11 +43,11 @@ static uint8_t last_pwm;
 /* if the UART is found to have char avvailable turn everything off*/
 void initReflow(void)
 {
-    PinMode(SSR, OUTPUT);
-    DigitalWrite(SSR, LOW);
+    pinMode(SSR, OUTPUT);
+    digitalWrite(SSR, LOW);
     
-    PinMode(BUZZER, OUTPUT);
-    DigitalWrite(BUZZER, LOW);
+    pinMode(BUZZER, OUTPUT);
+    digitalWrite(BUZZER, LOW);
 }
 
 
@@ -62,11 +62,11 @@ void Reflow(void)
         last_pwm =0;
         reflow_zone_started_at = millis();
         
-        PinMode(SSR, OUTPUT);
-        DigitalWrite(SSR, LOW);
+        pinMode(SSR, OUTPUT);
+        digitalWrite(SSR, LOW);
         
-        PinMode(BUZZER, OUTPUT);
-        DigitalWrite(BUZZER, LOW);
+        pinMode(BUZZER, OUTPUT);
+        digitalWrite(BUZZER, LOW);
 
         command_done = 11;
     }
@@ -79,11 +79,11 @@ void Reflow(void)
         // Turn on the SSR if pwm is between 1 thru 254 (255 is used for the buzzer)
         if ( (pwm > 0) && (pwm < 255) )
         {
-            DigitalWrite(SSR, HIGH);
+            digitalWrite(SSR, HIGH);
         }
         if (pwm == 255)
         {
-            DigitalWrite(BUZZER, HIGH);
+            digitalWrite(BUZZER, HIGH);
         }
         command_done = 12;
     }
@@ -94,8 +94,8 @@ void Reflow(void)
         unsigned long kRuntime= now - reflow_zone_started_at;
         if (  (kRuntime) > ( (unsigned long)( 0.5 + (pwm/255.0)*REFLOW_ZONE_DELAY_MILSEC) )  )
         {
-            DigitalWrite(BUZZER, LOW);
-            DigitalWrite(SSR, LOW);
+            digitalWrite(BUZZER, LOW);
+            digitalWrite(SSR, LOW);
             printf_P(PSTR("\"pwm\":\"%u\","),pwm);
             command_done = 13;
         }

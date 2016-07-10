@@ -1,5 +1,5 @@
 /*
-process is part of Capture, it is used to select command functions from the command line
+process is used to select command functions from the command line
 Copyright (C) 2016 Ronald Sutherland
 
 This program is free software; you can redistribute it and/or

@@ -31,6 +31,13 @@ static int ee_mem;
 /* /0/ee? 0..1023 */
 void EEread(void)
 {
+    if (arg_count != 1)
+    {
+        printf_P(PSTR("{\"err\":\"EEreadNeeds1Arg\"}\r\n"));
+        initCommandBuffer();
+        return;
+    }
+    
     if ( (command_done == 10) )
     {
         // check that argument[0] is in the range 0..1023

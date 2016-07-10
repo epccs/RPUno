@@ -49,9 +49,7 @@ $(TARGET).hex: $(TARGET).elf
 
 ## http://eleccelerator.com/fusecalc/fusecalc.php?chip=atmega328p&LOW=FF&HIGH=DE&EXTENDED=05&LOCKBIT=2F
 ## stk500v1 is for Arduino as ISP (e.g. it is an example in the Arduino.cc IDE 1.6.7+)
-## lock is from optiboot's Makefile.isp, it helps to prevent the bootloader from nuking itself.
-fuse: 
-	avrdude -v -p $(MCU) -c stk500v1 -P $(ISP_PORT) -b 19200 -e -U lock:w:0x3f:m -U lfuse:w:0xFF:m -U hfuse:w:0xDE:m -U efuse:w:0xFD:m
+## to reduce dupliction I only show the fuse setting in ../Bootloader
 
 ## 328p can lock the bootloader section, which is a good idea even if it is not used
 isp: $(TARGET).hex

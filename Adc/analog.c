@@ -53,28 +53,23 @@ void Analog(void)
     }
     else if ( (command_done == 11) )
     { // use the channel as an index in the JSON reply
-        if ( (adc_arg_index) == 0) 
+        uint8_t arg_indx_channel =atoi(arg[adc_arg_index]);
+        
+        if (arg_indx_channel < 6)
         {
             printf_P(PSTR("\"ADC%s\":"),arg[adc_arg_index]);
-            command_done = 12;
         }
-        else
+        
+        if (arg_indx_channel == 6)
         {
-            uint8_t arg_indx_channel =atoi(arg[adc_arg_index]);
-            if (arg_indx_channel < 6)
-            {
-                printf_P(PSTR("\"ADC%s\":"),arg[adc_arg_index]);
-            }
-            if (arg_indx_channel == 6)
-            {
-                printf_P(PSTR("\"PV_IN\":"));
-            }
-            if (arg_indx_channel == 7)
-            {
-                printf_P(PSTR("\"PWR\":"));
-            }
-            command_done = 12;
+            printf_P(PSTR("\"PV_IN\":"));
         }
+        
+        if (arg_indx_channel == 7)
+        {
+            printf_P(PSTR("\"PWR\":"));
+        }
+        command_done = 12;
     }
     else if ( (command_done == 12) )
     {

@@ -35,7 +35,7 @@ void ProcessCmd()
     {
         Id("Adc");
     }
-    if ( (strcmp_P( command, PSTR("/analog?")) == 0) && ( (arg_count >= 1 ) || (arg_count <= 5) ) )
+    if ( (strcmp_P( command, PSTR("/analog?")) == 0) && ( (arg_count >= 1 ) && (arg_count <= 5) ) )
     {
         Analog();
     }

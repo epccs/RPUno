@@ -14,20 +14,49 @@ GNU General Public License for more details.
 
 For a copy of the GNU General Public License use
 http://www.gnu.org/licenses/gpl-2.0.html
-
 */
 #include <avr/pgmspace.h>
 #include <util/atomic.h>
-#include "process.h"
 #include "../lib/uart.h"
 #include "../lib/parse.h"
 #include "../lib/timers.h"
 #include "../lib/adc.h"
 #include "../lib/icp1.h"
+#include "../Uart/id.h"
+#include "../Capture/capture.h"
+#include "ht.h"
 
 // running the ADC burns power, which can be saved by delaying its use
 #define ADC_DELAY_MILSEC 10000
 static unsigned long adc_started_at;
+
+void ProcessCmd()
+{ 
+    if ( (strcmp_P( command, PSTR("/id?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
+    {
+        Id("Ht");
+    }
+    if ( (strcmp_P( command, PSTR("/count?")) == 0) &&  ( (arg_count == 0) || ( (arg_count == 1) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
+    {
+        Count();
+    }
+    if ( (strcmp_P( command, PSTR("/capture?")) == 0) && ( (arg_count == 0 ) || ( (arg_count == 2) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
+    {
+        Capture();
+    }
+    if ( (strcmp_P( command, PSTR("/event?")) == 0) && ( (arg_count == 0 ) || ( (arg_count == 2) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
+    {
+        Event();
+    }
+    if ( (strcmp_P( command, PSTR("/initICP")) == 0) && ( ( (arg_count == 3) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
+    {
+        InitICP();
+    }
+    if ( (strcmp_P( command, PSTR("/ht?")) == 0) && ( (arg_count == 0 ) ) )
+    {
+        Ht();
+    }
+}
 
 int main(void) 
 {    

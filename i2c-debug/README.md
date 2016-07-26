@@ -136,3 +136,52 @@ Load the PCA9554 configuration register 3 (DDR) with zero to set the port as out
 /0/write
 {"returnCode":"success"}
 ``` 
+
+# HTU21D Example 
+
+``` 
+/0/scan?
+{"scan":[{"addr":"0x40"}]}
+``` 
+
+Command 0xE3 measures temperature, the clock is streached until data is ready.
+
+``` 
+/0/address 64
+{"address":"0x40"}
+/0/buffer 227
+{"buffer":["data":"0xE3"]}
+/0/read? 3
+{"rxBuffer":[{"data":"0x6A"},{"data":"0xC"},{"data":"0xC6"}]}
+``` 
+
+The first two bytes are the temperature data. The last two bits of LSB are status (ignore or mask them off). Some Python gives the result in
+°C.
+
+``` 
+Stmp = 0x6A0C
+Temp = -46.85 + 175.72 * Stmp / (2**16)
+Temp
+25.9
+``` 
+
+Command 0xE5 measures humidity, again the clock is streached until data is ready.
+
+``` 
+/0/address 64
+{"address":"0x40"}
+/0/buffer 229
+{"buffer":["data":"0xE5"]}
+/0/read? 3
+{"rxBuffer":[{"data":"0x65"},{"data":"0x96"},{"data":"0xBC"}]}
+``` 
+
+The first two bytes are the temperature data. The last two bits of LSB are status (ignore or mask them off). Some Python gives the result in
+°C.
+
+``` 
+Stmp = 0x6596 & 0xFFFC
+RH = -6 + 125 * Stmp / (2**16)
+RH
+43.6
+``` 

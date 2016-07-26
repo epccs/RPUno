@@ -13,14 +13,13 @@ With a serial port connection (set the BOOT_PORT in Makefile) and optiboot insta
 ``` 
 rsutherland@straightneck:~/Samba/RPUno/Adc$ make bootload
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o main.o main.c
-avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o process.o process.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o analog.o analog.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../Uart/id.o ../Uart/id.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/timers.o ../lib/timers.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/uart.o ../lib/uart.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/adc.o ../lib/adc.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/parse.o ../lib/parse.c
-avr-gcc -Wl,-Map,Adc.map  -Wl,--gc-sections  -Wl,-u,vfprintf -lprintf_flt -lm -mmcu=atmega328p main.o process.o analog.o ../Uart/id.o ../lib/timers.o ../lib/uart.o ../lib/adc.o ../lib/parse.o -o Adc.elf
+avr-gcc -Wl,-Map,Adc.map  -Wl,--gc-sections  -Wl,-u,vfprintf -lprintf_flt -lm -mmcu=atmega328p main.o analog.o ../Uart/id.o ../lib/timers.o ../lib/uart.o ../lib/adc.o ../lib/parse.o -o Adc.elf
 avr-size -C --mcu=atmega328p Adc.elf
 AVR Memory Usage
 ----------------
@@ -33,7 +32,7 @@ Data:        180 bytes (8.8% Full)
 (.data + .bss + .noinit)
 
 
-rm -f Adc.o main.o process.o analog.o ../Uart/id.o ../lib/timers.o ../lib/uart.o ../lib/adc.o ../lib/parse.o
+rm -f Adc.o main.o analog.o ../Uart/id.o ../lib/timers.o ../lib/uart.o ../lib/adc.o ../lib/parse.o
 avr-objcopy -j .text -j .data -O ihex Adc.elf Adc.hex
 rm -f Adc.elf
 avrdude -v -p atmega328p -c arduino -P /dev/ttyUSB0 -b 115200 -U flash:w:Adc.hex
@@ -101,7 +100,7 @@ avrdude: reading input file "Adc.hex"
 avrdude: input file Adc.hex auto detected as Intel Hex
 avrdude: writing flash (8472 bytes):
 
-Writing | ################################################## | 100% 1.27s
+Writing | ################################################## | 100% 1.22s
 
 avrdude: 8472 bytes of flash written
 avrdude: verifying flash memory against Adc.hex:
@@ -110,7 +109,7 @@ avrdude: input file Adc.hex auto detected as Intel Hex
 avrdude: input file Adc.hex contains 8472 bytes
 avrdude: reading on-chip flash data:
 
-Reading | ################################################## | 100% 1.01s
+Reading | ################################################## | 100% 0.95s
 
 avrdude: verifying ...
 avrdude: 8472 bytes of flash verified
@@ -120,6 +119,7 @@ avrdude: safemode: efuse reads as 0
 avrdude: safemode: Fuses OK (E:00, H:00, L:00)
 
 avrdude done.  Thank you.
+
 ``` 
 
 Now connect with picocom (or ilk). Note I am often at another computer doing this through SSH. The Samba folder is for editing the files from Windows.
@@ -147,7 +147,7 @@ identify
 
 ``` 
 /0/id?
-{"id":{"name":"Adc"}}
+{"id":{"name":"Adc","desc":"RPUno Board /w atmega328p and LT3652","avr-gcc":"4.9"}}
 ```
 
 ##  /0/analog? 0..7[,0..7[,0..7[,0..7[,0..7]]]]    

@@ -20,15 +20,10 @@ Modified in 2012 by Todd Krein (todd@krein.org) to implement repeated starts
 Modified in 2016 by Ronald Sutherland (ronald.sutherlad@gmail) to use as a C library with avr-libc dependency
 */
 
-#include <math.h>
-#include <stdlib.h>
-#include <inttypes.h>
-#include <avr/io.h>
+#include <stdbool.h>
 #include <avr/interrupt.h>
 #include <compat/twi.h>
 
-#include "pin_num.h"
-#include "pins_board.h"
 #include "twi.h"
 
 static volatile uint8_t twi_state;
@@ -53,16 +48,32 @@ static volatile uint8_t twi_rxBufferIndex;
 static volatile uint8_t twi_error;
 
 /* init twi pins and set bitrate */
-void twi_init(void)
+void twi_init(uint8_t pull_up)
 {
     // initialize state
     twi_state = TWI_READY;
     twi_sendStop = 1;		// default value
     twi_inRepStart = 0;
 
-    // activate internal pullups for twi.
-    digitalWrite(SDA, 1);
-    digitalWrite(SCL, 1);
+    // Do not use pull-up for twi pins if the MCU is running at a higher voltage.
+    // e.g. if MCU has 5V and others have 3.3V do not use the pull-up. 
+    if (pull_up) 
+    {
+#if defined(__AVR_ATmega48__) ||defined(__AVR_ATmega88__) || \
+        defined(__AVR_ATmega168__) || defined(__AVR_ATmega48P__) || \
+        defined(__AVR_ATmega88P__) || defined(__AVR_ATmega168P__) || \
+        defined(__AVR_ATmega328P__) 
+        // digitalWrite(SDA, 1) without the function call
+        DDRC &= ~(1 << DDC4);  // clear the ddr bit to set as an input
+        PORTC |= (1 << PORTC4);  // write a one to the port bit to enable the pull-up
+
+        // digitalWrite(SCL, 1)
+        DDRC &= ~(1 << DDC5);
+        PORTC |= (1 << PORTC5); 
+#else
+#error "no I2C definition for MCU available"
+#endif
+    }
 
     // initialize twi prescaler and bit rate
     TWSR &= ~((1<<TWPS0));
@@ -85,8 +96,18 @@ void twi_disable(void)
     TWCR &= ~((1<<TWEN) | (1<<TWIE) | (1<<TWEA));
 
     // deactivate internal pullups for twi.
-    digitalWrite(SDA, 0);
-    digitalWrite(SCL, 0);
+#if defined(__AVR_ATmega48__) ||defined(__AVR_ATmega88__) || \
+    defined(__AVR_ATmega168__) || defined(__AVR_ATmega48P__) || \
+    defined(__AVR_ATmega88P__) || defined(__AVR_ATmega168P__) || \
+    defined(__AVR_ATmega328P__) 
+    // digitalWrite(SDA, 0) without the function call
+    PORTC &= ~(1 << PORTC4);  // clear the port bit to disable the pull-up
+
+    // digitalWrite(SCL, 0)
+    PORTC &= ~(1 << PORTC5); 
+#else
+#error "no I2C definition for MCU available"
+#endif
 }
 
 /* init slave address and enable interrupt */

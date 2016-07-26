@@ -1,5 +1,5 @@
 /*
-Adc is a command line controled demonstration of Interrupt Driven Analog Conversion
+Eeprom is a command line controled demonstration of the control of an ATmega328p EEPROM
 Copyright (C) 2016 Ronald Sutherland
 
 This program is free software; you can redistribute it and/or
@@ -14,40 +14,31 @@ GNU General Public License for more details.
 
 For a copy of the GNU General Public License use
 http://www.gnu.org/licenses/gpl-2.0.html
-
-    Adc is an interactive command line program that demonstrates
-    control of an ATmega328p (e.g. Arduino Uno) Analog-to-Digital Converter
-    from pins PC0 through PC7. Warning Arduino marked there board as A0 
-    though A5, which is somtimes confused as PA0, I think they wanted it to 
-    mean the ADMUX value. 
-
-    COMMAND LINE STRUCTURE: e.g. /0/id?
-    position            usage 
-    '/'                 first char will flush the transmit buffer and nuke any command in process
-    '0'                 second char will address a (multi-drop) device and start echo
-    command             is a string of isalpha() or '/' or '?' only 
-    [space]             use an isspace() char between command and arguments
-    [arg[,arg[...]]]    one or more comma delimited arguments e.g. "13,high"  
-    [\r]\n              end of comand line
-            
-
-    id? [name|desc|avr-gcc]       sends back device info (name is the default)
-    analog? 0..7[,0..7[,0..7[,0..7[,0..7]]]]    adc reading from up to 5 channels.
-                        The reading repeats until the Rx buffer has a character.
-
-On Linux picocom can be used as a minimal serial terminal
-
-picocom -b 115200 /dev/ttyUSB0
-exit is C-a, C-x
 */
 #include <avr/pgmspace.h>
 #include <util/atomic.h>
-#include "process.h"
 #include "../lib/uart.h"
 #include "../lib/parse.h"
 #include "../lib/timers.h"
 #include "../lib/adc.h"
+#include "../Uart/id.h"
+#include "ee.h"
 
+void ProcessCmd()
+{ 
+    if ( (strcmp_P( command, PSTR("/id?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
+    {
+        Id("Eeprom");
+    }
+    if ( (strcmp_P( command, PSTR("/ee?")) == 0) && (arg_count == 1 ) )
+    {
+        EEread();
+    }
+    if ( (strcmp_P( command, PSTR("/ee")) == 0) && (arg_count == 2 ) )
+    {
+        EEwrite();
+    }
+}
 
 int main(void) 
 {    

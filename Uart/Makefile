@@ -2,7 +2,6 @@
 TARGET = Uart
 LIBDIR = ../lib
 OBJECTS = main.o \
-	process.o \
 	id.o \
 	$(LIBDIR)/uart.o \
 	$(LIBDIR)/parse.o

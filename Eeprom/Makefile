@@ -2,7 +2,6 @@
 TARGET = Eeprom
 LIBDIR = ../lib
 OBJECTS = main.o \
-	process.o \
 	ee.o \
 	../Uart/id.o \
 	$(LIBDIR)/timers.o \

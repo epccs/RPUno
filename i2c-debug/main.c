@@ -69,8 +69,8 @@ int main(void)
     /* Initialize UART, it returns a pointer to FILE so redirect of stdin and stdout works*/
     stdout = stdin = uartstream0_init(BAUD);
 
-    /* Initialize I2C*/
-    twi_init();
+    /* Initialize I2C, without the internal pull-up*/
+    twi_init(0);
 
     /* Clear and setup the command buffer, (probably not needed at this point) */
     initCommandBuffer();

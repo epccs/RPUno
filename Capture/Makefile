@@ -2,7 +2,6 @@
 TARGET = Capture
 LIBDIR = ../lib
 OBJECTS = main.o \
-	process.o \
 	pwm.o \
 	capture.o \
 	../Uart/id.o \

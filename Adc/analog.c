@@ -79,22 +79,24 @@ void Analog(void)
     else if ( (command_done == 12) )
     {
         uint8_t arg_indx_channel =atoi(arg[adc_arg_index]);
-        
+
+        // There are values from 0 to 1023 for 1024 slots where each reperesents 1/1024 of the reference. Last slot has issues
+        // https://forum.arduino.cc/index.php?topic=303189.0        
         if (arg_indx_channel < 6)
         {
-            printf_P(PSTR("\"%1.2f\""),(analogRead(arg_indx_channel)*5.0/1023.0));
+            printf_P(PSTR("\"%1.2f\""),(analogRead(arg_indx_channel)*5.0/1024.0));
         }
         
         // RPUno has a 432k and 100k voltage divider from the solar input. The PV goes through a 432k  to ADC6 and a 100k to ground.
         if (arg_indx_channel == 6) 
         {
-            printf_P(PSTR("\"%1.2f\""),(analogRead(arg_indx_channel)*(5.0/1023.0)*(532.0/100.0)));
+            printf_P(PSTR("\"%1.2f\""),(analogRead(arg_indx_channel)*(5.0/1024.0)*(532.0/100.0)));
         }
 
         // RPUno has a 100 and 200k voltage divider from the battery(PWR). The PWR goes through a 100k  to ADC7 and a 200k to ground.
         if (arg_indx_channel == 7) 
         {
-            printf_P(PSTR("\"%1.2f\""),(analogRead(arg_indx_channel)*(5.0/1023.0)*(3.0/2.0)));
+            printf_P(PSTR("\"%1.2f\""),(analogRead(arg_indx_channel)*(5.0/1024.0)*(3.0/2.0)));
         }
 
         if ( (adc_arg_index+1) >= arg_count) 

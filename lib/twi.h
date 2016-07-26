@@ -23,8 +23,6 @@ Modified in 2016 by Ronald Sutherland (ronald.sutherlad@gmail) to use as a C lib
 #ifndef twi_h
 #define twi_h
 
-#include <inttypes.h>
-
 #ifndef TWI_FREQ
 #define TWI_FREQ 100000L
 #endif
@@ -39,7 +37,7 @@ Modified in 2016 by Ronald Sutherland (ronald.sutherlad@gmail) to use as a C lib
 #define TWI_SRX   3
 #define TWI_STX   4
   
-void twi_init(void);
+void twi_init(uint8_t);
 void twi_disable(void);
 void twi_setAddress(uint8_t);
 void twi_setFrequency(uint32_t);

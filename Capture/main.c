@@ -14,48 +14,45 @@ GNU General Public License for more details.
 
 For a copy of the GNU General Public License use
 http://www.gnu.org/licenses/gpl-2.0.html
-
-    Capture is an interactive command line program that demonstrates
-    control of an ATmega328p (e.g. Arduino Uno) Input Capture Unit (ICP1)
-    PWM from pin 11 may be used as a signal to capture with pin 8, plug 
-    a 10k Ohm resistor between them to be safe.
-    
-    Updates may be found at http://epccs.org/hg/open/RPUno/file/tip/Capture
-    Forum: http://forum.arduino.cc/index.php?topic=260172.0
-
-    COMMAND LINE STRUCTURE: e.g. /0/id?
-    position            usage 
-    '/'                 first char will flush the transmit buffer and nuke any command in process
-    '0'                 second char will address a (multi-drop) device and start echo
-    command             is a string of isalpha() or '/' or '?' only 
-    [space]             use an isspace() char between command and arguments
-    [arg[,arg[...]]]    one or more comma delimited arguments e.g. "13,high"  
-    [\r]\n              end of comand line
-            
-
-    id? [name|desc|avr-gcc]       sends back device info
-    count? [icp1]   Count of ICP1 event captures.
-    capture? [icp1,1..15]  return ICP1 timer count delta(s) as a pair of low and high counts 
-                        from the buffered capture events. These can be used to find the duty 
-                        or period. The index value is the count of event captures.
-    pwm oc2a[|oc2b],0..255    Pulse width modulation using OC2A (ATmega328 pin PB3. 
-                        Uno pin 11) or OC2B (ATmega328 pin PD3. Uno pin 3) can be used 
-                        to feed the ICP1 input. Note that timer2 is used with OC2[A|B], 
-                        while timer1 is needed for ICP1.
-
-On Linux picocom can be used as a minimal serial terminal
-
-picocom -b 115200 /dev/ttyUSB0
-exit is C-a, C-x
 */
 #include <avr/pgmspace.h>
 #include <util/atomic.h>
-#include "process.h"
 #include "../lib/uart.h"
 #include "../lib/parse.h"
 #include "../lib/timers.h"
 #include "../lib/adc.h"
 #include "../lib/icp1.h"
+#include "../Uart/id.h"
+#include "pwm.h"
+#include "capture.h"
+
+void ProcessCmd()
+{ 
+    if ( (strcmp_P( command, PSTR("/id?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
+    {
+        Id("Capture");
+    }
+    if ( (strcmp_P( command, PSTR("/pwm")) == 0) )
+    {
+        Pwm();
+    }
+    if ( (strcmp_P( command, PSTR("/count?")) == 0) &&  ( (arg_count == 0) || ( (arg_count == 1) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
+    {
+        Count();
+    }
+    if ( (strcmp_P( command, PSTR("/capture?")) == 0) && ( (arg_count == 0 ) || ( (arg_count == 2) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
+    {
+        Capture();
+    }
+    if ( (strcmp_P( command, PSTR("/event?")) == 0) && ( (arg_count == 0 ) || ( (arg_count == 2) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
+    {
+        Event();
+    }
+    if ( (strcmp_P( command, PSTR("/initICP")) == 0) && ( ( (arg_count == 3) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
+    {
+        InitICP();
+    }
+}
 
 int main(void) 
 {    

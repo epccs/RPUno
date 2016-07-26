@@ -2,7 +2,6 @@
 TARGET = Ht
 LIBDIR = ../lib
 OBJECTS = main.o \
-	process.o \
 	ht.o \
 	../Capture/pwm.o \
 	../Capture/capture.o \

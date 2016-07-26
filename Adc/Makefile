@@ -2,7 +2,6 @@
 TARGET = Adc
 LIBDIR = ../lib
 OBJECTS = main.o \
-	process.o \
 	analog.o \
 	../Uart/id.o \
 	$(LIBDIR)/timers.o \

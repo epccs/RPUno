@@ -18,16 +18,37 @@ http://www.gnu.org/licenses/gpl-2.0.html
 */
 #include <avr/pgmspace.h>
 #include <util/atomic.h>
-#include "process.h"
 #include "../lib/uart.h"
 #include "../lib/parse.h"
 #include "../lib/timers.h"
 #include "../lib/adc.h"
+#include "../Uart/id.h"
+#include "../Eeprom/ee.h"
 #include "reflow.h"
 
 // running the ADC burns power, which can be saved by delaying its use
 #define ADC_DELAY_MILSEC 1000
 static unsigned long adc_started_at;
+
+void ProcessCmd()
+{ 
+    if ( (strcmp_P( command, PSTR("/id?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
+    {
+        Id("Reflow");
+    }
+    if ( (strcmp_P( command, PSTR("/reflow?")) == 0) &&  (arg_count == 0 ) )
+    {
+        Reflow();
+    }
+    if ( (strcmp_P( command, PSTR("/ee?")) == 0) && (arg_count == 1 ) )
+    {
+        EEread();
+    }
+    if ( (strcmp_P( command, PSTR("/ee")) == 0) && (arg_count == 2 ) )
+    {
+        EEwrite();
+    }
+}
 
 int main(void) 
 {    

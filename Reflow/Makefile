@@ -2,7 +2,6 @@
 TARGET = Reflow
 LIBDIR = ../lib
 OBJECTS = main.o \
-	process.o \
 	reflow.o \
 	../Eeprom/ee.o \
 	../Uart/id.o \

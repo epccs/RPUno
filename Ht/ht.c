@@ -222,10 +222,12 @@ void Ht(void)
         command_done = 16;
     }
     
+    // The ADC values are from 0 to 1023 for 1024 slots where each reperesents 1/1024 of the reference. Last slot has issues
+    // https://forum.arduino.cc/index.php?topic=303189.0    
     else if ( (command_done == 16) )
     {
         // analog channel 6 is connected to the solar power input (PV_IN)
-        float PV_IN = analogRead(6)*(5.0/1023.0)*(532.0/100.0);
+        float PV_IN = analogRead(6)*(5.0/1024.0)*(532.0/100.0);
         printf_P(PSTR("\"PV_IN\":\"%1.2f\""),PV_IN);
         command_done = 17;
     }
@@ -233,7 +235,7 @@ void Ht(void)
     else if ( (command_done == 17) )
     {
         // analog channel 7 is connected to the battery power (PWR)
-        float PWR = analogRead(7)*(5.0/1023.0)*(3.0/2.0);
+        float PWR = analogRead(7)*(5.0/1024.0)*(3.0/2.0);
         printf_P(PSTR("\"PWR\":\"%1.2f\""),PWR);
         command_done = 24;
     }

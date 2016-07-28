@@ -122,7 +122,7 @@ void digitalToggle(uint8_t pin) {
   }
 }
 
-/* set pin value */
+/* set pin value HIGH and LOW */
 static inline __attribute__((always_inline))
 void digitalWrite(uint8_t pin_num, bool value_for_bit) {
   badPinCheck(pin_num);

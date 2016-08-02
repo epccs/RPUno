@@ -21,7 +21,7 @@
 #define Adc_h
 
 #define ADC_CHANNELS 8
-extern volatile int adc[ADC_CHANNELS];
+extern volatile int adc[];
 extern volatile uint8_t adc_channel;
 extern volatile uint8_t ADC_auto_conversion;
 extern volatile uint8_t analog_reference;
@@ -61,9 +61,12 @@ extern volatile uint8_t analog_reference;
 #ifndef EXTERNAL_AVCC
 #   error your mcu is not supported
 #endif
-
 extern void init_ADC_single_conversion(uint8_t reference);
-extern void enable_ADC_auto_conversion(void);
+
+#define FREE_RUNNING 1
+#define BURST_MODE 0
+extern void enable_ADC_auto_conversion(uint8_t free_run);
+
 extern void analogReference(uint8_t mode);
 extern int analogRead(uint8_t channel);
 

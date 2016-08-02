@@ -20,10 +20,12 @@
 #include <util/atomic.h>
 #include "adc.h"
 
-volatile int adc[ADC_CHANNELS];
+volatile int adc[ADC_CHANNELS+1];
 volatile uint8_t adc_channel;
 volatile uint8_t ADC_auto_conversion;
 volatile uint8_t analog_reference;
+
+static uint8_t free_running;
 
 // Interrupt service routine for enable_ADC_auto_conversion
 ISR(ADC_vect){
@@ -35,22 +37,26 @@ ISR(ADC_vect){
     if (adc_channel >= ADC_CHANNELS) 
     {
         adc_channel = 0;
+        adc[ADC_CHANNELS] = 0x7FFF; // mark to notify burst is done
+        if (!free_running)
+        {
+            return;
+        }
+
     }
-    else
-    {
+
 #if defined(ADMUX)
-        // clear the mux to select the next channel to do conversion without changing the reference
-        ADMUX &= ~(1<<MUX3) & ~(1<<MUX2) & ~(1<<MUX1) & ~(1<<MUX0);
+    // clear the mux to select the next channel to do conversion without changing the reference
+    ADMUX &= ~(1<<MUX3) & ~(1<<MUX2) & ~(1<<MUX1) & ~(1<<MUX0);
         
-        // use a stack register to reset the referance, most likly it is not changed and fliping the hardware bit would mess up the reading.
-        ADMUX = ( (ADMUX & ~(ADREFSMASK) & ~(1<<ADLAR) ) | analog_reference ) + adc_channel;
+    // use a stack register to reset the referance, most likly it is not changed and fliping the hardware bit would mess up the reading.
+    ADMUX = ( (ADMUX & ~(ADREFSMASK) & ~(1<<ADLAR) ) | analog_reference ) + adc_channel;
 #else
 #   error missing ADMUX register which is used to sellect the reference and channel
 #endif
 
-        // set ADSC in ADCSRA, ADC Start Conversion
-        ADCSRA |= (1<<ADSC);
-    }
+    // set ADSC in ADCSRA, ADC Start Conversion
+    ADCSRA |= (1<<ADSC);
 }
 
 
@@ -62,6 +68,7 @@ void init_ADC_single_conversion(uint8_t reference)
     // it should not be automagic. Smoke will get let out if AREF is connected to
     // another source while AVCC is selected. AREF should not be run to a pin.
     analog_reference = reference;
+    free_running = 0;
 
 #if defined(ADMUX)
     // clear the channel select MUX
@@ -113,13 +120,11 @@ void init_ADC_single_conversion(uint8_t reference)
 
 /* This changes the ADC to Auto Trigger mode. It will take readings on each 
     channel and hold them in an array. The array value is accessed by reading from adc[]  */
-void enable_ADC_auto_conversion()
+void enable_ADC_auto_conversion(uint8_t free_run)
 {
     adc_channel = 0;
-    for(uint8_t i=0; i<ADC_CHANNELS; i++) 
-    {
-        adc[i] = 0;
-    }
+    adc[ADC_CHANNELS] = 0x00;
+    free_running = free_run;
 
     // ADLAR is right adjust (zero) by default so it does not need clear e.g. ~(1<<ADLAR)
     // MUX[3:0] default to zero which sellects ADC0

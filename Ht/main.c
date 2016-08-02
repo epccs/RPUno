@@ -68,7 +68,7 @@ int main(void)
     // setup()
 
     // put ADC in Auto Trigger mode and fetch an array of channels
-    enable_ADC_auto_conversion();
+    enable_ADC_auto_conversion(BURST_MODE);
     adc_started_at = millis();
     
     /* Initialize Input Capture Unit 1 */
@@ -111,7 +111,7 @@ int main(void)
         kRuntime= millis() - adc_started_at;
         if ((kRuntime) > ((unsigned long)ADC_DELAY_MILSEC))
         {
-            enable_ADC_auto_conversion();
+            enable_ADC_auto_conversion(BURST_MODE);
             adc_started_at = millis();
         } 
         

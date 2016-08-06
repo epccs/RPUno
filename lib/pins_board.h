@@ -56,22 +56,48 @@
 // #define analogInputToDigitalPin(p)  ((p < 8) ? (p) + 14 : -1)
 #define digitalPinHasPWM(p)         ((p) == 3 || (p) == 5 || (p) == 6 || (p) == 9 || (p) == 10 || (p) == 11)
 
-static const uint8_t LED_BUILTIN = 13; // board has no led but this is the normal place it would be found
+// LT3652 has some pins that may be connected to mega328p
+#define SHUTDOWN 5
+#define DISCONNECT 6
+#define FAULT 7
 
-// don't use RX0 or TX0 pins they are for the serial communication.
-//static const uint8_t RX0 = 0; 
-//static const uint8_t TX0 = 1;
+// RPUno board has no led but this is the normal place it would be found
+#define LED_BUILTIN 13 
 
-static const uint8_t SS   = 10; 
-static const uint8_t MOSI = 11;
-static const uint8_t MISO = 12;
-static const uint8_t SCK  = 13;
+// UART on RPUno is for serial communication (you should never use these pins)
+#define RX0 0 
+#define TX0 1
 
-static const uint8_t SDA = 18;
-static const uint8_t SCL = 19;
+// SPI on RPUno
+#define SS 10 
+#define MOSI 11
+#define MISO 12
+#define SCK 13
 
-// these are ADC channels, they do not map to a digital IO function
-static const uint8_t PV_IN = 6; // measure PV input voltage at 100/532 V/V
-static const uint8_t PWR = 7; // measure Battery at about 2/3 V/V
+// I2C on RPUno
+#define SDA 18
+#define SCL 19
+
+// ADC channels
+// There are values from 0 to 1023 for 1024 slots where each reperesents 1/1024 of the reference. Last slot has issues
+// https://forum.arduino.cc/index.php?topic=303189.0      
+
+// PV_I_ADC1 is a high side current sense on CCtest board
+// PV_I_ADC1 voltage is analogRead(PV_I)*(5.0/1024.0)/(0.068*50.0)
+#define PV_I 1
+
+// CHRG_ADC2 voltage is analogRead(CHRG_I)*(5.0/1024.0)/(0.068*50.0)
+#define CHRG_I 2
+
+// DISCHRG_ADC3 voltage is analogRead(DISCHRG_I)*(5.0/1024.0)/(0.068*50.0)
+#define DISCHRG_I 3
+
+// ADC4 and ADC5 are used for I2C with the RPUadpt/RPUftdi/RPUpi shields
+
+// PV_IN_ADC6 voltage is analogRead(PV_V)*(5.0/1024.0)*(532.0/100.0)
+#define PV_V 6 
+
+// PWR_ADC7 or Battery voltage is analogRead(PWR_V)*(5.0/1024.0)*(3.0/2.0)
+#define PWR_V 7
 
 #endif // Pins_Board_h

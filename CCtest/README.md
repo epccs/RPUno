@@ -1,38 +1,38 @@
-# Analog-to-Digital Converter
+# Charge Control test
 
 ## Overview
 
-Adc is an interactive command line program that demonstrates control of an ATmega328p Analog-to-Digital Converter from pins PC0 through PC7. 
+I made a  [CCtest]<http://epccs.org/indexes/Board/CCtest> board that has high side current sensing for the PV input and Battery charging and discharging. The high side sensor only measures one direction so two are needed for the battery. A load is also provided, it has four digital control lines that enable current sinks. 
 
-Note Arduino marked there Uno board as A0 though A5, which is somtimes confused as PA0, I think they wanted it to mean the ADMUX value. 
+At startup, the program waits until the PV_IN is over 18V which means the solar has charged the battery to its float level. It then delays for 3hr to allow an absorption cycle to complete. After which a delay occurs until PV_IN has dropped to less than 5V (e.g. night). Next, the load settings are stepped through for a record. Then it discharges and reports as the Battery voltage crosses 50mV thresholds until the discharge voltage is reached. If the serial receives a character it will interrupt the test and enable charging.
 
 For how I setup my Makefile toolchain <http://epccs.org/indexes/Document/DvlpNotes/LinuxBoxCrossCompiler.html>.
 
 With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
 
 ``` 
-rsutherland@straightneck:~/Samba/RPUno/Adc$ make bootload
+rsutherland@straightneck:~/Samba/RPUno/CCtest$ make bootload
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o main.o main.c
-avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o analog.o analog.c
+avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o cctest.o cctest.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../Uart/id.o ../Uart/id.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/timers.o ../lib/timers.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/uart.o ../lib/uart.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/adc.o ../lib/adc.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/parse.o ../lib/parse.c
-avr-gcc -Wl,-Map,Adc.map  -Wl,--gc-sections  -Wl,-u,vfprintf -lprintf_flt -lm -mmcu=atmega328p main.o analog.o ../Uart/id.o ../lib/timers.o ../lib/uart.o ../lib/adc.o ../lib/parse.o -o Adc.elf
+avr-gcc -Wl,-Map,Adc.map  -Wl,--gc-sections  -Wl,-u,vfprintf -lprintf_flt -lm -mmcu=atmega328p main.o cctest.o ../Uart/id.o ../lib/timers.o ../lib/uart.o ../lib/adc.o ../lib/parse.o -o Adc.elf
 avr-size -C --mcu=atmega328p Adc.elf
 AVR Memory Usage
 ----------------
 Device: atmega328p
 
-Program:    8768 bytes (26.8% Full)
+Program:   11268 bytes (34.4% Full)
 (.text + .data + .bootloader)
 
-Data:        183 bytes (8.9% Full)
+Data:        219 bytes (10.7% Full)
 (.data + .bss + .noinit)
 
 
-rm -f Adc.o main.o analog.o ../Uart/id.o ../lib/timers.o ../lib/uart.o ../lib/adc.o ../lib/parse.o
+rm -f Adc.o main.o cctest.o ../Uart/id.o ../lib/timers.o ../lib/uart.o ../lib/adc.o ../lib/parse.o
 avr-objcopy -j .text -j .data -O ihex Adc.elf Adc.hex
 rm -f Adc.elf
 avrdude -v -p atmega328p -c arduino -P /dev/ttyUSB0 -b 115200 -U flash:w:Adc.hex
@@ -98,21 +98,21 @@ avrdude: NOTE: "flash" memory has been specified, an erase cycle will be perform
 avrdude: erasing chip
 avrdude: reading input file "Adc.hex"
 avrdude: input file Adc.hex auto detected as Intel Hex
-avrdude: writing flash (8768 bytes):
+avrdude: writing flash (11268 bytes):
 
-Writing | ################################################## | 100% 1.25s
+Writing | ################################################## | 100% 1.72s
 
-avrdude: 8768 bytes of flash written
+avrdude: 11268 bytes of flash written
 avrdude: verifying flash memory against Adc.hex:
 avrdude: load data flash data from input file Adc.hex:
 avrdude: input file Adc.hex auto detected as Intel Hex
-avrdude: input file Adc.hex contains 8768 bytes
+avrdude: input file Adc.hex contains 11268 bytes
 avrdude: reading on-chip flash data:
 
-Reading | ################################################## | 100% 1.03s
+Reading | ################################################## | 100% 1.16s
 
 avrdude: verifying ...
-avrdude: 8768 bytes of flash verified
+avrdude: 11268 bytes of flash verified
 
 avrdude: safemode: hfuse reads as 0
 avrdude: safemode: efuse reads as 0
@@ -122,7 +122,6 @@ avrdude done.  Thank you.
 ``` 
 
 Now connect with picocom (or ilk). Note I am often at another computer doing this through SSH. The Samba folder is for editing the files from Windows.
-
 
 ``` 
 #exit is C-a, C-x
@@ -146,18 +145,44 @@ identify
 
 ``` 
 /0/id?
-{"id":{"name":"Adc","desc":"RPUno Board /w atmega328p and LT3652","avr-gcc":"4.9"}}
+{"id":{"name":"CCtest","desc":"RPUno Board /w atmega328p and LT3652","avr-gcc":"4.9"}}
 ```
 
-##  /0/analog? 0..7[,0..7[,0..7[,0..7[,0..7]]]]    
+##  /0/cctest? [load_step]|[start_step,end_step,bat_mv]
 
-Analog-to-Digital Converter reading from up to 5 ADMUX channels. The reading repeats until the Rx buffer gets a character. On RPUno channel 6 is the solar input voltage, and channel 7 is the battery voltage. Note ADC4 and ADC5 are used for I2C on RPUno.
+For zero or three argument test, first the program waits until the PV_IN is over 19V which means solar has charged the battery to its float level. Next, the load settings are stepped through for a record. Then the Loop enters now to discharge and reports as the Battery voltage crosses 50mV thresholds until the discharge voltage is reached. Cycling through a verify MPPT mode that starts charging up to the float voltage. Following an absorption cycle to complete the charge. After which it waits until Night (PV_IN less than 5V). And then the loop cycles back into discharge. If the serial line receives a character it will interrupt the test and enable charging.
+
+One argument test sets the load step value and runs with the charger off until receiving a character on the UART.
 
 ``` 
-/0/analog? 1,2,3,6,7
-{"PV_A":"0.004","CHRG_A":"0.010","DISCHRG_A":"0.000","PV_V":"17.95","PWR_V":"6.72"}
-{"PV_A":"0.006","CHRG_A":"0.010","DISCHRG_A":"0.000","PV_V":"17.87","PWR_V":"6.72"}
-/0/analog? 4,5
-{"ADC4":"SDA","ADC5":"SCL"}
+/0/cctest?
+{"DIS_A":"0.006","PV_V":"19.17","PWR_V":"6.69","TIME":"5","LD":"0"}
+{"DIS_A":"0.030","PV_V":"19.14","PWR_V":"6.68","TIME":"2007","LD":"1"}
+{"DIS_A":"0.036","PV_V":"19.04","PWR_V":"6.68","TIME":"4007","LD":"2"}
+{"DIS_A":"0.045","PV_V":"19.07","PWR_V":"6.67","TIME":"6008","LD":"3"}
+{"DIS_A":"0.050","PV_V":"19.04","PWR_V":"6.67","TIME":"8009","LD":"4"}
+{"DIS_A":"0.059","PV_V":"19.04","PWR_V":"6.67","TIME":"10010","LD":"5"}
+{"DIS_A":"0.066","PV_V":"19.04","PWR_V":"6.66","TIME":"12011","LD":"6"}
+{"DIS_A":"0.073","PV_V":"19.04","PWR_V":"6.65","TIME":"14012","LD":"7"}
+{"DIS_A":"0.082","PV_V":"19.04","PWR_V":"6.65","TIME":"16013","LD":"8"}
+{"DIS_A":"0.089","PV_V":"19.04","PWR_V":"6.64","TIME":"18014","LD":"9"}
+{"DIS_A":"0.098","PV_V":"19.04","PWR_V":"6.64","TIME":"20015","LD":"10"}
+{"DIS_A":"0.105","PV_V":"19.04","PWR_V":"6.63","TIME":"22017","LD":"11"}
+{"DIS_A":"0.113","PV_V":"19.04","PWR_V":"6.63","TIME":"24017","LD":"12"}
+{"DIS_A":"0.121","PV_V":"19.04","PWR_V":"6.62","TIME":"26018","LD":"13"}
+{"DIS_A":"0.128","PV_V":"19.01","PWR_V":"6.61","TIME":"28019","LD":"14"}
+{"DIS_A":"0.135","PV_V":"19.01","PWR_V":"6.61","TIME":"30020","LD":"15"}
+{"DIS_A":"0.119","PV_V":"19.01","PWR_V":"6.55","TIME":"79441","LD":"15"}
+{"DIS_A":"0.119","PV_V":"19.04","PWR_V":"6.50","TIME":"139063","LD":"15"}
+{"DIS_A":"0.118","PV_V":"19.14","PWR_V":"6.45","TIME":"275579","LD":"15"}
+/0/cctest?
+{"CHRG_A":"0.284","PV_V":"15.20","PWR_V":"6.61","TIME":"494596","LD":"0"}
 ```
 
+# Notes
+
+More debuging to do.
+
+When I stopped the test and then stat it at the comand line I find it charging at 284mA @ 6.61V (i.e. about 1.9W) with a SLP003-12U solar PV module.
+
+The battery discharge current reads near 136mA when the serial driver is more active and 119mA when it is not active, this is because the RS485 drivers were not sinking current at the moment of the 119mA reading. 

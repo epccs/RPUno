@@ -23,6 +23,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/parse.h"
 #include "../lib/adc.h"
 #include "../lib/timers.h"
+#include "../lib/pins_board.h"
 #include "analog.h"
 
 #define SERIAL_PRINT_DELAY_MILSEC 60000
@@ -55,19 +56,44 @@ void Analog(void)
     { // use the channel as an index in the JSON reply
         uint8_t arg_indx_channel =atoi(arg[adc_arg_index]);
         
-        if (arg_indx_channel < 6)
+        if (arg_indx_channel == 0)
         {
             printf_P(PSTR("\"ADC%s\":"),arg[adc_arg_index]);
         }
-        
-        if (arg_indx_channel == 6)
+
+        if (arg_indx_channel == PV_I) //ADC1
         {
-            printf_P(PSTR("\"PV_IN\":"));
+            printf_P(PSTR("\"PV_A\":"));
         }
         
-        if (arg_indx_channel == 7)
+        if (arg_indx_channel == CHRG_I) //ADC2
         {
-            printf_P(PSTR("\"PWR\":"));
+            printf_P(PSTR("\"CHRG_A\":"));
+        }
+
+        if (arg_indx_channel == DISCHRG_I) //ADC3
+        {
+            printf_P(PSTR("\"DISCHRG_A\":"));
+        }
+
+        if (arg_indx_channel == 4)
+        {
+            printf_P(PSTR("\"ADC4\":"));
+        }
+
+        if (arg_indx_channel == 5)
+        {
+            printf_P(PSTR("\"ADC5\":"));
+        }
+
+        if (arg_indx_channel == PV_V) //ADC6
+        {
+            printf_P(PSTR("\"PV_V\":"));
+        }
+        
+        if (arg_indx_channel == PWR_V) //ADC7
+        {
+            printf_P(PSTR("\"PWR_V\":"));
         }
         command_done = 12;
     }
@@ -77,21 +103,44 @@ void Analog(void)
 
         // There are values from 0 to 1023 for 1024 slots where each reperesents 1/1024 of the reference. Last slot has issues
         // https://forum.arduino.cc/index.php?topic=303189.0        
-        if (arg_indx_channel < 6)
+        if (arg_indx_channel == 0)
         {
-            printf_P(PSTR("\"%1.2f\""),(analogRead(arg_indx_channel)*5.0/1024.0));
-        }
-        
-        // RPUno has a 432k and 100k voltage divider from the solar input. The PV goes through a 432k  to ADC6 and a 100k to ground.
-        if (arg_indx_channel == 6) 
-        {
-            printf_P(PSTR("\"%1.2f\""),(analogRead(arg_indx_channel)*(5.0/1024.0)*(532.0/100.0)));
+            printf_P(PSTR("\"%1.2f\""),(analogRead(0)*5.0/1024.0));
         }
 
-        // RPUno has a 100 and 200k voltage divider from the battery(PWR). The PWR goes through a 100k  to ADC7 and a 200k to ground.
-        if (arg_indx_channel == 7) 
+        if (arg_indx_channel == PV_I) //CCtest board current sense that can be connected to ADC1.
         {
-            printf_P(PSTR("\"%1.2f\""),(analogRead(arg_indx_channel)*(5.0/1024.0)*(3.0/2.0)));
+            printf_P(PSTR("\"%1.3f\""),(analogRead(PV_I)*(5.0/1024.0)/(0.068*50.0)));
+        }
+
+        if (arg_indx_channel == CHRG_I) // RPUno has ADC2 connected to high side current sense to measure battery charging.
+        {
+            printf_P(PSTR("\"%1.3f\""),(analogRead(CHRG_I)*(5.0/1024.0)/(0.068*50.0)));
+        }
+
+        if (arg_indx_channel == DISCHRG_I) // RPUno has ADC3 connected to high side current sense to measure battery discharg.
+        {
+            printf_P(PSTR("\"%1.3f\""),(analogRead(DISCHRG_I)*(5.0/1024.0)/(0.068*50.0)));
+        }
+
+        if (arg_indx_channel == 4) // RPUno has ADC4 is used for I2C SDA function
+        {
+            printf_P(PSTR("\"SDA\""));
+        }
+
+        if (arg_indx_channel == 5) // RPUno has ADC5 is used for I2C SCL function
+        {
+            printf_P(PSTR("\"SCL\""));
+        }
+
+        if (arg_indx_channel == PV_V) // RPUno has ADC6 connected to a voltage divider from the solar input.
+        {
+            printf_P(PSTR("\"%1.2f\""),(analogRead(PV_V)*(5.0/1024.0)*(532.0/100.0)));
+        }
+
+        if (arg_indx_channel == PWR_V) // RPUno has ADC7 connected a voltage divider from the battery (PWR).
+        {
+            printf_P(PSTR("\"%1.2f\""),(analogRead(PWR_V)*(5.0/1024.0)*(3.0/2.0)));
         }
 
         if ( (adc_arg_index+1) >= arg_count) 

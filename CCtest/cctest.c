@@ -34,7 +34,7 @@ static unsigned long absorption_started_at;
 static uint8_t absorption;
 static uint8_t runtest;
 
-// ADC channels: 7 is battery, 6 is PV, 5 is not-used 4 is battery discharge, 3 is battery charge, 2 is PV_I.
+// ADC channels: 7 is battery, 6 is PV, 5 is I2C:SCL 4 is I2C:SDA, 3 is battery discharge, 2 is battery charge, 1 is PV_I.
 #define START_CHANNEL 1
 #define END_CHANNEL 7
 static uint8_t adc_index;

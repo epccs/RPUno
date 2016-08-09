@@ -149,6 +149,7 @@ script -f -c "picocom -b 9600 /dev/ttyUSB0" stuff.log
 # Commands
 
 Commands are interactive over the serial interface at 9600 baud rate. The echo will start after second charactor of a new line. 
+Commands are interactive over the serial interface at 9600 baud rate. The echo will start after the second character of a new line. 
 
 ## /0/id? [name|desc|avr-gcc]
 

@@ -1,5 +1,5 @@
 /*
- * Pin definitions for use with Digital IO library
+ * Pin definitions for RPUno used with pin_num.h Digital IO library
  * Copyright (C) 2016 Ronald Sutherland
  *
  * This Library is free software: you can redistribute it and/or modify

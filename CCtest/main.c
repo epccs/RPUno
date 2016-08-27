@@ -1,5 +1,5 @@
 /*
-Adc is a command line controled demonstration of Interrupt Driven Analog Conversion
+CCtest is a command line controled demonstration for battery and power testing for RPUno
 Copyright (C) 2016 Ronald Sutherland
 
 This program is free software; you can redistribute it and/or

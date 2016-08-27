@@ -30,9 +30,10 @@ static uint8_t free_running;
 // Interrupt service routine for enable_ADC_auto_conversion
 ISR(ADC_vect){
     // ADCL contain lower 8 bits, ADCH upper (two bits)
-    // Must read ADCL first
-    adc[adc_channel] = ADCL | (ADCH << 8);
-
+    // Must read ADCL first (news ADC is now defined for this)
+    adc[adc_channel] = ADC;
+    //adc[adc_channel] = ADCL | (ADCH << 8);
+    
     ++adc_channel;
     if (adc_channel >= ADC_CHANNELS) 
     {

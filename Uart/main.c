@@ -19,6 +19,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include <util/atomic.h>
 #include "../lib/uart.h"
 #include "../lib/parse.h"
+#include "../lib/twi.h"
 #include "id.h"
 
 void ProcessCmd()
@@ -34,9 +35,23 @@ int main(void) {
 
     /* Initialize UART, it returns a pointer to FILE so redirect of stdin and stdout works*/
     stdout = stdin = uartstream0_init(BAUD);
+    
+    /* Initialize I2C, with the internal pull-up*/
+    twi_init(1);
+
+    /* Clear and setup the command buffer, (probably not needed at this point) */
     initCommandBuffer();
        
     sei(); // Enable global interrupts
+
+    char rpu_addr = get_Rpu_address();
+    printf_P(PSTR("RPU manager addr 0x%x \r\n" ), rpu_addr);
+    
+    // set a default address if RPU manager not found
+    if (rpu_addr == 0)
+    {
+        rpu_addr = '0';
+    }
     
     while(1) 
     {
@@ -46,8 +61,8 @@ int main(void) {
             // get a character from stdin and use it to assemble a command
             AssembleCommand(getchar());
 
-            // address is the ascii value for '0' note: a null address will terminate the command string. 
-            StartEchoWhenAddressed('0');
+            // address is a char e.g. the ascii value for '0' warning: a null will terminate the command string. 
+            StartEchoWhenAddressed(rpu_addr);
         }
         
         // check if the character is available, and if so stop transmit and the command in process.

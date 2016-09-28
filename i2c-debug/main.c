@@ -69,8 +69,9 @@ int main(void)
     /* Initialize UART, it returns a pointer to FILE so redirect of stdin and stdout works*/
     stdout = stdin = uartstream0_init(BAUD);
 
-    /* Initialize I2C, without the internal pull-up*/
-    twi_init(0);
+    /* Initialize I2C, with the internal pull-up 
+        note: I2C scan will stop without a pull-up on the bus */
+    twi_init(1);
 
     /* Clear and setup the command buffer, (probably not needed at this point) */
     initCommandBuffer();

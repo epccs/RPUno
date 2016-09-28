@@ -69,7 +69,7 @@
 #define TX0 1
 
 // SPI on RPUno
-#define SS 10 
+#define nSS 10 
 #define MOSI 11
 #define MISO 12
 #define SCK 13

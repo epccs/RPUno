@@ -4,6 +4,7 @@ LIBDIR = ../lib
 OBJECTS = main.o \
 	id.o \
 	$(LIBDIR)/uart.o \
+	$(LIBDIR)/twi.o \
 	$(LIBDIR)/parse.o
 
 ## Chip and project-specific global definitions

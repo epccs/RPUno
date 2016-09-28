@@ -6,7 +6,7 @@ OBJECTS = main.o $(LIBDIR)/uart.o $(LIBDIR)/parse.o
 ## Chip and project-specific global definitions
 MCU   =  atmega328p
 F_CPU = 16000000UL  
-BAUD  =  9600UL
+BAUD  =  115200UL
 CPPFLAGS = -DF_CPU=$(F_CPU) -DBAUD=$(BAUD) -I. 
 
 ## Cross-compilation

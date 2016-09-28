@@ -13,13 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 For a copy of the GNU General Public License use
-http://www.gnu.org/licenses/gpl-2.0.html
-
-On Linux picocom can be used as a minimal serial terminal
-https://github.com/npat-efault/picocom
-
-picocom -b 9600 /dev/ttyUSB0
-exit is C-a, C-x
+http://www.gnu.org/licenses/gpl-2.0.html 
 */
 #include <avr/pgmspace.h>
 #include <util/atomic.h>

@@ -77,7 +77,15 @@ int main(void)
     initCommandBuffer();
 
     sei(); // Enable global interrupts starts TIMER0, UART0, ICP1 and other ISR's
+
+    char rpu_addr = get_Rpu_address();
     
+    // set a default address if RPU manager not found
+    if (rpu_addr == 0)
+    {
+        rpu_addr = '0';
+    }
+
     while(1) 
     {
         // check if character is available to assemble a command, e.g. non-blocking

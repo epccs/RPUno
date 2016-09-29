@@ -45,7 +45,6 @@ int main(void) {
     sei(); // Enable global interrupts
 
     char rpu_addr = get_Rpu_address();
-    printf_P(PSTR("RPU manager addr 0x%x \r\n" ), rpu_addr);
     
     // set a default address if RPU manager not found
     if (rpu_addr == 0)

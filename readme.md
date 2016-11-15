@@ -1,14 +1,13 @@
-![EPCCS.ORG Logo](http://epccs.org/indexes/Document/Logo/Documents/HeaderName.jpg "EPCCS.ORG Logo")
-# Software for RPUno which has an ATmega328p
+# RPUno has an ATmega328p with on-board solar charge controller
 
-From <http://epccs.org/hg/open/RPUno>
+From <https://github.com/epccs/RPUno/>
 
-![Status](http://epccs.org/indexes/Board/RPUno/status_icon.png "RPUno Status")
+The Board has an easy to use MCU and LT3652 solar charge controller, it does not have USB or an LED.
 
-The Board is an ATmega328p[b] with an LT3652 solar charge controller and Arduino Uno R3 pin compatible header. It does not have USB.
+![Schematic](https://raw.githubusercontent.com/epccs/RPUno/master/Hardware/profile/14140,Schematic.png "RPUno Schematic")
 
-![Schematic](http://epccs.org/indexes/Board/RPUno/Documents/14140,Schematic.png "RPUno Schematic")
+[Forum](http://rpubus.org/bb/viewforum.php?f=6)
 
-[RPUno](http://epccs.org/indexes/Board/RPUno/) Board development and hardware.
+[HackaDay](https://hackaday.io/project/12784-rpuno)
 
-This repository has some Arduino.cc IDE projects and some Makefile projects. Makefile setup <http://epccs.org/indexes/Document/DvlpNotes/LinuxBoxCrossCompiler.html>
+The core files are in the /lib folder while each example has its own Makefile.

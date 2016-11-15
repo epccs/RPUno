@@ -10,7 +10,7 @@ The capture ISR was shown to skip events when less than 300 machine cycles are a
 
 For how I setup my Makefile toolchain <http://epccs.org/indexes/Document/DvlpNotes/LinuxBoxCrossCompiler.html>.
 
-With optiboot installed run 'make bootload' and it will compile and then flash the MCU the same way Arduino does.
+With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
 
 ``` 
 rsutherland@straightneck:~/Samba/RPUno/Ht$ make bootload

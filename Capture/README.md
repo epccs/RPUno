@@ -2,7 +2,7 @@
 
 ## Overview
 
-Timer 1 Input Capture (ICP1) is on the Arduino Uno pin 8. 
+Timer 1 Input Capture (ICP1) is on RPUno Digital (Wiring) pin 8. 
 
 Referance ATmega328 datasheet 16.6 Input Capture Unit (page 118). A capture copies the value in timer TCNT1 into ICR1, which is a timestamp of the event.
 
@@ -10,7 +10,7 @@ Note the ISR needs about 300 machine cycles to finish. If events happen faster t
 
 For how I setup my Makefile toolchain <http://epccs.org/indexes/Document/DvlpNotes/LinuxBoxCrossCompiler.html>.
 
-With optiboot installed run 'make bootload' and it will compile and then flash the MCU the same way Arduino does.
+With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
 
 ``` 
 rsutherland@straightneck:~/Samba/RPUno/Capture$ make bootload

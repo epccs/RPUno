@@ -17,10 +17,19 @@ http://www.gnu.org/licenses/gpl-2.0.html
 */
 #include <avr/pgmspace.h>
 #include <util/atomic.h>
+#include "../lib/timers.h"
 #include "../lib/uart.h"
 #include "../lib/parse.h"
 #include "../lib/twi.h"
+#include "../lib/pin_num.h"
+#include "../lib/pins_board.h"
 #include "id.h"
+
+#define BLINK_DELAY 1000UL
+
+static unsigned long blink_started_at;
+static unsigned long blink_delay;
+static char rpu_addr;
 
 void ProcessCmd()
 { 
@@ -30,8 +39,14 @@ void ProcessCmd()
     }
 }
 
-
-int main(void) {    
+void setup(void) 
+{
+	// RPUuno has no LED, but LED_BUILTIN is defined as pin 13 anyway.
+    pinMode(LED_BUILTIN,OUTPUT);
+    digitalWrite(LED_BUILTIN,HIGH);
+    
+    //Timer0 Fast PWM mode, Timer1 & Timer2 Phase Correct PWM mode.
+    initTimers(); 
 
     /* Initialize UART, it returns a pointer to FILE so redirect of stdin and stdout works*/
     stdout = stdin = uartstream0_init(BAUD);
@@ -41,19 +56,44 @@ int main(void) {
 
     /* Clear and setup the command buffer, (probably not needed at this point) */
     initCommandBuffer();
-       
-    sei(); // Enable global interrupts
 
-    char rpu_addr = get_Rpu_address();
+    // Enable global interrupts to start TIMER0 and UART
+    sei(); 
     
-    // set a default address if RPU manager not found
+    blink_started_at = millis();
+    
+    rpu_addr = get_Rpu_address();
+    blink_delay = BLINK_DELAY;
+    
+    // blink fast if a default address from RPU manager not found
     if (rpu_addr == 0)
     {
         rpu_addr = '0';
+        blink_delay = BLINK_DELAY/4;
     }
-    
+}
+
+void blink(void)
+{
+    unsigned long kRuntime = millis() - blink_started_at;
+    if ( kRuntime > blink_delay)
+    {
+        digitalToggle(LED_BUILTIN);
+        
+        // next toggle 
+        blink_started_at += blink_delay; 
+    }
+}
+
+int main(void) {    
+
+    setup(); 
+
     while(1) 
     {
+        // use LED to see if I2C has a bus manager
+        blink();
+        
         // check if character is available to assemble a command, e.g. non-blocking
         if ( (!command_done) && uart0_available() ) // command_done is an extern from parse.h
         {

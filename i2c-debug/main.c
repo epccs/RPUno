@@ -23,9 +23,17 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/timers.h"
 #include "../lib/adc.h"
 #include "../lib/twi.h"
+#include "../lib/pin_num.h"
+#include "../lib/pins_board.h"
 #include "../Uart/id.h"
 #include "i2c-scan.h"
 #include "i2c-cmd.h"
+
+#define BLINK_DELAY 1000UL
+
+static unsigned long blink_started_at;
+static unsigned long blink_delay;
+static char rpu_addr;
 
 void ProcessCmd()
 { 
@@ -59,16 +67,20 @@ void ProcessCmd()
     }
 }
 
-int main(void) 
-{    
-    // Initialize Timers, ADC, and clear bootloader, Arduino does these with init() in wiring.c 
+void setup(void) 
+{
+	// RPUuno has no LED, but LED_BUILTIN is defined as pin 13 anyway.
+    pinMode(LED_BUILTIN,OUTPUT);
+    digitalWrite(LED_BUILTIN,HIGH);
+    
+    // Initialize Timers, ADC, and clear bootloader, Arduino does these with init() in wiring.c
     initTimers(); //Timer0 Fast PWM mode, Timer1 & Timer2 Phase Correct PWM mode.
     init_ADC_single_conversion(EXTERNAL_AVCC); // warning AREF must not be connected to anything
     init_uart0_after_bootloader(); // bootloader may have the UART setup
-
+    
     /* Initialize UART, it returns a pointer to FILE so redirect of stdin and stdout works*/
     stdout = stdin = uartstream0_init(BAUD);
-
+    
     /* Initialize I2C, with the internal pull-up 
         note: I2C scan will stop without a pull-up on the bus */
     twi_init(1);
@@ -76,18 +88,43 @@ int main(void)
     /* Clear and setup the command buffer, (probably not needed at this point) */
     initCommandBuffer();
 
-    sei(); // Enable global interrupts starts TIMER0, UART0, ICP1 and other ISR's
-
-    char rpu_addr = get_Rpu_address();
+    // Enable global interrupts to start TIMER0 and UART ISR's
+    sei(); 
     
-    // set a default address if RPU manager not found
+    blink_started_at = millis();
+    
+    rpu_addr = get_Rpu_address();
+    blink_delay = BLINK_DELAY;
+    
+    // blink fast if a default address from RPU manager not found
     if (rpu_addr == 0)
     {
         rpu_addr = '0';
+        blink_delay = BLINK_DELAY/4;
     }
+}
+
+void blink(void)
+{
+    unsigned long kRuntime = millis() - blink_started_at;
+    if ( kRuntime > blink_delay)
+    {
+        digitalToggle(LED_BUILTIN);
+        
+        // next toggle 
+        blink_started_at += blink_delay; 
+    }
+}
+
+int main(void) 
+{    
+    setup(); 
 
     while(1) 
     {
+        // use LED to see if I2C has a bus manager
+        blink();
+
         // check if character is available to assemble a command, e.g. non-blocking
         if ( (!command_done) && uart0_available() ) // command_done is an extern from parse.h
         {
@@ -95,7 +132,7 @@ int main(void)
             AssembleCommand(getchar());
 
             // address is the ascii value for '0' note: a null address will terminate the command string. 
-            StartEchoWhenAddressed('0');
+            StartEchoWhenAddressed(rpu_addr);
         }
         
         // check if a character is available, and if so flush transmit buffer and nuke the command in process.

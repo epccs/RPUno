@@ -22,5 +22,7 @@ PULSE CURR SOURCE: 17mA current source for  MT, LT type sensors or to bias hall 
 PULSE ALT CURR SOURCE: 10mA source used to feed open collector on hall or VR sensors that will shunt it.
 PULSE CURR LOOP TERMINATION: 100 Ohm. Used to bias a NPN transistor that pulls down ICP1.
 DIGITAL: five levle protected to IOREF and diode clamped to VIN which may be disconnectd from battery
-ANALOG: two inputs with 22 mA current sources from VIN for loop power.
+ANALOG: two inputs with 20 mA current sources (from VIN) for loop sensor power.
 ```
+
+When connected to power the battery must first charge to about 13V before power will flow to the board (VIN) and microcontroller, the buffered power means hiccup free operation is possible for a while.  If charging is insufficient after startup a power saving strategy needs to be accommodated to deal with the constrained power.

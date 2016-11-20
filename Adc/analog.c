@@ -56,14 +56,14 @@ void Analog(void)
     { // use the channel as an index in the JSON reply
         uint8_t arg_indx_channel =atoi(arg[adc_arg_index]);
         
-        if (arg_indx_channel == 0)
+        if (arg_indx_channel == 0) //ADC0
         {
             printf_P(PSTR("\"ADC%s\":"),arg[adc_arg_index]);
         }
 
-        if (arg_indx_channel == PV_I) //ADC1
+        if (arg_indx_channel == 1) //ADC1
         {
-            printf_P(PSTR("\"PV_A\":"));
+            printf_P(PSTR("\"ADC%s\":"),arg[adc_arg_index]);
         }
         
         if (arg_indx_channel == CHRG_I) //ADC2
@@ -108,9 +108,9 @@ void Analog(void)
             printf_P(PSTR("\"%1.2f\""),(analogRead(0)*5.0/1024.0));
         }
 
-        if (arg_indx_channel == PV_I) //CCtest board current sense that can be connected to ADC1.
+        if (arg_indx_channel == 1)
         {
-            printf_P(PSTR("\"%1.3f\""),(analogRead(PV_I)*(5.0/1024.0)/(0.068*50.0)));
+            printf_P(PSTR("\"%1.2f\""),(analogRead(0)*5.0/1024.0));
         }
 
         if (arg_indx_channel == CHRG_I) // RPUno has ADC2 connected to high side current sense to measure battery charging.
@@ -140,7 +140,7 @@ void Analog(void)
 
         if (arg_indx_channel == PWR_V) // RPUno has ADC7 connected a voltage divider from the battery (PWR).
         {
-            printf_P(PSTR("\"%1.2f\""),(analogRead(PWR_V)*(5.0/1024.0)*(3.0/2.0)));
+            printf_P(PSTR("\"%1.2f\""),(analogRead(PWR_V)*(5.0/1024.0)*(3.0/1.0)));
         }
 
         if ( (adc_arg_index+1) >= arg_count) 

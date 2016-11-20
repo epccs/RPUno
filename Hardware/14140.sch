@@ -10235,8 +10235,8 @@ pad .65X x 1.06Y mm</description>
 <part name="R35" library="R-C" deviceset="R" device="0805" value="100k"/>
 <part name="GND22" library="Plane" deviceset="0V" device=""/>
 <part name="R34" library="R-C" deviceset="R" device="0805" value="432k"/>
-<part name="R36" library="R-C" deviceset="R" device="0805" value="100k"/>
-<part name="R37" library="R-C" deviceset="R" device="0805" value="200k"/>
+<part name="R36" library="R-C" deviceset="R" device="0805" value="200k"/>
+<part name="R37" library="R-C" deviceset="R" device="0805" value="100k"/>
 <part name="C19" library="C-C" deviceset="C" device="C0603A" value=".01uF"/>
 <part name="GND42" library="Plane" deviceset="0V" device=""/>
 <part name="C23" library="C-C" deviceset="C" device="C0603A" value="15pF"/>
@@ -10438,7 +10438,7 @@ SENSOR</text>
 SENSOR</text>
 <text x="171.196" y="126.492" size="2.54" layer="98">PV AND BATTERY VOLTAGE</text>
 <text x="146.304" y="123.19" size="1.27" layer="98">PV * .188</text>
-<text x="204.724" y="123.19" size="1.27" layer="98">PWR * .667</text>
+<text x="204.724" y="123.19" size="1.27" layer="98">PWR * .333</text>
 <text x="7.62" y="24.13" size="1.778" layer="98">ECS-160-20-3X-TR
 16MHZ +/- 30PPM
 STABILITY AND TOLERANCE

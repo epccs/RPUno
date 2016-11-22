@@ -167,7 +167,7 @@ Set the Data Direction Register (DDRx) bit that sets a pin as INPUT or OUTPUT.
 ```
 
 
-##  /0/digitalWrite 3|4|10|11|12|13,HIGH|LOW    
+##  /0/digitalWrite 3|4|10|11|12,HIGH|LOW    
 
 Set the Port Data Register (PORTx) bit that drives the pin or if mode (e.g. Port Input Register bit) is set as an INPUT enables a pullup. Returns the Port Input Register PINx bit (e.g. same as read command)
 
@@ -179,7 +179,7 @@ Set the Port Data Register (PORTx) bit that drives the pin or if mode (e.g. Port
 ```
 
 
-##  /0/digitalToggle 3|4|10|11|12|13  
+##  /0/digitalToggle 3|4|10|11|12  
 
 Toggle the Port Data Register (PORTx) bit if the Data Direction Register (DDRx) bit is set as an OUTPUT. Returns the Port Input Register PINx bit (e.g. same as read command)
 
@@ -194,7 +194,7 @@ Toggle the Port Data Register (PORTx) bit if the Data Direction Register (DDRx) 
 ```
 
 
-##  /0/digitalRead? 3|4|10|11|12|13  
+##  /0/digitalRead? 3|4|10|11|12 
 
 Read the Port Input Register (PINx) bit that was latched during last low edge of the system clock.
 
@@ -202,7 +202,7 @@ Read the Port Input Register (PINx) bit that was latched during last low edge of
 /1/digitalRead? 3
 {"PD3":"HIGH"}
 /1/digitalRead? 10
-{"PB2":"HIGH"}
+{"PB2":"LOW"}
 
 ```
 I have a 1k Ohm resistor on the nSS pin (digital 10) to ground that causes it to read low, the ATmega328p pull-up is about 60k Ohm.

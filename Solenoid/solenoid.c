@@ -507,9 +507,12 @@ void SolenoidControl() {
                     k[i].flow_cnt_stop = icp1.count; //record the flow meter pulse count after solenoid has closed
                     if (k[i].cycles)
                     {
+                        k[i].cycles = k[i].cycles -1;
+                    }
+                    if (k[i].cycles)
+                    {
                         k[i].started_at = millis();
                         k[i].cycle_state = 11;
-                        k[i].cycles = k[i].cycles -1;
                         break;
                     }
                     else

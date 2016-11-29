@@ -18,6 +18,8 @@ PB5     (SCK/IO13)  LED_BUILTIN
 
 The RPUno has those I/O's wired to a pluggable onboard connector. They are level converted to 5V so will ouput 4V without a pullup (which is just enough for a minimum high with 74HC logic). The LED_BUILTIN pin blinks on for a second and off for a second when the rpu_address is read over I2C (else it blinks four times as fast). 
 
+[![RPUno^5 With K3^0](http://rpubus.org/bb/download/file.php?id=25)](http://rpubus.org/Video/14140%5E5WithK3%5E0.mp4 "RPUno^5 With K3^0")
+
 With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
 
 ``` 

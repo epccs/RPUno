@@ -34,12 +34,12 @@ static uint8_t solenoids_initalized;
 
 void ProcessCmd()
 { 
-    if ( (strcmp_P( command, PSTR("/id?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
-    {
-        Id("Solenoid");
-    }
     if (solenoids_initalized) 
     {
+        if ( (strcmp_P( command, PSTR("/id?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
+        {
+            Id("Solenoid");
+        }
         if ( (strcmp_P( command, PSTR("/runtime")) == 0) && ( (arg_count == 2 ) ) )
         {
             RunTime();
@@ -48,7 +48,7 @@ void ProcessCmd()
         {
             Delay();
         }
-        if ( (strcmp_P( command, PSTR("/run")) == 0) && ( (arg_count == 1 ) ) )
+        if ( (strcmp_P( command, PSTR("/run")) == 0) && ( (arg_count == 2 ) ) )
         {
             Run();
         }

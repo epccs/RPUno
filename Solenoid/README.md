@@ -2,7 +2,7 @@
 
 ## Overview
 
-Solenoid is an interactive command line program that demonstrates control of the K3 latching solenoid driver board using an ATmega328p pins. 
+Solenoid is an interactive command line program that demonstrates control of the K3 latching solenoid driver board using the ATmega328p pins. 
 
 ``` 
 RPUno   (digital)   K3 
@@ -16,7 +16,7 @@ PB4     (MISO/IO12) A2
 PB5     (SCK/IO13)  LED_BUILTIN
 ``` 
 
-The RPUno has those I/O's wired to a pluggable onboard connector. They are level converted to 5V so will ouput 4V without a pullup (which is just enough for a minimum high with 74HC logic). The LED_BUILTIN pin blinks on for a second and off for a second when the rpu_address is read over I2C (else it blinks four times as fast). 
+The RPUno has those I/O's wired to a pluggable onboard connector. They are level converted to 5V so will ouput 4V without a pullup (which is enough for a minimum high with 74HC logic). The LED_BUILTIN pin blinks on for a second and off for a second when the rpu_address is read over I2C (else it blinks four times as fast). 
 
 [![RPUno^5 With K3^0](http://rpubus.org/bb/download/file.php?id=25)](http://rpubus.org/Video/14140%5E5WithK3%5E0.mp4 "RPUno^5 With K3^0")
 
@@ -61,41 +61,51 @@ Identify is from ../Uart/id.h Id().
 
 ``` 
 /1/id?
-{"id":{"name":"Digital","desc":"RPUno Board /w atmega328p and LT3652","avr-gcc":"4.9"}}
+{"id":{"name":"Solenoid","desc":"RPUno Board /w atmega328p and LT3652","avr-gcc":"4.9"}}
 ```
 
 
-##  /0/runtime 1|2|3,runtime_in_sec
+##  /0/run k,cycles 
 
-Set the solenoid run time (6hr max). 
+Start the solenoid k (1|2|3) operation for these cycles (1..255).
 
-defaults: delay = 3600 Sec, cycles = 1, flow_stop = not used, delay_start = 0.
+After startup the solenoids are initialized with values (delay_start = 1..7, runtime= 1, delay = 3600, flow_stop = not used) that will cause each solenoid to operate for a second after a delay_start time that spaces there operation out by 3 seconds each (it insures all are in a known state).
 
-``` 
-/1/runtime 3,20
-{"K3":{"runtime_sec":"20"}}
+After a solenoid has entered the delay state and let go of the flow meter resource another solenoid that is ready to use the flow meter will do so. Make sure to set the delay time long enough that all the other solenoids can use their runtime, or the flow meter becomes a resource constraint and some zones will get shorted. For example set all the delay times to 360 and make sure the combined runtimes do not add up to 360 (i.e. 100, 80, 120).
+
+```
+/1/run 1,1
+{"K1":{"delay_start_sec":"1","runtime_Sec":"1","delay_Sec":"3600","cycles":"1"}}
+/1/run 2,1
+{"K2":{"delay_start_sec":"4","runtime_Sec":"1","delay_Sec":"3600","cycles":"1"}}
+/1/run 3,1
+{"K3":{"delay_start_sec":"7","runtime_Sec":"1","delay_Sec":"3600","cycles":"1"}}
 ```
 
 
-##  /0/delay 1|2|3,delay_in_sec
+##  /0/delay k,delay_in_sec
 
-Set the solenoid delay between runs (24 hr max). 
+Set the solenoid k (1|2|3) delay between runs (1..86400, e.g. 24 hr max). 
 
 ``` 
 /1/delay 3,40
 {"K3":{"delay_sec":"40"}}
+/1/run 3,1
+{"K3":{"delay_start_sec":"7","runtime_sec":"1","delay_sec":"40","cycles":"1"}}
 ```
 
 
-##  /0/run 1|2|3
+##  /0/runtime k,runtime_in_sec
 
-Start the solenoid operation. 
-
-Note the default value for delay_start is zero, and for cycles it is one.
-
-After a solenoid is finished the lowest value solenoid that is ready to run will do so. 
+Set the solenoid k (1|2|3) run time (1..21600, e.g. 6hr max). 
 
 ``` 
-/1/run 3
-{"K3":{"delay_start_sec":"0","runtime_sec":"20", "delay_sec":"40","cycles":"1"}}
+/1/runtime 3,20
+{"K3":{"runtime_sec":"20"}}
+/1/run 3,1
+{"K3":{"delay_start_sec":"7","runtime_sec":"20","delay_sec":"40","cycles":"1"}}
 ```
+
+
+
+

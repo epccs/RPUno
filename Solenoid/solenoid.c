@@ -51,7 +51,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 
 typedef struct {
     unsigned long started_at;  // holds the start time of the present operation
-    unsigned long delay_start; // delay befor first set operation (one time)
+    unsigned long delay_start_sec; // delay befor first set operation (one time)
     unsigned long runtime_sec; // delay after set operation and befor reset
     unsigned long delay_sec;   // delay after reset operation and befor next set operation if (cycles > 0)
     uint8_t cycle_state;
@@ -94,9 +94,9 @@ void RunTime(void)
             initCommandBuffer();
             return;
         }
-        // and arg[1] value is 0..21600 
+        // and arg[1] value is 1..21600 
         unsigned long runtime = atol(arg[1]);
-        if ( ( runtime < 0) || (runtime > SEC_IN_6HR) )
+        if ( ( runtime < 1) || (runtime > SEC_IN_6HR) )
         {
             printf_P(PSTR("{\"err\":\"RunTmOutOfRng\"}\r\n"));
             initCommandBuffer();
@@ -109,21 +109,17 @@ void RunTime(void)
             initCommandBuffer();
             return;
         }
-        k[k_solenoid-1].delay_start = 0;
         k[k_solenoid-1].runtime_sec = runtime;
-        k[k_solenoid-1].delay_sec = SEC_IN_HR;
-        k[k_solenoid-1].flow_stop = FLOW_NOT_SET;
-        k[k_solenoid-1].cycles = 1;
-        printf_P(PSTR("{\"K%d\":{\"day\":\"true\","),k_solenoid);
+        printf_P(PSTR("{\"K%d\":{"),k_solenoid);
         command_done = 11;
     }
     else if ( (command_done == 11) )
     {  
         uint8_t k_solenoid = atoi(arg[0]);
-        printf_P(PSTR("\"runtime_Sec\":\"%lu\","),(k[k_solenoid-1].runtime_sec));
+        printf_P(PSTR("\"runtime_sec\":\"%lu\","),(k[k_solenoid-1].runtime_sec));
         command_done = 12;
     }
-    else if ( (command_done == 13) )
+    else if ( (command_done == 12) )
     {
         printf_P(PSTR("}}\r\n"));
         initCommandBuffer();
@@ -162,9 +158,9 @@ void Delay(void)
             initCommandBuffer();
             return;
         }
-        // and arg[1] value is 0..86400 
+        // and arg[1] value is 1..86400 
         unsigned long delay = atol(arg[1]);
-        if ( ( delay < 0) || (delay > SEC_IN_DAY) )
+        if ( ( delay < 1) || (delay > SEC_IN_DAY) )
         {
             printf_P(PSTR("{\"err\":\"DlyOutOfRng\"}\r\n"));
             initCommandBuffer();
@@ -173,22 +169,18 @@ void Delay(void)
         // don't change a solenoid that is in use it needs to be stopped first
         if (k[k_solenoid-1].cycle_state)
         {
-            printf_P(PSTR("{\"err\":\"DlyInUse\"}\r\n"));
+            printf_P(PSTR("{\"err\":\"DelayInUse\"}\r\n"));
             initCommandBuffer();
             return;
         }
-        // do not change delay_start 
-        // do not change runtime
         k[k_solenoid-1].delay_sec = delay;
-        // do not change flow_stop
-        // do not change cycles ;
         printf_P(PSTR("{\"K%d\":{"),k_solenoid);
         command_done = 11;
     }
     else if ( (command_done == 11) )
     {  
         uint8_t k_solenoid = atoi(arg[0]);
-        printf_P(PSTR("\"delay_Sec\":\"%lu\""),(k[k_solenoid-1].delay_sec));
+        printf_P(PSTR("\"delay_sec\":\"%lu\""),(k[k_solenoid-1].delay_sec));
         command_done = 12;
     }
     else if ( (command_done == 12) )
@@ -223,34 +215,50 @@ void Run(void)
             initCommandBuffer();
             return;
         }
+        // check that arg[1] is a digit 
+        if ( ( !( isdigit(arg[1][0]) ) ) )
+        {
+            printf_P(PSTR("{\"err\":\"RunCycNaN\"}\r\n"));
+            initCommandBuffer();
+            return;
+        }
+        // and arg[1] value is 0..255
+        unsigned long cycles = atol(arg[1]);
+        if ( ( cycles < 1) || (cycles > 0xFF) )
+        {
+            printf_P(PSTR("{\"err\":\"RunCycOutOfRng\"}\r\n"));
+            initCommandBuffer();
+            return;
+        }
         // don't run a solenoid that is in use it needs to be stopped first
         if (k[k_solenoid-1].cycle_state)
         {
-            printf_P(PSTR("{\"err\":\"RunInUse\"}\r\n"));
+            printf_P(PSTR("{\"err\":\"K%dInUse\"}\r\n"),k_solenoid);
             initCommandBuffer();
             return;
         }
         k[k_solenoid-1].cycle_state = 1;
-        k[k_solenoid-1].started_at = millis(); //delay_start is timed from now
+        k[k_solenoid-1].cycles = (uint8_t)cycles;
+        k[k_solenoid-1].started_at = millis(); //delay_start_sec is timed from now
         printf_P(PSTR("{\"K%d\":{"),k_solenoid);
         command_done = 11;
     }
     else if ( (command_done == 11) )
     {  
         uint8_t k_solenoid = atoi(arg[0]);
-        printf_P(PSTR("\"delay_start_Sec\":\"%lu\","),(k[k_solenoid-1].runtime_sec));
+        printf_P(PSTR("\"delay_start_sec\":\"%lu\","),(k[k_solenoid-1].delay_start_sec));
         command_done = 12;
     }
     else if ( (command_done == 12) )
     {  
         uint8_t k_solenoid = atoi(arg[0]);
-        printf_P(PSTR("\"runtime_Sec\":\"%lu\","),(k[k_solenoid-1].runtime_sec));
+        printf_P(PSTR("\"runtime_sec\":\"%lu\","),(k[k_solenoid-1].runtime_sec));
         command_done = 13;
     }
     else if ( (command_done == 13) )
     {  
         uint8_t k_solenoid = atoi(arg[0]);
-        printf_P(PSTR("\"delay_Sec\":\"%lu\","),(k[k_solenoid-1].delay_sec));
+        printf_P(PSTR("\"delay_sec\":\"%lu\","),(k[k_solenoid-1].delay_sec));
         command_done = 14;
     }
     else if ( (command_done == 14) )
@@ -361,7 +369,7 @@ void reset_solenoid(uint8_t k_indx)
 /* operate the solenoid states without blocking
     cycle_state 
     0 = solenoid not active
-    1 = active, wait for start time (delay_start), then start a Boost charge and setup to measure flow.
+    1 = active, wait for start time (delay_start_sec), then start a Boost charge and setup to measure flow.
     2 = wait for BOOST_TIME to finish, then set solenoid.
     3 = wait for PWR_HBRIDGE time to drive solenoid, then trun off H-bridge.
     4 = wait for runTime, then select state 7. or if within 16M counts of flow_stop select state 5. 
@@ -371,15 +379,15 @@ void reset_solenoid(uint8_t k_indx)
     8 = wait for BOOST_TIME to finish, then reset solenoid and measure flow rate.
     9 = wait for PWR_HBRIDGE time to drive solenoid, then trun off H-bridge.
     10 = wait for SOLENOID_CLOSE time, then measure flow count, if cycles is set then state 0.
-    11 = wait for delay time, then loop to cycle_state = 1 (backdate so delay_start is not used in each loop).
+    11 = wait for delay time, then loop to cycle_state = 1 (backdate so delay_start_sec is not used in each loop).
 */ 
 void SolenoidControl() {
     for(int i = 0; i < SOLENOID_COUNT; i++){
-        // active, wait for start time (delay_start), then start a Boost charge and setup to measure pulse count.
+        // active, wait for start time (delay_start_sec), then start a Boost charge and setup to measure pulse count.
         if ((k[i].cycle_state == 1) && !boostInUse && !flowInUse) 
         {
             unsigned long kRuntime= millis() - k[i].started_at;
-            if ((kRuntime) > ((unsigned long)k[i].delay_start * 1000)) 
+            if ((kRuntime) > ((unsigned long)k[i].delay_start_sec * 1000)) 
             {
                 reset_solenoid(BOOST);
                 k[i].cycle_state = 2;
@@ -531,8 +539,8 @@ void SolenoidControl() {
             unsigned long kRuntime= millis() - k[i].started_at;
             if ( (kRuntime) > ((unsigned long)k[i].delay_sec*1000UL) ) 
             {
-                // back date by delay_start since it should only be used once
-                k[i].started_at = millis()-((unsigned long)k[i].delay_start*1000UL);
+                // back date by delay_start_sec since it should only be used once
+                k[i].started_at = millis()-((unsigned long)k[i].delay_start_sec*1000UL);
                 k[i].cycle_state = 1;
                 break;
             }
@@ -545,9 +553,9 @@ void Reset_All_K() {
     for(uint8_t i = 0; i < SOLENOID_COUNT; i++)
     {
         k[i].started_at = millis(); // used to delay start
-        k[i].delay_start = i+i+i+1; // every 3 sec starting at 1, then 4, and 7
+        k[i].delay_start_sec = i+i+i+1; // every 3 sec starting at 1, then 4, and 7
         k[i].runtime_sec = 1; 
-        k[i].delay_sec = 0;
+        k[i].delay_sec = SEC_IN_HR;
         k[i].flow_stop = FLOW_NOT_SET;
         k[i].cycles = 1;
         k[i].cycle_state = 1; 

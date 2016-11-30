@@ -7,7 +7,7 @@ Solenoid is an interactive command line program that demonstrates control of the
 ``` 
 RPUno   (digital)   K3 
 ------------------------
-PD3     (IO3)       E3, 
+PD3     (IO3)       E3
 0V       na         nE2
 0V       na         nE1
 PB2     (nSS/IO10)  A0
@@ -83,7 +83,7 @@ After a solenoid has entered the delay state and let go of the flow meter resour
 ```
 
 
-##  /0/delay k,delay_in_sec
+##  /0/post k,delay_in_sec
 
 Set the solenoid k (1|2|3) delay between runs (1..86400, e.g. 24 hr max). 
 
@@ -107,5 +107,25 @@ Set the solenoid k (1|2|3) run time (1..21600, e.g. 6hr max).
 ```
 
 
+##  /0/pre k,delay_start_in_sec
+
+Set the solenoid k (1|2|3) one time delay befor cycles run (1..21600, e.g. 6hr max). 
+
+``` 
+/1/pre 3,10
+{"K3":{"delay_start_sec":"10"}}
+/1/run 3,1
+{"K3":{"delay_start_sec":"10","runtime_sec":"20","delay_sec":"40","cycles":"1"}}
+``` 
 
 
+##  /0/flow k,flow_stop
+
+Set the solenoid k (1|2|3) flow_stop (1..0xFFFFFFFF) that also stops the solenoid (e.g. when flow count is reached).
+
+``` 
+/1/flow 3,500
+{"K3":{"flow_stop":"500"}}
+/1/run 3,1
+{"K3":{"delay_start_sec":"10","runtime_sec":"20","delay_sec":"40","cycles":"1","flow_stop":"500"}}
+``` 

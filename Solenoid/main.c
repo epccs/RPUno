@@ -40,6 +40,10 @@ void ProcessCmd()
         {
             Id("Solenoid");
         }
+        if ( (strcmp_P( command, PSTR("/pre")) == 0) && ( (arg_count == 2 ) ) )
+        {
+            DelayStart();
+        }
         if ( (strcmp_P( command, PSTR("/runtime")) == 0) && ( (arg_count == 2 ) ) )
         {
             RunTime();
@@ -47,6 +51,10 @@ void ProcessCmd()
         if ( (strcmp_P( command, PSTR("/delay")) == 0) && ( (arg_count == 2 ) ) )
         {
             Delay();
+        }
+        if ( (strcmp_P( command, PSTR("/flow")) == 0) && ( (arg_count == 2 ) ) )
+        {
+            FlowStop();
         }
         if ( (strcmp_P( command, PSTR("/run")) == 0) && ( (arg_count == 2 ) ) )
         {

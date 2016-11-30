@@ -67,45 +67,110 @@ static solenoidTimer k[SOLENOID_COUNT];
 static uint8_t boostInUse; // 0 if free, 1 thru SOLENOID_COUNT and is the solenoid using boost
 static uint8_t flowInUse; // 0 only one solenoid can be active so its flow count can be measured
 
-// arg[0] is solenoid, arg[1] is runtime
-void RunTime(void)
+
+uint8_t k_solenoid_from_arg0 (void)
+{
+    // check that arg[0] is a digit 
+    if ( ( !( isdigit(arg[0][0]) ) ) )
+    {
+        printf_P(PSTR("{\"err\":\"%sKNaN\"}\r\n"),command[1]);
+        return 0;
+    }
+    uint8_t k_solenoid = atoi(arg[0]);
+    if ( ( k_solenoid < 1) || (k_solenoid > SOLENOID_COUNT) )
+    {
+        printf_P(PSTR("{\"err\":\"%sKOtOfRng\"}\r\n"),command[1]);
+        return 0;
+    }
+    return k_solenoid;
+}
+
+unsigned long ul_from_arg1 (unsigned long max)
+{
+    // check that arg[1] is a digit 
+    if ( ( !( isdigit(arg[1][0]) ) ) )
+    {
+        printf_P(PSTR("{\"err\":\"%s1NaN\"}\r\n"),command[1]);
+        return 0;
+    }
+    unsigned long ul = strtoul(arg[1], (char **)NULL, 10);
+    if ( ( ul < 1) || (ul > max) )
+    {
+        printf_P(PSTR("{\"err\":\"%s1OtOfRng\"}\r\n"),command[1]);
+        return 0;
+    }
+    return ul;
+}
+
+// arg[0] is solenoid, arg[1] is delay_start
+void DelayStart(void)
 {
     if ( (command_done == 10) )
     {
-        // check that arg[0] is a digit 
-        if ( ( !( isdigit(arg[0][0]) ) ) )
+        uint8_t k_solenoid = k_solenoid_from_arg0();
+        if (! k_solenoid)
         {
-            printf_P(PSTR("{\"err\":\"RunTmKNaN\"}\r\n"));
             initCommandBuffer();
             return;
         }
-        // and arg[0] value is 1..3 
-        uint8_t k_solenoid = atoi(arg[0]);
-        if ( ( k_solenoid < 1) || (k_solenoid > 3) )
+        // and arg[1] value is 1..SEC_IN_6HR 
+        unsigned long delay_start = ul_from_arg1(SEC_IN_6HR);
+        if (! delay_start)
         {
-            printf_P(PSTR("{\"err\":\"RunTmKOutOfRng\"}\r\n"));
-            initCommandBuffer();
-            return;
-        }
-        // check that arg[1] is a digit 
-        if ( ( !( isdigit(arg[1][0]) ) ) )
-        {
-            printf_P(PSTR("{\"err\":\"RunTmNaN\"}\r\n"));
-            initCommandBuffer();
-            return;
-        }
-        // and arg[1] value is 1..21600 
-        unsigned long runtime = atol(arg[1]);
-        if ( ( runtime < 1) || (runtime > SEC_IN_6HR) )
-        {
-            printf_P(PSTR("{\"err\":\"RunTmOutOfRng\"}\r\n"));
             initCommandBuffer();
             return;
         }
         // don't change a solenoid that is in use it needs to be stopped first
         if (k[k_solenoid-1].cycle_state)
         {
-            printf_P(PSTR("{\"err\":\"RunTmInUse\"}\r\n"));
+            printf_P(PSTR("{\"err\":\"K%dInUse\"}\r\n"),k_solenoid);
+            initCommandBuffer();
+            return;
+        }
+        k[k_solenoid-1].delay_start_sec = delay_start;
+        printf_P(PSTR("{\"K%d\":{"),k_solenoid);
+        command_done = 11;
+    }
+    else if ( (command_done == 11) )
+    {  
+        uint8_t k_solenoid = atoi(arg[0]);
+        printf_P(PSTR("\"delay_start_sec\":\"%lu\","),(k[k_solenoid-1].delay_start_sec));
+        command_done = 12;
+    }
+    else if ( (command_done == 12) )
+    {
+        printf_P(PSTR("}}\r\n"));
+        initCommandBuffer();
+    }
+    else
+    {
+        printf_P(PSTR("{\"err\":\"DlyStCmdDnWTF\"}\r\n"));
+        initCommandBuffer();
+    }
+}
+
+// arg[0] is solenoid, arg[1] is runtime
+void RunTime(void)
+{
+    if ( (command_done == 10) )
+    {
+        uint8_t k_solenoid = k_solenoid_from_arg0();
+        if (! k_solenoid)
+        {
+            initCommandBuffer();
+            return;
+        }
+        // and arg[1] value is 1..SEC_IN_6HR 
+        unsigned long runtime = ul_from_arg1(SEC_IN_6HR);
+        if (! runtime)
+        {
+            initCommandBuffer();
+            return;
+        }
+        // don't change a solenoid that is in use it needs to be stopped first
+        if (k[k_solenoid-1].cycle_state)
+        {
+            printf_P(PSTR("{\"err\":\"K%dInUse\"}\r\n"),k_solenoid);
             initCommandBuffer();
             return;
         }
@@ -136,40 +201,23 @@ void Delay(void)
 {
     if ( (command_done == 10) )
     {
-        // check that arg[0] is a digit 
-        if ( ( !( isdigit(arg[0][0]) ) ) )
+        uint8_t k_solenoid = k_solenoid_from_arg0();
+        if (! k_solenoid)
         {
-            printf_P(PSTR("{\"err\":\"DlyKNaN\"}\r\n"));
             initCommandBuffer();
             return;
         }
-        // and arg[0] value is 1..3 
-        uint8_t k_solenoid = atoi(arg[0]);
-        if ( ( k_solenoid < 1) || (k_solenoid > 3) )
+        // and arg[1] value is 1..SEC_IN_DAY 
+        unsigned long delay = ul_from_arg1(SEC_IN_DAY);
+        if (! delay)
         {
-            printf_P(PSTR("{\"err\":\"DlyKOutOfRng\"}\r\n"));
-            initCommandBuffer();
-            return;
-        }
-        // check that arg[1] is a digit 
-        if ( ( !( isdigit(arg[1][0]) ) ) )
-        {
-            printf_P(PSTR("{\"err\":\"DlyNaN\"}\r\n"));
-            initCommandBuffer();
-            return;
-        }
-        // and arg[1] value is 1..86400 
-        unsigned long delay = atol(arg[1]);
-        if ( ( delay < 1) || (delay > SEC_IN_DAY) )
-        {
-            printf_P(PSTR("{\"err\":\"DlyOutOfRng\"}\r\n"));
             initCommandBuffer();
             return;
         }
         // don't change a solenoid that is in use it needs to be stopped first
         if (k[k_solenoid-1].cycle_state)
         {
-            printf_P(PSTR("{\"err\":\"DelayInUse\"}\r\n"));
+            printf_P(PSTR("{\"err\":\"K%dInUse\"}\r\n"),k_solenoid);
             initCommandBuffer();
             return;
         }
@@ -195,42 +243,72 @@ void Delay(void)
     }
 }
 
-// arg[0] is solenoid
+// arg[0] is solenoid, arg[1] is flow_stop
+void FlowStop(void)
+{
+    if ( (command_done == 10) )
+    {
+        uint8_t k_solenoid = k_solenoid_from_arg0();
+        if (! k_solenoid)
+        {
+            initCommandBuffer();
+            return;
+        }
+        // and arg[1] value is 1..FLOW_NOT_SET 
+        unsigned long flow_stop = ul_from_arg1(FLOW_NOT_SET);
+        if (! flow_stop)
+        {
+            initCommandBuffer();
+            return;
+        }
+        // don't change a solenoid that is in use it needs to be stopped first
+        if (k[k_solenoid-1].cycle_state)
+        {
+            printf_P(PSTR("{\"err\":\"K%dInUse\"}\r\n"),k_solenoid);
+            initCommandBuffer();
+            return;
+        }
+        k[k_solenoid-1].flow_stop = flow_stop;
+        printf_P(PSTR("{\"K%d\":{"),k_solenoid);
+        command_done = 11;
+    }
+    else if ( (command_done == 11) )
+    {  
+        uint8_t k_solenoid = atoi(arg[0]);
+        printf_P(PSTR("\"flow_stop\":\"%lu\","),(k[k_solenoid-1].flow_stop));
+        command_done = 12;
+    }
+    else if ( (command_done == 12) )
+    {
+        printf_P(PSTR("}}\r\n"));
+        initCommandBuffer();
+    }
+    else
+    {
+        printf_P(PSTR("{\"err\":\"FlwStpCmdDnWTF\"}\r\n"));
+        initCommandBuffer();
+    }
+}
+
+// arg[0] is solenoid, arg[1] is cycles
 void Run(void)
 {
     if ( (command_done == 10) )
     {
-        // check that arg[0] is a digit 
-        if ( ( !( isdigit(arg[0][0]) ) ) )
+        uint8_t k_solenoid = k_solenoid_from_arg0();
+        if (! k_solenoid)
         {
-            printf_P(PSTR("{\"err\":\"RunKNaN\"}\r\n"));
             initCommandBuffer();
             return;
         }
-        // and arg[0] value is 1..3 
-        uint8_t k_solenoid = atoi(arg[0]);
-        if ( ( k_solenoid < 1) || (k_solenoid > 3) )
+        // and arg[1] value is 1..0xFF 
+        unsigned long cycles = ul_from_arg1(0xFF);
+        if (! cycles)
         {
-            printf_P(PSTR("{\"err\":\"RunKOutOfRng\"}\r\n"));
             initCommandBuffer();
             return;
         }
-        // check that arg[1] is a digit 
-        if ( ( !( isdigit(arg[1][0]) ) ) )
-        {
-            printf_P(PSTR("{\"err\":\"RunCycNaN\"}\r\n"));
-            initCommandBuffer();
-            return;
-        }
-        // and arg[1] value is 0..255
-        unsigned long cycles = atol(arg[1]);
-        if ( ( cycles < 1) || (cycles > 0xFF) )
-        {
-            printf_P(PSTR("{\"err\":\"RunCycOutOfRng\"}\r\n"));
-            initCommandBuffer();
-            return;
-        }
-        // don't run a solenoid that is in use it needs to be stopped first
+         // don't run a solenoid that is in use it needs to be stopped first
         if (k[k_solenoid-1].cycle_state)
         {
             printf_P(PSTR("{\"err\":\"K%dInUse\"}\r\n"),k_solenoid);

@@ -4,7 +4,7 @@
 
 Eagle Files, BOM, Status, and how to Test.
 
-![Schematic](https://raw.githubusercontent.com/epccs/RPUno/master/Hardware/14140,Schematic.png "RPUno Schematic")
+![Schematic](https://raw.githubusercontent.com/epccs/RPUno/master/Hardware/Documents/14140,Schematic.png "RPUno Schematic")
 
 # Notes
 

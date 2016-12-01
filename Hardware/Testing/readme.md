@@ -126,7 +126,7 @@ NOTE: 17MA_PL and 10MA_PL need IO9 pulled up to IOREF (the pin is floating).
 
 The MCU needs its fuses set, so a Makefile is used to do that. Apply a 5V current limited source (about 30mA*) to +5V. Check that the input current is for a blank MCU (e.g. less than 5mA).
 
-Use the <https://github.com/epccs/RPUadpt/tree/master/Bootload> Makefile 
+Use the <https://github.com/epccs/RPUno/tree/master/Bootload> Makefile 
 
 Connect the ICSP tool and run "make fuse" to program the fuses, next run "make isp" to install the bootloader.Disconnect the ICSP tool and measure the input current. Turn off power.
 

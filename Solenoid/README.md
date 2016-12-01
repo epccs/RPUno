@@ -83,7 +83,7 @@ After a solenoid has entered the delay state and let go of the flow meter resour
 ```
 
 
-##  /0/post k,delay_in_sec
+##  /0/delay k,delay_in_sec
 
 Set the solenoid k (1|2|3) delay between runs (1..86400, e.g. 24 hr max). 
 

@@ -17,9 +17,9 @@ http://www.gnu.org/licenses/gpl-2.0.html
 */
 #include <avr/pgmspace.h>
 #include <util/atomic.h>
+#include "../lib/timers.h"
 #include "../lib/uart.h"
 #include "../lib/parse.h"
-#include "../lib/timers.h"
 #include "../lib/adc.h"
 #include "../lib/twi.h"
 #include "../lib/pin_num.h"

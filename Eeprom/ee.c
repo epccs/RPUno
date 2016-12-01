@@ -106,7 +106,7 @@ void EEwrite(void)
         }
     }
     else if ( (command_done == 12) )
-    {  //  keep checking if we can use eeprom, there is be a delay after a write
+    {  //  keep checking if we can use eeprom, there is a delay after a write
         if ( eeprom_is_ready() ) 
         {
             ee_mem =(int) (eeprom_read_byte( (uint8_t *) (atoi(arg[0])) )  );

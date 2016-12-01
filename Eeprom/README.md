@@ -1,38 +1,35 @@
-# AVR EEPROM
+# EEPROM
 
 ## Overview
 
-Eeprom is an interactive command line program that demonstrates the control of an ATmega328p EEPROM.
-
-Depends on avr/eeprom.h from avr-libc <http://www.nongnu.org/avr-libc/user-manual/group__avr__eeprom.html>.
-
-For how I setup my Makefile toolchain <http://epccs.org/indexes/Document/DvlpNotes/LinuxBoxCrossCompiler.html>.
+Eeprom is an interactive command line program that demonstrates the control of EEPROM on an ATmega328p.
 
 With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
 
 ``` 
-rsutherland@straightneck:~/Samba/RPUno/Eeprom$ make bootload
+rsutherland@conversion:~/Samba/RPUno/Eeprom$ make bootload
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o main.o main.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ee.o ee.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../Uart/id.o ../Uart/id.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/timers.o ../lib/timers.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/uart.o ../lib/uart.c
+avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/twi.o ../lib/twi.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/adc.o ../lib/adc.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/parse.o ../lib/parse.c
-avr-gcc -Wl,-Map,Eeprom.map  -Wl,--gc-sections  -Wl,-u,vfprintf -lprintf_flt -lm -mmcu=atmega328p main.o ee.o ../Uart/id.o ../lib/timers.o ../lib/uart.o ../lib/adc.o ../lib/parse.o -o Eeprom.elf
+avr-gcc -Wl,-Map,Eeprom.map  -Wl,--gc-sections  -Wl,-u,vfprintf -lprintf_flt -lm -mmcu=atmega328p main.o ee.o ../Uart/id.o ../lib/timers.o ../lib/uart.o ../lib/twi.o ../lib/adc.o ../lib/parse.o -o Eeprom.elf
 avr-size -C --mcu=atmega328p Eeprom.elf
 AVR Memory Usage
 ----------------
 Device: atmega328p
 
-Program:    7626 bytes (23.3% Full)
+Program:    9048 bytes (27.6% Full)
 (.text + .data + .bootloader)
 
-Data:        177 bytes (8.6% Full)
+Data:        303 bytes (14.8% Full)
 (.data + .bss + .noinit)
 
 
-rm -f Eeprom.o main.o ee.o ../Uart/id.o ../lib/timers.o ../lib/uart.o ../lib/adc.o ../lib/parse.o
+rm -f Eeprom.o main.o ee.o ../Uart/id.o ../lib/timers.o ../lib/uart.o ../lib/twi.o ../lib/adc.o ../lib/parse.o
 avr-objcopy -j .text -j .data -O ihex Eeprom.elf Eeprom.hex
 rm -f Eeprom.elf
 avrdude -v -p atmega328p -c arduino -P /dev/ttyUSB0 -b 115200 -U flash:w:Eeprom.hex
@@ -98,21 +95,21 @@ avrdude: NOTE: "flash" memory has been specified, an erase cycle will be perform
 avrdude: erasing chip
 avrdude: reading input file "Eeprom.hex"
 avrdude: input file Eeprom.hex auto detected as Intel Hex
-avrdude: writing flash (7626 bytes):
+avrdude: writing flash (9048 bytes):
 
-Writing | ################################################## | 100% 1.16s
+Writing | ################################################## | 100% 1.28s
 
-avrdude: 7626 bytes of flash written
+avrdude: 9048 bytes of flash written
 avrdude: verifying flash memory against Eeprom.hex:
 avrdude: load data flash data from input file Eeprom.hex:
 avrdude: input file Eeprom.hex auto detected as Intel Hex
-avrdude: input file Eeprom.hex contains 7626 bytes
+avrdude: input file Eeprom.hex contains 9048 bytes
 avrdude: reading on-chip flash data:
 
-Reading | ################################################## | 100% 0.79s
+Reading | ################################################## | 100% 0.92s
 
 avrdude: verifying ...
-avrdude: 7626 bytes of flash verified
+avrdude: 9048 bytes of flash verified
 
 avrdude: safemode: hfuse reads as 0
 avrdude: safemode: efuse reads as 0
@@ -132,6 +129,14 @@ picocom -b 115200 /dev/ttyUSB0
 # Commands
 
 Commands are interactive over the serial interface at 115200 baud rate. The echo will start after the second character of a new line. 
+
+
+## /[rpu_address]/[command [arg]]
+
+rpu_address is taken from the I2C address 0x29 (e.g. get_Rpu_address() which is included form ../Uart/id.h). The value of rpu_address is used as a character in a string, which means don't use a null value (C strings are null terminated), but the ASCII value for '1' (0x31) is easy and looks nice, though I fear it will cause some confusion when it is discovered that the actual address value is 49.
+
+Commands and their arguments follow.
+
 
 ## /0/id? [name|desc|avr-gcc]
 

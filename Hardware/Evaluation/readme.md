@@ -25,11 +25,11 @@ An interactive Command Line Interface for [Solenoid][6] control is wired to LED'
     
 [6]: https://github.com/epccs/RPUno/tree/master/Solenoid
 [7]: http://rpubus.org/Video/14140%5E5_SolenoidResetAllLogic.mp4
-[8]: http://rpubus.org/Video/14140%5E5WithK3%5E0.mp4">RPUno With K3</A> Video
+[8]: http://rpubus.org/Video/14140%5E5WithK3%5E0.mp4
 
 ![Solenoid Testing](./RPUno^5_SolenoidResetAllTesting.jpg "Solenoid Reset All Testing")
 
-![K3 With RPUno](./K3^0WithRPUno^5.jpg "K3 With RPUno")
+![RPUno with K3](./RPUno^5WithK3^0.jpg "RPUno with K3")
 
 
 ## ^5 ADC and DIO

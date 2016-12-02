@@ -4,6 +4,7 @@ LIBDIR = ../lib
 OBJECTS = main.o \
 	solenoid.o \
 	../Uart/id.o \
+	../Eeprom/ee.o \
 	$(LIBDIR)/timers.o \
 	$(LIBDIR)/uart.o \
 	$(LIBDIR)/icp_buf.o \

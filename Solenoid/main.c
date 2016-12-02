@@ -24,6 +24,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/pin_num.h"
 #include "../lib/pins_board.h"
 #include "../Uart/id.h"
+#include "../Eeprom/ee.h"
 #include "solenoid.h"
 
 #define BLINK_DELAY 1000UL
@@ -38,27 +39,35 @@ void ProcessCmd()
     {
         if ( (strcmp_P( command, PSTR("/id?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
         {
-            Id("Solenoid");
+            Id("Solenoid"); // ../Uart/id.c
         }
         if ( (strcmp_P( command, PSTR("/pre")) == 0) && ( (arg_count == 2 ) ) )
         {
-            DelayStart();
+            DelayStart(); // solenoid.c
         }
         if ( (strcmp_P( command, PSTR("/runtime")) == 0) && ( (arg_count == 2 ) ) )
         {
-            RunTime();
+            RunTime(); // solenoid.c
         }
         if ( (strcmp_P( command, PSTR("/delay")) == 0) && ( (arg_count == 2 ) ) )
         {
-            Delay();
+            Delay(); // solenoid.c
         }
         if ( (strcmp_P( command, PSTR("/flow")) == 0) && ( (arg_count == 2 ) ) )
         {
-            FlowStop();
+            FlowStop(); // solenoid.c
         }
         if ( (strcmp_P( command, PSTR("/run")) == 0) && ( (arg_count == 2 ) ) )
         {
-            Run();
+            Run(); // solenoid.c
+        }
+        if ( (strcmp_P( command, PSTR("/ee?")) == 0) && ( (arg_count == 1 ) ) )
+        {
+            EEread(); // ../Eeprom/ee.c
+        }
+        if ( (strcmp_P( command, PSTR("/ee")) == 0) && ( (arg_count == 2 ) ) )
+        {
+            EEwrite(); // ../Eeprom/ee.c
         }
     }
     else

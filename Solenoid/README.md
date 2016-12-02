@@ -2,7 +2,9 @@
 
 ## Overview
 
-Solenoid is an interactive command line program that demonstrates control of the K3 latching solenoid driver board using the ATmega328p pins. 
+Solenoid is an interactive command line program that demonstrates control of the K3 latching solenoid driver board using the I/O pins of an ATmega328p. 
+
+## Wiring K3 to RPUno
 
 ``` 
 RPUno   (digital)   K3 
@@ -16,9 +18,28 @@ PB4     (MISO/IO12) A2
 PB5     (SCK/IO13)  LED_BUILTIN
 ``` 
 
-The RPUno has those I/O's wired to a pluggable onboard connector. They are level converted to 5V so will ouput 4V without a pullup (which is enough for a minimum high with 74HC logic). The LED_BUILTIN pin blinks on for a second and off for a second when the rpu_address is read over I2C (else it blinks four times as fast). 
+The RPUno has those I/O's wired to a pluggable onboard connector. They are level converted to 5V and will ouput 4V without a pullup (which is enough for a minimum high on 74HC logic). 
+
+The IO13 pin is named LED_BUILTIN and blinks on for a second and off for a second when an rpu_address is read over I2C (if I2C failed it blinks four times as fast). 
 
 [![RPUno^5 With K3^0](http://rpubus.org/bb/download/file.php?id=25)](http://rpubus.org/Video/14140%5E5WithK3%5E0.mp4 "RPUno^5 With K3^0")
+
+
+# Memory map 
+
+EEPROM has the values that are loaded after initialization (where each valve is operated for a second).  EEPROM values are skipped if bytes 0..3 are anything but zero. 
+
+__Note__: this is work in progress
+
+```
+EEPROM Addr : description
+0..0x03     : ID bytes 0x00 0x00 0x00 0x00
+
+TBD
+```
+
+
+# Programing
 
 With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
 
@@ -129,3 +150,9 @@ Set the solenoid k (1|2|3) flow_stop (1..0xFFFFFFFF) that also stops the solenoi
 /1/run 3,1
 {"K3":{"delay_start_sec":"10","runtime_sec":"20","delay_sec":"40","cycles":"1","flow_stop":"500"}}
 ``` 
+
+##  [/0/ee? 0..1023][1]
+
+[1]: ../Eeprom
+
+##  [/0/ee 0..1023,0..255][1]

@@ -31,19 +31,19 @@ static uint32_t ee_mem;
 
 uint8_t ee_read_type(const char * addr, const char * type)
 {
-    if ( (strlen(type) == 0) || (strcmp_P(type, PSTR("UINT8")) ==0) )
+    if ( (type == NULL) || (strcmp_P(type, PSTR("UINT8")) ==0) )
     {
-        ee_mem =(uint32_t) read_eeprom_byte(atoi(addr) );
+        ee_mem =(uint32_t) eeprom_read_byte((uint8_t*)(atoi(addr)) );
         return 1;
     }
     if ( strcmp_P(type, PSTR("UINT16")) == 0 )
     {
-        ee_mem =(uint32_t) read_eeprom_word(atoi(addr) );
+        ee_mem =(uint32_t) eeprom_read_word((uint16_t*)(atoi(addr)));
         return 1;
     }
     if ( strcmp_P(type, PSTR("UINT32")) == 0 )
     {
-        ee_mem =(uint32_t) read_eeprom_dword(atoi(addr) );
+        ee_mem =(uint32_t) eeprom_read_dword((uint32_t*)(atoi(addr)));
         return 1;
     }
     return 0;
@@ -71,7 +71,7 @@ void EEread(void)
 
         if ( arg_count == 1)
         {
-            if (strlen(arg[1]) != 0)
+            if (arg[1] != NULL)
             {
                 printf_P(PSTR("{\"err\":\"ParserBroken\"}\r\n"));
                 initCommandBuffer();
@@ -89,7 +89,7 @@ void EEread(void)
             return;
         }
         
-        printf_P(PSTR("{\"EE[%s]\":"),arg[0]);
+        printf_P(PSTR("{\"EE[%s]\":{"),arg[0]);
         ee_mem = -1;
         command_done = 11;
     }
@@ -99,7 +99,7 @@ void EEread(void)
         {
             if (!ee_read_type(arg[0], arg[1]))
             {
-                printf_P(PSTR("{\"err\":\"EeRdCmdDn11WTF\"}\r\n"));
+                printf_P(PSTR("\"err\":\"EeRdCmdDn11WTF\"}}\r\n"));
                 initCommandBuffer();
                 return;
             }
@@ -108,7 +108,7 @@ void EEread(void)
     }
     else if ( (command_done == 12) )
     {
-        printf_P(PSTR("\"%lu\"}\r\n"),ee_mem);
+        printf_P(PSTR("\"r\":\"%lu\"}}\r\n"),ee_mem);
         initCommandBuffer();
     }
     else
@@ -142,7 +142,7 @@ void EEwrite(void)
 
         if ( arg_count == 2)
         {
-            if (strlen(arg[3]) != 0)
+            if (arg[2] != NULL)
             {
                 printf_P(PSTR("{\"err\":\"ParserBroken\"}\r\n"));
                 initCommandBuffer();
@@ -160,24 +160,29 @@ void EEwrite(void)
             return;
         }
         
-        printf_P(PSTR("{\"EE[%s]\":"),arg[0]);
+        printf_P(PSTR("{\"EE[%d]\":{"), atoi(arg[0]));
         command_done = 11;
     }
     else if ( (command_done == 11) )
     {  //  check if we can use eeprom, or just loop.
         if ( eeprom_is_ready() ) 
         {
-            if ( (strlen(arg[2]) == 0) || (strcmp_P(arg[2], PSTR("UINT8")) ==0) )
+            if ( (arg[2] == NULL) || (strcmp_P(arg[2], PSTR("UINT8")) == 0) )
             {
-                write_eeprom_byte(atoi(arg[1]), (uint8_t) (ee_mem & 0xFF) ) ;
+                uint8_t value = (uint8_t) (ee_mem & 0xFFU);
+                printf_P(PSTR("\"byte\":\"%u\","),value);
+                eeprom_write_byte( (uint8_t *) (atoi(arg[0])), value);
             }
             if ( strcmp_P(arg[2], PSTR("UINT16")) == 0 )
             {
-                write_eeprom_word(atoi(arg[1]), (uint16_t) (ee_mem & 0xFFFF) );
+                uint16_t value = (uint16_t) (ee_mem & 0xFFFFU);
+                printf_P(PSTR("\"word\":\"%u\","),value);
+                eeprom_write_word( (uint16_t *) (atoi(arg[0])), value);
             }
             if ( strcmp_P(arg[2], PSTR("UINT32")) == 0 )
             {
-                write_eeprom_dword(atoi(arg[1]), ee_mem);
+                printf_P(PSTR("\"dword\":\"%lu\","),ee_mem);
+                eeprom_write_dword( (uint32_t *) (atoi(arg[0])), ee_mem);
             }
             command_done = 12;
         }
@@ -197,7 +202,7 @@ void EEwrite(void)
     }
     else if ( (command_done == 13) )
     {
-        printf_P(PSTR("\"%d\"}\r\n"),ee_mem);
+        printf_P(PSTR("\"r\":\"%lu\"}}\r\n"),ee_mem);
         initCommandBuffer();
     }
     else

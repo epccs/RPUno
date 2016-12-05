@@ -190,9 +190,9 @@ uint8_t findArgument(uint8_t at_command_buf_offset)
 }
 
 
-// in an previous version white space was allowed befor the command, but not now.
-// a command string always starts at postion 2 and ends at the first white space
-// the command looks like an MQTT topic or the directory structure of a file system 
+// white space is not allowed befor the command.
+// command always starts at postion 2 and ends at the first white space
+// the combined address  and command looks like an MQTT topic or the directory structure of a file system 
 // e.g. /0/pwm 127
 // find end of command and place a null termination so it can be used as a string
 uint8_t findCommand(void) 

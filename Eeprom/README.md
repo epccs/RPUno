@@ -153,18 +153,21 @@ Return the EEPROM value at address [0..1023 on RPUno]. Type is UINT8, UINT16 or 
 
 ``` 
 /1/ee? 0
-{"EE[0]":"255"}
+{"EE[0]":{"r":"255"}}
 /1/ee? 1
-{"EE[1]":"255"}
+{"EE[1]":{"r":"128"}}
 /1/ee? 2
-{"EE[2]":"255"}
+{"EE[2]":{"r":"255"}}
 /1/ee? 3,UINT8
-{"EE[3]":"255"}
+{"EE[3]":{"r":"32"}}
 /1/ee? 2,UINT16
-{"EE[2]":"65535"}
+{"EE[2]":{"r":"65535"}}
 /1/ee? 0,UINT32
-{"EE[0]":"4294967295"}
+{"EE[0]":{"r":"553615615"}}
 ```
+
+Note: 553615615 is 0x20FF80FF, so the numbers are packed little endian by the gcc compiler (AVR itself has no endianness)
+
 
 ##  /0/ee address,value[,type]
 
@@ -173,13 +176,13 @@ Write the value to the address [0..1023 on RPUno] as type. Type is Type is UINT8
 __Warning__ writing EEPROM can lead to device failure, it is only rated for 100k write cycles.
 
 ``` 
-/1/ee 0,128
-{"err":"ParserBroken"} 
-/1/ee 1,255,UINT8
-{"EE[1]":"255"}
+/1/ee 0,255
+{"EE[0]":{"byte":"255","r":"255"}} 
+/1/ee 1,128,UINT8
+{"EE[1]":{"byte":"128","r":"128"}}
 /1/ee 2,65535,UINT16
-{"EE[2]":"65535"}
+{"EE[2]":{"word":"65535","r":"65535"}}
 /1/ee 0,4294967295,UINT32
 {"EE[0]":"4294967295"}
 ```
-Need to fix this
+Note: 4294967295 is 0xFFFFFFFF, it is the default for a blank chip.

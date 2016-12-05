@@ -10497,7 +10497,7 @@ PULSE LOOP, HALL, OR VR</text>
 <text x="356.616" y="242.824" size="1.27" layer="98">NOTE: THE ARDUINO IDE (TOOLCHAIN)
 DOES NOT YET SUPPORT 328PB
 (iom328pb.h will show up with avr-libc when it does)</text>
-<text x="232.41" y="183.642" size="1.27" layer="98">BATTERY
+<text x="232.41" y="183.642" size="1.27" layer="98">Q6 BATTERY
 REVERSE 
 PROTECTION</text>
 <text x="204.47" y="176.53" size="1.27" layer="98">SHUTDOWN IF
@@ -10647,6 +10647,21 @@ Monolithic Power Solutions</text>
 <text x="290.068" y="30.988" size="1.6764" layer="98">ADD 5V PLUG, PULL UP/DWN 
 IO2, 10K B=3380 CONN </text>
 <text x="320.294" y="32.004" size="1.778" layer="98">10/16/16</text>
+<text x="199.136" y="197.104" size="1.27" layer="98">Q5 BATTERY
+DISCONNECT</text>
+<text x="43.18" y="238.76" size="1.27" layer="98">AT DAY START U1 WILL SEND CURRENT THROUGH 
+BODY DIODE OF Q5 UNTIL U5 B-SIDE HAS A 
+CHANCE TO PULL DOWN GATE OF Q5</text>
+<text x="142.748" y="231.648" size="1.27" layer="98">ONCE Q5 IS ON THEN THE BATTERY AND U1 OUTPUT 
+ARE CONNECTED. THE BATTERY CHARGES UP TO 
+ABOUT 13.1V BEFORE THE U5 RELEASES PULL DOWN 
+ON ITS A-SIDE TO TURN ON Q9 THAT PULLS DOWN 
+ON Q1 GATE.</text>
+<text x="224.79" y="219.202" size="1.27" layer="98">ONCE Q1 IS 
+ON IT IS 
+LATCHED BY Q2</text>
+<text x="224.79" y="214.122" size="1.27" layer="98">Q2 LATCH RELEASES 
+WHEN U5 B-SIDE OPENS</text>
 </plain>
 <instances>
 <instance part="FRAME1" gate="G$3" x="279.4" y="50.8"/>

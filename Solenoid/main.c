@@ -32,6 +32,7 @@ static unsigned long blink_started_at;
 static unsigned long blink_delay;
 static char rpu_addr;
 static uint8_t solenoids_initalized;
+static uint8_t load_setting_from_eeprom;
 
 void ProcessCmd()
 { 
@@ -120,6 +121,7 @@ void setup(void)
     // loads settings that will run a fast cycle
     Reset_All_K();
     solenoids_initalized = 0;
+    load_setting_from_eeprom =0;
 }
 
 void blink(void)
@@ -194,21 +196,29 @@ int main(void)
         SolenoidControl();
         if (!solenoids_initalized)
         {
-            uint8_t sleeping = 1;
+            // lets test that idea, i.e. they are not in use.
+            uint8_t solenoids_not_in_use = 1;
             for(uint8_t i = 1; i <= SOLENOID_COUNT; i++)
             {
                 if (Live(i))
                 {                    
-                    sleeping =0;
+                    solenoids_not_in_use =0;
                     break;
                 }
             }
-            if (sleeping) 
+            if (solenoids_not_in_use) 
             {
                 solenoids_initalized = 1;
-                // load setting from eeprom
             }
         }
+        else if (!load_setting_from_eeprom)
+        {
+            // abi_from_ee = EpromABI(); // ptr to str
+            // chekc ABI with strcmp_P(abi_from_ee , PSTR("Solenoid 0.0")
+            // If match then Load settings from EEPROM
+            load_setting_from_eeprom = 1;
+        }
+        
     }        
     return 0;
 }

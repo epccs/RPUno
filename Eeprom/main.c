@@ -40,11 +40,11 @@ void ProcessCmd()
     {
         Id("Eeprom");
     }
-    if ( (strcmp_P( command, PSTR("/ee?")) == 0) && (arg_count == 1 ) )
+    if ( (strcmp_P( command, PSTR("/ee?")) == 0) && ( (arg_count == 1) || (arg_count == 2)) )
     {
         EEread();
     }
-    if ( (strcmp_P( command, PSTR("/ee")) == 0) && (arg_count == 2 ) )
+    if ( (strcmp_P( command, PSTR("/ee")) == 0) && ( (arg_count == 2 ) || (arg_count == 3)) )
     {
         EEwrite();
     }

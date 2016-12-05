@@ -147,22 +147,39 @@ identify
 {"id":{"name":"Eeprom","desc":"RPUno Board /w atmega328p and LT3652","avr-gcc":"4.9"}}
 ```
 
-##  /0/ee? 0..1023
+##  /0/ee? address[,type]
 
-Return the EEPROM value at address. This checks if eeprom_is_ready() befor trying to read the EEPROM, if it is not ready the program loops back through the round robin where a received charactor may terminate the command. 
-
-``` 
-/0/ee? 0
-{"EE[0]":"255"}
-```
-
-##  /0/ee 0..1023,0..255
-
-Write the value given as argument one to the address given as Argument zero. This checks if eeprom_is_ready() befor trying to write to the EEPROM, if it is not ready the program loops back through the round robin where a received charactor may terminate the command. If the command is terminated the write may not occure. The JSON response is a read of the EEPROM. 
-
-Warning writing EEPROM can lead to device failure, it is only rated for 100k write cycles.
+Return the EEPROM value at address [0..1023 on RPUno]. Type is UINT8, UINT16 or UINT32. Default type is UINT8. This checks if eeprom_is_ready() befor trying to read the EEPROM, if not ready it loops back through the program. 
 
 ``` 
-/0/ee 0,255
+/1/ee? 0
 {"EE[0]":"255"}
+/1/ee? 1
+{"EE[1]":"255"}
+/1/ee? 2
+{"EE[2]":"255"}
+/1/ee? 3,UINT8
+{"EE[3]":"255"}
+/1/ee? 2,UINT16
+{"EE[2]":"65535"}
+/1/ee? 0,UINT32
+{"EE[0]":"4294967295"}
 ```
+
+##  /0/ee address,value[,type]
+
+Write the value to the address [0..1023 on RPUno] as type. Type is Type is UINT8, UINT16 or UINT32. Default type is UINT8. This checks if eeprom_is_ready() befor trying to read the EEPROM, if not ready it loops back through the program. The JSON response is a read of the EEPROM. 
+
+__Warning__ writing EEPROM can lead to device failure, it is only rated for 100k write cycles.
+
+``` 
+/1/ee 0,128
+{"err":"ParserBroken"} 
+/1/ee 1,255,UINT8
+{"EE[1]":"255"}
+/1/ee 2,65535,UINT16
+{"EE[2]":"65535"}
+/1/ee 0,4294967295,UINT32
+{"EE[0]":"4294967295"}
+```
+Need to fix this

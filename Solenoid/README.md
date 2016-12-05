@@ -151,8 +151,12 @@ Set the solenoid k (1|2|3) flow_stop (1..0xFFFFFFFF) that also stops the solenoi
 {"K3":{"delay_start_sec":"10","runtime_sec":"20","delay_sec":"40","cycles":"1","flow_stop":"500"}}
 ``` 
 
+
 ##  [/0/ee? 0..1023][1]
 
-[1]: ../Eeprom
+[1]: ../Eeprom#0ee-01023
 
-##  [/0/ee 0..1023,0..255][1]
+##  [/0/ee 0..1023,0..255][2]
+
+[1]: ../Eeprom#0ee-010230255
+

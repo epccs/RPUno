@@ -17,6 +17,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 */
 #include <avr/pgmspace.h>
 #include <util/atomic.h>
+#include <avr/eeprom.h> 
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -66,7 +67,6 @@ static solenoidTimer k[SOLENOID_COUNT];
 
 static uint8_t boostInUse; // 0 if free, 1 thru SOLENOID_COUNT and is the solenoid using boost
 static uint8_t flowInUse; // 0 only one solenoid can be active so its flow count can be measured
-
 
 uint8_t k_solenoid_from_arg0 (void)
 {
@@ -652,7 +652,8 @@ uint8_t Live(uint8_t i)
 }
 
 // only use init at setup() not durring loop()
-void init_K(void) {
+void init_K(void) 
+{
     boostInUse = 0;
     flowInUse = 0;
     pinMode(E3,OUTPUT);
@@ -664,3 +665,4 @@ void init_K(void) {
     pinMode(A2,OUTPUT);
     digitalWrite(A2,LOW); 
 }
+

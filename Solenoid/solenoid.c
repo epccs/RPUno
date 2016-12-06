@@ -60,7 +60,11 @@ typedef struct {
     uint32_t flow_stop; // pulse counts after start at which to reset the solenoid
     uint32_t flow_cnt_start; // pulse count when set occured (e.g. ICP1 capture events)
     uint32_t flow_cnt_stop; // pulse count when reset occured
+    uint32_t flow_cnt_bank; // pulse count accumulate or store
     // uint8_t use_flow_meter; // the defaut is for all solenoids to use the flow meter, but what if I want to inject fertilizers into flow
+    unsigned long cycle_millis_start;
+    unsigned long cycle_millis_stop;
+    unsigned long cycle_millis_bank; // millis count accumulate or store
 }  solenoidTimer;
 
 static solenoidTimer k[SOLENOID_COUNT];
@@ -317,6 +321,8 @@ void Run(void)
         }
         k[k_solenoid-1].cycle_state = 1;
         k[k_solenoid-1].cycles = (uint8_t)cycles;
+        k[k_solenoid-1].flow_cnt_bank = 0;
+        k[k_solenoid-1].cycle_millis_bank = 0;
         k[k_solenoid-1].started_at = millis(); //delay_start_sec is timed from now
         printf_P(PSTR("{\"K%d\":{"),k_solenoid);
         command_done = 11;
@@ -362,6 +368,138 @@ void Run(void)
     else
     {
         printf_P(PSTR("{\"err\":\"RunCmdDnWTF\"}\r\n"));
+        initCommandBuffer();
+    }
+}
+
+// arg[0] is solenoid
+void Time(void)
+{
+    if ( (command_done == 10) )
+    {
+        uint8_t k_solenoid = k_solenoid_from_arg0();
+        if (! k_solenoid)
+        {
+            initCommandBuffer();
+            return;
+        }
+        printf_P(PSTR("{\"K%d\":{"),k_solenoid);
+        command_done = 11;
+    }
+    else if ( (command_done == 11) )
+    {  
+        uint8_t k_solenoid = atoi(arg[0]);
+        printf_P(PSTR("\"cycle_state\":\"%d\","),(k[k_solenoid-1].cycle_state));
+        command_done = 12;
+    }
+    else if ( (command_done == 12) )
+    {  
+        uint8_t k_solenoid = atoi(arg[0]);
+        printf_P(PSTR("\"cycles\":\"%d\","),(k[k_solenoid-1].cycles));
+        command_done = 13;
+    }
+    else if ( (command_done == 13) )
+    {  
+        uint8_t k_solenoid = atoi(arg[0]);
+        printf_P(PSTR("\"cycle_millis\":\"%lu\""),(k[k_solenoid-1].cycle_millis_bank));
+        command_done = 14;
+    }
+    else if ( (command_done == 14) )
+    {
+        printf_P(PSTR("}}\r\n"));
+        initCommandBuffer();
+    }
+    else
+    {
+        printf_P(PSTR("{\"err\":\"TmCmdDnWTF\"}\r\n"));
+        initCommandBuffer();
+    }
+}
+
+// arg[0] is solenoid
+void Flow(void)
+{
+    if ( (command_done == 10) )
+    {
+        uint8_t k_solenoid = k_solenoid_from_arg0();
+        if (! k_solenoid)
+        {
+            initCommandBuffer();
+            return;
+        }
+        printf_P(PSTR("{\"K%d\":{"),k_solenoid);
+        command_done = 11;
+    }
+    else if ( (command_done == 11) )
+    {  
+        uint8_t k_solenoid = atoi(arg[0]);
+        printf_P(PSTR("\"cycle_state\":\"%d\","),(k[k_solenoid-1].cycle_state));
+        command_done = 12;
+    }
+    else if ( (command_done == 12) )
+    {  
+        uint8_t k_solenoid = atoi(arg[0]);
+        printf_P(PSTR("\"cycles\":\"%d\","),(k[k_solenoid-1].cycles));
+        command_done = 13;
+    }
+    else if ( (command_done == 13) )
+    {  
+        uint8_t k_solenoid = atoi(arg[0]);
+        printf_P(PSTR("\"flow_cnt\":\"%lu\""),(k[k_solenoid-1].flow_cnt_bank));
+        command_done = 14;
+    }
+    else if ( (command_done == 14) )
+    {
+        printf_P(PSTR("}}\r\n"));
+        initCommandBuffer();
+    }
+    else
+    {
+        printf_P(PSTR("{\"err\":\"FlwCmdDnWTF\"}\r\n"));
+        initCommandBuffer();
+    }
+}
+
+// arg[0] is solenoid
+void Stop(void)
+{
+    if ( (command_done == 10) )
+    {
+        uint8_t k_solenoid = k_solenoid_from_arg0();
+        if (! k_solenoid)
+        {
+            initCommandBuffer();
+            return;
+        }
+        printf_P(PSTR("{\"K%d\":{"),k_solenoid);
+        command_done = 11;
+    }
+    else if ( (command_done == 11) )
+    {  
+        uint8_t k_solenoid = atoi(arg[0]);
+        if (k[k_solenoid-1].cycle_state)
+        {
+            k[k_solenoid-1].delay_start_sec = 1;
+            k[k_solenoid-1].runtime_sec = 1; 
+            k[k_solenoid-1].delay_sec = 1;
+            k[k_solenoid-1].flow_stop = FLOW_NOT_SET;
+            k[k_solenoid-1].cycles = 1;
+            printf_P(PSTR("\"stop_time_sec\":\"3\""));
+        }
+        else
+        {
+            printf_P(PSTR("\"stop_time_sec\":\"0\""));
+        }
+        command_done = 12;
+    }
+    else if ( (command_done == 12) )
+    {
+        printf_P(PSTR("}}\r\n"));
+        initCommandBuffer();
+    }
+    else
+    {
+        printf_P(PSTR("{\"err\":\"StpCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
@@ -472,7 +610,6 @@ void SolenoidControl() {
                 k[i].started_at = millis(); // boost started
                 boostInUse = i+1; //allow this solenoid to use boost
                 flowInUse = i+1; //allow this solenoid to use flow meter
-                k[i].flow_cnt_start = icp1.count; //pulse count at start of run
                 break;
             }
         }
@@ -500,6 +637,8 @@ void SolenoidControl() {
                     boostInUse = 0;
                     bridge_off();
                     k[i].started_at = millis(); //start runtime e.g. solenoid is set
+                    k[i].cycle_millis_start = millis(); 
+                    k[i].flow_cnt_start =  icp1.count;
                     k[i].cycle_state = 4;
                     break;
                 }
@@ -509,14 +648,15 @@ void SolenoidControl() {
             if (k[i].cycle_state == 4) 
             {
                 unsigned long kRuntime= millis() - k[i].started_at;
-                if ((kRuntime) > ((unsigned long)k[i].runtime_sec * 1000)) 
+                if ((kRuntime) > ((unsigned long)k[i].runtime_sec * 1000)-1) 
                 {
+                    k[i].cycle_millis_stop = millis(); // correction of -1 millis was added so timer shows expected value
                     k[i].cycle_state = 7;
                 }
                 if (k[i].flow_stop != FLOW_NOT_SET) 
                 {  
                     if ( (icp1.count - k[i].flow_cnt_start) >= k[i].flow_stop) 
-                    { // need to stop now
+                    {
                         k[i].cycle_state = 5;
                         break;
                     }
@@ -577,6 +717,7 @@ void SolenoidControl() {
                 {
                     boostInUse = 0;
                     bridge_off();
+                    k[i].cycle_millis_bank += (k[i].cycle_millis_stop - k[i].cycle_millis_start);
                     k[i].started_at = millis(); // Solenoid may need some time to finish closing befor recording the flow count
                     k[i].cycle_state = 10;
                     break;
@@ -591,6 +732,7 @@ void SolenoidControl() {
                 {
                     flowInUse = 0; // this will allow the next solenoid cycle_state to progress 
                     k[i].flow_cnt_stop = icp1.count; //record the flow meter pulse count after solenoid has closed
+                    k[i].flow_cnt_bank += (k[i].flow_cnt_stop - k[i].flow_cnt_start);
                     if (k[i].cycles)
                     {
                         k[i].cycles = k[i].cycles -1;
@@ -636,7 +778,9 @@ void Reset_All_K() {
         k[i].delay_sec = SEC_IN_HR;
         k[i].flow_stop = FLOW_NOT_SET;
         k[i].cycles = 1;
-        k[i].cycle_state = 1; 
+        k[i].cycle_state = 1;
+        k[i].flow_cnt_bank = 0;
+        k[i].cycle_millis_bank = 0;
     }
 }
 
@@ -653,7 +797,9 @@ void LoadSolenoidControlFromEEPROM(void)
             k[i].delay_sec = eeprom_read_dword((uint32_t*)(i*20+50)); 
             k[i].flow_stop = eeprom_read_dword((uint32_t*)(i*20+54)); 
             k[i].cycles = eeprom_read_byte((uint8_t*)(i*20+58)); 
-            k[i].cycle_state = 1; //  first step for solenoid control to do its thing 
+            k[i].flow_cnt_bank = 0;
+            k[i].cycle_millis_bank = 0;
+            k[i].cycle_state = 1;
         }
     }
 }

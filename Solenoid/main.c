@@ -54,13 +54,25 @@ void ProcessCmd()
         {
             Delay(); // solenoid.c
         }
-        if ( (strcmp_P( command, PSTR("/flow")) == 0) && ( (arg_count == 2 ) ) )
+        if ( (strcmp_P( command, PSTR("/fstop")) == 0) && ( (arg_count == 2 ) ) )
         {
             FlowStop(); // solenoid.c
         }
         if ( (strcmp_P( command, PSTR("/run")) == 0) && ( (arg_count == 2 ) ) )
         {
             Run(); // solenoid.c
+        }
+        if ( (strcmp_P( command, PSTR("/time?")) == 0) && ( (arg_count == 1 ) ) )
+        {
+            Time(); // solenoid.c
+        }
+        if ( (strcmp_P( command, PSTR("/flow?")) == 0) && ( (arg_count == 1 ) ) )
+        {
+            Flow(); // solenoid.c
+        }
+        if ( (strcmp_P( command, PSTR("/stop")) == 0) && ( (arg_count == 1 ) ) )
+        {
+            Stop(); // solenoid.c
         }
         if ( (strcmp_P( command, PSTR("/ee?")) == 0) && ( (arg_count == 1) || (arg_count == 2) ) )
         {

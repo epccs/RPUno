@@ -52,12 +52,13 @@ AVR Memory Usage
 ----------------
 Device: atmega328p
 
-Program:   15546 bytes (47.4% Full)
+Program:   16898 bytes (51.6% Full)
 (.text + .data + .bootloader)
 
-Data:        486 bytes (23.7% Full)
+Data:        534 bytes (26.1% Full)
 (.data + .bss + .noinit)
 ...
+avrdude done.  Thank you.
 ``` 
 
 Now connect with picocom (or ilk). Note I am often at another computer doing this through SSH. The Samba folder is for editing the files from Windows.
@@ -117,6 +118,16 @@ After a solenoid has entered the delay state and let go of the flow meter resour
 ```
 
 
+##  /0/stop k 
+
+Stop the solenoid k (1|2|3) operation.
+
+```
+/1/stop 1
+{"K1":{"stop_time_sec":"3"}}
+```
+
+
 ##  /0/delay k,delay_in_sec
 
 Set the solenoid k (1|2|3) delay between runs (1..86400, e.g. 24 hr max). 
@@ -153,25 +164,43 @@ Set the solenoid k (1|2|3) one time delay befor cycles run (1..21600, e.g. 6hr m
 ``` 
 
 
-##  /0/flow k,flow_stop
+##  /0/fstop k,flow_stop
 
 Set the solenoid k (1|2|3) flow_stop (1..0xFFFFFFFF) that also stops the solenoid (e.g. when flow count is reached).
 
 ``` 
-/1/flow 3,500
+/1/fstop 3,500
 {"K3":{"flow_stop":"500"}}
 /1/run 3,1
 {"K3":{"delay_start_sec":"10","runtime_sec":"20","delay_sec":"40","cycles":"1","flow_stop":"500"}}
 ``` 
 
+##  /0/flow? k
+
+Report the solenoid k (1|2|3) flow_cnt or pulses events on ICP1.
+
+``` 
+/1/flow? 3
+{"K3":{"cycle_state":"11","cycles":"7","flow_cnt":"0"}}
+``` 
+
+
+##  /0/time? k
+
+Report the solenoid k (1|2|3) runtime in millis.
+
+``` 
+/1/time? 3
+{"K3":{"cycle_state":"11","cycles":"9","cycle_millis":"15000"}}
+
 
 ##  [/0/ee? address,type][1]
 
-[1]: ..//Eeprom#0ee-addresstype
+[1]: ../Eeprom#0ee-addresstype
 
 ##  [/0/ee address,value,type][2]
 
-[1]: ../Eeprom#0ee-addressvaluetype
+[2]: ../Eeprom#0ee-addressvaluetype
 
 ID is the ascii values for K1'(0x4B31), 'K2'(0x4B32) and 'K3'(0x4B33). 
 

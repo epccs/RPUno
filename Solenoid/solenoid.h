@@ -6,6 +6,9 @@ extern void RunTime(void);
 extern void Delay(void);
 extern void FlowStop(void);
 extern void Run(void);
+extern void Time(void);
+extern void Flow(void);
+extern void Stop(void);
 
 extern void SolenoidControl(void);
 extern void Reset_All_K(void);

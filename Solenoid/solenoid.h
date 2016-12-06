@@ -9,6 +9,7 @@ extern void Run(void);
 
 extern void SolenoidControl(void);
 extern void Reset_All_K(void);
+extern void LoadSolenoidControlFromEEPROM(void);
 extern uint8_t Live(uint8_t);
 extern void init_K(void);
 

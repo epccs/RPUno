@@ -36,7 +36,7 @@ static uint8_t load_setting_from_eeprom;
 
 void ProcessCmd()
 { 
-    if (solenoids_initalized) 
+    if (solenoids_initalized & load_setting_from_eeprom) 
     {
         if ( (strcmp_P( command, PSTR("/id?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
         {
@@ -62,11 +62,11 @@ void ProcessCmd()
         {
             Run(); // solenoid.c
         }
-        if ( (strcmp_P( command, PSTR("/ee?")) == 0) && ( (arg_count == 1 ) ) )
+        if ( (strcmp_P( command, PSTR("/ee?")) == 0) && ( (arg_count == 1) || (arg_count == 2) ) )
         {
             EEread(); // ../Eeprom/ee.c
         }
-        if ( (strcmp_P( command, PSTR("/ee")) == 0) && ( (arg_count == 2 ) ) )
+        if ( (strcmp_P( command, PSTR("/ee")) == 0) && ( (arg_count == 2 ) || (arg_count == 3) ) )
         {
             EEwrite(); // ../Eeprom/ee.c
         }
@@ -194,9 +194,10 @@ int main(void)
         
         // Solenoid Control is a function that moves them through different states that are timed with millis() or icp1 flow count.
         SolenoidControl();
+        
         if (!solenoids_initalized)
         {
-            // lets test that idea, i.e. they are not in use.
+            // lets test if they are in use.
             uint8_t solenoids_not_in_use = 1;
             for(uint8_t i = 1; i <= SOLENOID_COUNT; i++)
             {
@@ -211,11 +212,10 @@ int main(void)
                 solenoids_initalized = 1;
             }
         }
-        else if (!load_setting_from_eeprom)
+        
+        if (solenoids_initalized & !load_setting_from_eeprom)
         {
-            // abi_from_ee = EpromABI(); // ptr to str
-            // chekc ABI with strcmp_P(abi_from_ee , PSTR("Solenoid 0.0")
-            // If match then Load settings from EEPROM
+            LoadSolenoidControlFromEEPROM();
             load_setting_from_eeprom = 1;
         }
         

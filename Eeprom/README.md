@@ -183,6 +183,6 @@ __Warning__ writing EEPROM can lead to device failure, it is only rated for 100k
 /1/ee 2,65535,UINT16
 {"EE[2]":{"word":"65535","r":"65535"}}
 /1/ee 0,4294967295,UINT32
-{"EE[0]":"4294967295"}
+{"EE[0]":{"dword":"4294967295","r":"4294967295"}}
 ```
 Note: 4294967295 is 0xFFFFFFFF, it is the default for a blank chip.

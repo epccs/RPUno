@@ -640,6 +640,24 @@ void Reset_All_K() {
     }
 }
 
+void LoadSolenoidControlFromEEPROM(void) 
+{
+    for(uint16_t i = 0; i < SOLENOID_COUNT; i++)
+    {
+        uint16_t id = eeprom_read_word((uint16_t*)(i*20+40));
+        if (id == (i+0x4B31) ) // 'K' is 0x4B and '1' is 0x31, thus K1, K2...
+        {
+            k[i].started_at = millis(); // delay start is from now.
+            k[i].delay_start_sec =eeprom_read_dword((uint32_t*)(i*20+42)); 
+            k[i].runtime_sec = eeprom_read_dword((uint32_t*)(i*20+46));  
+            k[i].delay_sec = eeprom_read_dword((uint32_t*)(i*20+50)); 
+            k[i].flow_stop = eeprom_read_dword((uint32_t*)(i*20+54)); 
+            k[i].cycles = eeprom_read_byte((uint8_t*)(i*20+58)); 
+            k[i].cycle_state = 1; //  first step for solenoid control to do its thing 
+        }
+    }
+}
+
 // return the solenoid cycle_state (e.g. it is running)
 uint8_t Live(uint8_t i) 
 {

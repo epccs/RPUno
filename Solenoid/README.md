@@ -27,15 +27,16 @@ The IO13 pin is named LED_BUILTIN and blinks on for a second and off for a secon
 
 # Memory map 
 
-EEPROM has the values that are loaded after initialization (where each valve is operated for a second).  EEPROM values are skipped if bytes 0..3 are anything but zero. 
-
-__Note__: this is work in progress
+EEPROM has the values that are loaded after initialization (if the id value is correct). 
 
 ```
-EEPROM Addr : description
-0..0x03     : ID bytes 0x00 0x00 0x00 0x00
-
-TBD
+function            type       addr:K1  K2  K3
+id                  UINT16          40  60  80
+delay_start_in_sec  UINT32          42  62  82
+runtiem_in_sec      UINT32          46  66  86
+delay_in_sec        UINT32          50  70  90
+flow_stop           UINT32          54  74  94
+cycles              UINT8           58  78  98
 ```
 
 
@@ -45,6 +46,18 @@ With a serial port connection (set the BOOT_PORT in Makefile) and optiboot insta
 
 ``` 
 rsutherland@conversion:~/Samba/RPUno/Solenoid$ make bootload
+...
+avr-size -C --mcu=atmega328p Solenoid.elf
+AVR Memory Usage
+----------------
+Device: atmega328p
+
+Program:   15546 bytes (47.4% Full)
+(.text + .data + .bootloader)
+
+Data:        486 bytes (23.7% Full)
+(.data + .bss + .noinit)
+...
 ``` 
 
 Now connect with picocom (or ilk). Note I am often at another computer doing this through SSH. The Samba folder is for editing the files from Windows.
@@ -152,11 +165,75 @@ Set the solenoid k (1|2|3) flow_stop (1..0xFFFFFFFF) that also stops the solenoi
 ``` 
 
 
-##  [/0/ee? 0..1023][1]
+##  [/0/ee? address,type][1]
 
-[1]: ../Eeprom#0ee-01023
+[1]: ..//Eeprom#0ee-addresstype
 
-##  [/0/ee 0..1023,0..255][2]
+##  [/0/ee address,value,type][2]
 
-[1]: ../Eeprom#0ee-010230255
+[1]: ../Eeprom#0ee-addressvaluetype
 
+ID is the ascii values for K1'(0x4B31), 'K2'(0x4B32) and 'K3'(0x4B33). 
+
+``` 
+/1/ee 40,19249,UINT16
+{"EE[40]":{"word":"19249","r":"19249"}}
+/1/ee 60,19250,UINT16
+{"EE[60]":{"word":"19250","r":"19250"}}
+/1/ee 80,19251,UINT16
+{"EE[80]":{"word":"19251","r":"19251"}}
+``` 
+
+Delay Start (one time) K1 ten seconds, K2 thirty seconds, and K3 fifty seconds. 
+
+``` 
+/1/ee 42,10,UINT32
+{"EE[42]":{"dword":"10","r":"10"}}
+/1/ee 62,30,UINT32
+{"EE[62]":{"dword":"30","r":"30"}}
+/1/ee 82,50,UINT32
+{"EE[82]":{"dword":"50","r":"50"}}
+``` 
+
+Runtime for K1 15 seconds, K2 15 seconds, and K3 15 seconds. 
+
+``` 
+/1/ee 46,15,UINT32
+{"EE[46]":{"dword":"15","r":"15"}}
+/1/ee 66,15,UINT32
+{"EE[66]":{"dword":"15","r":"15"}}
+/1/ee 86,15,UINT32
+{"EE[86]":{"dword":"15","r":"15"}}
+``` 
+
+Delay between cycles for K1, K2, and K3 is 60 seconds. 
+
+```
+/1/ee 50,60,UINT32
+{"EE[50]":{"dword":"60","r":"60"}}
+/1/ee 70,60,UINT32
+{"EE[70]":{"dword":"60","r":"60"}}
+/1/ee 90,60,UINT32
+{"EE[90]":{"dword":"60","r":"60"}}
+```
+
+Flow Stop sets the number of flow pulse counts per cycle K1, K2, and K3 is 0xFFFFFFFFUL (e.g. FLOW_NOT_SET). 
+
+```
+/1/ee 54,4294967295,UINT32
+{"EE[54]":{"dword":"4294967295","r":"4294967295"}}
+/1/ee 74,4294967295,UINT32
+{"EE[74]":{"dword":"4294967295","r":"4294967295"}}
+/1/ee 94,4294967295,UINT32
+{"EE[94]":{"dword":"4294967295","r":"4294967295"}}
+```
+
+Cycles to operate Runtime and then the Delay for K1, K2, and K3. 
+
+``` 
+/1/ee 58,10,UINT8
+{"EE[58]":{"byte":"10","r":"10"}}
+/1/ee 78,10,UINT8
+{"EE[78]":{"word":"10","r":"10"}}
+/1/ee 98,10,UINT8
+{"EE[98]":{"word":"10","r":"10"}}

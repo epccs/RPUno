@@ -36,15 +36,15 @@ static char rpu_addr;
 
 void ProcessCmd()
 { 
-    if ( (strcmp_P( command, PSTR("/id?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
+    if ( (strcmp_P( command, PSTR("/id?")) == 0) && ( (arg_count == 0) || (arg_count == 1) ) )
     {
         Id("Eeprom");
     }
-    if ( (strcmp_P( command, PSTR("/ee?")) == 0) && ( (arg_count == 1) || (arg_count == 2)) )
+    if ( (strcmp_P( command, PSTR("/ee?")) == 0) && ( (arg_count == 1) || (arg_count == 2) ) )
     {
         EEread();
     }
-    if ( (strcmp_P( command, PSTR("/ee")) == 0) && ( (arg_count == 2 ) || (arg_count == 3)) )
+    if ( (strcmp_P( command, PSTR("/ee")) == 0) && ( (arg_count == 2 ) || (arg_count == 3) ) )
     {
         EEwrite();
     }

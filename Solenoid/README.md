@@ -20,7 +20,7 @@ PB5     (SCK/IO13)  LED_BUILTIN
 
 The RPUno has those I/O's wired to a pluggable onboard connector. They are level converted to 5V and will ouput 4V without a pullup (which is enough for a minimum high on 74HC logic). 
 
-The IO13 pin is named LED_BUILTIN and blinks on for a second and off for a second when an rpu_address is read over I2C (if I2C failed it blinks four times as fast). 
+The IO13 pin is used as LED_BUILTIN and blinks on and off for a second when an rpu_address is read over I2C (if I2C failed it blinks four times as fast). 
 
 [![RPUno^5 With K3^0](http://rpubus.org/bb/download/file.php?id=25)](http://rpubus.org/Video/14140%5E5WithK3%5E0.mp4 "RPUno^5 With K3^0")
 
@@ -52,10 +52,10 @@ AVR Memory Usage
 ----------------
 Device: atmega328p
 
-Program:   16898 bytes (51.6% Full)
+Program:   17114 bytes (52.2% Full)
 (.text + .data + .bootloader)
 
-Data:        534 bytes (26.1% Full)
+Data:        530 bytes (25.9% Full)
 (.data + .bss + .noinit)
 ...
 avrdude done.  Thank you.
@@ -100,11 +100,11 @@ Identify is from ../Uart/id.h Id().
 ```
 
 
-##  /0/run k,cycles 
+##  /0/run k[,cycles] 
 
-Start the solenoid k (1|2|3) operation for these cycles (1..255).
+Start the solenoid k (1|2|3) operation, with option to override cycles (1..255). 
 
-After startup the solenoids are initialized with values (delay_start = 1..7, runtime= 1, delay = 3600, flow_stop = not used) that will cause each solenoid to operate for a second after a delay_start time that spaces there operation out by 3 seconds each (it insures all are in a known state).
+If EEPROM does not have settings the solenoids retains initialized values (delay_start = 1..7, runtime= 1, delay = 3600, flow_stop = not used) that will cause each solenoid to operate for a second after a delay_start time that spaces there operation out by 3 seconds each (it insures all are in a known state).
 
 After a solenoid has entered the delay state and let go of the flow meter resource another solenoid that is ready to use the flow meter will do so. Make sure to set the delay time long enough that all the other solenoids can use their runtime, or the flow meter becomes a resource constraint and some zones will get shorted. For example set all the delay times to 360 and make sure the combined runtimes do not add up to 360 (i.e. 100, 80, 120).
 
@@ -118,9 +118,39 @@ After a solenoid has entered the delay state and let go of the flow meter resour
 ```
 
 
+##  /0/save k,cycles 
+
+Save the solenoid k (1|2|3) with cycles (1..255) to EEPROM, it can then autostart.
+
+Saved settings are loaded after the solenoids have initialized.
+
+```
+/1/save 1,10
+{"K1":{"delay_start_sec":"10","runtime_Sec":"15","delay_Sec":"60","cycles":"10"}}
+/1/save 2,10
+{"K2":{"delay_start_sec":"30","runtime_Sec":"15","delay_Sec":"60","cycles":"10"}}
+/1/save 3,10
+{"K3":{"delay_start_sec":"50","runtime_Sec":"15","delay_Sec":"60","cycles":"10"}}
+```
+
+##  /0/load k
+
+Load the solenoid k (1|2|3) from EEPROM. Use run to start it.
+
+```
+/1/load 1
+{"K1":{"delay_start_sec":"10","runtime_Sec":"15","delay_Sec":"60","cycles":"10"}}
+/1/load 2
+{"K2":{"delay_start_sec":"30","runtime_Sec":"15","delay_Sec":"60","cycles":"10"}}
+/1/load 3
+{"K3":{"delay_start_sec":"50","runtime_Sec":"15","delay_Sec":"60","cycles":"10"}}
+
+
 ##  /0/stop k 
 
-Stop the solenoid k (1|2|3) operation.
+Reduce the delay_start, runtime, and delay to one second each to stop the solenoid k (1|2|3) operation.
+
+To change the solenoids setting use /stop, then /load, and change the desired setting (e.g. /runtime) and finally save it and perhaps /run it.
 
 ```
 /1/stop 1
@@ -133,10 +163,10 @@ Stop the solenoid k (1|2|3) operation.
 Set the solenoid k (1|2|3) delay between runs (1..86400, e.g. 24 hr max). 
 
 ``` 
-/1/delay 3,40
+/1/delay 3,60
 {"K3":{"delay_sec":"40"}}
 /1/run 3,1
-{"K3":{"delay_start_sec":"7","runtime_sec":"1","delay_sec":"40","cycles":"1"}}
+{"K3":{"delay_start_sec":"7","runtime_sec":"1","delay_sec":"60","cycles":"1"}}
 ```
 
 
@@ -192,77 +222,4 @@ Report the solenoid k (1|2|3) runtime in millis.
 ``` 
 /1/time? 3
 {"K3":{"cycle_state":"11","cycles":"9","cycle_millis":"15000"}}
-
-
-##  [/0/ee? address,type][1]
-
-[1]: ../Eeprom#0ee-addresstype
-
-##  [/0/ee address,value,type][2]
-
-[2]: ../Eeprom#0ee-addressvaluetype
-
-ID is the ascii values for K1'(0x4B31), 'K2'(0x4B32) and 'K3'(0x4B33). 
-
 ``` 
-/1/ee 40,19249,UINT16
-{"EE[40]":{"word":"19249","r":"19249"}}
-/1/ee 60,19250,UINT16
-{"EE[60]":{"word":"19250","r":"19250"}}
-/1/ee 80,19251,UINT16
-{"EE[80]":{"word":"19251","r":"19251"}}
-``` 
-
-Delay Start (one time) K1 ten seconds, K2 thirty seconds, and K3 fifty seconds. 
-
-``` 
-/1/ee 42,10,UINT32
-{"EE[42]":{"dword":"10","r":"10"}}
-/1/ee 62,30,UINT32
-{"EE[62]":{"dword":"30","r":"30"}}
-/1/ee 82,50,UINT32
-{"EE[82]":{"dword":"50","r":"50"}}
-``` 
-
-Runtime for K1 15 seconds, K2 15 seconds, and K3 15 seconds. 
-
-``` 
-/1/ee 46,15,UINT32
-{"EE[46]":{"dword":"15","r":"15"}}
-/1/ee 66,15,UINT32
-{"EE[66]":{"dword":"15","r":"15"}}
-/1/ee 86,15,UINT32
-{"EE[86]":{"dword":"15","r":"15"}}
-``` 
-
-Delay between cycles for K1, K2, and K3 is 60 seconds. 
-
-```
-/1/ee 50,60,UINT32
-{"EE[50]":{"dword":"60","r":"60"}}
-/1/ee 70,60,UINT32
-{"EE[70]":{"dword":"60","r":"60"}}
-/1/ee 90,60,UINT32
-{"EE[90]":{"dword":"60","r":"60"}}
-```
-
-Flow Stop sets the number of flow pulse counts per cycle K1, K2, and K3 is 0xFFFFFFFFUL (e.g. FLOW_NOT_SET). 
-
-```
-/1/ee 54,4294967295,UINT32
-{"EE[54]":{"dword":"4294967295","r":"4294967295"}}
-/1/ee 74,4294967295,UINT32
-{"EE[74]":{"dword":"4294967295","r":"4294967295"}}
-/1/ee 94,4294967295,UINT32
-{"EE[94]":{"dword":"4294967295","r":"4294967295"}}
-```
-
-Cycles to operate Runtime and then the Delay for K1, K2, and K3. 
-
-``` 
-/1/ee 58,10,UINT8
-{"EE[58]":{"byte":"10","r":"10"}}
-/1/ee 78,10,UINT8
-{"EE[78]":{"word":"10","r":"10"}}
-/1/ee 98,10,UINT8
-{"EE[98]":{"word":"10","r":"10"}}

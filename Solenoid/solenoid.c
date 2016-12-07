@@ -294,7 +294,7 @@ void FlowStop(void)
     }
 }
 
-// arg[0] is solenoid, arg[1] is cycles
+// arg[0] is solenoid, [arg[1] is cycles]
 void Run(void)
 {
     if ( (command_done == 10) )
@@ -305,13 +305,19 @@ void Run(void)
             initCommandBuffer();
             return;
         }
-        // and arg[1] value is 1..0xFF 
-        unsigned long cycles = ul_from_arg1(0xFF);
-        if (! cycles)
+        
+        uint8_t cycles = k[k_solenoid-1].cycles;
+        if (arg[1]!=NULL)
         {
-            initCommandBuffer();
-            return;
+            // and arg[1] value is 1..0xFF 
+            cycles = (uint8_t) (ul_from_arg1(0xFF));
+            if (! cycles)
+            {
+                initCommandBuffer();
+                return;
+            }
         }
+
          // don't run a solenoid that is in use it needs to be stopped first
         if (k[k_solenoid-1].cycle_state)
         {
@@ -320,7 +326,7 @@ void Run(void)
             return;
         }
         k[k_solenoid-1].cycle_state = 1;
-        k[k_solenoid-1].cycles = (uint8_t)cycles;
+        k[k_solenoid-1].cycles = cycles;
         k[k_solenoid-1].flow_cnt_bank = 0;
         k[k_solenoid-1].cycle_millis_bank = 0;
         k[k_solenoid-1].started_at = millis(); //delay_start_sec is timed from now
@@ -368,6 +374,194 @@ void Run(void)
     else
     {
         printf_P(PSTR("{\"err\":\"RunCmdDnWTF\"}\r\n"));
+        initCommandBuffer();
+    }
+}
+
+// arg[0] is solenoid, arg[1] is cycles
+void Save(void)
+{
+    if ( (command_done == 10) )
+    {
+        uint8_t k_solenoid = k_solenoid_from_arg0();
+        if (! k_solenoid)
+        {
+            initCommandBuffer();
+            return;
+        }
+        // and arg[1] value is 1..0xFF 
+        unsigned long cycles = ul_from_arg1(0xFF);
+        if (! cycles)
+        {
+            initCommandBuffer();
+            return;
+        }
+         // don't save a solenoid that is in use
+        if (k[k_solenoid-1].cycle_state)
+        {
+            printf_P(PSTR("{\"err\":\"K%dInUse\"}\r\n"),k_solenoid);
+            initCommandBuffer();
+            return;
+        }
+        if ( eeprom_is_ready() )
+        {
+            k[k_solenoid-1].cycle_state = 0;
+            k[k_solenoid-1].cycles = (uint8_t)cycles;
+            k[k_solenoid-1].flow_cnt_bank = 0;
+            k[k_solenoid-1].cycle_millis_bank = 0;
+            uint16_t value = ((uint16_t) (k_solenoid)) + 0x4B30; //ascii bytes for 'K1', 'K2'...
+            eeprom_write_word( (uint16_t *)((k_solenoid-1)*20+40), value);
+            printf_P(PSTR("{\"K%d\":{"),k_solenoid);
+            command_done = 11;
+        }
+    }
+    else if ( (command_done == 11) )
+    {  
+        if ( eeprom_is_ready() )
+        {
+            uint8_t k_solenoid = atoi(arg[0]);
+            uint32_t value = k[k_solenoid-1].delay_start_sec;
+            eeprom_write_dword( (uint32_t *)((k_solenoid-1)*20+42), value);
+            printf_P(PSTR("\"delay_start_sec\":\"%lu\","),(value));
+            command_done = 12;
+        }
+    }
+    else if ( (command_done == 12) )
+    {
+        if ( eeprom_is_ready() )
+        {
+            uint8_t k_solenoid = atoi(arg[0]);
+            uint32_t value = k[k_solenoid-1].runtime_sec;
+            eeprom_write_dword( (uint32_t *)((k_solenoid-1)*20+46), value);
+            printf_P(PSTR("\"runtime_sec\":\"%lu\","),(value));
+            command_done = 13;
+        }
+    }
+    else if ( (command_done == 13) )
+    {  
+        if ( eeprom_is_ready() )
+        {
+            uint8_t k_solenoid = atoi(arg[0]);
+            uint32_t value = k[k_solenoid-1].delay_sec;
+            eeprom_write_dword( (uint32_t *)((k_solenoid-1)*20+50), value);
+            printf_P(PSTR("\"delay_sec\":\"%lu\","),(value));
+            command_done = 14;
+        }
+    }
+    else if ( (command_done == 14) )
+    {
+        if ( eeprom_is_ready() )
+        {
+            uint8_t k_solenoid = atoi(arg[0]);
+            uint32_t value = k[k_solenoid-1].flow_stop;
+            eeprom_write_dword( (uint32_t *)((k_solenoid-1)*20+54), value);
+            if (k[k_solenoid-1].flow_stop != FLOW_NOT_SET)
+            {
+                printf_P(PSTR("\"flow_stop\":\"%lu\","),(value));
+            }
+            command_done = 15;
+        }
+    }
+    else if ( (command_done == 15) )
+    {
+        if ( eeprom_is_ready() )
+        {
+            uint8_t k_solenoid = atoi(arg[0]);
+            uint8_t value = k[k_solenoid-1].cycles;
+            eeprom_write_byte( (uint8_t *)((k_solenoid-1)*20+58), value);
+            printf_P(PSTR("\"cycles\":\"%d\""),(value));
+            command_done = 16;
+        }
+    }
+    else if ( (command_done == 16) )
+    {
+        printf_P(PSTR("}}\r\n"));
+        initCommandBuffer();
+    }
+    else
+    {
+        printf_P(PSTR("{\"err\":\"SavCmdDnWTF\"}\r\n"));
+        initCommandBuffer();
+    }
+}
+
+// arg[0] is solenoid
+void Load(void)
+{
+    if ( (command_done == 10) )
+    {
+        uint8_t k_solenoid = k_solenoid_from_arg0();
+        if (! k_solenoid)
+        {
+            initCommandBuffer();
+            return;
+        }
+
+         // don't load a solenoid that is in use
+        if (k[k_solenoid-1].cycle_state)
+        {
+            printf_P(PSTR("{\"err\":\"K%dInUse\"}\r\n"),k_solenoid);
+            initCommandBuffer();
+            return;
+        }
+        if ( eeprom_is_ready() )
+        {
+            if (LoadSolenoidControlFromEEPROM(k_solenoid))
+            {
+                k[k_solenoid-1].flow_cnt_bank = 0;
+                k[k_solenoid-1].cycle_millis_bank = 0;
+                printf_P(PSTR("{\"K%d\":{"),k_solenoid);
+                command_done = 11;
+            }
+            else
+            {
+                printf_P(PSTR("{\"err\":\"LdFailK%dnoEEP\"}\r\n"),k_solenoid);
+                initCommandBuffer();
+                return;
+            }
+        }
+    }
+    else if ( (command_done == 11) )
+    {  
+        uint8_t k_solenoid = atoi(arg[0]);
+        printf_P(PSTR("\"delay_start_sec\":\"%lu\","),(k[k_solenoid-1].delay_start_sec));
+        command_done = 12;
+    }
+    else if ( (command_done == 12) )
+    {
+        uint8_t k_solenoid = atoi(arg[0]);
+        printf_P(PSTR("\"runtime_sec\":\"%lu\","),(k[k_solenoid-1].runtime_sec));
+        command_done = 13;
+    }
+    else if ( (command_done == 13) )
+    {  
+        uint8_t k_solenoid = atoi(arg[0]);
+        printf_P(PSTR("\"delay_sec\":\"%lu\","),(k[k_solenoid-1].delay_sec));
+        command_done = 14;
+    }
+    else if ( (command_done == 14) )
+    {
+        uint8_t k_solenoid = atoi(arg[0]);
+        if (k[k_solenoid-1].flow_stop != FLOW_NOT_SET)
+        {
+            printf_P(PSTR("\"flow_stop\":\"%lu\","),(k[k_solenoid-1].flow_stop));
+        }
+        command_done = 15;
+    }
+    else if ( (command_done == 15) )
+    {  
+        uint8_t k_solenoid = atoi(arg[0]);
+        printf_P(PSTR("\"cycles\":\"%d\""),(k[k_solenoid-1].cycles));
+        command_done = 16;
+    }
+    else if ( (command_done == 16) )
+    {
+        printf_P(PSTR("}}\r\n"));
+        initCommandBuffer();
+    }
+    else
+    {
+        printf_P(PSTR("{\"err\":\"LdCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
@@ -784,9 +978,10 @@ void Reset_All_K() {
     }
 }
 
-void LoadSolenoidControlFromEEPROM(void) 
+uint8_t LoadSolenoidControlFromEEPROM(uint8_t solenoid) 
 {
-    for(uint16_t i = 0; i < SOLENOID_COUNT; i++)
+    uint16_t i = solenoid-1;
+    if (!k[i].cycle_state)
     {
         uint16_t id = eeprom_read_word((uint16_t*)(i*20+40));
         if (id == (i+0x4B31) ) // 'K' is 0x4B and '1' is 0x31, thus K1, K2...
@@ -799,20 +994,40 @@ void LoadSolenoidControlFromEEPROM(void)
             k[i].cycles = eeprom_read_byte((uint8_t*)(i*20+58)); 
             k[i].flow_cnt_bank = 0;
             k[i].cycle_millis_bank = 0;
-            k[i].cycle_state = 1;
+            return 1;
         }
+        else
+        {
+            return 0;
+        }
+    }
+    else
+    {
+        return 0;
     }
 }
 
-// return the solenoid cycle_state (e.g. it is running)
-uint8_t Live(uint8_t i) 
+// return the solenoid cycle_state (e.g. tells if it is running)
+uint8_t Live(uint8_t solenoid) 
 {
-    if (i && (i<=SOLENOID_COUNT))
+    uint16_t i = solenoid-1;
+    if (i<SOLENOID_COUNT)
     {
-        return k[i-1].cycle_state;
+        return k[i].cycle_state;
     }
-    else
-        return 0xFF; // not a valid solenoid
+    else return 0xFF; // not a valid solenoid 
+}
+
+// start the solenoid if it is not running and return cycle state
+uint8_t StartSolenoid(uint8_t solenoid) 
+{
+    uint16_t i = solenoid-1;
+    if (i<SOLENOID_COUNT )
+    {
+        if (! k[i].cycle_state) k[i].cycle_state = 1;
+        return k[i].cycle_state;
+    }
+    else return 0x0; // not a valid solenoid
 }
 
 // only use init at setup() not durring loop()

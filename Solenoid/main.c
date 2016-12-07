@@ -24,7 +24,6 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/pin_num.h"
 #include "../lib/pins_board.h"
 #include "../Uart/id.h"
-#include "../Eeprom/ee.h"
 #include "solenoid.h"
 
 #define BLINK_DELAY 1000UL
@@ -58,9 +57,17 @@ void ProcessCmd()
         {
             FlowStop(); // solenoid.c
         }
-        if ( (strcmp_P( command, PSTR("/run")) == 0) && ( (arg_count == 2 ) ) )
+        if ( (strcmp_P( command, PSTR("/run")) == 0) && ( (arg_count == 1) || (arg_count == 2) ) )
         {
             Run(); // solenoid.c
+        }
+        if ( (strcmp_P( command, PSTR("/save")) == 0) && ( (arg_count == 2 ) ) )
+        {
+            Save(); // solenoid.c
+        }
+        if ( (strcmp_P( command, PSTR("/load")) == 0) && ( (arg_count == 1 ) ) )
+        {
+            Load(); // solenoid.c
         }
         if ( (strcmp_P( command, PSTR("/time?")) == 0) && ( (arg_count == 1 ) ) )
         {
@@ -74,20 +81,19 @@ void ProcessCmd()
         {
             Stop(); // solenoid.c
         }
-        if ( (strcmp_P( command, PSTR("/ee?")) == 0) && ( (arg_count == 1) || (arg_count == 2) ) )
-        {
-            EEread(); // ../Eeprom/ee.c
-        }
-        if ( (strcmp_P( command, PSTR("/ee")) == 0) && ( (arg_count == 2 ) || (arg_count == 3) ) )
-        {
-            EEwrite(); // ../Eeprom/ee.c
-        }
     }
     else
     {
+        if (! solenoids_initalized)
+        {
             printf_P(PSTR("{\"err\":\"NotFinishKinit\"}\r\n"));
-            initCommandBuffer();
-            return;
+        }
+        if (solenoids_initalized && (! load_setting_from_eeprom) )
+        {
+            printf_P(PSTR("{\"err\":\"NotFinishLdEEPROM\"}\r\n"));
+        }
+        initCommandBuffer();
+        return;
     }
 }
 
@@ -210,16 +216,16 @@ int main(void)
         if (!solenoids_initalized)
         {
             // lets test if they are in use.
-            uint8_t solenoids_not_in_use = 1;
-            for(uint8_t i = 1; i <= SOLENOID_COUNT; i++)
+            uint8_t solenoids_in_use = 0;
+            for(uint8_t solenoid = 1; solenoid <= SOLENOID_COUNT; solenoid++)
             {
-                if (Live(i))
-                {                    
-                    solenoids_not_in_use =0;
+                if (Live(solenoid))
+                {
+                    solenoids_in_use =1;
                     break;
                 }
             }
-            if (solenoids_not_in_use) 
+            if (! solenoids_in_use) 
             {
                 solenoids_initalized = 1;
             }
@@ -227,7 +233,11 @@ int main(void)
         
         if (solenoids_initalized & !load_setting_from_eeprom)
         {
-            LoadSolenoidControlFromEEPROM();
+            for(uint8_t solenoid = 1; solenoid <= SOLENOID_COUNT; solenoid++)
+            {
+                LoadSolenoidControlFromEEPROM(solenoid);
+                StartSolenoid(solenoid);
+            }
             load_setting_from_eeprom = 1;
         }
         

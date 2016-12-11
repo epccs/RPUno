@@ -7,7 +7,7 @@ This shows the setup and method used for evaluation of RPUno.
 
 # Table Of Contents:
 
-    10. ^5 Solenoid Reset All 
+    10. ^5 Solenoid FW Operates K3
     9. ^5 ADC and DIO
     8. ^5 Heat No Longer Problem
     7. ^4 Heat Wick
@@ -19,17 +19,23 @@ This shows the setup and method used for evaluation of RPUno.
     1. ^1 Mounting
 
 
-## ^5 Solenoid Reset All
+## ^5 Solenoid FW Operates K3
 
 An interactive Command Line Interface for [Solenoid][6] control is wired to LED's to see its function. In my [reset all video][7] each solenoid is cycled twice (opps), but the logic control is working. After connecting the K3 board I fixed the control program so it cycles each solenoid once as seen when [RPUno with K3 video][8] is seen. 
     
 [6]: https://github.com/epccs/RPUno/tree/master/Solenoid
 [7]: http://rpubus.org/Video/14140%5E5_SolenoidResetAllLogic.mp4
-[8]: http://rpubus.org/Video/14140%5E5WithK3%5E0.mp4
+[8]: http://rpubus.org/Video/14140%5E5WithK3%5E0.mp4">RPUno With K3</A> Video
 
 ![Solenoid Testing](./RPUno^5_SolenoidResetAllTesting.jpg "Solenoid Reset All Testing")
 
-![RPUno with K3](./RPUno^5WithK3^0.jpg "RPUno with K3")
+![K3 With RPUno](./K3^0WithRPUno^5.jpg "K3 With RPUno")
+
+Update: Added more options to the [Solenoid][6] program (save/load settings to/from EEPROM) and connected some of Orbits (58874N) latching valves (which work for me with a 24V 50 mSec pulse). Have a look at the [video of RPUno (modified ^4) with K3 controling some latching valves][9].
+
+[9]: http://rpubus.org/Video/14140%5E4_K3%5E0_WithLatchingValves.mp4
+
+![K3 RPUno with Valves](./RPUno^4+mod_K3^0_wLatchingValves.jpg "RPUno and K3 with Latching Valves")
 
 
 ## ^5 ADC and DIO

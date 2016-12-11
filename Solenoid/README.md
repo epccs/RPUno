@@ -126,11 +126,11 @@ Saved settings are loaded after the solenoids have initialized.
 
 ```
 /1/save 1,10
-{"K1":{"delay_start_sec":"10","runtime_Sec":"15","delay_Sec":"60","cycles":"10"}}
+{"K1":{"delay_start_sec":"3","runtime_Sec":"10","delay_Sec":"40","cycles":"10"}}
 /1/save 2,10
-{"K2":{"delay_start_sec":"30","runtime_Sec":"15","delay_Sec":"60","cycles":"10"}}
+{"K2":{"delay_start_sec":"16","runtime_Sec":"10","delay_Sec":"40","cycles":"10"}}
 /1/save 3,10
-{"K3":{"delay_start_sec":"50","runtime_Sec":"15","delay_Sec":"60","cycles":"10"}}
+{"K3":{"delay_start_sec":"29","runtime_Sec":"10","delay_Sec":"40","cycles":"10"}}
 ```
 
 ##  /0/load k
@@ -144,6 +144,7 @@ Load the solenoid k (1|2|3) from EEPROM. Use run to start it.
 {"K2":{"delay_start_sec":"30","runtime_Sec":"15","delay_Sec":"60","cycles":"10"}}
 /1/load 3
 {"K3":{"delay_start_sec":"50","runtime_Sec":"15","delay_Sec":"60","cycles":"10"}}
+```
 
 
 ##  /0/stop k 
@@ -158,16 +159,20 @@ To change the solenoids setting use /stop, then /load, and change the desired se
 ```
 
 
-##  /0/delay k,delay_in_sec
+##  /0/pre k,delay_start_in_sec
 
-Set the solenoid k (1|2|3) delay between runs (1..86400, e.g. 24 hr max). 
+Set the solenoid k (1|2|3) one time delay befor cycles run (1..21600, e.g. 6hr max). 
 
 ``` 
-/1/delay 3,60
-{"K3":{"delay_sec":"40"}}
-/1/run 3,1
-{"K3":{"delay_start_sec":"7","runtime_sec":"1","delay_sec":"60","cycles":"1"}}
-```
+/1/pre 1,3
+{"K1":{"delay_start_sec":"3"}}
+/1/pre 2,16
+{"K2":{"delay_start_sec":"16"}}
+/1/pre 3,29
+{"K3":{"delay_start_sec":"29"}}
+/1/run 2,1
+{"K2":{"delay_start_sec":"16","runtime_sec":"10","delay_sec":"40","cycles":"1"}}
+``` 
 
 
 ##  /0/runtime k,runtime_in_sec
@@ -175,23 +180,31 @@ Set the solenoid k (1|2|3) delay between runs (1..86400, e.g. 24 hr max).
 Set the solenoid k (1|2|3) run time (1..21600, e.g. 6hr max). 
 
 ``` 
-/1/runtime 3,20
-{"K3":{"runtime_sec":"20"}}
-/1/run 3,1
-{"K3":{"delay_start_sec":"7","runtime_sec":"20","delay_sec":"40","cycles":"1"}}
+/1/runtime 1,10
+{"K1":{"runtime_sec":"10"}}
+/1/runtime 2,10
+{"K2":{"runtime_sec":"10"}}
+/1/runtime 3,10
+{"K3":{"runtime_sec":"10"}}
+/1/run 1,1
+{"K1":{"delay_start_sec":"2","runtime_sec":"10","delay_sec":"40","cycles":"1"}}
 ```
 
 
-##  /0/pre k,delay_start_in_sec
+##  /0/delay k,delay_in_sec
 
-Set the solenoid k (1|2|3) one time delay befor cycles run (1..21600, e.g. 6hr max). 
+Set the solenoid k (1|2|3) delay between runs (1..86400, e.g. 24 hr max). 
 
-``` 
-/1/pre 3,10
-{"K3":{"delay_start_sec":"10"}}
+```
+/1/delay 1,40
+{"K1":{"delay_sec":"40"}}
+/1/delay 2,40
+{"K2":{"delay_sec":"40"}}
+/1/delay 3,40
+{"K3":{"delay_sec":"40"}}
 /1/run 3,1
-{"K3":{"delay_start_sec":"10","runtime_sec":"20","delay_sec":"40","cycles":"1"}}
-``` 
+{"K3":{"delay_start_sec":"7","runtime_sec":"1","delay_sec":"40","cycles":"1"}}
+```
 
 
 ##  /0/fstop k,flow_stop
@@ -204,6 +217,7 @@ Set the solenoid k (1|2|3) flow_stop (1..0xFFFFFFFF) that also stops the solenoi
 /1/run 3,1
 {"K3":{"delay_start_sec":"10","runtime_sec":"20","delay_sec":"40","cycles":"1","flow_stop":"500"}}
 ``` 
+
 
 ##  /0/flow? k
 

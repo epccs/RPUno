@@ -138,7 +138,7 @@ void DelayStart(void)
     else if ( (command_done == 11) )
     {  
         uint8_t k_solenoid = atoi(arg[0]);
-        printf_P(PSTR("\"delay_start_sec\":\"%lu\","),(k[k_solenoid-1].delay_start_sec));
+        printf_P(PSTR("\"delay_start_sec\":\"%lu\""),(k[k_solenoid-1].delay_start_sec));
         command_done = 12;
     }
     else if ( (command_done == 12) )

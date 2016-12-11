@@ -44,10 +44,10 @@ Bootloader options include [optiboot][1] and [xboot][2]. Uploading through a boo
 
 # Table Of Contents
 
-1. [Status](#Status)
-2. [Design](#Design)
-3. [Bill of Materials](#Bill-of-Materials)
-4. [How To Use](#How-To-Use)
+1. [Status](#status)
+2. [Design](#design)
+3. [Bill of Materials](#bill-of-materials)
+4. [How To Use](#how-to-use)
 
 
 # Status

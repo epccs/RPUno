@@ -7,15 +7,14 @@ This shows the setup and method used for evaluation of RPUno.
 
 # Table Of Contents:
 
-    9. [^5 Solenoid FW Operates K3][#5-solenoid-fw-operates-k3]
-    8. [^5 ADC and DIO][#5-adc-and-dio]
-    7. [^5 Heat No Longer Problem][#5-heat-no-longer-problem]
-    6. [^4 Heat Wick][#4-heat-wick]
-    5. [^2 Log CCtest][#2-log-cctest]
-    4. [^2 Log PV_IN and PWR for a day][#2-log-pv_in-and-pwr-for-a-day]
-    3. [^2 Log PV_IN and PWR for a day][#2-log-pv_in-and-pwr-for-a-day]
-    2. [^2 20mA Loop With Open Collector To ICP1][#2-20ma-loop-with-open-collector-to-icp1]
-    1. [^1 Mounting][#1-mounting]
+8. [^5 Solenoid FW Operates K3][#5-solenoid-fw-operates-k3]
+7. [^5 ADC and DIO][#5-adc-and-dio]
+6. [^5 Heat No Longer Problem][#5-heat-no-longer-problem]
+5. [^4 Heat Wick][#4-heat-wick]
+4. [^2 Log CCtest][#2-log-cctest]
+3. [^2 Log PV_IN and PWR for a day][#2-log-pv_in-and-pwr-for-a-day]
+2. [^2 20mA Loop With Open Collector To ICP1][#2-20ma-loop-with-open-collector-to-icp1]
+1. [^1 Mounting][#1-mounting]
 
 
 ## ^5 Solenoid FW Operates K3
@@ -24,13 +23,13 @@ An interactive Command Line Interface for [Solenoid][6] control is wired to LED'
     
 [6]: https://github.com/epccs/RPUno/tree/master/Solenoid
 [7]: http://rpubus.org/Video/14140%5E5_SolenoidResetAllLogic.mp4
-[8]: http://rpubus.org/Video/14140%5E5WithK3%5E0.mp4">RPUno With K3</A> Video
+[8]: http://rpubus.org/Video/14140%5E5WithK3%5E0.mp4
 
 ![Solenoid Testing](./RPUno^5_SolenoidResetAllTesting.jpg "Solenoid Reset All Testing")
 
-![K3 With RPUno](./K3^0WithRPUno^5.jpg "K3 With RPUno")
+![RPUno With K3](./RPUno^5WithK3^0.jpg "RPUno With K3")
 
-Update: Added more options to the [Solenoid][6] program (save/load settings to/from EEPROM) and connected some of Orbits (58874N) latching valves (which work for me with a 24V 50 mSec pulse). Have a look at the [video of RPUno (modified ^4) with K3 controling some latching valves][9].
+Update: Added more options to the [Solenoid][6] program (save/load settings to/from EEPROM) and connected some of Orbits (58874N) latching valves (which work for me with a 24V 50 mSec pulse). Have a look at the [video of RPUno (modified ^4) with K3 controlling some latching valves][9].
 
 [9]: http://rpubus.org/Video/14140%5E4_K3%5E0_WithLatchingValves.mp4
 
@@ -49,12 +48,12 @@ Interactive Command Line Interface for [Analog][4] updated, and for [Digital][5]
 
 ## ^5 Heat No Longer Problem
 
-Heat is no longer a problem. Testing shows it will do 1.3A all day with the thermistor  (R23) placed off-board (e.g. the green-white wire), and shuts down when R23 is heated to 40 degC.
+Heat is no longer a problem. Testing shows it will do 1.3A all day with the thermistor (R23) placed off-board (e.g. the green-white wire), and shuts down when R23 is heated to 40 degC.
 
 
 ## ^4 Heat Wick
 
-In order to run a Raspberry Pi, I will need to push the solar charge controller much harder than in the past. Testing shows it will do 1.28A but then gets hot and with the thermistor R23 in place shuts down after a few minutes. It starts back up after cooling down, but I need to wick more of the heat away and keep it running.
+In order to run a Raspberry Pi, I will need to push the solar charge controller more than in the past. Testing shows it will do 1.28A but then gets hot and with the thermistor R23 in place shuts down after a few minutes. It starts back up after cooling down, but I need to wick more of the heat away and keep it running.
 
 ![Heat Wick](./14140^4_HeatWicking.jpg "Heat Wick")
 

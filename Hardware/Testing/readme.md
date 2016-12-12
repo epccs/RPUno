@@ -7,18 +7,18 @@ This is a list of Test preformed on each RPUno after assembly.
 
 # Table Of Contents:
 
-1. [Basics][#basics]
-2. [Assembly check][#assembly-check]
-3. [IC Solder Test][#ic-solder-test]
-4. [Reverse Battery Protection][#reverse-battery-protection]
-5. [Battery Disconnect][#battery-disconnect]
-6. [Power Protection][#power-protection]
-7. [TPS3700 Window Comparator][#tps3700-window-comparator]
-8. [LT3652 Power Up Without Battery][#lt3652-power-up-without-battery]
-9. [LT3652 Load Test][#lt3652-load-test]
-10. [+5V From OKI-78SR-5][#5v-from-oki-78sr-5]
-11. [20mA Source][#current-sources]
-12. [Set MCU Fuse and Install Bootloader][#set-mcu-fuse-and-install-bootloader]
+1. [Basics](#basics)
+2. [Assembly check](#assembly-check)
+3. [IC Solder Test](#ic-solder-test)
+4. [Reverse Battery Protection](#reverse-battery-protection)
+5. [Battery Disconnect](#battery-disconnect)
+6. [Power Protection](#power-protection)
+7. [TPS3700 Window Comparator](#tps3700-window-comparator)
+8. [LT3652 Power Up Without Battery](#lt3652-power-up-without-battery)
+9. [LT3652 Load Test](#lt3652-load-test)
+10. [+5V From OKI-78SR-5](#5v-from-oki-78sr-5)
+11. [20mA Source](#current-sources)
+12. [Set MCU Fuse and Install Bootloader](#set-mcu-fuse-and-install-bootloader)
 
 
 ## Basics

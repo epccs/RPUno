@@ -4,12 +4,12 @@ Some lessons I learned doing RPUno.
 
 # Table Of Contents:
 
-6. [^5 ADC7 is .333 of PWR][#5-adc7-is-333-of-pwr]
-5. [^4 Pull-down on IO2][#4-pull-down-on-io2]
-4. [^2 Reduce EMI][#2-reduce-emi]
-3. [^1 Reduce Current Sense Noise][#1-reduce-current-sense-noise]
-2. [^1 Battery Connector Polarity][#1-battery-connector-polarity]
-1. [^0 Add Reversed Battery Protection][#0-add-reversed-battery-protection]
+6. [^5 ADC7 is .333 of PWR](#5-adc7-is-333-of-pwr)
+5. [^4 Pull-down on IO2](#4-pull-down-on-io2)
+4. [^2 Reduce EMI](#2-reduce-emi)
+3. [^1 Reduce Current Sense Noise](#1-reduce-current-sense-noise)
+2. [^1 Battery Connector Polarity](#1-battery-connector-polarity)
+1. [^0 Add Reversed Battery Protection](#0-add-reversed-battery-protection)
 
 
 ## ^5 ADC7 is .333 of PWR

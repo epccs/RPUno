@@ -59,10 +59,10 @@ uint8_t dayState = 0;
 unsigned long dayTmrStarted;
 static void (*dayState_atDayWork)(void);
 
-#define SERIAL_PRINT_DELAY_MILSEC 1000
+#define SERIAL_PRINT_DELAY_MILSEC 60000UL
 static unsigned long serial_print_started_at;
 
-/* set function called to provide the work that needs to be done
+/* set function callback that provides the task to do at start of each day
  * Input    function: callback function to use
  */
 void Day_AttachDayWork( void (*function)(void)  )
@@ -233,7 +233,7 @@ void CheckDayLight(void)
 
     if(dayState == DAYNIGHT_WORK_STATE) 
     { 
-        //do some work now
+        //do some work, e.g. load irrigation settings at the start of a day
         dayState_atDayWork();
         dayState = DAYNIGHT_DAY_STATE;
         return;

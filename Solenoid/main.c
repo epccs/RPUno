@@ -20,22 +20,30 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/uart.h"
 #include "../lib/parse.h"
 #include "../lib/timers.h"
+#include "../lib/adc.h"
 #include "../lib/twi.h"
 #include "../lib/pin_num.h"
 #include "../lib/pins_board.h"
 #include "../Uart/id.h"
+#include "../DayNight/day_night.h"
 #include "solenoid.h"
+
+#define ADC_DELAY_MILSEC 200UL
+static unsigned long adc_started_at;
+
+#define DAYNIGHT_STATUS_LED 4
+#define DAYNIGHT_BLINK 500UL
+static unsigned long day_status_blink_started_at;
 
 #define BLINK_DELAY 1000UL
 static unsigned long blink_started_at;
 static unsigned long blink_delay;
 static char rpu_addr;
 static uint8_t solenoids_initalized;
-static uint8_t load_setting_from_eeprom;
 
 void ProcessCmd()
 { 
-    if (solenoids_initalized & load_setting_from_eeprom) 
+    if (solenoids_initalized) 
     {
         if ( (strcmp_P( command, PSTR("/id?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
         {
@@ -81,6 +89,10 @@ void ProcessCmd()
         {
             Stop(); // solenoid.c
         }
+        if ( (strcmp_P( command, PSTR("/day?")) == 0) && ( (arg_count == 0 ) ) )
+        {
+            Day(); // ../DayNight/day_night.c
+        }
     }
     else
     {
@@ -88,12 +100,18 @@ void ProcessCmd()
         {
             printf_P(PSTR("{\"err\":\"NotFinishKinit\"}\r\n"));
         }
-        if (solenoids_initalized && (! load_setting_from_eeprom) )
-        {
-            printf_P(PSTR("{\"err\":\"NotFinishLdEEPROM\"}\r\n"));
-        }
         initCommandBuffer();
         return;
+    }
+}
+
+//At start of each day load the solenoid control settings from EEPROM and operate them.
+void callback_for_day_attach(void)
+{
+    for(uint8_t solenoid = 1; solenoid <= SOLENOID_COUNT; solenoid++)
+    {
+        LoadSolenoidControlFromEEPROM(solenoid);
+        StartSolenoid(solenoid);
     }
 }
 
@@ -103,9 +121,18 @@ void setup(void)
     pinMode(LED_BUILTIN,OUTPUT);
     digitalWrite(LED_BUILTIN,HIGH);
     
-    // Initialize Timers and clear bootloader, Arduino does these with init() in wiring.c
+    // A DayNight status LED is on digital pin 4
+    pinMode(DAYNIGHT_STATUS_LED,OUTPUT);
+    digitalWrite(DAYNIGHT_STATUS_LED,HIGH);
+    
+    // Initialize Timers, ADC, and clear bootloader, Arduino does these with init() in wiring.c
     initTimers(); //Timer0 Fast PWM mode, Timer1 & Timer2 Phase Correct PWM mode.
+    init_ADC_single_conversion(EXTERNAL_AVCC); // warning AREF must not be connected to anything
     init_uart0_after_bootloader(); // bootloader may have the UART setup
+
+    // put ADC in Auto Trigger mode and fetch an array of channels
+    enable_ADC_auto_conversion(BURST_MODE);
+    adc_started_at = millis();
 
     /* Initialize UART, it returns a pointer to FILE so redirect of stdin and stdout works*/
     stdout = stdin = uartstream0_init(BAUD);
@@ -121,6 +148,7 @@ void setup(void)
     sei(); 
     
     blink_started_at = millis();
+    day_status_blink_started_at = millis();
     
     rpu_addr = get_Rpu_address();
     blink_delay = BLINK_DELAY;
@@ -139,7 +167,9 @@ void setup(void)
     // loads settings that will run a fast cycle
     Reset_All_K();
     solenoids_initalized = 0;
-    load_setting_from_eeprom =0;
+    
+    // set callback. See Solenoid for another example, where it loads the EEPROM values used at the start of each day
+    Day_AttachDayWork(callback_for_day_attach);
 }
 
 void blink(void)
@@ -154,6 +184,55 @@ void blink(void)
     }
 }
 
+void day_status(void)
+{
+    unsigned long kRuntime = millis() - day_status_blink_started_at;
+    uint8_t state = DayState();
+    if ( ( (state == DAYNIGHT_EVENING_DEBOUNCE_STATE) || \
+           (state == DAYNIGHT_MORNING_DEBOUNCE_STATE) ) && \
+           (kRuntime > (DAYNIGHT_BLINK/2) ) )
+    {
+        digitalToggle(DAYNIGHT_STATUS_LED);
+        
+        // set for next toggle 
+        day_status_blink_started_at += DAYNIGHT_BLINK/2; 
+    }
+    if ( ( (state == DAYNIGHT_DAY_STATE) ) && \
+           (kRuntime > (DAYNIGHT_BLINK) ) )
+    {
+        digitalWrite(DAYNIGHT_STATUS_LED,HIGH);
+        
+        // set for next toggle 
+        day_status_blink_started_at += DAYNIGHT_BLINK; 
+    }
+    if ( ( (state == DAYNIGHT_NIGHT_STATE) ) && \
+           (kRuntime > (DAYNIGHT_BLINK) ) )
+    {
+        digitalWrite(DAYNIGHT_STATUS_LED,LOW);
+        
+        // set for next toggle 
+        day_status_blink_started_at += DAYNIGHT_BLINK; 
+    }
+    if ( ( (state == DAYNIGHT_FAIL_STATE) ) && \
+           (kRuntime > (DAYNIGHT_BLINK/8) ) )
+    {
+        digitalToggle(DAYNIGHT_STATUS_LED);
+        
+        // set for next toggle 
+        day_status_blink_started_at += DAYNIGHT_BLINK/8; 
+    }
+}
+
+void adc_burst(void)
+{
+    unsigned long kRuntime= millis() - adc_started_at;
+    if ((kRuntime) > ((unsigned long)ADC_DELAY_MILSEC))
+    {
+        enable_ADC_auto_conversion(BURST_MODE);
+        adc_started_at += ADC_DELAY_MILSEC; 
+    } 
+}
+
 int main(void) 
 {
     setup();
@@ -163,6 +242,15 @@ int main(void)
         // use LED to show if I2C has a bus manager
         blink();
         
+        // use LED to show day_state
+        day_status();
+
+        // Check Day Light is a function that operates a day-night state machine.
+        CheckDayLight(); // day_night.c
+
+        // delay between ADC burst
+        adc_burst();
+
         // check if character is available to assemble a command, e.g. non-blocking
         if ( (!command_done) && uart0_available() ) // command_done is an extern from parse.h
         {
@@ -230,17 +318,6 @@ int main(void)
                 solenoids_initalized = 1;
             }
         }
-        
-        if (solenoids_initalized & !load_setting_from_eeprom)
-        {
-            for(uint8_t solenoid = 1; solenoid <= SOLENOID_COUNT; solenoid++)
-            {
-                LoadSolenoidControlFromEEPROM(solenoid);
-                StartSolenoid(solenoid);
-            }
-            load_setting_from_eeprom = 1;
-        }
-        
     }        
     return 0;
 }

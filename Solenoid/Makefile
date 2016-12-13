@@ -4,11 +4,13 @@ LIBDIR = ../lib
 OBJECTS = main.o \
 	solenoid.o \
 	../Uart/id.o \
+	../DayNight/day_night.o \
 	$(LIBDIR)/timers.o \
 	$(LIBDIR)/uart.o \
 	$(LIBDIR)/icp_buf.o \
 	$(LIBDIR)/icp1.o \
 	$(LIBDIR)/twi.o \
+	$(LIBDIR)/adc.o \
 	$(LIBDIR)/parse.o
 
 ## Chip and project-specific global definitions

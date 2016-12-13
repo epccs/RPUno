@@ -29,11 +29,13 @@ An interactive Command Line Interface for [Solenoid][6] control is wired to LED'
 
 ![RPUno With K3](./RPUno^5WithK3^0.jpg "RPUno With K3")
 
-Update: Added more options to the [Solenoid][6] program (save/load settings to/from EEPROM) and connected some of Orbits (58874N) latching valves (which work for me with a 24V 50 mSec pulse). Have a look at the [video of RPUno (modified ^4) with K3 controlling some latching valves][9].
+Update1: Added more options to the [Solenoid][6] program that save/load settings to/from EEPROM and connected some of Orbits (58874N) latching valves (which work for me with a 24V 50 mSec pulse). Have a look at the [video of RPUno (modified ^4) with K3 controlling some latching valves][9].
 
 [9]: http://rpubus.org/Video/14140%5E4_K3%5E0_WithLatchingValves.mp4
 
 ![K3 RPUno with Valves](./RPUno^4+mod_K3^0_wLatchingValves.jpg "RPUno and K3 with Latching Valves")
+
+Update2: Added day/night state machine to the [Solenoid][6] program, which loads saved settings from EEPROM after a morning (debounce) at the start of each day, and starts their operation. 
 
 
 ## ^5 ADC and DIO

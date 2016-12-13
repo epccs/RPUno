@@ -2,8 +2,9 @@
 
 ## Overview
 
-Use RPUno's photovoltaic voltage (PV_V on ADC channel 6) to approximately tell when it is day or night. 
+Use RPUno's photovoltaic voltage (PV_V on ADC channel 6) to approximately tell when it is day (or night). 
 
+Note: Solenoid uses the Day_AttachDayWork() function to set a callback that will be run at the start of each day. This framework was used to debug the day-night stat machine idea.
 
 # Commands
 
@@ -52,9 +53,6 @@ WaterTheGarden
 ... 20 hr (e.g. using a power supply)
 {"day_state":"DAY"}
 {"day_state":"FAIL"}
-
-
-
 ```
 
 

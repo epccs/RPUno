@@ -65,7 +65,7 @@ void setup(void)
     pinMode(LED_BUILTIN,OUTPUT);
     digitalWrite(LED_BUILTIN,HIGH);
     
-    // A status LED is on digital pin 4
+    // A DayNight status LED is on digital pin 4
     pinMode(DAYNIGHT_STATUS_LED,OUTPUT);
     digitalWrite(DAYNIGHT_STATUS_LED,HIGH);
     

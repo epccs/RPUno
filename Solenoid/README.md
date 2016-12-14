@@ -10,6 +10,7 @@ Solenoid is an interactive command line program that demonstrates control of the
 RPUno   (digital)   K3 
 ------------------------
 PD3     (IO3)       E3
+PD4     (IO4)       DAYNIGHT_STATUS_LED
 0V       na         nE2
 0V       na         nE1
 PB2     (nSS/IO10)  A0
@@ -38,6 +39,11 @@ delay_in_sec        UINT32          50  70  90
 flow_stop           UINT32          54  74  94
 cycles              UINT8           58  78  98
 ```
+
+
+# Start of Day 
+
+The [day-night][../DayNight] state machine is used to load and run EEPROM values after the morning debounce. This means the valves will start to cycle after the delay_start time has elapsed each morning.
 
 
 # Programing
@@ -122,7 +128,7 @@ After a solenoid has entered the delay state and let go of the flow meter resour
 
 Save the solenoid k (1|2|3) with cycles (1..255) to EEPROM, it can then autostart.
 
-Saved settings are loaded after the solenoids have initialized.
+Saved settings are loaded and operated at the start of each day.
 
 ```
 /1/save 1,10
@@ -237,3 +243,9 @@ Report the solenoid k (1|2|3) runtime in millis.
 /1/time? 3
 {"K3":{"cycle_state":"11","cycles":"9","cycle_millis":"15000"}}
 ``` 
+
+##  [/0/day?][../DayNight#0day]
+
+
+##  [/0/analog? 0..7[,0..7[,0..7[,0..7[,0..7]]]]][../Adc#0analog-0707070707]
+

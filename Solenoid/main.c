@@ -26,6 +26,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/pins_board.h"
 #include "../Uart/id.h"
 #include "../DayNight/day_night.h"
+#include "../Adc/analog.h"
 #include "solenoid.h"
 
 #define ADC_DELAY_MILSEC 200UL
@@ -92,6 +93,10 @@ void ProcessCmd()
         if ( (strcmp_P( command, PSTR("/day?")) == 0) && ( (arg_count == 0 ) ) )
         {
             Day(); // ../DayNight/day_night.c
+        }
+        if ( (strcmp_P( command, PSTR("/analog?")) == 0) && ( (arg_count >= 1 ) && (arg_count <= 5) ) )
+        {
+            Analog(); // ../Adc/analog.c
         }
     }
     else

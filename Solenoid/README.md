@@ -46,6 +46,11 @@ cycles              UINT8           58  78  98
 The [day-night][../DayNight] state machine is used to load and run EEPROM values after the morning debounce. This means the valves will start to cycle after the delay_start time has elapsed each morning.
 
 
+# Flow Sensor
+
+ICP1 is available through the [Capture][../Capture] commands.
+
+
 # Programing
 
 With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
@@ -58,10 +63,10 @@ AVR Memory Usage
 ----------------
 Device: atmega328p
 
-Program:   17114 bytes (52.2% Full)
+Program:   23390 bytes (71.4% Full)
 (.text + .data + .bootloader)
 
-Data:        530 bytes (25.9% Full)
+Data:        694 bytes (33.9% Full)
 (.data + .bss + .noinit)
 ...
 avrdude done.  Thank you.
@@ -244,8 +249,19 @@ Report the solenoid k (1|2|3) runtime in millis.
 {"K3":{"cycle_state":"11","cycles":"9","cycle_millis":"15000"}}
 ``` 
 
-##  [/0/day?][../DayNight#0day]
+## [/0/day?][../DayNight#0day]
 
 
-##  [/0/analog? 0..7[,0..7[,0..7[,0..7[,0..7]]]]][../Adc#0analog-0707070707]
+## [/0/analog? 0..7[,0..7[,0..7[,0..7[,0..7]]]]][../Adc#0analog-0707070707]
 
+
+## [/0/initICP icp1,(rise|fall|both),(0..7)][../Capture#0initicp-icp1risefallboth07]
+
+
+## [/0/count? [icp1]][../Capture#0count-icp1]
+
+
+## [/0/capture? [icp1,1..15]][../Capture#0capture-icp1115]
+
+
+## [/0/event? [icp1,1..31]][../Capture#0event-icp1131]

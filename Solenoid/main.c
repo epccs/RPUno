@@ -22,11 +22,13 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/timers.h"
 #include "../lib/adc.h"
 #include "../lib/twi.h"
+#include "../lib/icp1.h"
 #include "../lib/pin_num.h"
 #include "../lib/pins_board.h"
 #include "../Uart/id.h"
 #include "../DayNight/day_night.h"
 #include "../Adc/analog.h"
+#include "../Capture/capture.h"
 #include "solenoid.h"
 
 #define ADC_DELAY_MILSEC 200UL
@@ -98,6 +100,22 @@ void ProcessCmd()
         {
             Analog(); // ../Adc/analog.c
         }
+        if ( (strcmp_P( command, PSTR("/count?")) == 0) &&  ( (arg_count == 0) || ( (arg_count == 1) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
+        {
+            Count();
+        }
+        if ( (strcmp_P( command, PSTR("/capture?")) == 0) && ( (arg_count == 0 ) || ( (arg_count == 2) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
+        {
+            Capture();
+        }
+        if ( (strcmp_P( command, PSTR("/event?")) == 0) && ( (arg_count == 0 ) || ( (arg_count == 2) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
+        {
+            Event();
+        }
+        if ( (strcmp_P( command, PSTR("/initICP")) == 0) && ( ( (arg_count == 3) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
+        {
+            InitICP();
+        }
     }
     else
     {
@@ -138,6 +156,9 @@ void setup(void)
     // put ADC in Auto Trigger mode and fetch an array of channels
     enable_ADC_auto_conversion(BURST_MODE);
     adc_started_at = millis();
+
+    /* Initialize Input Capture Unit 1 */
+    initIcp1(TRACK_BOTH, ICP1_MCUCLOCK) ;
 
     /* Initialize UART, it returns a pointer to FILE so redirect of stdin and stdout works*/
     stdout = stdin = uartstream0_init(BAUD);

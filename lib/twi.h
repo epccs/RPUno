@@ -36,6 +36,9 @@ Modified in 2016 by Ronald Sutherland (ronald.sutherlad@gmail) to use as a C lib
 #define TWI_MTX   2
 #define TWI_SRX   3
 #define TWI_STX   4
+
+#define TWI_PULLUP 1
+#define TWI_FLOATING 0
   
 void twi_init(uint8_t);
 void twi_disable(void);

@@ -7,6 +7,7 @@ OBJECTS = main.o \
 	../Uart/id.o \
 	$(LIBDIR)/timers.o \
 	$(LIBDIR)/uart.o \
+	$(LIBDIR)/twi.o \
 	$(LIBDIR)/adc.o \
 	$(LIBDIR)/icp_buf.o \
 	$(LIBDIR)/icp1.o \

@@ -52,7 +52,7 @@ void setup(void)
     stdout = stdin = uartstream0_init(BAUD);
     
     /* Initialize I2C, with the internal pull-up*/
-    twi_init(1);
+    twi_init(TWI_PULLUP);
 
     /* Clear and setup the command buffer, (probably not needed at this point) */
     initCommandBuffer();

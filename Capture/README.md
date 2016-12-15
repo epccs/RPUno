@@ -13,31 +13,32 @@ For how I setup my Makefile toolchain <http://epccs.org/indexes/Document/DvlpNot
 With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
 
 ``` 
-rsutherland@straightneck:~/Samba/RPUno/Capture$ make bootload
+rsutherland@conversion:~/Samba/RPUno/Capture$ make bootload
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o main.o main.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o pwm.o pwm.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o capture.o capture.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../Uart/id.o ../Uart/id.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/timers.o ../lib/timers.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/uart.o ../lib/uart.c
+avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/twi.o ../lib/twi.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/adc.o ../lib/adc.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/icp_buf.o ../lib/icp_buf.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/icp1.o ../lib/icp1.c
 avr-gcc -Os -g -std=gnu99 -Wall -ffunction-sections -fdata-sections  -DF_CPU=16000000UL   -DBAUD=115200UL -I.  -mmcu=atmega328p -c -o ../lib/parse.o ../lib/parse.c
-avr-gcc -Wl,-Map,Capture.map  -Wl,--gc-sections  -mmcu=atmega328p main.o pwm.o capture.o ../Uart/id.o ../lib/timers.o ../lib/uart.o ../lib/adc.o ../lib/icp_buf.o ../lib/icp1.o ../lib/parse.o -o Capture.elf
+avr-gcc -Wl,-Map,Capture.map  -Wl,--gc-sections  -mmcu=atmega328p main.o pwm.o capture.o ../Uart/id.o ../lib/timers.o ../lib/uart.o ../lib/twi.o ../lib/adc.o ../lib/icp_buf.o ../lib/icp1.o ../lib/parse.o -o Capture.elf
 avr-size -C --mcu=atmega328p Capture.elf
 AVR Memory Usage
 ----------------
 Device: atmega328p
 
-Program:    8728 bytes (26.6% Full)
+Program:   10134 bytes (30.9% Full)
 (.text + .data + .bootloader)
 
-Data:        403 bytes (19.7% Full)
+Data:        525 bytes (25.6% Full)
 (.data + .bss + .noinit)
 
 
-rm -f Capture.o main.o pwm.o capture.o ../Uart/id.o ../lib/timers.o ../lib/uart.o ../lib/adc.o ../lib/icp_buf.o ../lib/icp1.o ../lib/parse.o
+rm -f Capture.o main.o pwm.o capture.o ../Uart/id.o ../lib/timers.o ../lib/uart.o ../lib/twi.o ../lib/adc.o ../lib/icp_buf.o ../lib/icp1.o ../lib/parse.o
 avr-objcopy -j .text -j .data -O ihex Capture.elf Capture.hex
 rm -f Capture.elf
 avrdude -v -p atmega328p -c arduino -P /dev/ttyUSB0 -b 115200 -U flash:w:Capture.hex
@@ -103,21 +104,21 @@ avrdude: NOTE: "flash" memory has been specified, an erase cycle will be perform
 avrdude: erasing chip
 avrdude: reading input file "Capture.hex"
 avrdude: input file Capture.hex auto detected as Intel Hex
-avrdude: writing flash (8728 bytes):
+avrdude: writing flash (10134 bytes):
 
-Writing | ################################################## | 100% 1.29s
+Writing | ################################################## | 100% 1.44s
 
-avrdude: 8728 bytes of flash written
+avrdude: 10134 bytes of flash written
 avrdude: verifying flash memory against Capture.hex:
 avrdude: load data flash data from input file Capture.hex:
 avrdude: input file Capture.hex auto detected as Intel Hex
-avrdude: input file Capture.hex contains 8728 bytes
+avrdude: input file Capture.hex contains 10134 bytes
 avrdude: reading on-chip flash data:
 
-Reading | ################################################## | 100% 1.03s
+Reading | ################################################## | 100% 1.04s
 
 avrdude: verifying ...
-avrdude: 8728 bytes of flash verified
+avrdude: 10134 bytes of flash verified
 
 avrdude: safemode: hfuse reads as 0
 avrdude: safemode: efuse reads as 0
@@ -149,7 +150,7 @@ Commands are interactive over the serial interface at 115200 baud rate. The echo
 identify 
 
 ``` 
-/0/id?
+/1/id?
 {"id":{"name":"Capture","desc":"RPUno Board /w atmega328p and LT3652","avr-gcc":"4.9"}}
 ```
 
@@ -158,7 +159,7 @@ identify
 Initialize Input Capture ICP1. Set the Input Capture Edge Select mode. Set the prescale (0 = no clock, 1 = MCU clock, 2 = MCU clock/8... see datasheet for others. Note some are not based on the MCU clock)
 
 ``` 
-/0/initICP icp1,both,1
+/1/initICP icp1,both,1
 {"icp1":{"edgSel":"both", "preScalr":"1"}}
 ```
 
@@ -167,7 +168,7 @@ Initialize Input Capture ICP1. Set the Input Capture Edge Select mode. Set the p
 Return count of ICP1 (ATmega328 pin PB0. Uno pin 8) event captures. A zero means icp1 captures are not happening (because I forgot to connect a sensor).
 
 ``` 
-/0/count? icp1
+/1/count? icp1
 {"icp1":{"count":"0"}}
 {"icp1":{"count":"0"}}
 {"icp1":{"count":"0"}}
@@ -188,8 +189,6 @@ return ICP1 timer delta(s) as a pair of low and high timing values from the buff
 {"icp1":{"count":"11969471","low":"1607","high":"348","status":"1"}}
 {"icp1":{"count":"11969469","low":"1603","high":"349","status":"1"}}
 {"icp1":{"count":"11969467","low":"1607","high":"349","status":"1"}}
-
-
 ```
 
 It takes three events to aggregate the data for a capture report. The status reports only the most recent event status since the other two events can be inferred. 
@@ -218,10 +217,6 @@ Pulse width modulation using OC2A (ATmega328 pin PB3. Uno pin 11) or OC2B (ATmeg
 ``` 
 
 # Notes
-
-## Forum thread
-
-<Forum: http://forum.arduino.cc/index.php?topic=260172.0>
 
 ## Pulse Skipping
 

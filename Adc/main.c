@@ -67,7 +67,7 @@ void setup(void)
     
     /* Initialize I2C, with the internal pull-up 
         note: I2C scan will stop without a pull-up on the bus */
-    twi_init(1);
+    twi_init(TWI_PULLUP);
 
     /* Clear and setup the command buffer, (probably not needed at this point) */
     initCommandBuffer();

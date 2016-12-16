@@ -20,7 +20,7 @@ This shows the setup and method used for evaluation of RPUno.
 
 ## ^5 Flow Meter
 
-With the solenoid setup working its time to initialize ICP1 and add [Capture][9] commands to the [Solenoid][6] program, which allows connecting a flow meter to the pulse capture input to see the pulse counts from the flow meter. I have an Adafruit PID:833 meter that has a small turbine and a hall sensor with an open drain output. Each pulse is about 2 milliliters. After the initialization that happens when reset occurs I see over 400 pulses went through each zone (e.g. in 1 second). 
+With the solenoid setup working it is time to initialize ICP1 and add [Capture][9] commands to the [Solenoid][6] program, which allows connecting a flow meter to the pulse capture input to see the pulse counts from the flow meter. I have an Adafruit PID:833 meter that has a small turbine and a hall sensor with an open drain output. Each pulse is about 2 milliliters. After the initialization that happens when reset occurs I see over 400 pulses went through each zone (e.g. in 1 second).
 
 [9]: https://github.com/epccs/RPUno/tree/master/Capture
 
@@ -88,14 +88,13 @@ The Capture program has the capture unit prescale set to the MCU clock speed, so
 {"icp1":{"count":"765","event":"45234","status":"1"}}
 {"icp1":{"count":"764","event":"43767","status":"1"}}
 {"icp1":{"count":"763","event":"42286","status":"1"}}
-
 ```
 
-This is good feedback, each zone has a flow count to show it is working. I have also used this meter on a previous setup and the numbers look reasonable. One thing to note is that as the valve is closed the time between events will cause the 16 bit timer to overflow even with prescale set at MCU clock/64.
+This is good feedback, each zone has a flow count to show it is working. I have also used this meter on a previous setup and the numbers look reasonable. Some things to note. One is that as the valve is closed the time between events will cause the 16-bit timer to overflow for the most recent events (even with prescale set at MCU clock/64). Another is that I have a nasty turbulent flow going through the turbine that spins a magnet and triggers the hall sensor, so the timing has astonishingly high jitter (which indicates issues with pulse interpolation techniques).
 
-After a rebuild and upload. Remember I'm sitting at my desk using an ssh session to a Linux box at my test bench, which is connected to a RPUftdi shield that has a CAT5 cable going out to the RPUno with an RPUadpt shield in the garden... I almost feel like I have a clue what I'm doing (but it fades fast).
+After a rebuild and upload. Remember I'm sitting at my desk using an SSH session to the Linux box on my test bench, which is connected to an RPUftdi shield that has a CAT5 cable going out to the RPUno with an RPUadpt shield in the garden... I almost feel like I have a clue what I'm doing. But it fades fast when I find the board on my bench got the update because I forgot to tell the bus manager which device I wanted to load and thus nuked the i2c-debug program on the bench board that is used to tell the RPUftid bus manager what remote address to load. Clearly, this needs improvements.
 
-I operat the valves maualy by loading settings from the EEPROM and running them. Ten cycles of ten second duration, spread by a 40 second delay between cycles. The delay_start only occures once so that I can start watering when it gets warm. Looks like each zone got over 48 liters (each pulse counts as about 2ml) durring the 100 seconds of activation time (e.g. 10 cycles of 10 seconds).
+I operate the valves manually by loading settings from the EEPROM and running them. Ten cycles of 10 Second duration spread by a 40 Second delay between cycles. The delay_start only occurs once so that I can start the watering cycles later in the day when it gets warm. 
 
 ```
 /1/load 1
@@ -129,7 +128,7 @@ Wait for 10 minutes while it runs
 {"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
 ```
 
-So that is about 34 Liters (9 gallon) to each zone during a 100 second period. The flow_cnt could be calibrated to figure out the flow meter K factor, but that is not a concern yet.
+So that is about 34 Liters (9 gallons) to each zone during a 100 second period. The flow_cnt could be calibrated to figure out the flow meter K factor, but that is not a concern yet.
 
 
 ## ^5 Solenoid FW Operates K3

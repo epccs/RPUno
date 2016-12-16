@@ -255,7 +255,7 @@ Report the solenoid k (1|2|3) runtime in millis.
 ## [/0/analog? 0..7[,0..7[,0..7[,0..7[,0..7]]]]][../Adc#0analog-0707070707]
 
 
-## [/0/initICP icp1,(rise|fall|both),(0..7)][../Capture#0initicp-icp1risefallboth07]
+## [/0/initICP icp1,mode,prescale][../Capture#0initicp-icp1modeprescale]
 
 
 ## [/0/count? [icp1]][../Capture#0count-icp1]

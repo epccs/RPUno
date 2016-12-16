@@ -154,9 +154,9 @@ identify
 {"id":{"name":"Capture","desc":"RPUno Board /w atmega328p and LT3652","avr-gcc":"4.9"}}
 ```
 
-## /0/initICP icp1,(rise|fall|both),(0..7)
+## /0/initICP icp1,mode,prescale
 
-Initialize Input Capture ICP1. Set the Input Capture Edge Select mode. Set the prescale (0 = no clock, 1 = MCU clock, 2 = MCU clock/8... see datasheet for others. Note some are not based on the MCU clock)
+Initialize Input Capture ICP1. Set the Input Capture Edge Select mode: rise, fall, both. Set the prescale: 0 = no clock, 1 = MCU clock, 2 = MCU clock/8, 3 = MCU clock/64, 4 = MCU clock/256, 5 = MCU clock/1024, 6 and 7 are for an external (IO5) clock source (see the datasheet). Note that IO5 is used for SHUTDOWN of the solar charge controler.
 
 ``` 
 /1/initICP icp1,both,1

@@ -157,8 +157,8 @@ void setup(void)
     enable_ADC_auto_conversion(BURST_MODE);
     adc_started_at = millis();
 
-    /* Initialize Input Capture Unit 1 */
-    initIcp1(TRACK_BOTH, ICP1_MCUCLOCK) ;
+    /* Initialize Input Capture Unit (see ../lib/icp1.h) */
+    initIcp1(TRACK_RISING, ICP1_MCUDIV64) ;
 
     /* Initialize UART, it returns a pointer to FILE so redirect of stdin and stdout works*/
     stdout = stdin = uartstream0_init(BAUD);

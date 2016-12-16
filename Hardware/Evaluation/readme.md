@@ -7,6 +7,7 @@ This shows the setup and method used for evaluation of RPUno.
 
 # Table Of Contents:
 
+9. [^5 Flow Meter](#5-flow-meter)
 8. [^5 Solenoid FW Operates K3](#5-solenoid-fw-operates-k3)
 7. [^5 ADC and DIO](#5-adc-and-dio)
 6. [^5 Heat No Longer Problem](#5-heat-no-longer-problem)
@@ -15,6 +16,120 @@ This shows the setup and method used for evaluation of RPUno.
 3. [^2 Log PV_IN and PWR for a day](#2-log-pv_in-and-pwr-for-a-day)
 2. [^2 20mA Loop With Open Collector To ICP1](#2-20ma-loop-with-open-collector-to-icp1)
 1. [^1 Mounting](#1-mounting)
+
+
+## ^5 Flow Meter
+
+With the solenoid setup working its time to initialize ICP1 and add [Capture][9] commands to the [Solenoid][6] program, which allows connecting a flow meter to the pulse capture input to see the pulse counts from the flow meter. I have an Adafruit PID:833 meter that has a small turbine and a hall sensor with an open drain output. Each pulse is about 2 milliliters. After the initialization that happens when reset occurs I see over 400 pulses went through each zone (e.g. in 1 second). 
+
+[9]: https://github.com/epccs/RPUno/tree/master/Capture
+
+![Flow Meter](./RPUno^4+mod_FlowMeter.jpg "Solenoids and Flow Meter")
+
+![RPUno FT/PULSE](./RPUno^4+mod_withCAT5toFlowMeter.jpg "RPUno FT/PULSE")
+
+```
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"405"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"415"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"414"}}
+```
+
+The Capture program has the capture unit prescale set to the MCU clock speed, so that was what I started with for the Solenoid program. The event timing shows the prescale needs set, which will not change the counts only the event times. The status also shows both rising and falling edge was captured, and that is a wake up call... I am counting both events (opps).
+
+```
+/1/event? icp1,6
+{"icp1":{"count":"1643","event":"51796","status":"1"}}
+{"icp1":{"count":"1642","event":"20072","status":"0"}}
+{"icp1":{"count":"1641","event":"8183","status":"1"}}
+{"icp1":{"count":"1640","event":"60309","status":"0"}}
+{"icp1":{"count":"1639","event":"52793","status":"1"}}
+{"icp1":{"count":"1638","event":"53660","status":"0"}}
+/1/initICP icp1,rise,3
+/1/run 1
+{"K1":{"delay_start_sec":"3","runtime_sec":"10","delay_sec":"40","cycles":"10"}}
+/1/stop 1
+{"K1":{"stop_time_sec":"3"}}
+/1/run 1,1
+{"K1":{"delay_start_sec":"1","runtime_sec":"1","delay_sec":"1","cycles":"1"}}
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"244"}}
+/1/event? icp1,31
+{"icp1":{"count":"793","event":"29682","status":"1"}}
+{"icp1":{"count":"792","event":"56369","status":"1"}}
+{"icp1":{"count":"791","event":"40079","status":"1"}}
+{"icp1":{"count":"790","event":"30084","status":"1"}}
+{"icp1":{"count":"789","event":"23288","status":"1"}}
+{"icp1":{"count":"788","event":"18644","status":"1"}}
+{"icp1":{"count":"787","event":"15244","status":"1"}}
+{"icp1":{"count":"786","event":"12683","status":"1"}}
+{"icp1":{"count":"785","event":"10543","status":"1"}}
+{"icp1":{"count":"784","event":"8676","status":"1"}}
+{"icp1":{"count":"783","event":"6931","status":"1"}}
+{"icp1":{"count":"782","event":"5256","status":"1"}}
+{"icp1":{"count":"781","event":"3614","status":"1"}}
+{"icp1":{"count":"780","event":"2017","status":"1"}}
+{"icp1":{"count":"779","event":"432","status":"1"}}
+{"icp1":{"count":"778","event":"64420","status":"1"}}
+{"icp1":{"count":"777","event":"62890","status":"1"}}
+{"icp1":{"count":"776","event":"61391","status":"1"}}
+{"icp1":{"count":"775","event":"59886","status":"1"}}
+{"icp1":{"count":"774","event":"58407","status":"1"}}
+{"icp1":{"count":"773","event":"56932","status":"1"}}
+{"icp1":{"count":"772","event":"55480","status":"1"}}
+{"icp1":{"count":"771","event":"54010","status":"1"}}
+{"icp1":{"count":"770","event":"52560","status":"1"}}
+{"icp1":{"count":"769","event":"51093","status":"1"}}
+{"icp1":{"count":"768","event":"49635","status":"1"}}
+{"icp1":{"count":"767","event":"48173","status":"1"}}
+{"icp1":{"count":"766","event":"46714","status":"1"}}
+{"icp1":{"count":"765","event":"45234","status":"1"}}
+{"icp1":{"count":"764","event":"43767","status":"1"}}
+{"icp1":{"count":"763","event":"42286","status":"1"}}
+
+```
+
+This is good feedback, each zone has a flow count to show it is working. I have also used this meter on a previous setup and the numbers look reasonable. One thing to note is that as the valve is closed the time between events will cause the 16 bit timer to overflow even with prescale set at MCU clock/64.
+
+After a rebuild and upload. Remember I'm sitting at my desk using an ssh session to a Linux box at my test bench, which is connected to a RPUftdi shield that has a CAT5 cable going out to the RPUno with an RPUadpt shield in the garden... I almost feel like I have a clue what I'm doing (but it fades fast).
+
+I operat the valves maualy by loading settings from the EEPROM and running them. Ten cycles of ten second duration, spread by a 40 second delay between cycles. The delay_start only occures once so that I can start watering when it gets warm. Looks like each zone got over 48 liters (each pulse counts as about 2ml) durring the 100 seconds of activation time (e.g. 10 cycles of 10 seconds).
+
+```
+/1/load 1
+{"K1":{"delay_start_sec":"3","runtime_sec":"10","delay_sec":"40","cycles":"10"}}
+/1/run 1
+{"K1":{"delay_start_sec":"3","runtime_sec":"10","delay_sec":"40","cycles":"10"}}
+/1/load 2
+{"K2":{"delay_start_sec":"16","runtime_sec":"10","delay_sec":"40","cycles":"10"}}
+/1/run 2
+{"K2":{"delay_start_sec":"16","runtime_sec":"10","delay_sec":"40","cycles":"10"}}
+/1/load 3
+{"K3":{"delay_start_sec":"29","runtime_sec":"10","delay_sec":"40","cycles":"10"}}
+/1/run 3
+{"K3":{"delay_start_sec":"29","runtime_sec":"10","delay_sec":"40","cycles":"10"}}
+```
+
+Wait for 10 minutes while it runs
+
+```
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"16335"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"17773"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17076"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+```
+
+So that is about 34 Liters (9 gallon) to each zone during a 100 second period. The flow_cnt could be calibrated to figure out the flow meter K factor, but that is not a concern yet.
 
 
 ## ^5 Solenoid FW Operates K3

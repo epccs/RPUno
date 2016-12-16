@@ -1,38 +1,93 @@
-# RPUno has an ATmega328p with on-board solar charge controller
-
-![Status](https://raw.githubusercontent.com/epccs/RPUno/master/Hardware/status_icon.png "Status")
+# RPUno 
 
 From <https://github.com/epccs/RPUno/>
 
 ## Overview
 
-The Board has an easy to use MCU and LT3652 solar charge controller, it does not have USB or an LED.
-
-![Schematic](https://raw.githubusercontent.com/epccs/RPUno/master/Hardware/Documents/14140,Schematic.png "RPUno Schematic")
-
-![Bottom](https://raw.githubusercontent.com/epccs/RPUno/master/Hardware/Documents/14140,Bottom.png "RPUno Board Bottom")
-
-![Top](https://raw.githubusercontent.com/epccs/RPUno/master/Hardware/Documents/14140,Top.png "RPUno Board Top")
+The Board has an easy to use ATmega328p and LT3652 solar charge controller, it does not have USB or an LED.
 
 [Forum](http://rpubus.org/bb/viewforum.php?f=6)
 
 [HackaDay](https://hackaday.io/project/12784-rpuno)
 
+[OSHpark](https://oshpark.com/shared_projects/84emcdT8)
+
+[1]: ./i2c-debug
+[2]: https://github.com/epccs/RPUftdi
+[3]: https://github.com/epccs/RPUadpt
+
+## Status
+
+![Status](https://raw.githubusercontent.com/epccs/RPUno/master/Hardware/status_icon.png "Status")
+
+## [Hardware](./Hardware)
+
+Hardware files are in Eagle, there is also some testing, evaluation, and schooling notes for referance.
+
 ## Example with RPU BUS (RS-422)
 
-A wired serial bus that allows multiple microcontroller boards to be connected to a host port. An RPUftdi shield is on one of the MCU boards near the host computer (USB can be run for 2 or 3 meters). The other boards use an RPUadpt shield and are connected as a daisy-chain up to perhaps 1000 meters. 
+A wired serial bus that allows multiple microcontroller boards to be connected to a host port. An [RPUftdi][2] shield is on one of the MCU boards near the host computer (USB cable can only be run for 2 or 3 meters). The other boards use an [RPUadpt][3] shield and are connected as a daisy-chain up to perhaps 1000 meters. 
 
 ![MultiDrop](https://raw.githubusercontent.com/epccs/RPUno/master/Hardware/Documents/MultiDrop.png "RPUno MultiDrop")
 
-Wired connections are inherently secure. However, if the host provides a raw connection (e.g. telnet, or a raw console server) any chance of security will be compromised. I use SSH to the host for remote access and run picocom within the SSH session. SSL options could also work but they will fail when the upstream network is down. The problem with OpenWrt devices (e.g. Yun) is they end up having to expose a raw serial terminal to the AVR since they are too dumb to run the AVR toolchain and must offload the task of building and uploading firmware. A Pi Zero can run the toolchain within its environment and when connected instead of an OpenWrt device the raw serial terminal need not be exposed on the network as the Pi can build and upload firmware directly (just like a host computer on RPUftdi). 
+I prefer a Command Line Interface (CLI), so that is what these examples use. The CLI is programmed to respond to commands terminated with a newline, so remember to press enter (which sends a newline) before starting a command. The command includes an address with a leading and trailing forward slash "/". The command echo starts after the address (second byte) is sent. The first byte will cause any transmitting device to stop and dump its outgoing buffer which should prevent collisions with the delayed echo. 
+
+As a short example, I'll connect with SSH (e.g. from a Pi) to the machine (an old x86 with Ubuntu) that has a USB connection to the [RPUftdi][2] board. These machines have matching usernames and keys placed so I don't need to use passwords. Then I will use picocom to interact with the RPU_BUS. There are two boards on the serial bus one is at address '1' the other at address '0'.  
+
+```
+rsutherland@raspberrypi:~ $ ssh conversion.local
+Welcome to Ubuntu 16.04.1 LTS (GNU/Linux 4.4.0-53-generic i686)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+0 packages can be updated.
+0 updates are security updates.
+
+Last login: Fri Dec 16 12:59:33 2016 from 192.168.1.172
+rsutherland@conversion:~$ picocom -b 115200 /dev/ttyUSB0
+picocom v1.7
+
+port is        : /dev/ttyUSB0
+flowcontrol    : none
+baudrate is    : 115200
+parity is      : none
+databits are   : 8
+escape is      : C-a
+local echo is  : no
+noinit is      : no
+noreset is     : no
+nolock is      : no
+send_cmd is    : sz -vv
+receive_cmd is : rz -vv
+imap is        :
+omap is        :
+emap is        : crcrlf,delbs,
+
+Terminal ready
+/1/id?
+{"id":{"name":"Solenoid","desc":"RPUno Board /w atmega328p and LT3652","avr-gcc":"4.9"}}
+/0/id?
+{"id":{"name":"I2Cdebug","desc":"RPUno Board /w atmega328p and LT3652","avr-gcc":"4.9"}}
+Ctrl-a,Ctrl-x 
+Thanks for using picocom
+```
+
+At present, I'm using [I2Cdebug][1] to set the bus manager on the [RPUftdi][2] shield, it needs to know which address to reset so that it can lockout the others during bootload. Solenoid is the star of the show (so far), it is an attempt to control latching irrigation valves with cycles (inspired by Vinduino) and start the cycle at a daylight based offset, flow sensing for each zone is also working.  
 
 ## AVR toolchain
 
-The core files are in the /lib folder while each example has its own Makefile.
+The core files for this board are in the /lib folder. Each example has its files and a Makefile in its own folder. The toolchain packages that I use are available on Ubuntu and Raspbian. 
 
     * sudo apt-get install [gcc-avr](http://packages.ubuntu.com/search?keywords=gcc-avr)
     * sudo apt-get install [binutils-avr](http://packages.ubuntu.com/search?keywords=binutils-avr)
     * sudo apt-get install [gdb-avr](http://packages.ubuntu.com/search?keywords=gdb-avr)
     * sudo apt-get install [avr-libc](http://packages.ubuntu.com/search?keywords=avr-libc)
     * sudo apt-get install [avrdude](http://packages.ubuntu.com/search?keywords=avrdude)
-    
+
+I am not a software developer (more of a hardware type), I started with the Arduino IDE and an Uno board and man was it easy to do cool stuff, unfortunately, when I tried to do my own board it was more pain than gain. I look at Hack-a-day often (it has better noise) and noticed some of Elliot Williams articles "Makefile Madness", and that was sort of a turning point. Makefiles for simple projects don't need to complicated? Wait can I do that? Nice, that is way less pain, and hold on it works on the Pi or the old Linux machine at my bench which I started using to limit exposure to damage from my hardware mistakes. 
+
+[Makefile Madness](http://hackaday.com/2016/03/11/embed-with-elliot-march-makefile-madness/)
+
+

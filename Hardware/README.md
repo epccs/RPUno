@@ -55,6 +55,11 @@ Bootloader options include [optiboot][1] and [xboot][2]. Uploading through a boo
 ![Status](./status_icon.png "RPUno Status")
 
 ```
+        ^6  Done:  
+            WIP: Design, (ADC6 to Anode)
+            Todo: Layout, BOM, Review*, Order Boards, Assembly, Testing, Evaluation.
+            *during review the Design may change without changing the revision.
+
         ^5 Done: Design, Layout, BOM, Review*, Order Boards, Assembly, Testing,
             WIP: Evaluation
             Todo: 

@@ -249,19 +249,19 @@ Report the solenoid k (1|2|3) runtime in millis.
 {"K3":{"cycle_state":"11","cycles":"9","cycle_millis":"15000"}}
 ``` 
 
-## [/0/day?][../DayNight#0day]
+## [/0/day?](../DayNight#0day)
 
 
-## [/0/analog? 0..7[,0..7[,0..7[,0..7[,0..7]]]]][../Adc#0analog-0707070707]
+## [/0/analog? 0..7[,0..7[,0..7[,0..7[,0..7]]]]](../Adc#0analog-0707070707)
 
 
-## [/0/initICP icp1,mode,prescale][../Capture#0initicp-icp1modeprescale]
+## [/0/initICP icp1,mode,prescale](../Capture#0initicp-icp1modeprescale)
 
 
-## [/0/count? [icp1]][../Capture#0count-icp1]
+## [/0/count? [icp1]](../Capture#0count-icp1)
 
 
-## [/0/capture? [icp1,1..15]][../Capture#0capture-icp1115]
+## [/0/capture? [icp1,1..15]](../Capture#0capture-icp1115)
 
 
-## [/0/event? [icp1,1..31]][../Capture#0event-icp1131]
+## [/0/event? [icp1,1..31]](../Capture#0event-icp1131)

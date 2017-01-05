@@ -152,7 +152,7 @@ identify
 
 ## /0/scan?
 
-Scan of I2C bus shows all 7 bit devices found. I have a PCA9554 at 0x38 and an 24C02AN eeprom at 0x50.  
+Scan of I2C bus shows all 7 bit devices found. I have a PCA9554 at 0x38 and an 24C02AN eeprom at 0x50.
 
 ``` 
 /0/scan?
@@ -261,8 +261,7 @@ Command 0xE3 measures temperature, the clock is streached until data is ready.
 {"rxBuffer":[{"data":"0x6A"},{"data":"0xC"},{"data":"0xC6"}]}
 ``` 
 
-The first two bytes are the temperature data. The last two bits of LSB are status (ignore or mask them off). Some Python gives the result in
-°C.
+The first two bytes are the temperature data. The last two bits of LSB are status (ignore or mask them off). Some Python gives the result in deg C.
 
 ``` 
 Stmp = 0x6A0C
@@ -282,8 +281,7 @@ Command 0xE5 measures humidity, again the clock is streached until data is ready
 {"rxBuffer":[{"data":"0x65"},{"data":"0x96"},{"data":"0xBC"}]}
 ``` 
 
-The first two bytes are the temperature data. The last two bits of LSB are status (ignore or mask them off). Some Python gives the result in
-°C.
+The first two bytes are the temperature data. The last two bits of LSB are status (ignore or mask them off). Some Python gives the result in deg C.
 
 ``` 
 Stmp = 0x6596 & 0xFFFC

@@ -7,6 +7,7 @@ This shows the setup and method used for evaluation of RPUno.
 
 # Table Of Contents:
 
+10. [^5 Day Night](#5-day-night)
 9. [^5 Flow Meter](#5-flow-meter)
 8. [^5 Solenoid FW Operates K3](#5-solenoid-fw-operates-k3)
 7. [^5 ADC and DIO](#5-adc-and-dio)
@@ -18,11 +19,141 @@ This shows the setup and method used for evaluation of RPUno.
 1. [^1 Mounting](#1-mounting)
 
 
+## ^5 Day Night
+
+A [Day-Night] state machine with a callback that is run after the morning debounce. [Solenoid] has been changed to use the callback to load the saved solenoid settings (same as Flow Meter evaluation) and starting solenoid valve control state machine. What follows is a log from some different days while I've let the RPUno loaded with the Solenoid program do its thing. The date and times are when I used picocom to log the data.
+
+[Day-Night]: https://github.com/epccs/RPUno/tree/master/Capture
+
+```
+12/17/2016:11:22AM 
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"15568"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"17315"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17259"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"13.36","PV_V":"16.08","DISCHRG_A":"0.000","CHRG_A":"0.096"}
+
+12/18/2016:10:41AM shadow on PV
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"15342"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"17173"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17205"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.96","PV_V":"16.03","DISCHRG_A":"0.000","CHRG_A":"0.024"}
+
+12/20/2016: equalizing charge (using a car battery) also fixed a water line kink on K1
+
+12/20/2016:12:23PM high clouds
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17349"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"17635"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17373"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"13.24","PV_V":"15.72","DISCHRG_A":"0.000","CHRG_A":"0.065"}
+
+12/21/2016:13:02PM clouds and some rain
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17576"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18042"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17774"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.66","PV_V":"16.70","DISCHRG_A":"0.033","CHRG_A":"0.000"}
+
+
+12/23/2016:13:02PM clouds and rain
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17569"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18146"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17875"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.58","PV_V":"17.33","DISCHRG_A":"0.050","CHRG_A":"0.000"}
+
+12/26/2016:17:07PM sunny all day
+/1/flow? 1
+"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17370"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"17819"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17811"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.64","PV_V":"12.55","DISCHRG_A":"0.049","CHRG_A":"0.000"}
+
+12/27/2016:12:51AM sunny 
+# equalizing charge needed (still using a car battery) last night so no flow data today. 
+# I removed the charger in the morning, and after a few hours see it is floating (good).
+/1/analog? 7,6,3,2
+{"PWR_V":"13.56","PV_V":"19.04","DISCHRG_A":"0.000","CHRG_A":"0.023"}
+
+12/28/2016:17:07PM cloudy
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17516"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"17929"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17815"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.80","PV_V":"16.63","DISCHRG_A":"0.011","CHRG_A":"0.000"}
+```
+
+
 ## ^5 Flow Meter
 
-With the solenoid setup working it is time to initialize ICP1 and add [Capture][9] commands to the [Solenoid][6] program, which allows connecting a flow meter to the pulse capture input to see the pulse counts from the flow meter. I have an Adafruit PID:833 meter that has a small turbine and a hall sensor with an open drain output. Each pulse is about 2 milliliters. After the initialization that happens when reset occurs I see over 400 pulses went through each zone (e.g. in 1 second).
+With the solenoid setup working it is time to initialize ICP1 and add [Capture] commands to the [Solenoid] program, which allows connecting a flow meter to the pulse capture input to see the pulse counts from the flow meter. I have an Adafruit PID:833 meter that has a small turbine and a hall sensor with an open drain output. Each pulse is about 2 milliliters. After the initialization that happens when reset occurs I see over 400 pulses went through each zone (e.g. in 1 second).
 
-[9]: https://github.com/epccs/RPUno/tree/master/Capture
+[Capture]: https://github.com/epccs/RPUno/tree/master/Capture
 
 ![Flow Meter](./RPUno^4+mod_FlowMeter.jpg "Solenoids and Flow Meter")
 
@@ -133,31 +264,31 @@ So that is about 34 Liters (9 gallons) to each zone during a 100 second period. 
 
 ## ^5 Solenoid FW Operates K3
 
-An interactive Command Line Interface for [Solenoid][6] control is wired to LED's to see its function. In my [reset all video][7] each solenoid is cycled twice (opps), but the logic control is working. After connecting the K3 board I fixed the control program so it cycles each solenoid once as seen when [RPUno with K3 video][8] is seen. 
+An interactive Command Line Interface for [Solenoid] control is wired to LED's to see its function. In my [reset all video] each solenoid is cycled twice (opps), but the logic control is working. After connecting the K3 board I fixed the control program so it cycles each solenoid once as seen when [RPUno with K3 video] is seen. 
     
-[6]: https://github.com/epccs/RPUno/tree/master/Solenoid
-[7]: http://rpubus.org/Video/14140%5E5_SolenoidResetAllLogic.mp4
-[8]: http://rpubus.org/Video/14140%5E5WithK3%5E0.mp4
+[Solenoid]: https://github.com/epccs/RPUno/tree/master/Solenoid
+[reset all video]: http://rpubus.org/Video/14140%5E5_SolenoidResetAllLogic.mp4
+[RPUno with K3 video]: http://rpubus.org/Video/14140%5E5WithK3%5E0.mp4
 
 ![Solenoid Testing](./RPUno^5_SolenoidResetAllTesting.jpg "Solenoid Reset All Testing")
 
 ![RPUno With K3](./RPUno^5WithK3^0.jpg "RPUno With K3")
 
-Update1: Added more options to the [Solenoid][6] program that save/load settings to/from EEPROM and connected some of Orbits (58874N) latching valves (which work for me with a 24V 50 mSec pulse). Have a look at the [video of RPUno (modified ^4) with K3 controlling some latching valves][9].
+Update1: Added more options to the [Solenoid] program that save/load settings to/from EEPROM and connected some of Orbits (58874N) latching valves (which work for me with a 24V 50 mSec pulse). Have a look at the [video of RPUno (modified ^4) with K3 controlling some latching valves].
 
-[9]: http://rpubus.org/Video/14140%5E4_K3%5E0_WithLatchingValves.mp4
+[video of RPUno (modified ^4) with K3 controlling some latching valves]: http://rpubus.org/Video/14140%5E4_K3%5E0_WithLatchingValves.mp4
 
 ![K3 RPUno with Valves](./RPUno^4+mod_K3^0_wLatchingValves.jpg "RPUno and K3 with Latching Valves")
 
-Update2: Added day/night state machine to the [Solenoid][6] program, which loads saved settings from EEPROM after a morning (debounce) at the start of each day, and starts their operation. 
+Update2: Added day/night state machine to the [Solenoid] program, which loads saved settings from EEPROM after a morning (debounce) at the start of each day, and starts their operation. 
 
 
 ## ^5 ADC and DIO
 
-Interactive Command Line Interface for [Analog][4] updated, and for [Digital][5] created. 
+Interactive Command Line Interface for [Analog] updated, and for [Digital] created. 
 
-[4]: https://github.com/epccs/RPUno/tree/master/Adc
-[5]: https://github.com/epccs/RPUno/tree/master/Digital
+[Analog]: https://github.com/epccs/RPUno/tree/master/Adc
+[Digital]: https://github.com/epccs/RPUno/tree/master/Digital
 
 ![Digital and Analog](./RPUno^5_DioAdc.jpg "Digital and Analog")
 
@@ -192,9 +323,9 @@ CCtest^0 boad is wired to RPUadpt^1 board
 
 ![CCtest Wiring](./14140^2_WithSLP003andCCtestWiring.jpg "CCtest Wiring")
 
-Using an interactive command line [CCtest firmware][3] to log the charge control and load test. I'm not happy with how the test works. I started the test in the evening when the PV was bellow 18V, so I connected a 24V wall wart. I had to keep it connected to hold the input above 18V or the load stepping stops. It stopped at step 9 after I unplugged the wall wart and considered what had happened and if I needed to start over. I need to improve the test, and then everything bellow will get updated... anyway, the data is still interesting.
+Using an interactive command line [CCtest] firmware to log the charge control and load test. I'm not happy with how the test works. I started the test in the evening when the PV was bellow 18V, so I connected a 24V wall wart. I had to keep it connected to hold the input above 18V or the load stepping stops. It stopped at step 9 after I unplugged the wall wart and considered what had happened and if I needed to start over. I need to improve the test, and then everything bellow will get updated... anyway, the data is still interesting.
 
-[3]: https://github.com/epccs/RPUno/tree/master/CCtest
+[CCtest]: https://github.com/epccs/RPUno/tree/master/CCtest
 
  The data that follows was recorded in a terminal session:
 
@@ -236,9 +367,7 @@ Using an interactive command line [CCtest firmware][3] to log the charge control
 {"PV_A":"0.105","CHRG_A":"0.234","PV_V":"17.14","PWR_V":"6.69","TIME":"66661628","LD":"0"}
 ```
 
-The time is from the millis() function. I sent a carriage return to stop the load because I want to see how it charged after that. It switches to float slowly, so I need to see that better. Loaded [Adc firmware][2].
-
-[2]: https://github.com/epccs/RPUno/tree/master/Adc
+The time is from the millis() function. I sent a carriage return to stop the load because I want to see how it charged after that. It switches to float slowly, so I need to see that better. Loaded [Adc] firmware.
 
 This shows 20Sec intervals of what the ATmega328 ADC can see as the charge control  (LT3652) switches from bulk charge to float charge.
 
@@ -272,9 +401,9 @@ Inside the box an RPUadpt board is setup for point to point and connected to a l
 
 ![Setup Day Log Box](./14140^2_ADC60SecIntervalSetupBox.jpg "Log for day Setup Box")
 
-Using an interactive command line program to log the solar input voltage (PV_IN) and the battery voltage (PWR). The interval between reading is 60 seconds, which was set in the [Adc Firmware][1]. The raw data was recorded in a terminal session:
+Using an interactive command line program to log the solar input voltage (PV_IN) and the battery voltage (PWR). The interval between reading is 60 seconds, which was set in the [Adc]. The raw data was recorded in a terminal session:
 
-[1]: https://github.com/epccs/RPUno/tree/master/Adc
+[Adc]: https://github.com/epccs/RPUno/tree/master/Adc
 
 ```
  rsutherland@straightneck:~/Samba/RPUno/Adc$ script -f -c "picocom -b 115200 /dev/ttyUSB0" [14140^2_ADC60SecInterval.log](./14140^2_ADC60SecInterval.log)

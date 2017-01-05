@@ -64,9 +64,22 @@
 // RPUno board has no led but this is the normal place it would be found
 #define LED_BUILTIN 13 
 
-// UART on RPUno is for serial communication (you should never use these pins)
+// UART on RPUno is for serial communication (never use these pins)
 #define RX0 0 
 #define TX0 1
+
+// VIN  pin shield power control
+#define VIN_POWER 2
+
+// Charge Controler (note use a weak pull up with CC_FAULT to read fault state) 
+#define CC_SHUTDOWN 5
+#define CC_FAULT 7
+
+// Battery Control
+#define BAT_DISCONNECT 6
+
+// FT/Pulse current source control
+#define FT_POWER 9
 
 // SPI on RPUno
 #define nSS 10 

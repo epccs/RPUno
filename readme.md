@@ -80,13 +80,19 @@ At present, I'm using [I2Cdebug][1] to set the bus manager on the [RPUftdi][2] s
 
 The core files for this board are in the /lib folder. Each example has its files and a Makefile in its own folder. The toolchain packages that I use are available on Ubuntu and Raspbian. 
 
-    * sudo apt-get install [gcc-avr](http://packages.ubuntu.com/search?keywords=gcc-avr)
-    * sudo apt-get install [binutils-avr](http://packages.ubuntu.com/search?keywords=binutils-avr)
-    * sudo apt-get install [gdb-avr](http://packages.ubuntu.com/search?keywords=gdb-avr)
-    * sudo apt-get install [avr-libc](http://packages.ubuntu.com/search?keywords=avr-libc)
-    * sudo apt-get install [avrdude](http://packages.ubuntu.com/search?keywords=avrdude)
+* sudo apt-get install [gcc-avr]
+* sudo apt-get install [binutils-avr]
+* sudo apt-get install [gdb-avr]
+* sudo apt-get install [avr-libc]
+* sudo apt-get install [avrdude]
+    
+[gcc-avr]: http://packages.ubuntu.com/search?keywords=gcc-avr
+[binutils-avr]: http://packages.ubuntu.com/search?keywords=binutils-avr
+[gdb-avr]: http://packages.ubuntu.com/search?keywords=gdb-avr
+[avr-libc]: http://packages.ubuntu.com/search?keywords=avr-libc
+[avrdude]: http://packages.ubuntu.com/search?keywords=avrdude
 
-I am not a software developer (more of a hardware type), I started with the Arduino IDE and an Uno board and man was it easy to do cool stuff, unfortunately, when I tried to do my own board it was more pain than gain. I look at Hack-a-day often (it has better noise) and noticed some of Elliot Williams articles "Makefile Madness", and that was sort of a turning point. Makefiles for simple projects don't need to complicated? Wait can I do that? Nice, that is way less pain, and hold on it works on the Pi or the old Linux machine at my bench which I started using to limit exposure to damage from my hardware mistakes. 
+I am not a software developer (more of a hardware type), I started with the Arduino IDE and an Uno board and man was it easy to do cool stuff, unfortunately, when I tried to do my own board it was more pain than gain. I look at Hack-a-day often (it has better noise) and noticed some of Elliot Williams articles "Makefile Madness", and that was sort of a turning point. Makefiles for simple projects don't need to be complicated? Wait can I do that? Nice, that is way less pain, and hold on it works on the Pi or the old Linux machine at my bench which I started using to limit exposure to damage from my hardware mistakes. 
 
 [Makefile Madness](http://hackaday.com/2016/03/11/embed-with-elliot-march-makefile-madness/)
 

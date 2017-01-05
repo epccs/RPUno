@@ -69,9 +69,9 @@ Bootloader options include [optiboot][1] and [xboot][2]. Uploading through a boo
             CC shutdown thermistor has a header so the board can run at over 40 C, but shutdown when enclosure is over 40 C.
 ```
 
-Debugging and fixing problems i.e. [Schooling] [./Schooling/].
+Debugging and fixing problems i.e. [Schooling](./Schooling/)
 
-Setup and methods used for [Evaluation] [./Evaluation/]
+Setup and methods used for [Evaluation](./Evaluation/)
 
 
 # Design
@@ -79,7 +79,9 @@ Setup and methods used for [Evaluation] [./Evaluation/]
 The board is 0.063 thick, FR4, two layer, 1 oz copper with ENIG (gold) finish.
 
 ![Top](./Documents/14140,Top.png "RPUno Top")
+![TAssy](./Documents/14140,TAssy.jpg "RPUno Top Assy")
 ![Bottom](./Documents/14140,Bottom.png "RPUno Bottom")
+![BAssy](./Documents/14140,BAssy.jpg "RPUno Bottom Assy")
 
 ## Electrical Parameters (Typical)
 
@@ -124,7 +126,7 @@ Check correct assembly and function with [Testing] [./Testing/]
 
 # Bill of Materials
 
-Import the [BOM][./Design/14140,BOM.csv] into LibreOffice Calc (or Excel) with semicolon separated values, or use a text editor.
+Import the [BOM](./Design/14140,BOM.csv) into LibreOffice Calc (or Excel) with semicolon separated values, or use a text editor.
 
 
 # How To Use

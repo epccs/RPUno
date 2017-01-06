@@ -21,6 +21,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/uart.h"
 #include "../lib/parse.h"
 #include "../lib/twi.h"
+#include "../lib/rpu_mgr.h"
 #include "../lib/pin_num.h"
 #include "../lib/pins_board.h"
 #include "id.h"

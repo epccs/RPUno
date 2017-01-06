@@ -1,0 +1,195 @@
+/*
+digital is part of Digital, it is a serial command interface to some digital Wiring like functions, 
+Copyright (C) 2016 Ronald Sutherland
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+For a copy of the GNU General Public License use
+http://www.gnu.org/licenses/gpl-2.0.html
+*/
+#include <avr/pgmspace.h>
+#include <util/atomic.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <stdbool.h>
+#include "../lib/parse.h"
+#include "../lib/adc.h"
+#include "../lib/timers.h"
+#include "../lib/twi.h"
+#include "../lib/rpu_mgr.h"
+#include "../lib/pin_num.h"
+#include "../lib/pins_board.h"
+#include "power.h"
+
+#define RPU_BUS_MSTR_CMD_SZ 2
+
+// Use integers at 10 uAmps per count, e.g. 7000 is 70mA
+#define DISCHRG_I_10uA_CNT_AFTER_HAULT 7000L
+
+#define SERIAL_PRINT_DELAY_MILSEC 10000
+static unsigned long serial_print_started_at;
+
+#define HAULT_DELAY_MILSEC 30000UL
+static unsigned long hault_started_at;
+
+#define WEARLEVEL_CHECK_MILSEC 1000UL
+static unsigned long wearlevel_check_started_at;
+
+#define WEARLEVEL_CHECKS 5
+static uint8_t stable_means_notwearleveling;
+static int last_wearlevel;
+
+void VinPwr(void)
+{
+    if ( (command_done == 10) )
+    {
+        // check arg[0] is not ('UP' or 'DOWN')
+        if ( !( (strcmp_P( arg[0], PSTR("UP")) == 0) || (strcmp_P( arg[0], PSTR("DOWN")) == 0) ) ) 
+        {
+            printf_P(PSTR("{\"err\":\"VinNaMode\"}\r\n"));
+            initCommandBuffer();
+            return;
+        }
+        serial_print_started_at = millis();
+        if (strcmp_P( arg[1], PSTR("UP")) == 0 ) 
+        {
+            digitalWrite(VIN_POWER,HIGH);
+            pinMode(VIN_POWER, OUTPUT);
+            printf_P(PSTR("{\"VIN\":\"UP\"}\r\n"));
+            initCommandBuffer();
+        }
+        else
+        {
+            // turn off the charge control
+            digitalWrite(CC_SHUTDOWN,HIGH);
+            pinMode(CC_SHUTDOWN, OUTPUT);
+            printf_P(PSTR("{\"VIN\":\"CCSHUTDOWN\"}\r\n"));
+            command_done = 11;
+        }
+    }
+    else if ( (command_done == 11) )
+    {  
+        set_Rpu_shutdown();
+        if ( detect_Rpu_shutdown() ) // it should not detect until after the ICP1 pin retruns to being a weak pull-up.
+        {
+            printf_P(PSTR("{\"VIN\":\"I2CHAULT\"}\r\n"));
+            command_done = 12;
+        }
+    }
+    else if ( (command_done == 12) )
+    {
+        // check that discharge current is less than the hault threshold
+        // adc_output = analogRead(DISCHRG_I) is a value from 0 to 1023
+        // Discharge_10uA_Cnt =  adc_output * 100000*(5.0/1024.0)/(0.068*50.0) 
+        // which is to say each adc count has a value of about 144 * 10uA  or 1.44mA
+        long Discharge_10uA_Cnt = analogRead(DISCHRG_I) * 144;
+        if (Discharge_10uA_Cnt < DISCHRG_I_10uA_CNT_AFTER_HAULT)
+        {
+            // If 70mA is accepted as the hault value, then the adc needs to be less than 49
+            printf_P(PSTR("{\"VIN\":\"ATHAULTCURR\"}\r\n"));
+            hault_started_at = millis();
+            command_done = 13;
+        }
+    }
+    else if ( (command_done == 13) )
+    {
+        // wait for some time befor checking for ware leveling
+        unsigned long kRuntime= millis() - hault_started_at;
+        if ((kRuntime) > ((unsigned long)HAULT_DELAY_MILSEC))
+        {
+            printf_P(PSTR("{\"VIN\":\"DELAY\"}\r\n"));
+            last_wearlevel = 0;
+            command_done = 14; /* This keeps looping output forever (until a Rx char anyway) */
+        }
+    }
+    else if ( (command_done == 14) )
+    {
+        // check that discharge current is less than the hault threshold and has been stable for a few readings
+        if (! last_wearlevel)
+        {
+            last_wearlevel = analogRead(DISCHRG_I);
+            wearlevel_check_started_at = millis();
+        }
+        else
+        {
+            unsigned long kRuntime= millis() - wearlevel_check_started_at;
+            if ((kRuntime) > ((unsigned long)WEARLEVEL_CHECK_MILSEC))
+            {
+                int new_wearlevel = analogRead(DISCHRG_I);
+                printf_P(PSTR("{\"VIN\":\"adc %d\"}\r\n"),new_wearlevel);
+                if ( (new_wearlevel < (last_wearlevel + 2) ) && (new_wearlevel > (last_wearlevel - 2) ) )
+                {
+                    stable_means_notwearleveling +=1;
+                    if (stable_means_notwearleveling > WEARLEVEL_CHECKS)
+                    {
+                        printf_P(PSTR("{\"VIN\":\"WEARLEVELINGCLEAR\"}\r\n"));
+                        command_done = 15;
+                    }
+                }
+                else
+                {
+                    last_wearlevel = new_wearlevel;
+                    stable_means_notwearleveling = 0;
+                }
+                wearlevel_check_started_at = millis();
+            }
+        }
+    }
+    else if ( (command_done == 15) )
+    {
+        digitalWrite(VIN_POWER,LOW);
+        pinMode(VIN_POWER, OUTPUT);
+        printf_P(PSTR("{\"VIN\":\"DOWN\"}\r\n"));
+        digitalWrite(CC_SHUTDOWN,LOW);
+        pinMode(CC_SHUTDOWN, OUTPUT);
+        initCommandBuffer();
+    }
+    else
+    {
+        printf_P(PSTR("{\"err\":\"VinCmdDnWTF\"}\r\n"));
+        initCommandBuffer();
+    }
+}
+
+void PulseLoopPwr(void)
+{
+    if ( (command_done == 10) )
+    {
+        // check arg[0] is not ('UP' or 'DOWN')
+        if ( !( (strcmp_P( arg[0], PSTR("UP")) == 0) || (strcmp_P( arg[0], PSTR("DOWN")) == 0) ) ) 
+        {
+            printf_P(PSTR("{\"err\":\"FTNaMode\"}\r\n"));
+            initCommandBuffer();
+            return;
+        }
+        serial_print_started_at = millis();
+        if (strcmp_P( arg[1], PSTR("UP")) == 0 ) 
+        {
+            digitalWrite(FT_POWER,HIGH);
+            pinMode(FT_POWER, OUTPUT);
+            printf_P(PSTR("{\"FT\":\"UP\"}\r\n"));
+            initCommandBuffer();
+        }
+        else
+        {
+            digitalWrite(FT_POWER,LOW);
+            pinMode(FT_POWER, OUTPUT);
+            printf_P(PSTR("{\"FT\":\"DOWN\"}\r\n"));
+            initCommandBuffer();
+        }
+    }
+    else
+    {
+        printf_P(PSTR("{\"err\":\"FTCmdDnWTF\"}\r\n"));
+        initCommandBuffer();
+    }
+}

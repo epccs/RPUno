@@ -17,16 +17,21 @@ http://www.gnu.org/licenses/gpl-2.0.html
 */
 #include <avr/pgmspace.h>
 #include <util/atomic.h>
+#include "../lib/timers.h"
 #include "../lib/uart.h"
 #include "../lib/parse.h"
-#include "../lib/timers.h"
+#include "../lib/adc.h"
 #include "../lib/twi.h"
 #include "../lib/rpu_mgr.h"
 #include "../lib/pin_num.h"
 #include "../lib/pins_board.h"
 #include "../Uart/id.h"
-#include "digital.h"
+#include "../Adc/analog.h"
+#include "power.h"
 
+// running the ADC burns some power, which can be reduced by delaying its use
+#define ADC_DELAY_MILSEC 200UL
+static unsigned long adc_started_at;
 #define BLINK_DELAY 1000UL
 static unsigned long blink_started_at;
 static unsigned long blink_delay;
@@ -36,23 +41,19 @@ void ProcessCmd()
 { 
     if ( (strcmp_P( command, PSTR("/id?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
     {
-        Id("Digital");
+        Id("PwrMgt");
     }
-    if ( (strcmp_P( command, PSTR("/pinMode")) == 0) && ( (arg_count == 2 ) ) )
+    if ( (strcmp_P( command, PSTR("/vin")) == 0) && ( (arg_count == 1 ) ) )
     {
-        Mode();
+        VinPwr();
     }
-    if ( (strcmp_P( command, PSTR("/digitalWrite")) == 0) && ( (arg_count == 2 ) ) )
+    if ( (strcmp_P( command, PSTR("/pulseloop")) == 0) && ( (arg_count == 1 ) ) )
     {
-        Write();
+        PulseLoopPwr();
     }
-    if ( (strcmp_P( command, PSTR("/digitalToggle")) == 0) && ( (arg_count == 1 ) ) )
+    if ( (strcmp_P( command, PSTR("/analog?")) == 0) && ( (arg_count >= 1 ) && (arg_count <= 5) ) )
     {
-        Toggle();
-    }
-    if ( (strcmp_P( command, PSTR("/digitalRead?")) == 0) && ( (arg_count == 1 ) ) )
-    {
-        Read();
+        Analog();
     }
 }
 
@@ -64,7 +65,12 @@ void setup(void)
     
     // Initialize Timers and clear bootloader, Arduino does these with init() in wiring.c
     initTimers(); //Timer0 Fast PWM mode, Timer1 & Timer2 Phase Correct PWM mode.
+    init_ADC_single_conversion(EXTERNAL_AVCC); // warning AREF must not be connected to anything
     init_uart0_after_bootloader(); // bootloader may have the UART setup
+
+    // put ADC in Auto Trigger mode and fetch an array of channels
+    enable_ADC_auto_conversion(BURST_MODE);
+    adc_started_at = millis();
 
     /* Initialize UART, it returns a pointer to FILE so redirect of stdin and stdout works*/
     stdout = stdin = uartstream0_init(BAUD);
@@ -103,6 +109,16 @@ void blink(void)
     }
 }
 
+void adc_burst(void)
+{
+    unsigned long kRuntime= millis() - adc_started_at;
+    if ((kRuntime) > ((unsigned long)ADC_DELAY_MILSEC))
+    {
+        enable_ADC_auto_conversion(BURST_MODE);
+        adc_started_at += ADC_DELAY_MILSEC; 
+    } 
+}
+
 int main(void) 
 {
     setup();
@@ -111,6 +127,9 @@ int main(void)
     { 
         // use LED to show if I2C has a bus manager
         blink();
+        
+        // delay between ADC burst
+        adc_burst();
         
         // check if character is available to assemble a command, e.g. non-blocking
         if ( (!command_done) && uart0_available() ) // command_done is an extern from parse.h

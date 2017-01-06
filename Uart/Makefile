@@ -5,6 +5,7 @@ OBJECTS = main.o \
 	id.o \
 	$(LIBDIR)/uart.o \
 	$(LIBDIR)/twi.o \
+	$(LIBDIR)/rpu_mgr.o \
 	$(LIBDIR)/timers.o \
 	$(LIBDIR)/parse.o
 

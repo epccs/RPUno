@@ -12,6 +12,7 @@ OBJECTS = main.o \
 	$(LIBDIR)/icp_buf.o \
 	$(LIBDIR)/icp1.o \
 	$(LIBDIR)/twi.o \
+	$(LIBDIR)/rpu_mgr.o \
 	$(LIBDIR)/adc.o \
 	$(LIBDIR)/parse.o
 

@@ -1,9 +1,10 @@
 # Makefile 
-TARGET = Adc
+TARGET = PwrMgt
 LIBDIR = ../lib
 OBJECTS = main.o \
-	analog.o \
+	power.o \
 	../Uart/id.o \
+	../Adc/analog.o \
 	$(LIBDIR)/timers.o \
 	$(LIBDIR)/uart.o \
 	$(LIBDIR)/twi.o \

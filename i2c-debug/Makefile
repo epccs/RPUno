@@ -8,6 +8,7 @@ OBJECTS = main.o \
 	$(LIBDIR)/timers.o \
 	$(LIBDIR)/uart.o \
 	$(LIBDIR)/twi.o \
+	$(LIBDIR)/rpu_mgr.o \
 	$(LIBDIR)/adc.o \
 	$(LIBDIR)/parse.o
 

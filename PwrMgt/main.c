@@ -51,6 +51,10 @@ void ProcessCmd()
     {
         PulseLoopPwr();
     }
+    if ( (strcmp_P( command, PSTR("/vin?")) == 0) && ( (arg_count == 0 ) ) )
+    {
+        ShutdownDetected();
+    }
     if ( (strcmp_P( command, PSTR("/analog?")) == 0) && ( (arg_count >= 1 ) && (arg_count <= 5) ) )
     {
         Analog();
@@ -99,6 +103,11 @@ void setup(void)
 
 void blink(void)
 {
+    if (stable_power_needed) // do not blink,  power usage needs to be very stable to tell if the host has haulted. 
+    {
+        return;
+    }
+
     unsigned long kRuntime = millis() - blink_started_at;
     if ( kRuntime > blink_delay)
     {
@@ -149,6 +158,11 @@ int main(void)
             // dump the transmit buffer to limit a collision 
             uart0_flush(); 
             initCommandBuffer();
+            
+            // the command "vin DOWN" may have the charge control off and set the stable_power_needed flag.
+            digitalWrite(CC_SHUTDOWN,LOW);
+            pinMode(CC_SHUTDOWN, INPUT);
+            stable_power_needed = 0;
         }
         
         // finish echo of the command line befor starting a reply (or the next part of a reply)

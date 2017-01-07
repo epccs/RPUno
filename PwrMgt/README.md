@@ -75,15 +75,17 @@ Set power to the RPUno VIN shield pin. Each state should echo once.
 {"VIN":"DOWN"}
 ```
 
-Note: If a byte is sent on the serial it will stop the command at whatever point it reached and restart the charge controller. 
+Note: If a byte is sent on the serial it will stop the command at whatever point it reached and restart the charge controller. Keep in mind that once the charge controller stops it will not restart until the battery voltage is 1.25% bellow the float voltage setpoint.
 
 CCSHUTDOWN shows that the solar charge control has to be turned off so that only the discharge current from battery needs looked at.
 
-I2CHAULT shows that an I2C command was sent to the [RPUpi] shield bus manager to pull down the shutdown pin. The Pi needs to have a Python [Shutdown] scrip installed and running to halt. 
+I2CHAULT shows that an I2C command was sent to the [RPUpi] shield bus manager to pull down the shutdown pin. The Pi needs to have a Python [Shutdown] script installed and running to halt. 
 
 ATHAULTCURR shows that the ADC reading of discharge current on analog channel 3 is less than the expected value that indicates the Pi Zero has halted.
 
-WEARLEVELINGCLEAR shows that the ADC reading of discharge current on analog channel 3 has been stable for a period of time that indicates wear leveling may have cleared (grain of salt). Unfortunately, wear leveling is not in the SD spec so there is not a proper way to insure it has really finished. 
+DELAY shows that HAULT_DELAY_MILSEC has passed.
+
+WEARLEVELINGCLEAR shows that the ADC reading of discharge current on analog channel 3 has been stable for a period of time that indicates wear leveling may have cleared (grain of salt). Unfortunately, wear leveling is not in the SD spec so there is not a proper way to ensure it has really finished. 
 
 DOWN shows that RPUno has pulled IO2 low and thus turned off the VIN pin power to the shield, and then restart the charge controller.
 
@@ -109,6 +111,19 @@ Set power to the RPUno FT/PULSE plugable connectors pin. Each state should echo 
 DOWN shows that RPUno has pulled IO9 low and thus turned off the FT/PULSE loop current sources.
 
 UP shows that RPUno has pulled IO9 high and thus turned on the FT/PULSE loop current sources.
+
+
+##  /0/vin?
+
+Return the shutdown_detected value from the bus manager over I2C, this will indicate if the shutdown button has been manualy pressed, and clear the flag. 
+
+``` 
+/1/vin?
+{"SHUTDOWN":"DETECTED"}
+/1/vin?
+{"SHUTDOWN":"CLEAR"}
+```
+
 
 
 ## [/0/analog? 0..7[,0..7[,0..7[,0..7[,0..7]]]]](../Adc#0analog-0707070707)

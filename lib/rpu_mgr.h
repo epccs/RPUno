@@ -20,10 +20,8 @@
 #ifndef Rpu_Mgr_h
 #define Rpu_Mgr_h
 
-#define RPU_BUS_MSTR_CMD_SZ 2
-
-extern char set_Rpu_shutdown(void);
-extern char detect_Rpu_shutdown(void);
+extern uint8_t set_Rpu_shutdown(void);
+extern uint8_t detect_Rpu_shutdown(void);
 extern char get_Rpu_address(void);
 
 #endif // Rpu_Mgr_h

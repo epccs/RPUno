@@ -3,5 +3,8 @@
 
 extern void VinPwr(void);
 extern void PulseLoopPwr(void);
+extern void ShutdownDetected(void);
+
+extern uint8_t stable_power_needed;
 
 #endif // PwrMgt_H 

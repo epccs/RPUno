@@ -30,8 +30,6 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/pins_board.h"
 #include "power.h"
 
-#define RPU_BUS_MSTR_CMD_SZ 2
-
 // Use integers at 10 uAmps per count, e.g. 7000 is 70mA
 #define DISCHRG_I_10uA_CNT_AFTER_HAULT 7000L
 
@@ -47,6 +45,7 @@ static unsigned long wearlevel_check_started_at;
 #define WEARLEVEL_CHECKS 5
 static uint8_t stable_means_notwearleveling;
 static int last_wearlevel;
+uint8_t stable_power_needed;
 
 void VinPwr(void)
 {
@@ -60,7 +59,7 @@ void VinPwr(void)
             return;
         }
         serial_print_started_at = millis();
-        if (strcmp_P( arg[1], PSTR("UP")) == 0 ) 
+        if (strcmp_P( arg[0], PSTR("UP")) == 0 ) 
         {
             digitalWrite(VIN_POWER,HIGH);
             pinMode(VIN_POWER, OUTPUT);
@@ -78,10 +77,10 @@ void VinPwr(void)
     }
     else if ( (command_done == 11) )
     {  
-        set_Rpu_shutdown();
-        if ( detect_Rpu_shutdown() ) // it should not detect until after the ICP1 pin retruns to being a weak pull-up.
+        if( set_Rpu_shutdown() ) 
         {
             printf_P(PSTR("{\"VIN\":\"I2CHAULT\"}\r\n"));
+            stable_power_needed = 1;
             command_done = 12;
         }
     }
@@ -108,6 +107,7 @@ void VinPwr(void)
         {
             printf_P(PSTR("{\"VIN\":\"DELAY\"}\r\n"));
             last_wearlevel = 0;
+            stable_means_notwearleveling = 0;
             command_done = 14; /* This keeps looping output forever (until a Rx char anyway) */
         }
     }
@@ -125,7 +125,7 @@ void VinPwr(void)
             if ((kRuntime) > ((unsigned long)WEARLEVEL_CHECK_MILSEC))
             {
                 int new_wearlevel = analogRead(DISCHRG_I);
-                printf_P(PSTR("{\"VIN\":\"adc %d\"}\r\n"),new_wearlevel);
+                //printf_P(PSTR("{\"VIN\":\"adc %d\"}\r\n"),new_wearlevel);
                 if ( (new_wearlevel < (last_wearlevel + 2) ) && (new_wearlevel > (last_wearlevel - 2) ) )
                 {
                     stable_means_notwearleveling +=1;
@@ -146,11 +146,20 @@ void VinPwr(void)
     }
     else if ( (command_done == 15) )
     {
+        stable_power_needed = 0;
         digitalWrite(VIN_POWER,LOW);
         pinMode(VIN_POWER, OUTPUT);
-        printf_P(PSTR("{\"VIN\":\"DOWN\"}\r\n"));
+        uint8_t shutdown_detected = detect_Rpu_shutdown(); 
+        if (shutdown_detected)
+        {
+            printf_P(PSTR("{\"VIN\":\"DOWN\"}\r\n"));
+        }
+        else
+        {
+            printf_P(PSTR("{\"VIN\":\"DOWN_I2CBAD\"}\r\n"));
+        }
         digitalWrite(CC_SHUTDOWN,LOW);
-        pinMode(CC_SHUTDOWN, OUTPUT);
+        pinMode(CC_SHUTDOWN, INPUT);
         initCommandBuffer();
     }
     else
@@ -172,7 +181,7 @@ void PulseLoopPwr(void)
             return;
         }
         serial_print_started_at = millis();
-        if (strcmp_P( arg[1], PSTR("UP")) == 0 ) 
+        if (strcmp_P( arg[0], PSTR("UP")) == 0 ) 
         {
             digitalWrite(FT_POWER,HIGH);
             pinMode(FT_POWER, OUTPUT);
@@ -186,6 +195,29 @@ void PulseLoopPwr(void)
             printf_P(PSTR("{\"FT\":\"DOWN\"}\r\n"));
             initCommandBuffer();
         }
+    }
+    else
+    {
+        printf_P(PSTR("{\"err\":\"FTCmdDnWTF\"}\r\n"));
+        initCommandBuffer();
+    }
+}
+
+void ShutdownDetected(void)
+{
+    if ( (command_done == 10) )
+    {
+        // zero arguments
+        uint8_t shutdown_detected = detect_Rpu_shutdown(); 
+        if (shutdown_detected)
+        {
+            printf_P(PSTR("{\"SHUTDOWN\":\"DETECTED\"}\r\n"));
+        }
+        else
+        {
+            printf_P(PSTR("{\"SHUTDOWN\":\"CLEAR\"}\r\n"));
+        }
+        initCommandBuffer();
     }
     else
     {

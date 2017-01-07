@@ -21,11 +21,14 @@
 #include "twi.h"
 #include "rpu_mgr.h"
 
-char set_Rpu_shutdown(void)
+#define RPU_BUS_MSTR_CMD_SZ 2
+#define I2C_ADDR_OF_BUS_MGR 0x29
+
+uint8_t set_Rpu_shutdown(void)
 { 
     uint8_t twi_returnCode;
 
-    uint8_t RPU_mgr_i2c_address = 0x29;
+    uint8_t RPU_mgr_i2c_address = I2C_ADDR_OF_BUS_MGR;
 
     // ping I2C for an RPU bus manager
     uint8_t address = RPU_mgr_i2c_address;
@@ -62,15 +65,22 @@ char set_Rpu_shutdown(void)
     }
     else
     {
-        return (char) (rxBuffer[1]); // All that for one byte, I am not amused. 
+        if ( rxBuffer[1] == txBuffer[1] )
+        {
+            return 1; // all seems good
+        }
+        else 
+        {
+            return 0;
+        }
     }
 }
 
-char detect_Rpu_shutdown(void)
+uint8_t detect_Rpu_shutdown(void)
 { 
     uint8_t twi_returnCode;
 
-    uint8_t RPU_mgr_i2c_address = 0x29;
+    uint8_t RPU_mgr_i2c_address = I2C_ADDR_OF_BUS_MGR;
 
     // ping I2C for an RPU bus manager
     uint8_t address = RPU_mgr_i2c_address;
@@ -107,7 +117,7 @@ char detect_Rpu_shutdown(void)
     }
     else
     {
-        return (char) (rxBuffer[1]); // All that for one byte, Again I am not amused. 
+        return rxBuffer[1]; // All that for one byte, Again I am not amused. 
     }
 }
 
@@ -115,7 +125,7 @@ char get_Rpu_address(void)
 { 
     uint8_t twi_returnCode;
 
-    uint8_t RPU_mgr_i2c_address = 0x29;
+    uint8_t RPU_mgr_i2c_address = I2C_ADDR_OF_BUS_MGR;
 
     // ping I2C for an RPU bus manager
     uint8_t address = RPU_mgr_i2c_address;
@@ -123,23 +133,24 @@ char get_Rpu_address(void)
     uint8_t length = 0;
     uint8_t wait = 1;
     uint8_t sendStop = 1;
-    twi_returnCode = twi_writeTo(address, &data, length, wait, sendStop); 
-    
-    if (twi_returnCode != 0)
-    { 
-        return 0;
+    for (uint8_t i =0;1; i++)
+    {
+        twi_returnCode = twi_writeTo(address, &data, length, wait, sendStop); 
+        if (twi_returnCode == 0) break; // error free code
+        if (i>5) return 0; // give up after 5 trys
     }
+    
     // An RPU bus manager was found now try to read the bus address from it
     // note the first byte is command, second is for that data (it will size the reply from what was sent)
     uint8_t txBuffer[RPU_BUS_MSTR_CMD_SZ] = {0x00,0x00}; //comand 0x00 should Read Shield RPU addr;
     length = RPU_BUS_MSTR_CMD_SZ;
     sendStop = 0;  //this will cause a I2C repeated Start durring read
-    twi_returnCode = twi_writeTo(address, txBuffer, length, wait, sendStop); 
-    if (twi_returnCode != 0)
+    for (uint8_t i =0;1; i++)
     {
-        return 0;
+        twi_returnCode = twi_writeTo(address, txBuffer, length, wait, sendStop); 
+        if (twi_returnCode == 0) break;
+        if (i>5) return 0; // give up after 5 trys
     }
-    
     uint8_t rxBuffer[RPU_BUS_MSTR_CMD_SZ];
     sendStop = 1;
     uint8_t quantity = RPU_BUS_MSTR_CMD_SZ;
@@ -150,7 +161,7 @@ char get_Rpu_address(void)
     }
     else
     {
-        return (char) (rxBuffer[1]);
+        return (char)(rxBuffer[1]);
     }
 }
 

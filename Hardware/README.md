@@ -4,10 +4,10 @@
 
 This board is solar powered and has an ATmega328p. The Capture (ICP1) hardware is connected to an inverting open collector transistor that pulls down the ICP1 pin when current (e.g. 10mA) is flowing through a 100 Ohm sense resistor. The captured value is accurate to within one crystal count of the event (e.g. pulse edge caused by the transition of 3mA to 10mA from a current loop or a sensor output goes open after it was a shunt for the 10mA source). This captured value is an excellent data acquisition of flow meter pulses or for other pulse interpolation task. The board also has six digital interfaces with voltage level conversion up to the board's internal supply voltage (VIN on schematic), and two analog inputs with current sources for two current loops. The ATmega328p can be programmed with the AVR toolchain on Ubuntu, Raspbian, and others.
 
-Bootloader options include [optiboot][1] and [xboot][2]. Uploading through a bootloader eliminates fuse setting errors and the bootloader over full duplex can not be blocked by accidental register settings, thus adding a feel of robustness to the user's experience during software development.
+Bootloader options include [optiboot] and [xboot]. Uploading through a bootloader eliminates fuse setting errors and the bootloader over full duplex can not be blocked by accidental register settings, thus adding a feel of robustness to the user's experience during software development.
 
-[1]: https://github.com/Optiboot/optiboot
-[2]: https://github.com/alexforencich/xboot
+[optiboot]: https://github.com/Optiboot/optiboot
+[xboot]: https://github.com/alexforencich/xboot
 
 ## Inputs/Outputs/Functions
 
@@ -56,9 +56,10 @@ Bootloader options include [optiboot][1] and [xboot][2]. Uploading through a boo
 
 ```
         ^6  Done:  
-            WIP: Design, (ADC6 to Anode)
+            WIP: Design, 
             Todo: Layout, BOM, Review*, Order Boards, Assembly, Testing, Evaluation.
             *during review the Design may change without changing the revision.
+            use ADC6 to measure the raw PV on Anode of dark blocking diode.  
 
         ^5 Done: Design, Layout, BOM, Review*, Order Boards, Assembly, Testing,
             WIP: Evaluation

@@ -12,9 +12,9 @@ The Board has an easy to use ATmega328p and LT3652 solar charge controller, it d
 
 [OSHpark](https://oshpark.com/shared_projects/84emcdT8)
 
-[1]: ./i2c-debug
-[2]: https://github.com/epccs/RPUftdi
-[3]: https://github.com/epccs/RPUadpt
+[I2Cdebug]: ./i2c-debug
+[RPUftdi]: https://github.com/epccs/RPUftdi
+[RPUadpt]: https://github.com/epccs/RPUadpt
 
 ## Status
 
@@ -26,13 +26,13 @@ Hardware files are in Eagle, there is also some testing, evaluation, and schooli
 
 ## Example with RPU BUS (RS-422)
 
-A wired serial bus that allows multiple microcontroller boards to be connected to a host port. An [RPUftdi][2] shield is on one of the MCU boards near the host computer (USB cable can only be run for 2 or 3 meters). The other boards use an [RPUadpt][3] shield and are connected as a daisy-chain up to perhaps 1000 meters. 
+A serial bus that allows multiple microcontroller boards to be connected to a host serial port. An [RPUftdi] shield with an on board USB device (a UART bridge) is placed near the host computer (USB cables can only reach about 2 meters). The remote MCU board(s) use an [RPUadpt] shield and are connected as a daisy-chain up to perhaps 1000 meters with CAT5 cable. 
 
 ![MultiDrop](https://raw.githubusercontent.com/epccs/RPUno/master/Hardware/Documents/MultiDrop.png "RPUno MultiDrop")
 
-I prefer a Command Line Interface (CLI), so that is what these examples use. The CLI is programmed to respond to commands terminated with a newline, so remember to press enter (which sends a newline) before starting a command. The command includes an address with a leading and trailing forward slash "/". The command echo starts after the address (second byte) is sent. The first byte will cause any transmitting device to stop and dump its outgoing buffer which should prevent collisions with the delayed echo. 
+I prefer a Command Line Interface (CLI), so that is what the examples use. The CLI is programmed to respond to commands terminated with a newline, so remember to press enter (which sends a newline) before starting a command. The command includes an address with a leading and trailing forward slash "/". The command echo starts after the address (second byte) is sent. The first byte will cause any transmitting device to stop and dump its outgoing buffer which should prevent collisions since the echo is delayed until after the second byte. 
 
-As a short example, I'll connect with SSH (e.g. from a Pi) to the machine (an old x86 with Ubuntu) that has a USB connection to the [RPUftdi][2] board. These machines have matching usernames and keys placed so I don't need to use passwords. Then I will use picocom to interact with the RPU_BUS. There are two boards on the serial bus one is at address '1' the other at address '0'.  
+As a short example, I'll connect with SSH (e.g. from a Pi) to the machine (an old x86 with Ubuntu) that has a USB connection to the [RPUftdi] board. These machines have matching usernames and keys placed so I don't need to use passwords. Then I will use picocom to interact with two different RPUno boards. They are on the serial bus at addresses '1' and '0' (note that ASCII '1' is 0x31, and ASCII '0' is 0x30, so they have an address that looks good on picocom but is probably not what was expected).  
 
 ```
 rsutherland@raspberrypi:~ $ ssh conversion.local
@@ -74,7 +74,7 @@ Ctrl-a,Ctrl-x
 Thanks for using picocom
 ```
 
-At present, I'm using [I2Cdebug][1] to set the bus manager on the [RPUftdi][2] shield, it needs to know which address to reset so that it can lockout the others during bootload. Solenoid is the star of the show (so far), it is an attempt to control latching irrigation valves with cycles (inspired by Vinduino) and start the cycle at a daylight based offset, flow sensing for each zone is also working.  
+At present, I'm using [I2Cdebug] to set the bus manager on the [RPUftdi] shield, it needs to know which address to reset so that it can lockout the others during bootload. Solenoid is the star of the show (so far), it is an attempt to control latching irrigation valves with cycles (inspired by Vinduino) and start the cycle at a daylight based offset, flow sensing for each zone is also working.  
 
 ## AVR toolchain
 

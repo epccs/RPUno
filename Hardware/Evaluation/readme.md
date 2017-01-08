@@ -7,6 +7,7 @@ This shows the setup and method used for evaluation of RPUno.
 
 # Table Of Contents:
 
+11. [^5 Power Management](#5-power-management)
 10. [^5 Day Night](#5-day-night)
 9. [^5 Flow Meter](#5-flow-meter)
 8. [^5 Solenoid FW Operates K3](#5-solenoid-fw-operates-k3)
@@ -19,11 +20,28 @@ This shows the setup and method used for evaluation of RPUno.
 1. [^1 Mounting](#1-mounting)
 
 
+## ^5 Power Management
+
+The RPUno controls power from the battery to its VIN pin with digital IO2. On the [RPUpi] shield that power is provided to an SMPS that provides 5V at up to 1A to the Pi Zero header. Wait... don't just pull the plug, the correct way is to halt the Pi Zero and then wait for it to stop. The time it takes to halt depends on the running applications. The best handshake I have figured out is to wait for thirty seconds and then watch that the load current from the RPUno battery has stabilized as demonstrated with this [Power Management] firmware.
+
+[Power Management]: https://github.com/epccs/RPUno/tree/master/PwrMgt
+[RPUpi]: https://github.com/epccs/RPUpi
+
+The RPUpi has a shutdown button that pulls down BCM6 (header pin 31) on the Pi Zero. BCM6 is used by a Python [Shutdown] script to halt the computer. For testing, I've loaded the bus manager with the [Remote]* firmware that places a weak pull up on its PB0 (ICP1) pin which is also tied to that BCM6 pin through a 1.8k resistor. As a result, both a manual or bus manager initiated halt can occur. The RPUno must check for a manual halt by reading the shutdown_detected flag from the bus manager as demonstrated with the [Power Management] firmware.
+
+    * Note: at this time I used Remote from RPUadpt (a port was not needed)
+
+[Shutdown]: https://github.com/epccs/RPUpi/tree/master/Shutdown
+[Remote]: https://github.com/epccs/RPUadpt/tree/master/Remote
+
+The RPUno also controls power to the FT/Pulse sensor current sources with digital IO2 and is also demonstrated with the [Power Management] firmware.
+
+
 ## ^5 Day Night
 
 A [Day-Night] state machine with a callback that is run after the morning debounce. [Solenoid] has been changed to use the callback to load the saved solenoid settings (same as Flow Meter evaluation) and starting solenoid valve control state machine. What follows is a log from some different days while I've let the RPUno loaded with the Solenoid program do its thing. The date and times are when I used picocom to log the data.
 
-[Day-Night]: https://github.com/epccs/RPUno/tree/master/Capture
+[Day-Night]: https://github.com/epccs/RPUno/tree/master/DayNight
 
 ```
 12/17/2016:11:22AM 

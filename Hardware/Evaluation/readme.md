@@ -27,14 +27,14 @@ The RPUno controls power from the battery to its VIN pin with digital IO2. On th
 [Power Management]: https://github.com/epccs/RPUno/tree/master/PwrMgt
 [RPUpi]: https://github.com/epccs/RPUpi
 
-The RPUpi has a shutdown button that pulls down BCM6 (header pin 31) on the Pi Zero. BCM6 is used by a Python [Shutdown] script to halt the computer. For testing, I've loaded the bus manager with the [Remote]* firmware that places a weak pull up on its PB0 (ICP1) pin which is also tied to that BCM6 pin through a 1.8k resistor. As a result, both a manual or bus manager initiated halt can occur. The RPUno must check for a manual halt by reading the shutdown_detected flag from the bus manager as demonstrated with the [Power Management] firmware.
+The [RPUpi] has a shutdown button that pulls down BCM6 (header pin 31) on the Pi Zero. BCM6 is used by a Python [Shutdown] script to halt the computer. For testing, I've loaded the bus manager with the [Remote]* firmware that places a weak pull up on its PB0 (ICP1) pin which is also tied to that BCM6 pin through a 1.8k resistor. As a result, both a manual or bus manager initiated halt can occur. The RPUno must check for a manual halt by reading the shutdown_detected flag from the bus manager as demonstrated with the [Power Management] firmware.
 
     * Note: at this time I used Remote from RPUadpt (a port was not needed)
 
 [Shutdown]: https://github.com/epccs/RPUpi/tree/master/Shutdown
 [Remote]: https://github.com/epccs/RPUadpt/tree/master/Remote
 
-The RPUno also controls power to the FT/Pulse sensor current sources with digital IO2 and is also demonstrated with the [Power Management] firmware.
+The RPUno also controls power to the FT/Pulse sensor current sources with digital IO9 and is also demonstrated with the [Power Management] firmware.
 
 
 ## ^5 Day Night

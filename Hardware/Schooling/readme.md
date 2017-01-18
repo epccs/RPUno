@@ -4,6 +4,7 @@ Some lessons I learned doing RPUno.
 
 # Table Of Contents:
 
+8. [^5 Current Source Power Off](#5-current-source-power-off)
 7. [^5 ADC6 to Anode](#5-adc6-to-anode)
 6. [^5 ADC7 is .333 of PWR](#5-adc7-is-333-of-pwr)
 5. [^4 Pull-down on IO2](#4-pull-down-on-io2)
@@ -11,6 +12,11 @@ Some lessons I learned doing RPUno.
 3. [^1 Reduce Current Sense Noise](#1-reduce-current-sense-noise)
 2. [^1 Battery Connector Polarity](#1-battery-connector-polarity)
 1. [^0 Add Reversed Battery Protection](#0-add-reversed-battery-protection)
+
+
+## ^5 Current Source Power Off
+
+Presently IO9 can turn off the flow meter current source (which was verified to work), but it might as well turn off all current sources in the next revision. That would allow the choice to cut data acquisition in order to preserve some level of operation.
 
 
 ## ^5 ADC6 to Anode

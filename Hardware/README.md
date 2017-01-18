@@ -2,12 +2,14 @@
 
 ## Overview
 
-This board is solar powered and has an ATmega328p. The Capture (ICP1) hardware is connected to an inverting open collector transistor that pulls down the ICP1 pin when current (e.g. 10mA) is flowing through a 100 Ohm sense resistor. The captured value is accurate to within one crystal count of the event (e.g. pulse edge caused by the transition of 3mA to 10mA from a current loop or a sensor output goes open after it was a shunt for the 10mA source). This captured value is an excellent data acquisition of flow meter pulses or for other pulse interpolation task. The board also has six digital interfaces with voltage level conversion up to the board's internal supply voltage (VIN on schematic), and two analog inputs with current sources for two current loops. The ATmega328p can be programmed with the AVR toolchain on Ubuntu, Raspbian, and others.
+This board is solar powered and has an ATmega328p. The Capture (ICP1) hardware is connected to an inverting open collector transistor that pulls down the ICP1 pin when current (e.g. 10mA) is flowing through a 100 Ohm sense resistor. The captured value is accurate to within one crystal count of the event (e.g. pulse edge caused by the transition of 3mA to 10mA from a current loop or a sensor output that goes open after it was a shunt for the 10mA source). This captured value is an excellent (e.g. crystal is 30ppm + drift) method for data acquisition from a flow meter or for other pulse interpolation task. The board also has six digital interfaces with voltage level conversion up to the board's internal supply voltage (VIN on schematic), and two analog inputs with current sources for two current loops. The ATmega328p can be programmed with the AVR toolchain on Debian which ends up in Ubuntu (upload from a host on [RPUftdi] shield), Raspbian (upload from a Pi Zero on a [RPUpi] shield), and others.
 
-Bootloader options include [optiboot] and [xboot]. Uploading through a bootloader eliminates fuse setting errors and the bootloader over full duplex can not be blocked by accidental register settings, thus adding a feel of robustness to the user's experience during software development.
+Bootloader options include [optiboot] and [xboot]. Uploading through a bootloader eliminates fuse setting errors and there are few register settings that can block an upload accidentally (some other bootloaders don't clear the watchdog and can get stuck in a loop). This has given the feel of robustness during my software development experience.
 
 [optiboot]: https://github.com/Optiboot/optiboot
 [xboot]: https://github.com/alexforencich/xboot
+[RPUpi]: https://github.com/epccs/RPUpi/
+[RPUftdi]: https://github.com/epccs/RPUftdi/
 
 ## Inputs/Outputs/Functions
 
@@ -55,19 +57,23 @@ Bootloader options include [optiboot] and [xboot]. Uploading through a bootloade
 ![Status](./status_icon.png "RPUno Status")
 
 ```
-        ^6  Done:  
-            WIP: Design, 
-            Todo: Layout, BOM, Review*, Order Boards, Assembly, Testing, Evaluation.
+        ^6  Done: Design, Layout, BOM,
+            WIP: Review*,
+            Todo: Order Boards, Assembly, Testing, Evaluation.
             *during review the Design may change without changing the revision.
             use ADC6 to measure the raw PV on Anode of dark blocking diode.  
 
-        ^5 Done: Design, Layout, BOM, Review*, Order Boards, Assembly, Testing,
-            WIP: Evaluation
-            Todo: 
-            *during review the Design may change without changing the revision. 
-            With options to Pull up|down on IO2 so VIN is set on|off durring (and after) a reset.
-            With 5V plug connector (i.e. so the K3 board can get some power).
-            CC shutdown thermistor has a header so the board can run at over 40 C, but shutdown when enclosure is over 40 C.
+        ^5  location: 2016-12-18 Test Bench /w an RPUpi^1, start power management testing
+                      2017-1-1 This^5 had ADC7 parts (and BOM) changed to measre battery.
+                      2017-1-5 This^5 had ADC6 hacked to measure raw PV.
+
+        ^4  location: 2016-12-1 SWall Encl /w K3^0, RPUadpt^4, SLP003-12U, 12V battery.
+                      2017-1-1 This^4 had ADC7 parts changed to measre battery.
+                      2017-1-1 This^4 had ADC6 hacked to measure raw PV.
+                      2017-1-5 RPUadpt^4 had ICP1 hacked open.
+                      
+        ^2  location: 2016-8-1 SEPortch Encl /w CCtest^0, RPUadpt^2, SLP003-12U, 6V SLA.
+                      2017-1-17 running but not doing anything useful
 ```
 
 Debugging and fixing problems i.e. [Schooling](./Schooling/)
@@ -132,4 +138,14 @@ Import the [BOM](./Design/14140,BOM.csv) into LibreOffice Calc (or Excel) with s
 
 # How To Use
 
-When I connect the PV and the battery it seems dead, I'm fooled by this very time, and end up using a DMM to see that the battery is charging and then remember it must first charge to about 13.1V before power will flow to the board's VIN and the microcontroller. That buffered power means hiccup free operation, but acting dead is an issue. 
+Fully charge the SLA battery that will be used, this step will help prevent frustration caused by waiting for the RPUno to charge it.
+
+Connect the application electronics (e.g. flow meter, Digital, and Analog) and check the connections. Then plug in the battery (which will remain disconnected). Next plug in the solar (PV) power, once the PV voltage is enough to enable the charger it will connect to the battery, and start charging (though nothing is visable, and this has caused some frustration). When the battery voltage is over 13.1V it will connect to the on board VIN and power-up. Buffered power ensures hiccup free operation. 
+
+In some ways, this board is like an Arduino Uno, but many functions are dedicated on the board.  Three digital lines (IO5, IO6, IO7) are connected to the solar charge controller. Two more digital lines (IO2, IO9) are used to control power to the SHLD_VIN and flow sensor current sources. Two analog lines (ADC4, ADC5) are dedicated to I2C (and not wired to the analog header). While four more analog lines (ADC7, ADC6, ADC3, ADC2) are used to measure the battery PWR voltage, PV_IN voltage, CHRG, and DISCHRG.
+
+Without connecting anything more than a battery and a solar panel there is a lot of firmware options to consider. How well suited this board is for a task is not easy to answer. 
+
+The [Solenoid] firmware is looking fairly interesting, it is a solenoid control state machine with some of the states using a timer with a programmed value. [Solenoid] also reads the flow sensor at specific states in order to accumulate the flow count (pulse count from flow meter) through the valve. It operates the valves several times with a delay between each operation. This should allow the drip irrigation to be done several times (e.g. 10 times with 5-minute watering and 30-minute delays between watering) during the day, rather than in one big pool (for 50 minutes). The idea is to give the vegetables a chance to use the water before it sinks bellow where their roots can access it. In my porous soil, the water sinks in fairly quick, I am looking forward to giving this idea a try. 
+
+[Solenoid]: ../Solenoid

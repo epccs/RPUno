@@ -51,7 +51,7 @@ The [day-night][../DayNight] state machine is used to load and run EEPROM values
 ICP1 is available through the [Capture][../Capture] commands.
 
 
-# Programing
+# Firmware Upload
 
 With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
 
@@ -63,7 +63,7 @@ AVR Memory Usage
 ----------------
 Device: atmega328p
 
-Program:   23390 bytes (71.4% Full)
+Program:   23408 bytes (71.4% Full)
 (.text + .data + .bootloader)
 
 Data:        694 bytes (33.9% Full)
@@ -74,22 +74,15 @@ avrdude done.  Thank you.
 
 Now connect with picocom (or ilk). Note I am often at another computer doing this through SSH. The Samba folder is for editing the files from Windows.
 
-
 ``` 
 #exit is C-a, C-x
-picocom -b 115200 /dev/ttyUSB0
-``` 
-
-or log the terminal session
-
-``` 
-script -f -c "picocom -b 115200 /dev/ttyUSB0" stuff.log
+picocom -b 38400 /dev/ttyUSB0
 ``` 
 
 
 # Commands
 
-Commands are interactive over the serial interface at 115200 baud rate. The echo will start after the second character of a new line. 
+Commands are interactive over the serial interface at 38400 baud rate. The echo will start after the second character of a new line. 
 
 
 ## /[rpu_address]/[command [arg]]

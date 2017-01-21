@@ -11,7 +11,7 @@ This command is available on the serial bus to tell the RPUno to have the bus ma
 
 After the bus manager is told to shutdown the Pi the battery current should drop and eventually stabilize (i.e. the Pi uses about 11mA from the battery when halted). One nasty thing happens at this time, the SD card will continue to do wear leveling, and this shows as slightly uneven current usage by the Pi (sd card) so I need to wait for a time (debounce) with the current usage very low and stable.  After the shutdown debounce is done the RPUno can power off its VIN pin which is controled with IO2 (reg-bit PD2).
 
-The Pulse input has some current sources that can be configured to send current to a sensor which is measured with a 100 Ohm resistor used to bias a bipolar transistor that pulls down the ICP1 pin. Turning IO9 (reg-bit PB1) off will stop transmitting current to the pulse sensor.
+Current sources can have power turned off (^5 only does ICP1 pulse sensor) using IO9 (reg-bit PB1).
 
 ## Firmware Upload
 
@@ -25,22 +25,15 @@ avrdude done.  Thank you.
 
 Now connect with picocom (or ilk). Note I am often at another computer doing this through SSH. The Samba folder is for editing the files from Windows.
 
-
 ``` 
 #exit is C-a, C-x
-picocom -b 115200 /dev/ttyUSB0
-``` 
-
-or log the terminal session
-
-``` 
-script -f -c "picocom -b 115200 /dev/ttyUSB0" stuff.log
+picocom -b 38400 /dev/ttyUSB0
 ``` 
 
 
 # Commands
 
-Commands are interactive over the serial interface at 115200 baud rate. The echo will start after the second character of a new line. 
+Commands are interactive over the serial interface at 38400 baud rate. The echo will start after the second character of a new line. 
 
 
 ## /[rpu_address]/[command [arg]]

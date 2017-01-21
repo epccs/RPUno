@@ -6,10 +6,27 @@ Use RPUno's photovoltaic voltage (PV_V on ADC channel 6) to approximately tell w
 
 Note: Solenoid uses the Day_AttachDayWork() function to set a callback that will be run at the start of each day. This framework was used to debug the day-night stat machine idea.
 
+## Firmware Upload
+
+With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
+
+``` 
+rsutherland@conversion:~/Samba/RPUno/DayNight$ make bootload
+...
+avrdude done.  Thank you.
+``` 
+
+Now connect with picocom (or ilk). Note I am often at another computer doing this through SSH. The Samba folder is for editing the files from Windows.
+
+``` 
+#exit is C-a, C-x
+picocom -b 38400 /dev/ttyUSB0
+``` 
+
+
 # Commands
 
-Commands are interactive over the serial interface at 115200 baud rate. The echo will start after the second character of a new line. 
-
+Commands are interactive over the serial interface at 38400 baud rate. The echo will start after the second character of a new line. 
 
 ## /[rpu_address]/[command [arg]]
 

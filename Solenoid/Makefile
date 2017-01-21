@@ -19,7 +19,7 @@ OBJECTS = main.o \
 ## Chip and project-specific global definitions
 MCU   =  atmega328p
 F_CPU = 16000000UL  
-BAUD  =  115200UL
+BAUD  =  38400UL
 CPPFLAGS = -DF_CPU=$(F_CPU) -DBAUD=$(BAUD) -I. 
 
 ## Cross-compilation

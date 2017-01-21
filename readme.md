@@ -48,12 +48,12 @@ Welcome to Ubuntu 16.04.1 LTS (GNU/Linux 4.4.0-53-generic i686)
 0 updates are security updates.
 
 Last login: Fri Dec 16 12:59:33 2016 from 192.168.1.172
-rsutherland@conversion:~$ picocom -b 115200 /dev/ttyUSB0
+rsutherland@conversion:~$ picocom -b 38400 /dev/ttyUSB0
 picocom v1.7
 
 port is        : /dev/ttyUSB0
 flowcontrol    : none
-baudrate is    : 115200
+baudrate is    : 38400
 parity is      : none
 databits are   : 8
 escape is      : C-a

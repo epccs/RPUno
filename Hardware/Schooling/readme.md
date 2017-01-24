@@ -4,7 +4,7 @@ Some lessons I learned doing RPUno.
 
 # Table Of Contents:
 
-9. [^5 Baud Rate](#5-baud-rate)
+9. [^5 Baud Rate Framing Error](#5-baud-rate-framing-error)
 8. [^5 Current Source Power Off](#5-current-source-power-off)
 7. [^5 ADC6 to Anode](#5-adc6-to-anode)
 6. [^5 ADC7 is .333 of PWR](#5-adc7-is-333-of-pwr)
@@ -15,18 +15,21 @@ Some lessons I learned doing RPUno.
 1. [^0 Add Reversed Battery Protection](#0-add-reversed-battery-protection)
 
 
-## ^5 Baud Rate
+## ^5 Baud Rate Framing Error
 
-The [Bit Rate] error at 115.2k is too high (2.1%, though it mostly works). I have seen enough errors now to be convinced. Looking at the [Rate Calculator] I see 76.8k is very good (0.2%), but the picocom packaged on Ubuntu does not support it. The next very good rate is 38.4k (also 0.2%) which picocom does support. The bootloader does a CRC check with each line in the hex file so running it at 115.2k is ok, it will redo the chunks with errors. However, I don't want to see any errors while running commands (that would look bad during a demo).
+At 115.2k [Bit Rate] there is a large framing error (2.1%). I have seen enough errors now to be convinced that I need to use a bit rate that has less framing error. Looking at the [Rate Calculator] I see 76.8k is very good (0.2%), but the picocom packaged on Ubuntu does not support it. The next very good rate is 38.4k (also 0.2%) which picocom does support. The bootloader does a CRC check with each line in the hex file so running it at 115.2k is ok, it will redo the chunks with errors. However, I don't want to see any errors while running commands (that would look bad during a demo).
+
+[Bit Rate]: https://en.wikipedia.org/wiki/Bit_rate#Gross_bit_rate
+[Rate Calculator]: http://wormfood.net/avrbaudcalc.php
 
 Turns out the ideal bit rate to use is 125k or 250k which has 0% error. I am using slew limited 250k RS485 transceivers so that is the max. The released version of picocom does not support custom bit rates. The good news is that picocom custom rates were fixed. All I have to do is wait for the next release after [picocom_2.2] and then Debian needs to pick it up but Debian is still using 1.7 from google code (what a PITA).
 
 Note: [Baud] is the wrong term, but is the one everyone knows.
 
-[Rate Calculator]: http://wormfood.net/avrbaudcalc.php
 [Baud]: https://en.wikipedia.org/wiki/Baud
-[Bit Rate]: https://en.wikipedia.org/wiki/Bit_rate#Gross_bit_rate
 [picocom 2.2]: https://github.com/npat-efault/picocom/releases
+
+It may be helpful to understand that the start and stop bits make up the framing system, and having little idle time between transmissions may help push the system into less stable operation.  I think this is why I was seeing errors when I cut-and-paste into picocom at 115.2k, there were never errors when typing directly or when only a few characters were paste.
 
 
 ## ^5 Current Source Power Off

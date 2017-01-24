@@ -36,6 +36,8 @@ The [RPUpi] has a shutdown button that pulls down BCM6 (header pin 31) on the Pi
 
 The RPUno also controls power to the FT/Pulse sensor current sources with digital IO9 and is also demonstrated with the [Power Management] firmware.
 
+![RPUno With RPUpi](./RPUno^5WithRPUpi^1.jpg "RPUno With RPUpi")
+
 
 ## ^5 Day Night
 

@@ -57,20 +57,23 @@ Bootloader options include [optiboot] and [xboot]. Uploading through a bootloade
 ![Status](./status_icon.png "RPUno Status")
 
 ```
-        ^6  Done: Design, Layout, BOM,
-            WIP: Review*,
-            Todo: Order Boards, Assembly, Testing, Evaluation.
+        ^6  Done: Design, Layout, BOM, Review*,
+            WIP: Order Boards,
+            Todo: Assembly, Testing, Evaluation.
             *during review the Design may change without changing the revision.
             use ADC6 to measure the raw PV on Anode of dark blocking diode.  
 
         ^5  location: 2016-12-18 Test Bench /w an RPUpi^1, start power management testing
                       2017-1-1 This^5 had ADC7 parts (and BOM) changed to measre battery.
                       2017-1-5 This^5 had ADC6 hacked to measure raw PV.
+                      2017-2-4 moved to SWall Encl /w K3^1, RPUadpt^4, SLP003-12U, 12V battery.
 
         ^4  location: 2016-12-1 SWall Encl /w K3^0, RPUadpt^4, SLP003-12U, 12V battery.
                       2017-1-1 This^4 had ADC7 parts changed to measre battery.
                       2017-1-1 This^4 had ADC6 hacked to measure raw PV.
                       2017-1-5 RPUadpt^4 had ICP1 hacked open.
+                      2017-2-4 an equalizing charge seems to have tripped a fault on the LT3652. 
+                      2017-2-4 moved from SWall Encl to Test Bench (it will not control VIN for the RPUpi^1).
                       
         ^2  location: 2016-8-1 SEPortch Encl /w CCtest^0, RPUadpt^2, SLP003-12U, 6V SLA.
                       2017-1-17 running but not doing anything useful
@@ -128,7 +131,7 @@ ANALOG: two inputs with 20 mA current sources (from VIN) for loop sensor power.
 
 ## Testing
 
-Check correct assembly and function with [Testing] [./Testing/]
+Check correct assembly and function with [Testing](./Testing/)
 
 
 # Bill of Materials

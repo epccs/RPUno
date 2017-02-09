@@ -1,0 +1,667 @@
+Using three Orbit 58874N valves
+The RPUno^4 Solenoid program has these save (eeprom) settings
+/1/save 1,10
+{"K1":{"delay_start_sec":"3","runtime_sec":"10","delay_sec":"40","cycles":"10"}}
+/1/save 2,10
+{"K2":{"delay_start_sec":"16","runtime_sec":"10","delay_sec":"40","cycles":"10"}}
+/1/save 3,10
+{"K3":{"delay_start_sec":"29","runtime_sec":"10","delay_sec":"40","cycles":"10"}}
+
+12/17/2016:11:22AM 
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"15568"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"17315"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17259"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"13.36","PV_V":"16.08","DISCHRG_A":"0.000","CHRG_A":"0.096"}
+
+12/18/2016:10:41AM shadow on PV
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"15342"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"17173"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17205"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.96","PV_V":"16.03","DISCHRG_A":"0.000","CHRG_A":"0.024"}
+
+12/20/2016: equalizing charge (using a car battery) also fixed a water line kink on K1
+
+12/20/2016:12:23PM high clouds
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17349"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"17635"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17373"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"13.24","PV_V":"15.72","DISCHRG_A":"0.000","CHRG_A":"0.065"}
+
+12/21/2016:13:02PM clouds and some rain
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17576"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18042"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17774"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.66","PV_V":"16.70","DISCHRG_A":"0.033","CHRG_A":"0.000"}
+
+
+12/23/2016:13:02PM clouds and rain
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17569"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18146"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17875"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.58","PV_V":"17.33","DISCHRG_A":"0.050","CHRG_A":"0.000"}
+
+12/26/2016:17:07PM sunny all day
+/1/flow? 1
+"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17370"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"17819"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17811"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.64","PV_V":"12.55","DISCHRG_A":"0.049","CHRG_A":"0.000"}
+
+12/27/2016:12:51AM sunny 
+# equalizing charge needed (still using a car battery) last night so no flow data. 
+# I removed the charger in the morning, and after a few hours see it is floating (good).
+/1/analog? 7,6,3,2
+{"PWR_V":"13.56","PV_V":"19.04","DISCHRG_A":"0.000","CHRG_A":"0.023"}
+
+12/28/2016:17:07PM cloudy
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17516"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"17929"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17815"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.80","PV_V":"16.63","DISCHRG_A":"0.011","CHRG_A":"0.000"}
+
+12/29/2016:12:14AM sunny
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17610"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"17928"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17821"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"13.15","PV_V":"15.40","DISCHRG_A":"0.000","CHRG_A":"0.082"}
+
+12/30/2016:3:14AM high clouds
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17485"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18059"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17852"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.89","PV_V":"16.42","DISCHRG_A":"0.000","CHRG_A":"0.055"}
+
+1/2/2017:11:24AM thick high clouds
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17639"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18038"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17947"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.86","PV_V":"16.55","DISCHRG_A":"0.000","CHRG_A":"0.010"}
+
+
+1/3/2017:10:05AM thick high clouds
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17626"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"17986"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17921"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.76","PV_V":"16.94","DISCHRG_A":"0.000","CHRG_A":"0.000"}
+
+1/4/2017:09:36AM sunny, valve stuck open, flow data lost when I reset power but the valve closed
+/1/analog? 7,6,3,2
+{"PWR_V":"12.93","PV_V":"16.50","DISCHRG_A":"0.000","CHRG_A":"0.057"}
+
+1/5/2017:09:46AM sunny, opps Host2Master had bootaddres of test unit and it reboot and lost the flow data
+/1/analog? 7,6,3,2
+{"PWR_V":"12.98","PV_V":"16.50","DISCHRG_A":"0.000","CHRG_A":"0.056"}
+
+1/6/2017:10:22AM random clouds
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17593"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18153"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17929"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.91","PV_V":"16.16","DISCHRG_A":"0.000","CHRG_A":"0.072"}
+
+
+1/7/2017:10:22AM clouds
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17550"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"17909"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17915"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.63","PV_V":"16.57","DISCHRG_A":"0.000","CHRG_A":"0.000"}
+
+1/8/2017:10:44AM some high clouds
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17647"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"17960"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17929"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.88","PV_V":"15.82","DISCHRG_A":"0.000","CHRG_A":"0.083"}
+
+
+1/10/2017:12:42AM high clouds
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17611"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18033"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"18015"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.91","PV_V":"15.53","DISCHRG_A":"0.000","CHRG_A":"0.066"}
+
+1/11/2017:11:49AM high clouds
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17654"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18126"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"18020"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+
+1/12/2017:12:50PM sunny with some high clouds
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17534"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18124"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"18014"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"13.27","PV_V":"15.77","DISCHRG_A":"0.000","CHRG_A":"0.083"}
+
+1/14/2017:16:30PM rain
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17653"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18057"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"18121"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.64","PV_V":"16.86","DISCHRG_A":"0.056","CHRG_A":"0.000"}
+
+1/15/2017:11:52AM rain
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17717"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18082"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17842"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.66","PV_V":"16.94","DISCHRG_A":"0.003","CHRG_A":"0.000"}
+
+1/16/2017:12:12PM intermittent clouds
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17653"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18173"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17990"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.74","PV_V":"16.75","DISCHRG_A":"0.034","CHRG_A":"0.000"}
+
+1/17/2017:12:12PM rain (bat was charged yesterday after noon)
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17595"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18011"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17921"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.86","PV_V":"16.88","DISCHRG_A":"0.039","CHRG_A":"0.000"}
+
+1/18/2017:12:01PM sunny
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17588"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18008"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17903"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"13.20","PV_V":"15.77","DISCHRG_A":"0.000","CHRG_A":"0.090"}
+
+1/19/2017:11:55AM rain
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17505"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18132"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17913"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.69","PV_V":"17.46","DISCHRG_A":"0.032","CHRG_A":"0.000"}
+
+1/20/2017:19:02PM rain
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17565"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18270"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"18091"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.61","PV_V":"0.31","DISCHRG_A":"0.043","CHRG_A":"0.000"}
+
+upload firmware that changed serial bit rate from 115200 to
+picocom -b 38400 /dev/ttyUSB0
+
+1/21/2017:12:22AM partly sunny (very interesting charging numbers with the clouds flying over)
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17762"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18141"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"18082"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"13.08","PV_V":"16.57","DISCHRG_A":"0.000","CHRG_A":"0.105"}
+{"PWR_V":"13.05","PV_V":"16.60","DISCHRG_A":"0.000","CHRG_A":"0.007"}
+{"PWR_V":"13.02","PV_V":"16.60","DISCHRG_A":"0.019","CHRG_A":"0.000"}
+{"PWR_V":"13.10","PV_V":"16.65","DISCHRG_A":"0.000","CHRG_A":"0.168"}
+{"PWR_V":"13.11","PV_V":"16.52","DISCHRG_A":"0.000","CHRG_A":"0.155"}
+{"PWR_V":"13.05","PV_V":"16.50","DISCHRG_A":"0.000","CHRG_A":"0.000"}
+{"PWR_V":"13.13","PV_V":"16.47","DISCHRG_A":"0.000","CHRG_A":"0.167"}
+{"PWR_V":"13.07","PV_V":"16.31","DISCHRG_A":"0.000","CHRG_A":"0.011"}
+
+1/22/2017:15:01PM clouds
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17797"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18166"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"18069"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.80","PV_V":"17.01","DISCHRG_A":"0.042","CHRG_A":"0.000"}
+
+1/23/2017:11:05AM clouds
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17743"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18332"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"18167"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.66","PV_V":"17.07","DISCHRG_A":"0.023","CHRG_A":"0.000"}
+
+1/24/2017:10:21AM sunny and cold
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17799"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18267"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"18136"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"13.07","PV_V":"15.95","DISCHRG_A":"0.000","CHRG_A":"0.089"}
+
+1/25/2017:13:48PM sunny and cold
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17607"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18200"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"18134"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"13.13","PV_V":"15.59","DISCHRG_A":"0.000","CHRG_A":"0.090"}
+
+1/26/2017:13:48PM sunny and cold
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17672"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18179"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"18075"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"13.17","PV_V":"15.64","DISCHRG_A":"0.000","CHRG_A":"0.098"}
+
+1/27/2017:13:28PM sunny
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17480"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18186"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17974"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"13.13","PV_V":"15.90","DISCHRG_A":"0.000","CHRG_A":"0.101"}
+
+1/28/2017:23:53PM night was a sunny day
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17698"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18240"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"18083"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.70","PV_V":"0.23","DISCHRG_A":"0.045","CHRG_A":"0.000"}
+
+1/29/2017:11:39AM sunny
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17647"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18250"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"18110"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"13.34","PV_V":"15.53","DISCHRG_A":"0.001","CHRG_A":"0.102"}
+
+1/30/2017:12:18PM sunny
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17748"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18303"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"18084"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"13.26","PV_V":"15.40","DISCHRG_A":"0.000","CHRG_A":"0.109"}
+
+1/31/2017:10:18PM sunny
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17807"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18349"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"18196"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"13.13","PV_V":"16.08","DISCHRG_A":"0.000","CHRG_A":"0.086"}
+
+2/2/2017:15:44 high clouds
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17925"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18211"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"18340"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.80","PV_V":"16.52","DISCHRG_A":"0.034","CHRG_A":"0.000"}
+
+2/3/2017:9:55 high clouds
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17963"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18322"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"18292"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"12.92","PV_V":"16.34","DISCHRG_A":"0.000","CHRG_A":"0.063"}
+
+2/4/2017:11:16 sunny (equalizing charge to last midnight)
+/1/flow? 1
+{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17942"}}
+/1/time? 1
+{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 2
+{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18367"}}
+/1/time? 2
+{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
+/1/flow? 3
+{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"18306"}}
+/1/time? 3
+{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
+/1/analog? 7,6,3,2
+{"PWR_V":"13.49","PV_V":"15.64","DISCHRG_A":"0.000","CHRG_A":"0.108"}
+
+Note: the charge controler seems to have been damaged from equalizing last night at just over 15V. In the morning it started normaly and then quit after it switched from MPPT to CV mode. I am not able to start it up again, but see nothing wrong. I happon to have had the analog command going so this is the data at the end of its life.
+{"PWR_V":"13.51","PV_V":"17.92","DISCHRG_A":"0.000","CHRG_A":"0.059"}
+{"PWR_V":"13.52","PV_V":"17.87","DISCHRG_A":"0.000","CHRG_A":"0.060"}
+{"PWR_V":"13.52","PV_V":"17.77","DISCHRG_A":"0.000","CHRG_A":"0.069"}
+{"PWR_V":"13.52","PV_V":"18.03","DISCHRG_A":"0.000","CHRG_A":"0.056"}
+{"PWR_V":"13.51","PV_V":"18.00","DISCHRG_A":"0.000","CHRG_A":"0.047"}
+{"PWR_V":"13.51","PV_V":"18.26","DISCHRG_A":"0.000","CHRG_A":"0.037"}
+{"PWR_V":"13.49","PV_V":"18.39","DISCHRG_A":"0.000","CHRG_A":"0.030"}
+{"PWR_V":"13.49","PV_V":"18.44","DISCHRG_A":"0.000","CHRG_A":"0.032"}
+{"PWR_V":"13.48","PV_V":"18.42","DISCHRG_A":"0.000","CHRG_A":"0.027"}
+{"PWR_V":"13.46","PV_V":"18.47","DISCHRG_A":"0.001","CHRG_A":"0.024"}
+{"PWR_V":"13.46","PV_V":"18.34","DISCHRG_A":"0.000","CHRG_A":"0.034"}
+{"PWR_V":"13.48","PV_V":"17.85","DISCHRG_A":"0.000","CHRG_A":"0.057"}
+{"PWR_V":"13.49","PV_V":"17.66","DISCHRG_A":"0.000","CHRG_A":"0.062"}
+{"PWR_V":"13.40","PV_V":"20.00","DISCHRG_A":"0.055","CHRG_A":"0.000"}
+{"PWR_V":"13.37","PV_V":"19.98","DISCHRG_A":"0.055","CHRG_A":"0.000"}
+{"PWR_V":"13.36","PV_V":"19.95","DISCHRG_A":"0.055","CHRG_A":"0.000"}
+{"PWR_V":"13.33","PV_V":"19.92","DISCHRG_A":"0.055","CHRG_A":"0.000"}
+
+The chip is rated at an absolute maximum voltage of 15V on the current sense pins. This shows that the charge controler will fail when a equalizing charge is done with the RPUno connected. 
+

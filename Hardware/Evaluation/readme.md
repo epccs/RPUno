@@ -45,139 +45,23 @@ A [Day-Night] state machine with a callback that is run after the morning deboun
 
 [Day-Night]: https://github.com/epccs/RPUno/tree/master/DayNight
 
-```
-12/17/2016:11:22AM 
-/1/flow? 1
-{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"15568"}}
-/1/time? 1
-{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
-/1/flow? 2
-{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"17315"}}
-/1/time? 2
-{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
-/1/flow? 3
-{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17259"}}
-/1/time? 3
-{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
-/1/analog? 7,6,3,2
-{"PWR_V":"13.36","PV_V":"16.08","DISCHRG_A":"0.000","CHRG_A":"0.096"}
+I let an RPUno^4 operate three Orbit 58874N valves from 12/17/2016 to 2/4/2017 using the day-nigh state machine to start operation of the three valves ten times each for ten seconds. [K3^0log] has the data, but some days are missing for various reasons (e.g. mostly I forgot to read it).
 
-12/18/2016:10:41AM shadow on PV
-/1/flow? 1
-{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"15342"}}
-/1/time? 1
-{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
-/1/flow? 2
-{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"17173"}}
-/1/time? 2
-{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
-/1/flow? 3
-{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17205"}}
-/1/time? 3
-{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
-/1/analog? 7,6,3,2
-{"PWR_V":"12.96","PV_V":"16.03","DISCHRG_A":"0.000","CHRG_A":"0.024"}
-
-12/20/2016: equalizing charge (using a car battery) also fixed a water line kink on K1
-
-12/20/2016:12:23PM high clouds
-/1/flow? 1
-{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17349"}}
-/1/time? 1
-{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
-/1/flow? 2
-{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"17635"}}
-/1/time? 2
-{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
-/1/flow? 3
-{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17373"}}
-/1/time? 3
-{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
-/1/analog? 7,6,3,2
-{"PWR_V":"13.24","PV_V":"15.72","DISCHRG_A":"0.000","CHRG_A":"0.065"}
-
-12/21/2016:13:02PM clouds and some rain
-/1/flow? 1
-{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17576"}}
-/1/time? 1
-{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
-/1/flow? 2
-{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18042"}}
-/1/time? 2
-{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
-/1/flow? 3
-{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17774"}}
-/1/time? 3
-{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
-/1/analog? 7,6,3,2
-{"PWR_V":"12.66","PV_V":"16.70","DISCHRG_A":"0.033","CHRG_A":"0.000"}
-
-
-12/23/2016:13:02PM clouds and rain
-/1/flow? 1
-{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17569"}}
-/1/time? 1
-{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
-/1/flow? 2
-{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"18146"}}
-/1/time? 2
-{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100001"}}
-/1/flow? 3
-{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17875"}}
-/1/time? 3
-{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
-/1/analog? 7,6,3,2
-{"PWR_V":"12.58","PV_V":"17.33","DISCHRG_A":"0.050","CHRG_A":"0.000"}
-
-12/26/2016:17:07PM sunny all day
-/1/flow? 1
-"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17370"}}
-/1/time? 1
-{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
-/1/flow? 2
-{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"17819"}}
-/1/time? 2
-{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
-/1/flow? 3
-{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17811"}}
-/1/time? 3
-{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
-/1/analog? 7,6,3,2
-{"PWR_V":"12.64","PV_V":"12.55","DISCHRG_A":"0.049","CHRG_A":"0.000"}
-
-12/27/2016:12:51AM sunny 
-# equalizing charge needed (still using a car battery) last night so no flow data today. 
-# I removed the charger in the morning, and after a few hours see it is floating (good).
-/1/analog? 7,6,3,2
-{"PWR_V":"13.56","PV_V":"19.04","DISCHRG_A":"0.000","CHRG_A":"0.023"}
-
-12/28/2016:17:07PM cloudy
-/1/flow? 1
-{"K1":{"cycle_state":"0","cycles":"0","flow_cnt":"17516"}}
-/1/time? 1
-{"K1":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
-/1/flow? 2
-{"K2":{"cycle_state":"0","cycles":"0","flow_cnt":"17929"}}
-/1/time? 2
-{"K2":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
-/1/flow? 3
-{"K3":{"cycle_state":"0","cycles":"0","flow_cnt":"17815"}}
-/1/time? 3
-{"K3":{"cycle_state":"0","cycles":"0","cycle_millis":"100000"}}
-/1/analog? 7,6,3,2
-{"PWR_V":"12.80","PV_V":"16.63","DISCHRG_A":"0.011","CHRG_A":"0.000"}
-```
+[K3^0log]: ./K3^0log.txt
 
 
 ## ^5 Flow Meter
 
-With the solenoid setup working it is time to initialize ICP1 and add [Capture] commands to the [Solenoid] program, which allows connecting a flow meter to the pulse capture input to see the pulse counts from the flow meter. I have an Adafruit PID:833 meter that has a small turbine and a hall sensor with an open drain output. Each pulse is about 2 milliliters. After the initialization that happens when reset occurs I see over 400 pulses went through each zone (e.g. in 1 second).
+With the solenoid setup working it is time to initialize ICP1 and add [Capture] commands to the [Solenoid] program, which allows connecting a flow meter to the pulse capture input to see the pulse counts from the flow meter. I have an [Adafruit PID:833] meter that has a small turbine and a hall sensor with an open drain output and 900 Ohm pullup. Each pulse is about 2 milliliters. After the initialization that happens when reset occurs I see over 400 pulses went through each zone (e.g. in 1 second).
 
 [Capture]: https://github.com/epccs/RPUno/tree/master/Capture
+[Adafruit PID:833]: https://www.adafruit.com/product/833
 
 ![Flow Meter](./RPUno^4+mod_FlowMeter.jpg "Solenoids and Flow Meter")
 
 ![RPUno FT/PULSE](./RPUno^4+mod_withCAT5toFlowMeter.jpg "RPUno FT/PULSE")
+
+UPDATE 2/5/2017: The flow meter has a pull-up so I did not need to use the 10mA pull-up on the board, which seems to be part of the reason why the 3W PV was not keeping the battery charged.
 
 ```
 /1/flow? 1

@@ -16,9 +16,10 @@ This is a list of Test preformed on each RPUno after assembly.
 7. [TPS3700 Window Comparator](#tps3700-window-comparator)
 8. [LT3652 Power Up Without Battery](#lt3652-power-up-without-battery)
 9. [LT3652 Load Test](#lt3652-load-test)
-10. [+5V From OKI-78SR-5](#5v-from-oki-78sr-5)
-11. [20mA Source](#current-sources)
-12. [Set MCU Fuse and Install Bootloader](#set-mcu-fuse-and-install-bootloader)
+10. [Bias +5V](#bias-5v)
+11. [+5V From OKI-78SR-5](#5v-from-oki-78sr-5)
+12. [20mA Source](#current-sources)
+13. [Set MCU Fuse and Install Bootloader](#set-mcu-fuse-and-install-bootloader)
 
 
 ## Basics
@@ -61,37 +62,40 @@ Apply a current limited (20mA) supply to the PV input with reverse polarity and 
 
 ## TPS3700 Window Comparator 
 
-Connect a 20mA rated LED between J4.1 and J4.3. Apply a current limited (&lt;50mA) supply starting at 12V to the +BAT and -BAT connector. Short S2 and then release it, which will force the battery to connect. Check that TP4 has been latched e.g. has voltage from supply. Increase the supply slowly until the LED turns on, but no more than 14V. This is the voltage at which the load connects, and should be about 13.1V. Now slowly reduce the supply until the LED turns off. This is the voltage at which the battery disconnects and should be about 11.58V. The parts used determine the actual voltages. 
+Apply a current limited (&lt;30mA) supply starting at 12V to the +BAT and -BAT connector. Connect 1k ohm between U2 pin 1 and pin 2 to give the VIN latch a load. Short S2 and then release it, which will force the battery to connect. Check that PWR has been latched to the battery with TP4 and that the VIN latch has not set with U2 pin 1. Increase the supply slowly until VIN on U2 pin 1 has power, but no more than 14V. This is the voltage at which the load connects, and should be about 13.1V. Now slowly reduce the supply until the LED turns off. This is the voltage at which the battery disconnects and should be about 11.58V. The parts used determine the actual voltages. 
 
 ```
-        TODO:  some data from unit(s)
-            { "LOAD_CONNNECT":[12.95,12.99,],
-               "DISCONNECT":[11.42,11.45,] }
+{ "LOAD_CONNNECT":[12.95,12.99,13.00,13.08],
+  "DISCONNECT":[11.42,11.45,11.47,11.45] }
 ```
 
 
 ## LT3652 Power Up Without Battery
 
-Connect 100 kOhm resistor to both the PV side and BAT side thermistor inputs to simulate room temperature. Connect an LED with 1k Ohm series resistor to the +LD and -LD. Apply a current limited (50mA) supply to the +PV and -PV inputs and adjust it to about 14V. Verify no output.  Next adjust the supply to 19V and verify a regulated voltage (13.63V) between +BAT and -BAT* pins. 
+Connect 100 kOhm resistor to both the PV side and BAT side thermistor inputs to simulate room temperature. Connect an electronic load to the +BAT and -BAT. Connect 1k ohm between U2 pin 1 and pin 2 to give the VIN latch a load. Connect a current limited (50mA) supply to the +PV and -PV inputs turn it on and increase the voltage to about 14V. Verify no output. Next increase the supply voltage to 19V and verify a regulated voltage (13.63V) between +BAT and -BAT* pins. 
 
 NOTE: the LT3652 goes into fault when started into my HP6050A in CC mode, which is by design. I can start the LT3652 with the load off, or in CV mode and then switch to CC. This note is to remind me that it is an expected behavior.
 
 ```
-        TODO:  some data from unit(s)
-            { "VOUT100K":[13.55,13.65,] }
+{ "VIN@100K":[13.55,13.65,13.62,13.66,] }
 ```
 
 
 ## LT3652 Load Test
 
-NOTE: this test is likely beyond the scope of the DIY, but anyone making more than a few of these should load test the converter and make sure it can dissipate heat.
-
-Connect 100 kOhm resistor to both the PV side and BAT side thermistor inputs to simulate room temperature. Connect a 20mA rated LED between J4.1 and J4.3. A voltage mode electronic load is used for this test, however, a partly discharged battery may also give results. Connect the electronic load between  the +BAT and -BAT pins. Set the electronic load voltage to 12.8V to simulate a battery. Connect +PV and -PV to a CC/CV mode supply with CC set at 150mA and CV set at 21V, apply the power. Verify the solar power point voltage is about 16.9V with the supply current CC at 150mA. Increase the supply CC setting until its voltage increases to 21V, e.g. the supply changes from CC to CV mode, and check that the charge controller is current limiting at about 1A with 0R068 placed on R3, also check if U1 (LT3652) is getting hot. Note that the voltage at UUT is higher than at the load because the wires drop some voltage (the load is still running at the 12.8V). 
+Connect 100 kOhm resistor to both the PV side and BAT side thermistor inputs to simulate room temperature. Connect an electronic load to the +BAT and -BAT. Connect 1k ohm between U2 pin 1 and pin 2 to give the VIN latch a load.  Set the electronic load voltage to 12.8V to simulate a battery. Connect +PV and -PV to a CC/CV mode supply with CC set at 50mA and  CV set at 0V. Apply power and increase the CV setting to 21V. Verify the solar power point voltage is about 16.9V, increase the supply current CC to 150mA and measure the power point voltage. Next increase the supply CC setting until its voltage increases to 21V, e.g. the supply changes from CC to CV mode, and check that the charge controller is current limiting at about 1.3A with 0R068 placed on R3, also check if U1 (LT3652) is getting hot. Note that the voltage at UUT is higher than at the load because the wires drop some voltage (the load is still running at the 12.8V). 
 
 ```
-        TODO:  some data from unit(s)
-            { "PP100K@150mA&amp;12V8":[16.86,16.88],
-               "CURR_LIMIT":[1.28,1.30,] }
+{ "PP100K@150mA&amp;12V8":[16.86,16.88,16.97,16.89,],
+  "CURR_LIMIT":[1.28,1.30,1.32,1.32,] }
+```
+
+## Bias +5V
+
+Apply a 5V current limited source (about 30mA*) to +5V (J7 pin 6 and pin 5). Check that the input current is for a blank MCU (e.g. less than 5mA). Turn off power.
+
+```
+{ "I_IN_BLANKMCU_mA":[]}
 ```
 
 
@@ -99,27 +103,26 @@ Connect 100 kOhm resistor to both the PV side and BAT side thermistor inputs to 
 
 NOTE: U2 needs added to the board.
 
-Power up like durring the load test and check the +5V supply at the ICSP header (e.g. between IOREF and 0V)
+Connect 100 kOhm resistor to both the PV side and BAT side thermistor inputs to simulate room temperature. Connect an 12V SLA battery to the +BAT and -BAT. Connect +PV and -PV to a CC/CV mode supply with CC set at 150mA and  CV set at 0V. Apply power and increase the CV setting to 21V. After the battery has charged up to the connect voltage then VIN will connect and power U2. Measure the +5V supply at J7 pin 6 and pin 5. Turn Power Off.
 
 ```
-        TODO:  some data from unit(s)
-            { "+5V":[5.00,4.99] }
+{ "+5V":[5.00,4.99,4.96,] }
 ```
+
 
 ## Current Sources
 
-Use a DMM to measure the 22mA current source for A0 from J4.1 to J4.3 (V0) and A1 from J4.5 to J4.3. Pulse Loop 17mA source, and Pulse Pull 10mA pull up current source. Digital IO 22mA current source. 
+Connect 100 kOhm resistor to both the PV side and BAT side thermistor inputs to simulate room temperature. Connect an 12V SLA battery to the +BAT and -BAT. Connect +PV and -PV to a CC/CV mode supply with CC set at 150mA and  CV set at 0V. Connect a 10k Ohm pull-up resistor from IO9 (J10 pin 9) to +5V. Apply power and increase the CV setting to 21V. Use a DMM to measure the 22mA current source for A0 from J4.1 to J4.3 (V0) and A1 from J4.5 to J4.3. Pulse Loop 17mA source, and Pulse Pull 10mA pull up current source. Digital IO 22mA current source. 
     
-NOTE: 17MA_PL and 10MA_PL need IO9 pulled up to IOREF (the pin is floating).
+```
+{ "22MA_A0":[20.7,21.6,21.9,],
+  "22MA_A1":[21.1,21.8,22.4,],
+  "17MA_PL":[18.6,18.4,18.5,],
+  "10MA_PL":[10.2,10.0,10.3,],
+  "22MA_IO":[21.7,22.0,22.1,]}
+```
 
-```
-        TODO:  some data from unit(s)
-            { "22MA_A0":[20.7,21.6,],
-               "22MA_A1":[21.1,21.8,],
-               "17MA_PL":[18.6,18.4,],
-               "10MA_PL":[10.2,10.0,],
-               "22MA_IO":[21.7,22.0,]}
-```
+NOTE: IO9 needs pulled up to 5V, the pin is floating when the MCU is not programed to control it.
 
 
 ## Set MCU Fuse and Install Bootloader
@@ -128,11 +131,11 @@ The MCU needs its fuses set, so a Makefile is used to do that. Apply a 5V curren
 
 Use the <https://github.com/epccs/RPUno/tree/master/Bootload> Makefile 
 
-Connect the ICSP tool and run "make fuse" to program the fuses, next run "make isp" to install the bootloader.Disconnect the ICSP tool and measure the input current. Turn off power.
+Connect the ICSP tool and run "make fuse" to program the fuses, next run "make isp" to install the bootloader.Disconnect the ICSP tool and measure the input current, wait 15 sec (or more) for the power to be settled. Turn off power.
 
 ```
-        TODO:  some data from unit(s)
-            { "I_IN_BLANKMCU_mA":[4.2,],
-            "I_IN_16MHZ_EXT_CRYST_mA":[11.0,]}
+{ "I_IN_BLANKMCU_WITH_U2_mA":[4.2,4.4],
+  "I_IN_16MHZ_EXT_CRYST_mA":[11.0,11.1]}
 ```
+
 

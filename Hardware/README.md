@@ -49,7 +49,8 @@ Bootloader options include [optiboot] and [xboot]. Uploading through a bootloade
 1. [Status](#status)
 2. [Design](#design)
 3. [Bill of Materials](#bill-of-materials)
-4. [How To Use](#how-to-use)
+4. [Assembly](#assembly)
+5. [How To Use](#how-to-use)
 
 
 # Status
@@ -57,9 +58,9 @@ Bootloader options include [optiboot] and [xboot]. Uploading through a bootloade
 ![Status](./status_icon.png "RPUno Status")
 
 ```
-        ^6  Done: Design, Layout, BOM, Review*,
-            WIP: Order Boards,
-            Todo: Assembly, Testing, Evaluation.
+        ^6  Done: Design, Layout, BOM, Review*, Order Boards, Assembly,
+            WIP: Testing,
+            Todo: Evaluation.
             *during review the Design may change without changing the revision.
             use ADC6 to measure the raw PV on Anode of dark blocking diode.  
 
@@ -106,9 +107,9 @@ MCU type: ATMega328p
 MCU clock: 16MHz
 MCU Voltage: 5V (e.g. IOREF is 5V)
 PULSE CURR SOURCE: 17mA current source for  MT, LT type sensors or to bias hall or VR sensor.
-PULSE ALT CURR SOURCE: 10mA source used to feed open collector on hall or VR sensors that will shunt it.
+PULSE ALT CURR SOURCE: 10mA source used to feed open collector on hall or VR sensors that can shunt it.
 PULSE CURR LOOP TERMINATION: 100 Ohm. Used to bias a NPN transistor that pulls down ICP1.
-DIGITAL: five levle protected to IOREF and diode clamped to VIN which may be disconnectd from battery
+DIGITAL: six levle protected and diode clamped to VIN
 ANALOG: two inputs with 20 mA current sources (from VIN) for loop sensor power.
 ```
 
@@ -139,16 +140,43 @@ Check correct assembly and function with [Testing](./Testing/)
 Import the [BOM](./Design/14140,BOM.csv) into LibreOffice Calc (or Excel) with semicolon separated values, or use a text editor.
 
 
+# Assembly
+
+## SMD
+
+The board is assembled with CHIPQUIK no-clean solder SMD291AX (RoHS non-compliant). 
+
+The SMD reflow is done in a Black & Decker Model NO. TO1303SB which has the heating elements controlled by a Solid State Relay and an ATMega328p loaded with this [Reflow] firmware.
+
+[Reflow]: ../Reflow
+
+## 10k Ohm Thermistor
+
+The LT3652 has sensor input used to ensure that the SLA is charged within the temperature window 0 to 40 deg C. The sensor needs to be located away from the circuit board somewhat so that the power conversion heat does not trip it. The length of wire should let the sensor rest against the DIN rail to measure the enclosure temperature. 
+
+![10kThermistor](./Documents/10kThermistor.jpg)
+
+## 100k Ohm Thermistor
+
+The LT3652 has a control loop for regulating the input voltage, which can be compensated to track the maximum power point of silicon photovoltaic string (36 cell's in this case). The power point of a silicon PV cell is well known and so is the amount it changes with temperature, so compensation is possible.
+
+Another control loop in the LT3652 is for regulating the SLA voltage, which needs to be compensated so that the charging voltage tracks with temperature to prevent battery damage.
+
+Both are compensated with a 100k Thermistor which is placed on a short wire mounted in heat shrink with some thermoplastic and connected to the pluggable screw terminals. When in use the installer will need to place a sensor under the PV panel and the other sensor near the battery. Use a sunlight resistant cable  between the PV panel and the enclosure, and for the battery temperature sensor use wiring appropriate for the enclosure. These sensors should be wired with twisted pair to minimize injecting noise into the charge controller.   
+
+![100kThermistor](./Documents/100kThermistor.jpg)
+
+
 # How To Use
 
 Fully charge the SLA battery that will be used, this step will help prevent frustration caused by waiting for the RPUno to charge it.
 
 Connect the application electronics (e.g. flow meter, Digital, and Analog) and check the connections. Then plug in the battery (which will remain disconnected). Next plug in the solar (PV) power, once the PV voltage is enough to enable the charger it will connect to the battery, and start charging (though nothing is visable, and this has caused some frustration). When the battery voltage is over 13.1V it will connect to the on board VIN and power-up. Buffered power ensures hiccup free operation. 
 
-In some ways, this board is like an Arduino Uno, but many functions are dedicated on the board.  Three digital lines (IO5, IO6, IO7) are connected to the solar charge controller. Two more digital lines (IO2, IO9) are used to control power to the SHLD_VIN and flow sensor current sources. Two analog lines (ADC4, ADC5) are dedicated to I2C (and not wired to the analog header). While four more analog lines (ADC7, ADC6, ADC3, ADC2) are used to measure the battery PWR voltage, PV_IN voltage, CHRG, and DISCHRG.
+In some ways, this board is like an Arduino Uno, but many functions are dedicated to the onboard hardware.  Three digital lines (IO5, IO6, IO7) are connected to the solar charge controller. Two more digital lines (IO2, IO9) are used to control power to the SHLD_VIN and current sources. Two analog lines (ADC4, ADC5) are dedicated to I2C (and not wired to the analog header). While four more analog lines (ADC7, ADC6, ADC3, ADC2) are used to measure the battery PWR voltage, PV_IN voltage, CHRG, and DISCHRG.
 
 Without connecting anything more than a battery and a solar panel there is a lot of firmware options to consider. How well suited this board is for a task is not easy to answer. 
 
-The [Solenoid] firmware is looking fairly interesting, it is a solenoid control state machine with some of the states using a timer with a programmed value. [Solenoid] also reads the flow sensor at specific states in order to accumulate the flow count (pulse count from flow meter) through the valve. It operates the valves several times with a delay between each operation. This should allow the drip irrigation to be done several times (e.g. 10 times with 5-minute watering and 30-minute delays between watering) during the day, rather than in one big pool (for 50 minutes). The idea is to give the vegetables a chance to use the water before it sinks bellow where their roots can access it. In my porous soil, the water sinks in fairly quick, I am looking forward to giving this idea a try. 
+The [Solenoid] firmware is looking fairly interesting, it is a solenoid control state machine with some of the states using a timer with a programmed value. [Solenoid] also reads the flow sensor at specific states in order to accumulate the flow count (i.e. the pulse count from a flow meter) into an irrigation zone feed by a solenoid valve. It allows operating the valves several times with a delay between each operation. This should allow the drip irrigation to be done in small doses several times (e.g. 10 times with 5-minute watering and 30-minute delays between watering) during the day, rather than in one big pool (i.e. for 50 minutes). The idea is to give the vegetables a chance to use the water before it sinks bellow where their roots have access. In my porous soil, the water sinks in fairly quick. 
 
 [Solenoid]: ../Solenoid

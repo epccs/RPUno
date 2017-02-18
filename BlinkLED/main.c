@@ -16,7 +16,6 @@
  * <http://www.gnu.org/licenses/>.
  */ 
 
-#define F_CPU 16000000UL
 #include <util/delay.h>
 #include <avr/io.h>
 #include "../lib/timers.h"

@@ -61,31 +61,50 @@
 #define DISCONNECT 6
 #define FAULT 7
 
-// RPUno board has no led but this is the normal place it would be found
-#define LED_BUILTIN 13 
+
 
 // UART on RPUno is for serial communication (never use these pins)
 #define RX0 0 
 #define TX0 1
 
 // VIN  pin shield power control
-#define VIN_POWER 2
+#define SHLD_VOUT_EN 2
 
-// Charge Controler (note use a weak pull up with CC_FAULT to read fault state) 
+// Plugable Digital Input/Outputs with Level shift
+#define DIO3 3
+#define DIO4 4
+
+// Charge Controler
 #define CC_SHUTDOWN 5
-#define CC_FAULT 7
 
-// Battery Control
+// Battery Control (Warning this will disconnect the battery)
 #define BAT_DISCONNECT 6
 
-// FT/Pulse current source control
-#define FT_POWER 9
+// Charge Controler not Fault (note use a weak pull up to read fault state) 
+#define CC_nFAULT 7
 
-// SPI on RPUno
-#define nSS 10 
-#define MOSI 11
-#define MISO 12
-#define SCK 13
+// ICP1 pin reads inverted from the plugable input with 100 Ohm termination
+#define ICP1 8
+
+// Current Source Enable
+#define CURR_SOUR_EN 9
+
+// Plugable Digital Input/Outputs with Level shift
+// SPI on RPUno is maped to the DIO
+#define DIO10 10
+#define nSS DIO10 
+
+#define DIO11 11
+#define MOSI DIO11
+
+#define DIO12 12
+#define MISO DIO12
+
+#define DIO13 13
+#define SCK DIO13
+
+// RPUno board has no led but this is the normal place it would be found
+#define LED_BUILTIN DIO13 
 
 // I2C on RPUno
 #define SDA 18
@@ -95,9 +114,13 @@
 // There are values from 0 to 1023 for 1024 slots where each reperesents 1/1024 of the reference. Last slot has issues
 // https://forum.arduino.cc/index.php?topic=303189.0      
 
-// PV_I_ADC1 is a high side current sense on CCtest board
-// PV_I_ADC1 voltage is analogRead(PV_I)*(5.0/1024.0)/(0.068*50.0)
-#define PV_I 1
+// ADC0 has a Plugable input with a 20mA current source
+// its voltage is analogRead(ADC0)*(5.0/1024.0)
+#define ADC0 0
+
+// ADC1 has a Plugable input with a 20mA current source
+// its voltage is analogRead(ADC1)*(5.0/1024.0)
+#define ADC1 1
 
 // CHRG_ADC2 voltage is analogRead(CHRG_I)*(5.0/1024.0)/(0.068*50.0)
 #define CHRG_I 2

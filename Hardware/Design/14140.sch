@@ -7472,7 +7472,7 @@ CRYSTAL ACCURACY.</text>
 <text x="362.204" y="118.872" size="1.27" layer="98">+5V</text>
 <text x="362.204" y="116.332" size="1.27" layer="98">+3V3</text>
 <text x="362.204" y="111.252" size="1.27" layer="98">IOREF</text>
-<text x="362.204" y="126.492" size="1.27" layer="98">VIN</text>
+<text x="362.204" y="126.492" size="1.27" layer="98">VOUT</text>
 <text x="362.204" y="123.952" size="1.27" layer="98">GND</text>
 <text x="362.204" y="121.412" size="1.27" layer="98">GND</text>
 <text x="362.204" y="113.792" size="1.27" layer="98">!RESET</text>
@@ -9801,7 +9801,7 @@ MT/HT/LT PULSE LOOP</text>
 <pinref part="R47" gate="G$1" pin="1"/>
 </segment>
 </net>
-<net name="SHLD_VIN" class="0">
+<net name="VOUT" class="0">
 <segment>
 <pinref part="J6" gate="G$1" pin="1"/>
 <pinref part="Q18" gate="G$1" pin="D"/>

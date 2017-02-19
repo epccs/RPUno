@@ -50,7 +50,11 @@ void setup(void)
     // Turn Off VOUT to shield (e.g. disconnect VIN from shield)
     pinMode(SHLD_VOUT_EN,OUTPUT);
     digitalWrite(SHLD_VOUT_EN,LOW);
-    
+
+    // Battery disconnect (don't let the pin glitch with a high)
+    digitalWrite(BAT_DISCONNECT,LOW);
+    pinMode(BAT_DISCONNECT,OUTPUT);
+
     // Charge control (don't let the pin glitch with a high)
     digitalWrite(CC_SHUTDOWN,LOW);
     pinMode(CC_SHUTDOWN,OUTPUT);
@@ -102,6 +106,9 @@ void setup(void)
 
 void test(void)
 {
+    // Info
+    printf_P(PSTR("Self Test date: %s\r\n"), __DATE__);
+    
     // I2C is used to read RPU bus manager address
     if (rpu_addr == '1')
     {
@@ -115,7 +122,7 @@ void test(void)
     }
 
     // +5V is used as the ADC reference (perhaps this could be given over the UART)
-    printf_P(PSTR("+5V needs measured and then set as ADC_REF: %1.3f A\r\n"), ADC_REF);
+    printf_P(PSTR("+5V needs measured and then set as ADC_REF: %1.3f V\r\n"), ADC_REF);
 
     // Current sources are off
     // Charge rate OK for 150mA input?
@@ -218,7 +225,7 @@ void test(void)
     
     // charge control shutdown
     digitalWrite(CC_SHUTDOWN,HIGH);
-    _delay_ms(50) ; // busy-wait delay
+    _delay_ms(200) ; // busy-wait delay. It needs some extra time for my supply to switch from CC mode to CV mode.
     float dischrg_i = analogRead(DISCHRG_I)*(ADC_REF/1024.0)/(0.068*50.0);
     printf_P(PSTR("Dischrging at: %1.3f A\r\n"), dischrg_i);
     if (dischrg_i < 0.05) 
@@ -227,6 +234,15 @@ void test(void)
         printf_P(PSTR(">>> Discharging is to low.\r\n"));
     }
 
+    // PV open circuit voltage (LT3652 is off)
+    float pvoc_v = analogRead(PV_V)*(ADC_REF/1024.0)*(532.0/100.0);
+    printf_P(PSTR("PV open circuit (LT3652 off) at: %1.3f V\r\n"), pvoc_v);
+    if (pvoc_v < 19.0) 
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> PV open circuit voltage is low.\r\n"));
+    }
+    
     // DIO13 and DIO12 high-z to add digital curr source to R1
     pinMode(DIO13,INPUT);
     pinMode(DIO12,INPUT);
@@ -250,7 +266,7 @@ void test(void)
     _delay_ms(50) ; // busy-wait delay
     float adc0_dio12_i = analogRead(ADC0)*(ADC_REF/1024.0) / R1;
     printf_P(PSTR("ADC0 measure curr on R1 with DIO12 shunting: %1.3f A\r\n"), adc0_dio12_i);
-    if (adc0_dio12_i > 0.035) 
+    if (adc0_dio12_i > 0.039) 
     { 
         passing = 0; 
         printf_P(PSTR(">>> DIO12 is not shunting.\r\n"));
@@ -262,7 +278,7 @@ void test(void)
     _delay_ms(50) ; // busy-wait delay
     float adc0_dio13_i = analogRead(ADC0)*(ADC_REF/1024.0) / R1;
     printf_P(PSTR("ADC0 measure curr on R1 with DIO13 shunting: %1.3f A\r\n"), adc0_dio13_i);
-    if (adc0_dio13_i > 0.035) 
+    if (adc0_dio13_i > 0.039) 
     { 
         passing = 0; 
         printf_P(PSTR(">>> DIO13 is not shunting.\r\n"));
@@ -292,7 +308,7 @@ void test(void)
     _delay_ms(50) ; // busy-wait delay
     float adc0_dio10_i = analogRead(ADC0)*(ADC_REF/1024.0) / R1;
     printf_P(PSTR("ADC0 measure curr on R1 with DIO10 shunting: %1.3f A\r\n"), adc0_dio10_i);
-    if (adc0_dio10_i > 0.035) 
+    if (adc0_dio10_i > 0.039) 
     { 
         passing = 0; 
         printf_P(PSTR(">>> DIO10 is not shunting.\r\n"));
@@ -304,11 +320,55 @@ void test(void)
     _delay_ms(50) ; // busy-wait delay
     float adc0_dio11_i = analogRead(ADC0)*(ADC_REF/1024.0) / R1;
     printf_P(PSTR("ADC0 measure curr on R1 with DIO11 shunting: %1.3f A\r\n"), adc0_dio11_i);
-    if (adc0_dio11_i > 0.035) 
+    if (adc0_dio11_i > 0.039) 
     { 
         passing = 0; 
         printf_P(PSTR(">>> DIO11 is not shunting.\r\n"));
     }
+
+    // DIO3 and DIO4 high-z to add icp1's 10mA and 16mA curr source to ICP1_TERM
+    pinMode(DIO3,INPUT);
+    pinMode(DIO4,INPUT);
+    _delay_ms(50) ; // busy-wait delay
+    float adc1_icp1all_i = analogRead(ADC1)*(ADC_REF/1024.0) / ICP1_TERM;
+    printf_P(PSTR("ICP1 10mA + 16mA curr source on ICP1_TERM: %1.3f A\r\n"), adc1_icp1all_i);
+    if (adc1_icp1all_i < 0.025) 
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> ICP1 10mA and 16mA curr source is to low\r\n"));
+    }
+    if (adc1_icp1all_i > 0.031) 
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> ICP1 10mA and 16mA curr source is to high.\r\n"));
+    }
+
+    // DIO3 high-z and DIO4 shunting most of the ICP1 curr source from going through ICP1_TERM
+    pinMode(DIO3,INPUT);
+    pinMode(DIO4,OUTPUT);
+    _delay_ms(50) ; // busy-wait delay
+    float adc1_dio4_i = analogRead(ADC0)*(ADC_REF/1024.0) / ICP1_TERM;
+    printf_P(PSTR("ICP1 curr on ICP1_TERM with DIO4 shunting: %1.3f A\r\n"), adc1_dio4_i);
+    if (adc1_dio4_i > 0.018) 
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> DIO4 is not shunting.\r\n"));
+    }
+
+    // DIO10 high-z and DIO11 shunting most of the ADC1 curr source from going through R1
+    pinMode(DIO4,INPUT);
+    pinMode(DIO3,OUTPUT);
+    _delay_ms(50) ; // busy-wait delay
+    float adc1_dio3_i = analogRead(ADC0)*(ADC_REF/1024.0) / ICP1_TERM;
+    printf_P(PSTR("ICP1 curr on ICP1_TERM with DIO3 shunting: %1.3f A\r\n"), adc1_dio3_i);
+    if (adc1_dio3_i > 0.018) 
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> DIO3 is not shunting.\r\n"));
+    }
+
+    // Disconnect message
+    printf_P(PSTR("To disconnect battery turn off the PV supply and LED should stop blinking\r\n"));
 
     // charge control startup
     digitalWrite(CC_SHUTDOWN,LOW);
@@ -322,6 +382,12 @@ void test(void)
     {
         printf_P(PSTR("[FAIL]\r\n"));
     }
+    printf_P(PSTR("\r\n\r\n\r\n"));
+    
+    // ESD packaging note
+    printf_P(PSTR("Only open the ESD shield bag in an ESD safe area.\r\n"));
+    printf_P(PSTR("Remove the shipping box and this paper from the area \r\n"));
+    printf_P(PSTR("before opening the ESD shield bag. \r\n"));
 }
 
 
@@ -388,6 +454,14 @@ int main(void)
     while (1) 
     {
         blink();
+        
+        // PV input voltage
+        float pv_v = analogRead(PV_V)*(ADC_REF/1024.0)*(532.0/100.0);
+        if (pv_v < 5.0) 
+        { 
+            digitalWrite(BAT_DISCONNECT,HIGH);
+            while (1) {}; // loop until the power is gone
+        }
     }    
 }
 

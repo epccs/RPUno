@@ -23,16 +23,17 @@ Bootloader options include [optiboot] and [xboot]. Uploading through a bootloade
         Pulse input for capacitive sensors HT, LT, MT, PT, VR, or OneShot.
         Optinal 10mA source for use with flow meters that have an open collector output.
         Two Analog Loops each with current sources from Vin.
-        Power off control to FT/Pulse (IO9) and Vin to Shield (IO2).
-        MCU power (+5V) is converted with an SMPS from the VIN output of the solar charge controller.
+        Currrent sources are turned off with DIO 9.
+        Power to the Shield Vin pin is turned off with DIO 2.
+        MCU power (+5V) is converted with an SMPS from the battery power.
 ```
 
 ## Uses
 
 ```
         Flow Meter Data Acquisition using Capture Hardware (ICP1).
-        20W PV is able to keep a Pi Zero with a WiFi dongle (see RPUpi shield) running through the night.
-        VIN to the shield can be powered down while the RPUno continues to run (also see RPUpi).
+        VIN to the shield can be powered down while the RPUno continues to run.
+        Power-maintained Bootstrap hardware e.g. starts a generator to pump some water on a blue moon.
 ```
 
 ## Notice
@@ -58,9 +59,9 @@ Bootloader options include [optiboot] and [xboot]. Uploading through a bootloade
 ![Status](./status_icon.png "RPUno Status")
 
 ```
-        ^6  Done: Design, Layout, BOM, Review*, Order Boards, Assembly,
-            WIP: Testing,
-            Todo: Evaluation.
+        ^6  Done: Design, Layout, BOM, Review*, Order Boards, Assembly, Testing,
+            WIP: Evaluation.
+            Todo: 
             *during review the Design may change without changing the revision.
             use ADC6 to measure the raw PV on Anode of dark blocking diode.  
 
@@ -109,8 +110,10 @@ MCU Voltage: 5V (e.g. IOREF is 5V)
 PULSE CURR SOURCE: 17mA current source for  MT, LT type sensors or to bias hall or VR sensor.
 PULSE ALT CURR SOURCE: 10mA source used to feed open collector on hall or VR sensors that can shunt it.
 PULSE CURR LOOP TERMINATION: 100 Ohm. Used to bias a NPN transistor that pulls down ICP1.
-DIGITAL: six levle protected and diode clamped to VIN
-ANALOG: two inputs with 20 mA current sources (from VIN) for loop sensor power.
+DIGITAL CURR SOURCES: 20mA source from VIN.
+DIGITAL: six level translated (to 5V) and diode clamped (to VIN) input/outputs.
+ANALOG CURR SOURCES two 20 mA sources from VIN which may feed 4-20mA sensors.
+ANALOG: two ADC channels with MCU voltage used as the reference (or an internal bandgap).
 ```
 
 ## Operating Temperature

@@ -56,13 +56,6 @@
 // #define analogInputToDigitalPin(p)  ((p < 8) ? (p) + 14 : -1)
 #define digitalPinHasPWM(p)         ((p) == 3 || (p) == 5 || (p) == 6 || (p) == 9 || (p) == 10 || (p) == 11)
 
-// LT3652 has some pins that may be connected to mega328p
-#define SHUTDOWN 5
-#define DISCONNECT 6
-#define FAULT 7
-
-
-
 // UART on RPUno is for serial communication (never use these pins)
 #define RX0 0 
 #define TX0 1

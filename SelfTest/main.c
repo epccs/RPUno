@@ -31,7 +31,7 @@ along with the Arduino DigitalIO Library.  If not, see
 #define BLINK_DELAY 1000UL
 
 // actual value of the +5V converter 
-#define ADC_REF 4.95
+#define ADC_REF 5.00
 
 #define R1 47.0
 #define ICP1_TERM 100.0

@@ -17,7 +17,6 @@ This is a list of Test preformed on each RPUno after assembly.
 8. [LT3652 Power Up Without Battery](#lt3652-power-up-without-battery)
 9. [LT3652 Load Test](#lt3652-load-test)
 10. [Bias +5V](#bias-5v)
-11. [+5V From OKI-78SR-5](#5v-from-oki-78sr-5)
 12. [20mA Source](#current-sources)
 13. [Set MCU Fuse and Install Bootloader](#set-mcu-fuse-and-install-bootloader)
 14. [Self Test](#self-test)
@@ -66,19 +65,19 @@ Apply a current limited (20mA) supply to the PV input with reverse polarity and 
 Apply a current limited (&lt;30mA) supply starting at 12V to the +BAT and -BAT connector. Connect 1k ohm between U2 pin 1 and pin 2 to give the VIN latch a load. Short S2 and then release it, which will force the battery to connect. Check that PWR has been latched to the battery with TP4 and that the VIN latch has not set with U2 pin 1. Increase the supply slowly until VIN on U2 pin 1 has power, but no more than 14V. This is the voltage at which the load connects, and should be about 13.1V. Now slowly reduce the supply until the LED turns off. This is the voltage at which the battery disconnects and should be about 11.58V.
 
 ```
-{ "LOAD_CONNNECT":[12.95,12.99,13.00,13.08],
-  "DISCONNECT":[11.42,11.45,11.47,11.45] }
+{ "LOAD_CONNNECT":[12.95,12.99,13.00,13.08,13.00,12.99,13.03,13.01,],
+  "DISCONNECT":[11.42,11.45,11.47,11.45,11.46,11.43,11.44,11.45,] }
 ```
 
 
 ## LT3652 Power Up Without Battery
 
-Connect 100 kOhm resistor to both the PV side and BAT side thermistor inputs to simulate room temperature. Connect an electronic load to the +BAT and -BAT. Connect 1k ohm between U2 pin 1 and pin 2 to give the VIN latch a load. Connect a current limited (50mA) supply to the +PV and -PV inputs turn it on and increase the voltage to about 14V. Verify no output. Next, increase the supply voltage to 19V and verify a regulated voltage (13.63V) between +BAT and -BAT* pins. 
+Connect 100 kOhm resistor to both the PV side and BAT side thermistor inputs to simulate room temperature. Connect an electronic load to the +BAT and -BAT. Connect 1k ohm between U2 pin 1 and pin 2 to give the VIN latch a load. Connect a current limited (50mA) supply to the +PV and -PV inputs turn it on and increase the voltage to about 14V. Verify no output. Next, increase the supply voltage to 21V and verify a regulated voltage (13.63V) between +BAT and -BAT* pins. 
 
 NOTE: the LT3652 goes into fault when started into my HP6050A in CC mode, which is by design. I can start the LT3652 with the load off, or in CV mode and then switch to CC. This note is to remind me that it is an expected behavior.
 
 ```
-{ "VIN@100K":[13.55,13.65,13.62,13.66,] }
+{ "VIN@100K":[13.55,13.65,13.62,13.66,13.65,13.64,13.64,13.59,] }
 ```
 
 
@@ -87,33 +86,64 @@ NOTE: the LT3652 goes into fault when started into my HP6050A in CC mode, which 
 Connect 100 kOhm resistor to both the PV side and BAT side thermistor inputs to simulate room temperature. Connect an electronic load to the +BAT and -BAT. Connect 1k ohm between U2 pin 1 and pin 2 to give the VIN latch a small load. Set the electronic load voltage to 12.8V to simulate a battery. Connect +PV and -PV to a CC/CV mode supply with CC set at 50mA and  CV set at 0V. Apply power and increase the CV setting to 21V. Verify the solar power point voltage is about 16.9V, increase the supply current CC to 150mA and measure the power point voltage. Next increase the supply CC setting until its voltage increases to 21V, e.g. the supply changes from CC to CV mode, and check that the charge controller is current limiting at about 1.3A with 0R068 placed on R3, also check if U1 (LT3652) is getting hot. Note that the voltage at UUT is higher than at the load because the wires drop some voltage (the load is still running at the 12.8V). 
 
 ```
-{ "PP100K@150mA&amp;12V8":[16.86,16.88,16.97,16.89,],
-  "CURR_LIMIT":[1.28,1.30,1.32,1.32,] }
+{ "PP100K@150mA&amp;12V8":[16.86,16.88,16.97,16.89,16.91,16.97,16.79,16.85,],
+  "CURR_LIMIT":[1.28,1.30,1.32,1.32,1.35,1.33,1.33,1.31,] }
 ```
+
 
 ## Bias +5V
 
-Apply a 5V current limited source (about 30mA*) to +5V (J7 pin 6 and pin 5). Check that the input current is for a blank MCU (e.g. less than 5mA). Turn off the power.
+Apply a 30mA current limited 5V source to +5V (J7 pin 6 and pin 5). Check that the input current is for a blank MCU (e.g. less than 5mA). Turn off the power.
 
 ```
-{ "I_IN_BLANKMCU_mA":[]}
+{ "I_IN_BLANKMCU_mA":[3.2,2.7,3.1,3.7,]}
 ```
 
 
-## +5V From OKI-78SR-5
+## Set MCU Fuse and Install Bootloader
 
-NOTE: U2 needs added to the board.
-
-Connect 100 kOhm resistor to both the PV side and BAT side thermistor inputs to simulate room temperature. Connect a 12V SLA battery to the +BAT and -BAT. Connect +PV and -PV to a CC/CV mode supply with CC set at 150mA and  CV set at 0V. Apply power and increase the CV setting to 21V. After the battery has charged up to the connect voltage then VIN will connect and power U2. Measure the +5V supply at J7 pin 6 and pin 5. Turn power off.
+Add U2 to the board now. Measurement of the input current is for referance (takes a long time to settle, 10mA ICP1 jumper is off).
 
 ```
-{ "+5V":[5.00,4.99,4.95,4.96,] }
+{ "I_IN_BLANKMCU_WITH_U2_mA":[4.2,4.4,6.4,6.9,5.4,7.4,7.1,]}
+```
+
+Install Git and AVR toolchain on Ubuntu (16.04, on an old computer try https://wiki.ubuntu.com/Lubuntu). 
+
+```
+sudo apt-get install git gcc-avr binutils-avr gdb-avr avr-libc avrdude
+```
+
+Clone the RPUadpt repository.
+
+```
+cd ~
+git clone https://github.com/epccs/RPUno
+cd ~/RPUno/Bootloader
+```
+
+Connect a 5V supply with CC mode set at 30mA to the +5V (J7 pin 6) and  0V (J7 pin 5). Connect the ICSP tool (J11). The MCU needs its fuses set, so run the Makefile rule to do that. 
+
+```
+make fuse
+```
+
+Next install the bootloader
+
+```
+make isp
+```
+
+Disconnect the ICSP tool and measure the input current, wait for the power to be settled. Turn off the power.
+
+```
+{ "I_IN_16MHZ_EXT_CRYST_mA":[11.0,11.1,12.8,11.8,11.6,12.6,12.8,]}
 ```
 
 
 ## Current Sources
 
-The self-test checks current sources, but keep some data for now.
+Skip this test: the self-test checks current sources now, but I will keep this data for now.
 
 Connect 100 kOhm resistor to both the PV side and BAT side thermistor inputs to simulate room temperature. Connect an 12V SLA battery to the +BAT and -BAT. Connect +PV and -PV to a CC/CV mode supply with CC set at 150mA and  CV set at 0V. Connect a 10k Ohm pull-up resistor from IO9 (J10 pin 9) to +5V. Apply power and increase the CV setting to 21V. Use a DMM to measure the 22mA current source for A0 from J4.1 to J4.3 (V0) and A1 from J4.5 to J4.3. Pulse Loop 17mA source, and Pulse Pull 10mA pull up current source. Digital IO 22mA current source. 
     
@@ -128,22 +158,7 @@ Connect 100 kOhm resistor to both the PV side and BAT side thermistor inputs to 
 NOTE: IO9 needs to be pulled up to 5V, the pin is floating when the MCU is not programmed to control it.
 
 
-## Set MCU Fuse and Install Bootloader
-
-The MCU needs its fuses set, so a Makefile is used to do that. Apply a 5V current limited source (about 30mA*) to +5V. Check that the input current is for a blank MCU (e.g. less than 5mA).
-
-Use the <https://github.com/epccs/RPUno/tree/master/Bootload> Makefile 
-
-Connect the ICSP tool and run "make fuse" to program the fuses, next run "make isp" to install the bootloader.Disconnect the ICSP tool and measure the input current, wait 15 sec (or more) for the power to be settled. Turn off the power.
-
-```
-{ "I_IN_BLANKMCU_WITH_U2_mA":[4.2,4.4],
-  "I_IN_16MHZ_EXT_CRYST_mA":[11.0,11.1]}
-```
-
 ## Self Test
-
-Use the <https://github.com/epccs/RPUno/tree/master/SelfTest> Firmware. Edit main.c such that "#define ADC_REF 5.0" has the correct value for the UUT.
 
 Plug an [RPUftdi] shield with [Host2Remote] firmware onto an [RPUno] board (not the UUT but a separate board) and load [I2C-Debug] on it.
 
@@ -157,6 +172,7 @@ Use picocom to set the bootload address on the RPUftdi shield. The RPUftdi is at
 ```
 picocom -b 38400 /dev/ttyUSB0
 ...
+Terminal ready
 /0/address 41
 {"address":"0x29"}
 /0/buffer 3,49
@@ -164,16 +180,35 @@ picocom -b 38400 /dev/ttyUSB0
 /0/read? 2
 {"rxBuffer":[{"data":"0x3"},{"data":"0x31"}]}
 ```
-Plug an [RPUadpt] shield with [Remote] firmware onto the UUT board. Note the RPUadpt address defaults to 0x31 when its firmware was installed.
+Exit picocom (Cntl^a and Cntl^x). Plug an [RPUadpt] shield with [Remote] firmware onto the UUT board. Note the RPUadpt address defaults to 0x31 when its firmware was installed.
 
 [RPUadpt]: https://github.com/epccs/RPUadpt
 [Remote]: https://github.com/epccs/RPUadpt/tree/master/Remote
 
-Connect the Self Test [Wiring] to the UUT. Connect 100 kOhm resistor to both the PV side and BAT side thermistor inputs to simulate room temperature. Connect a 12V SLA battery to the +BAT and -BAT. Connect +PV and -PV to a CC/CV mode supply with CC set at 150mA and  CV set at 0V. Apply power and increase the CV setting to 21V. Once the UUT connects
+Connect ICP1 (J8) jumper. Connect the Self Test [Harness] to the UUT. Connect 100 kOhm resistor to both the PV side and BAT side thermistor inputs to simulate room temperature. Connect a 12V SLA battery to the +BAT and -BAT. Connect +PV and -PV to a CC/CV mode supply with CC set at 150mA and  CV set at 0V. Apply power and increase the CV setting to 21V.
 
 [Harness]: https://raw.githubusercontent.com/epccs/RPUno/master/SelfTest/Setup/SelfTestWiring.png
 
-Once the UUT has power (battery charged to > 13.1V) check that the VIN pin on the shield has power (this is not tested by the self-test so it has to be done manually).  Next, run the bootload rule in the Makefile (i.e. run "make bootload") to upload the self-test firmware to the UUT that the remote shield is mounted on. Use picocom to see the SelfTest results over its UART interface.
+Once the UUT connects power (battery charged to > 13.1V) check that the VIN pin on the shield has power (this is not tested by the self-test so it has to be done manually).
+
+Measure the +5V supply at J7 pin 6 and pin 5.
+
+```
+{ "+5V":[5.00,4.99,4.95,4.96,5.00,4.99,4.97,5.00,] }
+```
+
+Edit the SelfTest main.c such that "#define ADC_REF 5.0" has the correct value for the UUT. Next, run the bootload rule in the Makefile to upload the self-test firmware to the UUT that the remote shield is mounted on.
+
+```
+cd ~RPUno/SelfTest
+gedit main.c
+make bootload
+# toss the change
+git checkout -- main.c
+```
+
+Use picocom to see the SelfTest results over its UART interface.
+
 
 ```
 picocom -b 38400 /dev/ttyUSB0
@@ -209,4 +244,4 @@ To disconnect battery turn off the PV supply and LED should stop blinking
 [PASS]
 ```
 
-Before disconnecting the battery check that the VIN pin on the shield has no power, the test turns it off. Then turn off the power supply and verify disconnect of the battery.
+Before truning off the PV power check that the VIN pin on the shield has no power, the test turns it off. Then turn off the power supply and verify battery was disconnected.

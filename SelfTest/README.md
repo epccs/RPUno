@@ -22,7 +22,7 @@ The red and green LED are used to indicate test status.
 
 Connect a fairly large 12V SLA battery and a 100k Ohm resistor to the battery thermistor input. The test looks for an MPPT voltage so the battery should be less than the float voltage. 
 
-The battery needs to charge to 13.1V before the VIN that powers MCU will connect. A large battery will give sufficient time to load the firmware and run a test before float voltage reached and the MPPT mode terminates.
+The battery needs to charge to 13.1V before the VIN that powers MCU will connect. A large battery will give sufficient time to load the firmware and run a test before the float voltage is reached and the MPPT mode terminates.
 
 ## Power Supply
 

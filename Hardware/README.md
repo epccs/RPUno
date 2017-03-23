@@ -79,6 +79,7 @@ Bootloader options include [optiboot] and [xboot]. Uploading through a bootloade
                       
         ^2  location: 2016-8-1 SEPortch Encl /w CCtest^0, RPUadpt^2, SLP003-12U, 6V SLA.
                       2017-1-17 running but not doing anything useful
+                      2017-3-19 scraped
 ```
 
 Debugging and fixing problems i.e. [Schooling](./Schooling/)
@@ -153,12 +154,6 @@ The SMD reflow is done in a Black & Decker Model NO. TO1303SB which has the heat
 
 [Reflow]: ../Reflow
 
-## 10k Ohm Thermistor
-
-The LT3652 has sensor input used to ensure that the SLA is charged within the temperature window 0 to 40 deg C. The sensor needs to be located away from the circuit board somewhat so that the power conversion heat does not trip it. The length of wire should let the sensor rest against the DIN rail to measure the enclosure temperature. 
-
-![10kThermistor](./Documents/10kThermistor.jpg)
-
 ## 100k Ohm Thermistor
 
 The LT3652 has a control loop for regulating the input voltage, which can be compensated to track the maximum power point of silicon photovoltaic string (36 cell's in this case). The power point of a silicon PV cell is well known and so is the amount it changes with temperature, so compensation is possible.
@@ -183,3 +178,11 @@ Without connecting anything more than a battery and a solar panel there is a lot
 The [Solenoid] firmware is looking fairly interesting, it is a solenoid control state machine with some of the states using a timer with a programmed value. [Solenoid] also reads the flow sensor at specific states in order to accumulate the flow count (i.e. the pulse count from a flow meter) into an irrigation zone feed by a solenoid valve. It allows operating the valves several times with a delay between each operation. This should allow the drip irrigation to be done in small doses several times (e.g. 10 times with 5-minute watering and 30-minute delays between watering) during the day, rather than in one big pool (i.e. for 50 minutes). The idea is to give the vegetables a chance to use the water before it sinks bellow where their roots have access. In my porous soil, the water sinks in fairly quick. 
 
 [Solenoid]: ../Solenoid
+
+## MPPT
+
+Is about optimizing the captured power (see [HackADay]).
+
+[HackADay]: https://hackaday.com/2017/03/17/are-you-down-with-mppt-yeah-you-know-me/#more-245987
+
+If you do not want to run a twisted parir to the solar panel then keep the thermistor connected to its input inside the enclosure, it will then track with the enclosure temperature, which is not bad especialy when the enclosure is in the sun near the solar panel.

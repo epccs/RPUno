@@ -4,6 +4,7 @@ Some lessons I learned doing RPUno.
 
 # Table Of Contents:
 
+10. [^5 LT3652 NTC 10k](#5-lt3652-ntc-10k)
 9. [^5 Baud Rate Framing Error](#5-baud-rate-framing-error)
 8. [^5 Current Source Power Off](#5-current-source-power-off)
 7. [^5 ADC6 to Anode](#5-adc6-to-anode)
@@ -13,6 +14,15 @@ Some lessons I learned doing RPUno.
 3. [^1 Reduce Current Sense Noise](#1-reduce-current-sense-noise)
 2. [^1 Battery Connector Polarity](#1-battery-connector-polarity)
 1. [^0 Add Reversed Battery Protection](#0-add-reversed-battery-protection)
+
+
+## ^5 LT3652 NTC 10k
+
+It is heating up again (March 19) in Tempe Arizona. The LT3652 charge controller has an NTC temperature sensor input, which has a window from 0 to 40 Celsius with a 10k B=3380 type thermistor. I had the thermistor inside the enclosure in direct sun. The enclosure is mounted under the solar panel. Unfortunately, I am finding the window is stopping the charge and I would actually rather let the battery cook with a charge than not get a charge. 
+
+![Enclosure](./14140^5,Enclosure.jpg "Enclosure")
+
+I'm not going to provide this thermistor, cause I find it to be a pessimistic value. Time will tell how long the battery will last when it is charged above 40 Celsius, but I know it will not last long without a charge. The LT3652 has a 50uA current source on the NTC pin and the voltage that develops is used by a few comparators (similar to how the TPS3700 works).
 
 
 ## ^5 Baud Rate Framing Error

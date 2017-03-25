@@ -69,6 +69,7 @@ Bootloader options include [optiboot] and [xboot]. Uploading through a bootloade
                       2017-1-1 This^5 had ADC7 parts (and BOM) changed to measre battery.
                       2017-1-5 This^5 had ADC6 hacked to measure raw PV.
                       2017-2-4 moved to SWall Encl /w K3^1, RPUadpt^4, SLP003-12U, 12V battery.
+                      2017-3-19 remove 10k thermistor which was used by  LT3652 to turn off chrg when over 40 C
 
         ^4  location: 2016-12-1 SWall Encl /w K3^0, RPUadpt^4, SLP003-12U, 12V battery.
                       2017-1-1 This^4 had ADC7 parts changed to measre battery.

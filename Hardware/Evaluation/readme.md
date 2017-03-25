@@ -7,6 +7,7 @@ This shows the setup and method used for evaluation of RPUno.
 
 # Table Of Contents:
 
+12. [^6 Power Example](#5-power-example)
 11. [^5 Power Management](#5-power-management)
 10. [^5 Day Night](#5-day-night)
 9. [^5 Flow Meter](#5-flow-meter)
@@ -19,6 +20,12 @@ This shows the setup and method used for evaluation of RPUno.
 2. [^2 20mA Loop With Open Collector To ICP1](#2-20ma-loop-with-open-collector-to-icp1)
 1. [^1 Mounting](#1-mounting)
 
+
+## ^6 Power Example
+
+![Power Example](./RPUno^6PowerExample.jpg "Power Example")
+
+A power setup evaluation. Note that hot glue (a.k.a. thermoplastic) is used to hold the thermistors in place. I find that the hot glue peels off when I want to move the thermistor. 
 
 ## ^5 Power Management
 

@@ -816,7 +816,7 @@ void SolenoidControl() {
                 if ((kRuntime) > ((unsigned long)BOOST_TIME)) 
                 {
                     set_solenoid(i+1);
-                    k[i].started_at = millis(); //start H-bridge SET has power
+                    k[i].started_at = millis(); //start time to wait for H-bridge to power a SET
                     k[i].cycle_state = 3;
                     break;
                 }
@@ -897,7 +897,7 @@ void SolenoidControl() {
                 if ((kRuntime) > ((unsigned long)BOOST_TIME)) 
                 {
                     reset_solenoid(i+1);
-                    k[i].started_at = millis(); //start H-bridge SET has power
+                    k[i].started_at = millis(); //start time to wait for H-bridge to power a RESET
                     k[i].cycle_state = 9;
                     break;
                 }

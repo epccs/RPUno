@@ -4,7 +4,7 @@ From <https://github.com/epccs/RPUno/>
 
 ## Overview
 
-This no frills programmable board has an Arduino-style header and an easy to use ATmega328p microcontroller. The embedded LT3652 solar charge controller manages power storage for a remote bare metal control and data acquisition application.
+This no frills programmable Solar Controller board has an Arduino-style header and an easy to use ATmega328p microcontroller. The embedded LT3652 solar charge controller manages power storage for a remote bare metal control and data acquisition application.
 
 [Store](https://www.tindie.com/products/ron-sutherland/rpuno/)
 
@@ -14,21 +14,20 @@ This no frills programmable board has an Arduino-style header and an easy to use
 
 [OSHpark](https://oshpark.com/shared_projects/84emcdT8)
 
-[I2Cdebug]: ./i2c-debug
-[RPUftdi]: https://github.com/epccs/RPUftdi
-[RPUadpt]: https://github.com/epccs/RPUadpt
-
 ## Status
 
 ![Status](https://raw.githubusercontent.com/epccs/RPUno/master/Hardware/status_icon.png "Status")
 
 ## [Hardware](./Hardware)
 
-Hardware, testing, evaluation, and schooling.
+Hardware files and notes for referance.
 
 ## Example with RPU BUS (RS-422)
 
 A serial bus that allows multiple microcontroller boards to be connected to a host serial port. An [RPUftdi] shield with an on board USB device (a UART bridge) is placed near the host computer (USB cables can only reach about 2 meters). The remote MCU board(s) use an [RPUadpt] shield and are connected as a daisy-chain up to perhaps 1000 meters with CAT5 cable. 
+
+[RPUftdi]: https://github.com/epccs/RPUftdi
+[RPUadpt]: https://github.com/epccs/RPUadpt
 
 ![MultiDrop](https://raw.githubusercontent.com/epccs/RPUno/master/Hardware/Documents/MultiDrop.png "RPUno MultiDrop")
 
@@ -80,16 +79,17 @@ Thanks for using picocom
 
 At present, I'm using [I2Cdebug] to set the bus manager on the [RPUftdi] shield, it needs to know which address to reset so that it can lockout the others during bootload. Solenoid is the star of the show (so far), it is an attempt to control latching irrigation valves with cycles (inspired by Vinduino) and start the cycle at a daylight based offset, flow sensing for each zone is also working.
 
+[I2Cdebug]: ./i2c-debug
+
 ## AVR toolchain
 
 The core files for this board are in the /lib folder. Each example has its files and a Makefile in its own folder. The toolchain packages that I use are available on Ubuntu and Raspbian. 
 
-* sudo apt-get install [gcc-avr]
-* sudo apt-get install [binutils-avr]
-* sudo apt-get install [gdb-avr]
-* sudo apt-get install [avr-libc]
-* sudo apt-get install [avrdude]
-    
+```
+sudo apt-get install git [gcc-avr] [binutils-avr] [gdb-avr] [avr-libc] [avrdude]
+git clone https://github.com/epccs/RPUno
+```
+
 [gcc-avr]: http://packages.ubuntu.com/search?keywords=gcc-avr
 [binutils-avr]: http://packages.ubuntu.com/search?keywords=binutils-avr
 [gdb-avr]: http://packages.ubuntu.com/search?keywords=gdb-avr

@@ -24,6 +24,8 @@ It is heating up again (March 19) in Tempe Arizona. The LT3652 charge controller
 
 I'm not going to provide this thermistor, cause I find it to be a pessimistic value. Time will tell how long the battery will last when it is charged above 40 Celsius, but I know it will not last long without a charge. The LT3652 has a 50uA current source on the NTC pin and the voltage that develops is used by a few comparators (similar to how the TPS3700 works).
 
+Back in early February, there were some warm days and I found the charger had stopped after having worked most of the day. The night before I had put an equalizing charge on the battery. I thought the 15V from equalizing had damaged the LT3652, but it worked fine when I got it to the bench. So now I think it had got too hot and the NTC pin turned it off.
+
 
 ## ^5 Baud Rate Framing Error
 

@@ -31,6 +31,7 @@ Bootloader options include [optiboot] and [xboot]. Uploading through a bootloade
 ## Uses
 
 ```
+        General Purpose Solar Controller
         Flow Meter Data Acquisition using Capture Hardware (ICP1).
         VIN to the shield can be powered down while the RPUno continues to run.
         Power-maintained Bootstrap hardware e.g. starts a generator to pump some water on a blue moon.

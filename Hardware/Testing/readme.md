@@ -24,13 +24,13 @@ This is a list of Test preformed on each RPUno after assembly.
 
 ## Basics
 
-These tests are for an assembled RPUno board 14140^5 which may be referred to as a Unit Under Test (UUT). If the UUT fails and can be reworked then do so, otherwise it needs to be scraped. 
+These tests are for an assembled RPUno board 14140^6 which may be referred to as a Unit Under Test (UUT). If the UUT fails and can be reworked then do so, otherwise it needs to be scraped. 
 
 **Warning: never use a soldering iron to rework ceramic capacitors due to the thermal shock.**
     
 Items used for test.
 
-![ItemsUsedForTest](https://raw.githubusercontent.com/epccs/RPUno/master/Hardware/Testing/14140,ItemsUsedForTest.jpg "RPUno Items Used For Test")
+![ItemsUsedForTest](./14140,ItemsUsedForTest.jpg "RPUno Items Used For Test")
 
 
 ## Assembly check
@@ -149,8 +149,8 @@ Connect 100 kOhm resistor to both the PV side and BAT side thermistor inputs to 
     
 ```
 { "22MA_A0":[20.7,21.6,21.9,21.9,],
-  "22MA_A1":[21.1,21.8,22.4,22.2.],
-  "17MA_PL":[18.6,18.4,18.5,18.4],
+  "22MA_A1":[21.1,21.8,22.4,22.2,],
+  "17MA_PL":[18.6,18.4,18.5,18.4,],
   "10MA_PL":[10.2,10.0,10.3,10.2,],
   "22MA_IO":[21.7,22.0,22.1,22.1,]}
 ```

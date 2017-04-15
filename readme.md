@@ -4,7 +4,7 @@ From <https://github.com/epccs/RPUno/>
 
 ## Overview
 
-This no frills programmable Solar Controller board has an Arduino-style header and an easy to use ATmega328p microcontroller. The embedded LT3652 solar charge controller manages power storage for a remote bare metal control and data acquisition application.
+This no frills Solar Controller board is open hardware and programmable. It has an easy to use microcontroller and Arduino-style headers. The embedded LT3652 solar charge controller manages battery charging while the ATmega328p interfaces with it (see Hardware for more details).
 
 [Store](https://www.tindie.com/products/ron-sutherland/rpuno/)
 
@@ -16,7 +16,7 @@ This no frills programmable Solar Controller board has an Arduino-style header a
 
 ## Status
 
-![Status](https://raw.githubusercontent.com/epccs/RPUno/master/Hardware/status_icon.png "Status")
+![Status](./Hardware/status_icon.png "Status")
 
 ## [Hardware](./Hardware)
 
@@ -29,11 +29,11 @@ A serial bus that allows multiple microcontroller boards to be connected to a ho
 [RPUftdi]: https://github.com/epccs/RPUftdi
 [RPUadpt]: https://github.com/epccs/RPUadpt
 
-![MultiDrop](https://raw.githubusercontent.com/epccs/RPUno/master/Hardware/Documents/MultiDrop.png "RPUno MultiDrop")
+![MultiDrop](./Hardware/Documents/MultiDrop.png "RPUno MultiDrop")
 
 Why not use plain RS485? I want the host computer to use common serial programs (e.g. avrdude, PySerial, picocom...), and the microcontroller to work with common UART control libraries (e.g. Arduino Uno core). Modbus could be used on both the host and the bare metal side but does not have firmware update tools. RS-422 (with the transceivers automatically activated) work with the common UART libraries and host programs for RS-232 so bootloaders can work as expected and so do the other serial programs (e.g. picocom and PySerial). 
 
-I prefer a Command Line Interface (CLI), so that is what the examples use. The CLI is programmed to respond to commands terminated with a newline, so remember to press enter (which sends a newline) before starting a command. The command includes an address with a leading and trailing forward slash "/". The command echo starts after the address (second byte) is sent. The first byte will cause any transmitting device to stop and dump its outgoing buffer which should prevent collisions since the echo is delayed until after the second byte. 
+I prefer a Command Line Interface (CLI), so that is what the examples use. The CLI is programmed to respond to commands terminated with a newline, so remember to press enter (which sends a newline) before starting a command. The command includes an address with a leading and trailing forward slash "/". The command echo starts after the address (second byte) is sent. The first byte ('/') will cause any transmitting device to stop and dump its outgoing buffer which should prevent collisions since the echo is delayed until after the second byte. 
 
 As a short example, I'll connect with SSH (e.g. from a Pi) to the machine (an old x86 with Ubuntu) that has a USB connection to the [RPUftdi] board. These machines have matching usernames and keys placed so I don't need to use passwords. Then I will use picocom to interact with two different RPUno boards. They are on the serial bus at addresses '1' and '0' (note that ASCII '1' is 0x31, and ASCII '0' is 0x30, so they have an address that looks good on picocom but is probably not what was expected).  
 
@@ -86,15 +86,15 @@ At present, I'm using [I2Cdebug] to set the bus manager on the [RPUftdi] shield,
 The core files for this board are in the /lib folder. Each example has its files and a Makefile in its own folder. The toolchain packages that I use are available on Ubuntu and Raspbian. 
 
 ```
-sudo apt-get install git [gcc-avr] [binutils-avr] [gdb-avr] [avr-libc] [avrdude]
+sudo apt-get install git gcc-avr binutils-avr gdb-avr avr-libc avrdude
 git clone https://github.com/epccs/RPUno
 ```
 
-[gcc-avr]: http://packages.ubuntu.com/search?keywords=gcc-avr
-[binutils-avr]: http://packages.ubuntu.com/search?keywords=binutils-avr
-[gdb-avr]: http://packages.ubuntu.com/search?keywords=gdb-avr
-[avr-libc]: http://packages.ubuntu.com/search?keywords=avr-libc
-[avrdude]: http://packages.ubuntu.com/search?keywords=avrdude
+* [gcc-avr](http://packages.ubuntu.com/search?keywords=gcc-avr)
+* [binutils-avr](http://packages.ubuntu.com/search?keywords=binutils-avr)
+* [gdb-avr](http://packages.ubuntu.com/search?keywords=gdb-avr)
+* [avr-libc](http://packages.ubuntu.com/search?keywords=avr-libc)
+* [avrdude](http://packages.ubuntu.com/search?keywords=avrdude)
 
 I am not a software developer (more of a hardware type), I started with the Arduino IDE and an Uno board and found it easy to do cool stuff, unfortunately, when I tried to do my own board it was more pain than gain. I noticed Elliot Williams articles on "Makefile Madness" on Hack-a-day, and that was sort of a turning point. 
 

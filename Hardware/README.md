@@ -2,14 +2,12 @@
 
 ## Overview
 
-This board is solar powered and has an ATmega328p. The Capture (ICP1) hardware is connected to an inverting open collector transistor that pulls down the ICP1 pin when current (e.g. 10mA) is flowing through a 100 Ohm sense resistor. The captured value is accurate to within one crystal count of the event (e.g. pulse edge caused by the transition of 3mA to 10mA from a current loop or a sensor output that goes open after it was a shunt for the 10mA source). This captured value is an excellent (e.g. crystal is 30ppm + drift) method for data acquisition from a flow meter or for other pulse interpolation task. The board also has six digital interfaces with voltage level conversion up to the board's internal supply voltage (VIN on schematic), and two analog inputs with current sources for two current loops. The ATmega328p can be programmed with the AVR toolchain on Debian which ends up in Ubuntu (upload from a host on [RPUftdi] shield), Raspbian (upload from a Pi Zero on a [RPUpi] shield), and others.
+This board is solar powered and has an ATmega328p. The Capture (ICP1) hardware is connected to an inverting open collector transistor that pulls down the ICP1 pin when current (e.g. 10mA) is flowing through a 100 Ohm sense resistor. The captured value is accurate to within one crystal count of the event (e.g. pulse edge caused by the transition of 3mA to 10mA from a current loop or a sensor output that goes open after it was a shunt for the 10mA source). This captured value is an excellent (e.g. crystal is 30ppm + drift) method for data acquisition from a flow meter or for other pulse interpolation task. The board also has six digital interfaces with voltage level conversion up to the board's internal supply voltage (VIN on schematic), and two analog inputs with current sources for two current loops. The ATmega328p can be programmed with the AVR toolchain on Debian, Ubuntu, Raspbian, and others. The toolchain is also available with the Arduino IDE, and PlatformIO.
 
 Bootloader options include [optiboot] and [xboot]. Uploading through a bootloader eliminates fuse setting errors and there are few register settings that can block an upload accidentally (some other bootloaders don't clear the watchdog and can get stuck in a loop). This has given the feel of robustness during my software development experience.
 
 [optiboot]: https://github.com/Optiboot/optiboot
 [xboot]: https://github.com/alexforencich/xboot
-[RPUpi]: https://github.com/epccs/RPUpi/
-[RPUftdi]: https://github.com/epccs/RPUftdi/
 
 ## Inputs/Outputs/Functions
 
@@ -110,8 +108,9 @@ Charge rate: about .055A per PV watt at 25ºC
 MCU type: ATMega328p
 MCU clock: 16MHz
 MCU Voltage: 5V (e.g. IOREF is 5V)
-PULSE CURR SOURCE: 17mA current source for  MT, LT type sensors or to bias hall or VR sensor.
-PULSE ALT CURR SOURCE: 10mA source used to feed open collector on hall or VR sensors that can shunt it.
+CAPTURE INPUTS: ICP1
+CAPTURE CURR SOURCE: 17mA.
+CAPTURE OC CURR SOURCE: 10mA used to feed an open collector sensor that can shunt it.
 PULSE CURR LOOP TERMINATION: 100 Ohm. Used to bias a NPN transistor that pulls down ICP1.
 DIGITAL CURR SOURCES: 20mA source from VIN.
 DIGITAL: six level translated (to 5V) and diode clamped (to VIN) input/outputs.
@@ -123,7 +122,7 @@ ANALOG: two ADC channels with MCU voltage used as the reference (or an internal 
 
 ```
         Charge control will shut down when outside 0 to 40 ºC
-        This is OSH so refer to the parts used for storage and operation limits.
+        Also refer to the parts used for storage and operation limits.
 ```
 
 ## Mounting
@@ -162,7 +161,7 @@ The LT3652 has a control loop for regulating the input voltage, which can be com
 
 Another control loop in the LT3652 is for regulating the SLA voltage, which needs to be compensated so that the charging voltage tracks with temperature to prevent battery damage.
 
-Both are compensated with a 100k Thermistor which is placed on a short wire mounted in heat shrink with some thermoplastic and connected to the pluggable screw terminals. When in use the installer will need to place a sensor under the PV panel and the other sensor near the battery. Use a sunlight resistant cable  between the PV panel and the enclosure, and for the battery temperature sensor use wiring appropriate for the enclosure. These sensors should be wired with twisted pair to minimize injecting noise into the charge controller.   
+Both are compensated with a 100k Thermistor which is placed on a short wire mounted in heat shrink with some thermoplastic and connected to the pluggable screw terminals. When in use the installer will need to place a sensor under the PV panel and the other sensor near the battery. Use a sunlight resistant cable between the PV panel and the enclosure, and for the battery temperature sensor use wiring appropriate for the enclosure. These sensors should be wired with twisted pair to minimize injecting noise into the charge controller.   
 
 ![100kThermistor](./Documents/100kThermistor.jpg)
 

@@ -6,15 +6,13 @@ From <https://github.com/epccs/RPUno/>
 
 This no frills Solar Controller board is open hardware and programmable. It has an easy to use microcontroller and Arduino-style headers. The embedded LT3652 solar charge controller manages battery charging while the ATmega328p interfaces with it (see Hardware for more details).
 
-[Store](https://www.tindie.com/products/ron-sutherland/rpuno/)
-
 [Forum](http://rpubus.org/bb/viewforum.php?f=6)
 
 [HackaDay](https://hackaday.io/project/12784-rpuno)
 
-[OSHpark](https://oshpark.com/shared_projects/84emcdT8)
-
 ## Status
+
+Available through [Tindie](https://www.tindie.com/products/ron-sutherland/rpuno-a-solar-powered-atmega328p-board/)
 
 ![Status](./Hardware/status_icon.png "Status")
 

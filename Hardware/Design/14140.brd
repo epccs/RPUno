@@ -3738,7 +3738,7 @@ design rules under a new name.</description>
 <wire x1="10.795" y1="23.583" x2="14.185" y2="23.583" width="0.254" layer="1"/>
 <wire x1="14.185" y1="23.583" x2="14.224" y2="23.622" width="0.254" layer="1"/>
 </signal>
-<signal name="5V88PL-DWN">
+<signal name="BAT-DISCON">
 <contactref element="R14" pad="2"/>
 <contactref element="D3" pad="C"/>
 <contactref element="R22" pad="1"/>
@@ -3957,7 +3957,7 @@ design rules under a new name.</description>
 <wire x1="35.941" y1="40.894" x2="36.703" y2="40.894" width="0.254" layer="1"/>
 <wire x1="36.703" y1="40.894" x2="37.167" y2="41.358" width="0.254" layer="1"/>
 </signal>
-<signal name="6V58PL-DWN">
+<signal name="VIN-DISCON">
 <contactref element="Q2" pad="3(D)"/>
 <contactref element="R4" pad="2"/>
 <contactref element="C2" pad="2"/>

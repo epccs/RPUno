@@ -7394,7 +7394,7 @@ ABOVE 40ºC OR BELOW 0ºC</text>
 <text x="151.892" y="154.178" size="1.27" layer="98">**10K  B = 3380
     NTC THERMISTOR
     0603 ON 0805 PAD</text>
-<text x="216.662" y="228.6" size="1.27" layer="98">VOUT 
+<text x="216.662" y="228.6" size="1.27" layer="98">VIN
 LATCH</text>
 <text x="119.126" y="143.51" size="1.27" layer="98">DISCONNECT 
 BATTERY AND 
@@ -7485,7 +7485,7 @@ CRYSTAL ACCURACY.</text>
 <text x="356.616" y="242.824" size="1.27" layer="98">NOTE: THE ARDUINO IDE (TOOLCHAIN)
 DOES NOT YET SUPPORT 328PB
 (iom328pb.h will show up with avr-libc when it does)</text>
-<text x="232.41" y="183.642" size="1.27" layer="98">Q6 BATTERY
+<text x="232.41" y="183.642" size="1.27" layer="98">BATTERY
 REVERSE 
 PROTECTION</text>
 <text x="204.47" y="176.53" size="1.27" layer="98">SHUTDOWN IF
@@ -7631,7 +7631,7 @@ Monolithic Power Solutions</text>
 <text x="290.068" y="30.988" size="1.6764" layer="98">ALL CS FROM CS_PWR
 ADC6 TO PV_RAW</text>
 <text x="320.294" y="32.004" size="1.778" layer="98">1/16/17</text>
-<text x="199.136" y="197.104" size="1.27" layer="98">Q5 BATTERY
+<text x="199.898" y="198.628" size="1.27" layer="98">BATTERY
 DISCONNECT</text>
 <text x="43.18" y="238.76" size="1.27" layer="98">AT DAY START U1 WILL SEND CURRENT THROUGH 
 BODY DIODE OF Q5 UNTIL U5 B-SIDE HAS A 
@@ -7643,9 +7643,9 @@ ON ITS A-SIDE TO TURN ON Q9 THAT PULLS DOWN
 ON Q1 GATE.</text>
 <text x="224.79" y="219.202" size="1.27" layer="98">ONCE Q1 IS 
 ON IT IS 
-LATCHED BY Q2</text>
-<text x="224.79" y="214.122" size="1.27" layer="98">Q2 LATCH RELEASES 
-WHEN U5 B-SIDE OPENS</text>
+HELD BY Q2</text>
+<text x="224.79" y="214.122" size="1.27" layer="98">Q2  RELEASES WHEN 
+TPS3700 B-SIDE OPENS</text>
 <text x="282.702" y="26.924" size="2.54" layer="98">^5</text>
 <text x="290.068" y="25.908" size="1.6764" layer="98">ADD 5V PLUG, PULL UP/DWN 
 IO2, 10K B=3380 CONN </text>
@@ -8554,7 +8554,7 @@ MT/HT/LT PULSE LOOP</text>
 <junction x="48.26" y="185.42"/>
 </segment>
 </net>
-<net name="5V88PL-DWN" class="0">
+<net name="BAT-DISCON" class="0">
 <segment>
 <wire x1="210.82" y1="200.66" x2="210.82" y2="190.5" width="0.1524" layer="91"/>
 <pinref part="R14" gate="G$1" pin="2"/>
@@ -8687,7 +8687,7 @@ MT/HT/LT PULSE LOOP</text>
 <junction x="91.44" y="154.94"/>
 </segment>
 </net>
-<net name="6V58PL-DWN" class="0">
+<net name="VIN-DISCON" class="0">
 <segment>
 <pinref part="Q2" gate="G$1" pin="D"/>
 <wire x1="215.9" y1="226.06" x2="215.9" y2="231.14" width="0.1524" layer="91"/>

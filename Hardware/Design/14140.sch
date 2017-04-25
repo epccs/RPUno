@@ -7404,7 +7404,7 @@ PWR IS &lt; 11.58V
 E.G. 1.5% HYSTERESIS</text>
 <text x="26.416" y="160.528" size="1.27" layer="98">OPEN COLLECTOR
 FAULT</text>
-<text x="22.86" y="173.482" size="1.27" layer="98">DISCONNECT 
+<text x="22.86" y="176.022" size="1.27" layer="98">DISCONNECT 
 BATTERY</text>
 <text x="119.126" y="133.35" size="1.27" layer="98">CONNECT 
 BATTERY WHEN
@@ -7663,6 +7663,10 @@ MT/HT/LT SENSOR</text>
 <wire x1="241.3" y1="88.9" x2="241.3" y2="83.82" width="0.1524" layer="98"/>
 <circle x="241.3" y="88.9" radius="0.254" width="0.381" layer="98"/>
 <text x="234.442" y="85.852" size="1.27" layer="98">1k OHM</text>
+<text x="5.842" y="166.116" size="1.27" layer="98">NOTE: PV POWER WILL
+CONNECT THE BATTERY BUT THE MCU WILL 
+EXPERIENCE A BROWN OUT SO DO NOT 
+DISCONNECT DURING THE DAY.</text>
 </plain>
 <instances>
 <instance part="FRAME1" gate="G$3" x="279.4" y="50.8"/>
@@ -7705,7 +7709,7 @@ MT/HT/LT SENSOR</text>
 <instance part="Q2" gate="G$1" x="215.9" y="220.98" rot="MR0"/>
 <instance part="R14" gate="G$1" x="218.44" y="198.12" rot="R270"/>
 <instance part="Q4" gate="G$1" x="50.8" y="172.72"/>
-<instance part="R6" gate="G$1" x="43.18" y="172.72"/>
+<instance part="R6" gate="G$1" x="43.18" y="175.26"/>
 <instance part="GND29" gate="1" x="53.34" y="165.1"/>
 <instance part="S1" gate="G$1" x="111.76" y="147.32" rot="R270"/>
 <instance part="C9" gate="G$1" x="121.92" y="185.42"/>
@@ -8620,6 +8624,7 @@ MT/HT/LT SENSOR</text>
 <segment>
 <pinref part="R6" gate="G$1" pin="2"/>
 <pinref part="Q4" gate="G$1" pin="B"/>
+<wire x1="48.26" y1="175.26" x2="48.26" y2="172.72" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$7" class="0">
@@ -9012,8 +9017,8 @@ MT/HT/LT SENSOR</text>
 <label x="353.06" y="208.28" size="1.27" layer="91" rot="R180" xref="yes"/>
 </segment>
 <segment>
-<wire x1="22.86" y1="172.72" x2="38.1" y2="172.72" width="0.1524" layer="91"/>
-<label x="22.86" y="172.72" size="1.27" layer="91" rot="R180" xref="yes"/>
+<wire x1="22.86" y1="175.26" x2="38.1" y2="175.26" width="0.1524" layer="91"/>
+<label x="22.86" y="175.26" size="1.27" layer="91" rot="R180" xref="yes"/>
 <pinref part="R6" gate="G$1" pin="1"/>
 </segment>
 </net>

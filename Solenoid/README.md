@@ -1,8 +1,21 @@
 # Solenoid Control 
 
+## Future improvements (to do)
+
+Did the flow meter not stop when the valve was closed, try to close the valve again a few times. Set a status value for the command line to read, and sort out a way to do a service request, perhaps with the bus manager.
+
+Option to include some scaled time (or flow count) based on PV power received. In other words, keep the peak mA-Sec per hour charge rate and use it to scale the last measured hour of that value to add solenoid time (or flow count). 
+
 ## Overview
 
-Solenoid is an interactive command line program that demonstrates control of the K3 latching solenoid driver board using the I/O pins of an ATmega328p. 
+Solenoid is an interactive command line program that demonstrates control of the K3 latching solenoid driver board using the I/O pins on an ATmega328p. 
+
+The solenoid state machine is implemented with the SolenoidControl() function. However before that can be used LoadSolenoidControlFromEEPROM() needs to fill the solenoid array with saved values and initialize it with StartSolenoid(), both of which are done when the day-night state machine runs the callback_for_day_attach() function.
+
+Once the state machine has started it allows an initial delay, which is used at power up to make sure the valves are all off, they are run for a second with a delay to offset each one. Once the initial delay is done then the cycles begin which includes a runtime and a delay. Durring the runtime the flowmeater is marked in use and the flow counts are recorded for that solenoid. If the delay is not enough to allow the other valves to run then the lowest number valve has priority (due to the logic of the program) and will hog the runtime.
+
+The implementation is very flexible, for example, there are resources constraints like when the boost converter is in use, or when the flow meter is in use. These constraints need to block other solenoids from using them even if they have passed a wait time between usage. This is critical for insuring  the flow meter values for a solenoid are in fact for that solenoid.
+
 
 ## Wiring K3 to RPUno
 

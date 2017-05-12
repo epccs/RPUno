@@ -151,7 +151,7 @@ void enable_ADC_auto_conversion(uint8_t free_run)
     // clear ADATE, not Auto Trigger Enable
     // set ADIE, Interrupt Enable
     // set ADPS[2:0], Prescaler division factor (128, thus 16M/128 = 125kHz ADC clock)
-    // Note, the first instruction takes 25 ADC clocks to execute, next takes 13 clocks
+    // Note, the first reading takes 25 ADC clocks, the next takes 13 clocks
 #if defined(ADCSRA)
 	// set a2d prescaler so we are inside the desired 50-200 KHz range.
 	#if F_CPU >= 16000000 // 16 MHz / 128 = 125 KHz

@@ -210,7 +210,7 @@ void blink(void)
     }
 }
 
-void day_status(void)
+void blink_day_status(void)
 {
     unsigned long kRuntime = millis() - day_status_blink_started_at;
     uint8_t state = DayState();
@@ -265,11 +265,11 @@ int main(void)
 
     while(1) 
     { 
-        // use LED to show if I2C has a bus manager
+        // use LED_BUILTIN to show if I2C has a bus manager
         blink();
         
-        // use LED to show day_state
-        day_status();
+        // use DAYNIGHT_STATUS_LED to show day_state
+        blink_day_status();
 
         // Check Day Light is a function that operates a day-night state machine.
         CheckDayLight(); // day_night.c

@@ -2,6 +2,8 @@
 TARGET = AmpHr
 LIBDIR = ../lib
 OBJECTS = main.o \
+	power_storage.o \
+	../DayNight/day_night.o \
 	../Adc/analog.o \
 	../Uart/id.o \
 	$(LIBDIR)/timers.o \

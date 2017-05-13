@@ -8,7 +8,13 @@ On RPUno ADC2 is connected to a high side current sense for charging and ADC3 is
 
 Since the mcu is good with integers (not floats) the units will be mA*mSec as integers. 
 
-## Firmware Upload
+
+# Start of Day 
+
+The [day-night][../DayNight] state machine is used to load and run EEPROM values after the morning debounce. This means the valves will start to cycle after the delay_start time has elapsed each morning.
+
+
+# Firmware Upload
 
 With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
 
@@ -29,7 +35,7 @@ picocom -b 38400 /dev/ttyUSB0
 or log the terminal session
 
 ``` 
-script -f -c "picocom -b 38400 /dev/ttyUSB0" stuff.log
+script -f -c "picocom -b 38400 /dev/ttyUSB0" stuff.json
 ``` 
 
 
@@ -56,16 +62,16 @@ identify
 
 ##  /0/charge?
 
-Report the charge gain since the day-night state machine switched from morning debounce to the day state. The charge and discharge values are zeroed at the start of the day as soon as charging is detected. 
+Report the charge gain since the day-night state machine switched from morning debounce to the day state. The charge and discharge accumulation values are zeroed at the start of the day. 
 
 ``` 
 /1/charge?
-{"CHRG_mAmSec":"123450","DAY_mSec":"12345"}
+{"CHRG_mAmSec":"123450","ACCUM_mSec":"12345"}
 ```
 
 ##  /0/discharge?
 
-Report the charge loss since the day-night state machine switched from morning to day and began charging. 
+Report the charge loss since the day-night state machine switched from morning to day. 
 
 ``` 
 /1/discharge?
@@ -80,3 +86,8 @@ Report the difference between charge and discharge that was present at the time 
 /1/remaining?
 {"RMNG_mAmSec":"123450"}
 ```
+
+## [/0/day?](../DayNight#0day)
+
+
+## [/0/analog? 0..7[,0..7[,0..7[,0..7[,0..7]]]]](../Adc#0analog-0707070707)

@@ -27,8 +27,10 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/pins_board.h"
 #include "../Uart/id.h"
 #include "../Adc/analog.h"
+#include "../DayNight/day_night.h"
+#include "power_storage.h"
 
-// how fast does the reading change?
+// how fast does the charge and discharge reading change? (it can be fast)
 // at 16MHz the adc clock runs at 125kHz (see the core file ../lib/adc.c)
 // the first reading takes 25 ADC clocks and the next takes 13 ADC clocks.
 // since the channel changes with each new reading it always takes 25 ADC clocks for each reading.
@@ -37,6 +39,11 @@ http://www.gnu.org/licenses/gpl-2.0.html
 // The ADC is off 84% of the time so most of the power saving is relized.
 #define ADC_DELAY_MILSEC 10UL
 static unsigned long adc_started_at;
+
+#define DAYNIGHT_STATUS_LED 4
+#define DAYNIGHT_BLINK 500UL
+static unsigned long day_status_blink_started_at;
+
 #define BLINK_DELAY 1000UL
 static unsigned long blink_started_at;
 static unsigned long blink_delay;
@@ -46,12 +53,28 @@ void ProcessCmd()
 { 
     if ( (strcmp_P( command, PSTR("/id?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
     {
-        Id("Adc");
+        Id("Adc"); // ../Uart/id.c
+    }
+    if ( (strcmp_P( command, PSTR("/day?")) == 0) && ( (arg_count == 0 ) ) )
+    {
+        Day(); // ../DayNight/day_night.c
     }
     if ( (strcmp_P( command, PSTR("/analog?")) == 0) && ( (arg_count >= 1 ) && (arg_count <= 5) ) )
     {
-        Analog();
+        Analog(); // ../Adc/analog.c
     }
+    if ( (strcmp_P( command, PSTR("/charge?")) == 0) && ( (arg_count == 0 ) ) )
+    {
+        Charge(); // ./power_storage.c
+    }
+}
+
+//At start of each day determine the remaining charge and zero the charge and discharge values.
+void callback_for_day_attach(void)
+{
+    // TBD
+    // save the remaining charge as differanc between the charge and discharge values
+    // zero the charge and discharge values
 }
 
 void setup(void) 
@@ -59,7 +82,11 @@ void setup(void)
 	// RPUuno has no LED, but LED_BUILTIN is defined as pin 13 anyway.
     pinMode(LED_BUILTIN,OUTPUT);
     digitalWrite(LED_BUILTIN,HIGH);
-    
+
+    // A DayNight status LED is on digital pin 4
+    pinMode(DAYNIGHT_STATUS_LED,OUTPUT);
+    digitalWrite(DAYNIGHT_STATUS_LED,HIGH);
+
     // Initialize Timers, ADC, and clear bootloader, Arduino does these with init() in wiring.c
     initTimers(); //Timer0 Fast PWM mode, Timer1 & Timer2 Phase Correct PWM mode.
     init_ADC_single_conversion(EXTERNAL_AVCC); // warning AREF must not be connected to anything
@@ -83,6 +110,7 @@ void setup(void)
     sei(); 
     
     blink_started_at = millis();
+    day_status_blink_started_at = millis();
     
     rpu_addr = get_Rpu_address();
     blink_delay = BLINK_DELAY;
@@ -107,6 +135,45 @@ void blink(void)
     }
 }
 
+void blink_day_status(void)
+{
+    unsigned long kRuntime = millis() - day_status_blink_started_at;
+    uint8_t state = DayState();
+    if ( ( (state == DAYNIGHT_EVENING_DEBOUNCE_STATE) || \
+           (state == DAYNIGHT_MORNING_DEBOUNCE_STATE) ) && \
+           (kRuntime > (DAYNIGHT_BLINK/2) ) )
+    {
+        digitalToggle(DAYNIGHT_STATUS_LED);
+        
+        // set for next toggle 
+        day_status_blink_started_at += DAYNIGHT_BLINK/2; 
+    }
+    if ( ( (state == DAYNIGHT_DAY_STATE) ) && \
+           (kRuntime > (DAYNIGHT_BLINK) ) )
+    {
+        digitalWrite(DAYNIGHT_STATUS_LED,HIGH);
+        
+        // set for next toggle 
+        day_status_blink_started_at += DAYNIGHT_BLINK; 
+    }
+    if ( ( (state == DAYNIGHT_NIGHT_STATE) ) && \
+           (kRuntime > (DAYNIGHT_BLINK) ) )
+    {
+        digitalWrite(DAYNIGHT_STATUS_LED,LOW);
+        
+        // set for next toggle 
+        day_status_blink_started_at += DAYNIGHT_BLINK; 
+    }
+    if ( ( (state == DAYNIGHT_FAIL_STATE) ) && \
+           (kRuntime > (DAYNIGHT_BLINK/8) ) )
+    {
+        digitalToggle(DAYNIGHT_STATUS_LED);
+        
+        // set for next toggle 
+        day_status_blink_started_at += DAYNIGHT_BLINK/8; 
+    }
+}
+
 void adc_burst(void)
 {
     unsigned long kRuntime= millis() - adc_started_at;
@@ -123,9 +190,15 @@ int main(void)
 
     while(1) 
     { 
-        // use LED to show if I2C has a bus manager
+        // use LED_BUILTIN to show if I2C has a bus manager
         blink();
-        
+
+        // use DAYNIGHT_STATUS_LED to show day_state
+        blink_day_status();
+
+        // delay between ADC burst
+        adc_burst();
+
         // check if character is available to assemble a command, e.g. non-blocking
         if ( (!command_done) && uart0_available() ) // command_done is an extern from parse.h
         {
@@ -145,10 +218,7 @@ int main(void)
             uart0_flush(); 
             initCommandBuffer();
         }
-        
-        // delay between ADC burst
-        adc_burst();
-          
+
         // finish echo of the command line befor starting a reply (or the next part of a reply)
         if ( command_done && (uart0_availableForWrite() == UART_TX0_BUFFER_SIZE) )
         {

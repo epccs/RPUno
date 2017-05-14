@@ -31,6 +31,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 // through a high side current sense to the battery, it is used to measure charging and discharging
 // ADC channel 3 (DISCHRG_I) is converted to current with analogRead(DISCHRG_I)*(5.0/1024.0)/(0.068*50.0))
 // ADC channel 2 (CHRG_I) is converted to current with analogRead(CHRG_I)*(5.0/1024.0)/(0.068*50.0))
+// the fine accumulators are for the adc reading * millis counts (e.g.  it is in mSec and needs scaled with above)
 
 static unsigned long chrgTmrStartOfAccum;
 static unsigned long chrgTmrStarted;
@@ -50,32 +51,32 @@ void Charge(void)
     if ( (command_done == 10) )
     {
         serial_print_started_at = millis();
-        printf_P(PSTR("{\"CHRG_ASec\":"));
+        printf_P(PSTR("{\"CHRG_mAHr\":"));
         command_done = 11;
     }
     else if ( (command_done == 11) )
     { 
-        printf_P(PSTR("\"%1.2f\","),(chrg_accum*(5.0/1024.0)/(0.068*50.0)));
+        printf_P(PSTR("\"%1.2f\","),( (chrg_accum*(5.0/1024.0)/(0.068*50.0)))/3.6 );
         command_done = 12;
     }
     else if ( (command_done == 12) )
     {
-        printf_P(PSTR("\"DCHRG_ASec\":"));
+        printf_P(PSTR("\"DCHRG_mAHr\":"));
         command_done = 13;
     }
     else if ( (command_done == 13) )
     { 
-        printf_P(PSTR("\"%1.2f\","),(dischrg_accum*(5.0/1024.0)/(0.068*50.0)));
+        printf_P(PSTR("\"%1.2f\","),( (dischrg_accum*(5.0/1024.0)/(0.068*50.0)))/3.6 );
         command_done = 14;
     }
     else if ( (command_done == 14) )
     {
-        printf_P(PSTR("\"RMNG_ASec\":"));
+        printf_P(PSTR("\"RMNG_mAHr\":"));
         command_done = 15;
     }
     else if ( (command_done == 15) )
     { 
-        printf_P(PSTR("\"%1.2f\","),(remaining_accum*(5.0/1024.0)/(0.068*50.0)));
+        printf_P(PSTR("\"%1.2f\","),( (remaining_accum*(5.0/1024.0)/(0.068*50.0)))/3.6 );
         command_done = 16;
     }
     else if ( (command_done == 16) )

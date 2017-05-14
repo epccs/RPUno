@@ -2,13 +2,9 @@
 
 ## Overview
 
-Note: values are reported in Amp-Seconds. To convert the reported value to the typical notion divide by 3600. 
-
 On RPUno ADC2 is connected to a high side current sense for charging and ADC3 is connected to one for discharging. The [Adc] firmware is used to take the direct readings. This interactive command line program demonstrates how the ATmega328p can be used to estimate the solar power that has been stored, or discharged. 
 
 [Adc]: ../Adc
-
-Since the mcu is good with integers (not floats) the units will be mA*mSec as integers. 
 
 
 # Start of Day 
@@ -68,17 +64,24 @@ Report the charge gain and loss since the day-night state machine switched from 
 
 ``` 
 /1/charge?
-{"CHRG_ASec":"0.67","DCHRG_ASec":"0.00","RMNG_ASec":"0.00","ACCUM_Sec":"9.12"}
-{"CHRG_ASec":"5.11","DCHRG_ASec":"0.00","RMNG_ASec":"0.00","ACCUM_Sec":"69.12"}
-{"CHRG_ASec":"9.56","DCHRG_ASec":"0.00","RMNG_ASec":"0.00","ACCUM_Sec":"129.12"}
-{"CHRG_ASec":"14.00","DCHRG_ASec":"0.00","RMNG_ASec":"0.00","ACCUM_Sec":"189.12"}
-{"CHRG_ASec":"18.44","DCHRG_ASec":"0.00","RMNG_ASec":"0.00","ACCUM_Sec":"249.12"}
-{"CHRG_ASec":"22.88","DCHRG_ASec":"0.00","RMNG_ASec":"0.00","ACCUM_Sec":"309.12"}
-{"CHRG_ASec":"27.32","DCHRG_ASec":"0.00","RMNG_ASec":"0.00","ACCUM_Sec":"369.12"}
+{"CHRG_mAHr":"0.00","DCHRG_mAHr":"0.03","RMNG_mAHr":"0.00","ACCUM_Sec":"6.24"}
+{"CHRG_mAHr":"0.00","DCHRG_mAHr":"0.27","RMNG_mAHr":"0.00","ACCUM_Sec":"66.24"}
+{"CHRG_mAHr":"0.00","DCHRG_mAHr":"0.51","RMNG_mAHr":"0.00","ACCUM_Sec":"126.24"}
+{"CHRG_mAHr":"0.00","DCHRG_mAHr":"0.74","RMNG_mAHr":"0.00","ACCUM_Sec":"186.24"}
+{"CHRG_mAHr":"0.00","DCHRG_mAHr":"0.98","RMNG_mAHr":"0.00","ACCUM_Sec":"246.24"}
+{"CHRG_mAHr":"0.00","DCHRG_mAHr":"1.22","RMNG_mAHr":"0.00","ACCUM_Sec":"306.24"}
+{"CHRG_mAHr":"0.00","DCHRG_mAHr":"1.46","RMNG_mAHr":"0.00","ACCUM_Sec":"366.24"}
+{"CHRG_mAHr":"0.00","DCHRG_mAHr":"1.70","RMNG_mAHr":"0.00","ACCUM_Sec":"426.24"}
+{"CHRG_mAHr":"0.00","DCHRG_mAHr":"1.94","RMNG_mAHr":"0.00","ACCUM_Sec":"486.24"}
+{"CHRG_mAHr":"0.00","DCHRG_mAHr":"2.18","RMNG_mAHr":"0.00","ACCUM_Sec":"546.24"}
 /1/analog? 2,3,6,7
-{"CHRG_A":"0.076","DISCHRG_A":"0.000","PV_V":"16.86","PWR_V":"13.54"}
-# note an LED is blinking
+{"CHRG_A":"0.000","DISCHRG_A":"0.026","PV_V":"0.29","PWR_V":"13.17"}
+{"CHRG_A":"0.000","DISCHRG_A":"0.024","PV_V":"0.29","PWR_V":"13.18"}
+{"CHRG_A":"0.000","DISCHRG_A":"0.022","PV_V":"0.23","PWR_V":"13.14"}
 ```
+
+Note that a LED was blinking when the ADC value was taken, also it is not a buffered value so the UART has just finished sending the last block of data (e.g. "\"DISCHRG_A\":") and the reading from ADC is a buffered value that likely includes the transceivers current usage. The accumulated charge seems to show that about 15mA is the average used over the first 66 Seconds. 15mA is not what the MCU is using it is what the SMPS is converting from 13V into 5V for the MCU (e.g. about 30mA).
+
 
 ## [/0/day?](../DayNight#0day)
 

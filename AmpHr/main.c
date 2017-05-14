@@ -121,8 +121,8 @@ void setup(void)
         blink_delay = BLINK_DELAY/4;
     }
     
-    // this is not needed but why not use it.
-    init_ChargAccumulation();
+    // set callback. so the DayNight state machine can reset the accumulated charge and discharge values
+    Day_AttachDayWork(callback_for_day_attach);
 }
 
 void blink(void)

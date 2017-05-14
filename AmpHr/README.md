@@ -2,6 +2,8 @@
 
 ## Overview
 
+Note: values are reported in Amp-Seconds. To convert the reported value to the typical notion divide by 3600. 
+
 On RPUno ADC2 is connected to a high side current sense for charging and ADC3 is connected to one for discharging. The [Adc] firmware is used to take the direct readings. This interactive command line program demonstrates how the ATmega328p can be used to estimate the solar power that has been stored, or discharged. 
 
 [Adc]: ../Adc
@@ -62,29 +64,20 @@ identify
 
 ##  /0/charge?
 
-Report the charge gain since the day-night state machine switched from morning debounce to the day state. The charge and discharge accumulation values are zeroed at the start of the day. 
+Report the charge gain and loss since the day-night state machine switched from morning debounce to the day state, where charge and discharge accumulators were zeroed. Also, report the remaining or difference between the charge and discharge accumulators that was present at the time the values were last zeroed. 
 
 ``` 
 /1/charge?
-{"CHRG_mAmSec":"123450","ACCUM_mSec":"12345"}
-```
-
-##  /0/discharge?
-
-Report the charge loss since the day-night state machine switched from morning to day. 
-
-``` 
-/1/discharge?
-{"DCHRG_mAmSec":"123450","DAY_mSec":"12345"}
-```
-
-##  /0/remaining?
-
-Report the difference between charge and discharge that was present at the time the values were last zeroed. This can be a negative value, but that means a power deficet for the day (where is that credit card... choped up!, opps).
-
-``` 
-/1/remaining?
-{"RMNG_mAmSec":"123450"}
+{"CHRG_ASec":"0.67","DCHRG_ASec":"0.00","RMNG_ASec":"0.00","ACCUM_Sec":"9.12"}
+{"CHRG_ASec":"5.11","DCHRG_ASec":"0.00","RMNG_ASec":"0.00","ACCUM_Sec":"69.12"}
+{"CHRG_ASec":"9.56","DCHRG_ASec":"0.00","RMNG_ASec":"0.00","ACCUM_Sec":"129.12"}
+{"CHRG_ASec":"14.00","DCHRG_ASec":"0.00","RMNG_ASec":"0.00","ACCUM_Sec":"189.12"}
+{"CHRG_ASec":"18.44","DCHRG_ASec":"0.00","RMNG_ASec":"0.00","ACCUM_Sec":"249.12"}
+{"CHRG_ASec":"22.88","DCHRG_ASec":"0.00","RMNG_ASec":"0.00","ACCUM_Sec":"309.12"}
+{"CHRG_ASec":"27.32","DCHRG_ASec":"0.00","RMNG_ASec":"0.00","ACCUM_Sec":"369.12"}
+/1/analog? 2,3,6,7
+{"CHRG_A":"0.076","DISCHRG_A":"0.000","PV_V":"16.86","PWR_V":"13.54"}
+# note an LED is blinking
 ```
 
 ## [/0/day?](../DayNight#0day)

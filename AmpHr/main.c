@@ -53,7 +53,7 @@ void ProcessCmd()
 { 
     if ( (strcmp_P( command, PSTR("/id?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
     {
-        Id("Adc"); // ../Uart/id.c
+        Id("AmpHr"); // ../Uart/id.c
     }
     if ( (strcmp_P( command, PSTR("/day?")) == 0) && ( (arg_count == 0 ) ) )
     {
@@ -70,11 +70,10 @@ void ProcessCmd()
 }
 
 //At start of each day determine the remaining charge and zero the charge and discharge values.
+// consider that DayNigh has no includes for power_storage but I can pass it in a callback... is that not odd?
 void callback_for_day_attach(void)
 {
-    // TBD
-    // save the remaining charge as differanc between the charge and discharge values
-    // zero the charge and discharge values
+    init_ChargAccumulation(); 
 }
 
 void setup(void) 
@@ -121,6 +120,9 @@ void setup(void)
         rpu_addr = '0';
         blink_delay = BLINK_DELAY/4;
     }
+    
+    // this is not needed but why not use it.
+    init_ChargAccumulation();
 }
 
 void blink(void)
@@ -179,7 +181,7 @@ void adc_burst(void)
     unsigned long kRuntime= millis() - adc_started_at;
     if ((kRuntime) > ((unsigned long)ADC_DELAY_MILSEC))
     {
-        enable_ADC_auto_conversion(BURST_MODE);
+        enable_ADC_auto_conversion(BURST_MODE); // ../lib/adc.c
         adc_started_at += ADC_DELAY_MILSEC; 
     } 
 }
@@ -196,17 +198,23 @@ int main(void)
         // use DAYNIGHT_STATUS_LED to show day_state
         blink_day_status();
 
+        // Check Day Light is a function that operates a day-night state machine.
+        CheckDayLight(); // ../DayNight/day_night.c
+
         // delay between ADC burst
         adc_burst();
 
+        // check how much charge went into battery
+        CheckChrgAccumulation();
+    
         // check if character is available to assemble a command, e.g. non-blocking
         if ( (!command_done) && uart0_available() ) // command_done is an extern from parse.h
         {
             // get a character from stdin and use it to assemble a command
-            AssembleCommand(getchar());
+            AssembleCommand(getchar()); // ../lib/parse.c
 
             // address is an ascii value, warning: a null address would terminate the command string. 
-            StartEchoWhenAddressed(rpu_addr);
+            StartEchoWhenAddressed(rpu_addr); // ../lib/parse.c
         }
         
         // check if a character is available, and if so flush transmit buffer and nuke the command in process.
@@ -215,8 +223,8 @@ int main(void)
         if ( command_done && uart0_available() )
         {
             // dump the transmit buffer to limit a collision 
-            uart0_flush(); 
-            initCommandBuffer();
+            uart0_flush(); // ../lib/uart.c
+            initCommandBuffer(); // ../lib/parse.c
         }
 
         // finish echo of the command line befor starting a reply (or the next part of a reply)
@@ -224,13 +232,13 @@ int main(void)
         {
             if ( !echo_on  )
             { // this happons when the address did not match 
-                initCommandBuffer();
+                initCommandBuffer(); // ../lib/parse.c
             }
             else
             {
                 if (command_done == 1)  
                 {
-                    findCommand();
+                    findCommand(); // ../lib/parse.c
                     command_done = 10;
                 }
                 
@@ -241,7 +249,7 @@ int main(void)
                 }
                 else 
                 {
-                    initCommandBuffer();
+                    initCommandBuffer(); // ../lib/parse.c
                 }
             }
          }

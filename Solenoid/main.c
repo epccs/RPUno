@@ -254,7 +254,7 @@ void adc_burst(void)
     unsigned long kRuntime= millis() - adc_started_at;
     if ((kRuntime) > ((unsigned long)ADC_DELAY_MILSEC))
     {
-        enable_ADC_auto_conversion(BURST_MODE);
+        enable_ADC_auto_conversion(BURST_MODE); // ../lib/adc.c
         adc_started_at += ADC_DELAY_MILSEC; 
     } 
 }
@@ -272,7 +272,7 @@ int main(void)
         blink_day_status();
 
         // Check Day Light is a function that operates a day-night state machine.
-        CheckDayLight(); // day_night.c
+        CheckDayLight(); // ../DayNight/day_night.c
 
         // delay between ADC burst
         adc_burst();

@@ -50,26 +50,46 @@ void Charge(void)
     if ( (command_done == 10) )
     {
         serial_print_started_at = millis();
-        printf_P(PSTR("{\"CHRG_mAmSec\":"));
+        printf_P(PSTR("{\"CHRG_ASec\":"));
         command_done = 11;
     }
     else if ( (command_done == 11) )
     { 
-        printf_P(PSTR("\"%lu\","),(chrg_accum));
+        printf_P(PSTR("\"%1.2f\","),(chrg_accum*(5.0/1024.0)/(0.068*50.0)));
         command_done = 12;
     }
     else if ( (command_done == 12) )
-    { 
-        printf_P(PSTR("\"ACCUM_mSec\":"));
+    {
+        printf_P(PSTR("\"DCHRG_ASec\":"));
         command_done = 13;
     }
     else if ( (command_done == 13) )
     { 
-        printf_P(PSTR("\"%lu\""),(chrgTmrStarted - chrgTmrStartOfAccum));
-        printf_P(PSTR("}\r\n"));
+        printf_P(PSTR("\"%1.2f\","),(dischrg_accum*(5.0/1024.0)/(0.068*50.0)));
         command_done = 14;
     }
-    else if ( (command_done == 14) ) 
+    else if ( (command_done == 14) )
+    {
+        printf_P(PSTR("\"RMNG_ASec\":"));
+        command_done = 15;
+    }
+    else if ( (command_done == 15) )
+    { 
+        printf_P(PSTR("\"%1.2f\","),(remaining_accum*(5.0/1024.0)/(0.068*50.0)));
+        command_done = 16;
+    }
+    else if ( (command_done == 16) )
+    { 
+        printf_P(PSTR("\"ACCUM_Sec\":"));
+        command_done = 17;
+    }
+    else if ( (command_done == 17) )
+    { 
+        printf_P(PSTR("\"%1.2f\""),((chrgTmrStarted - chrgTmrStartOfAccum)/1000.0));
+        printf_P(PSTR("}\r\n"));
+        command_done = 18;
+    }
+    else if ( (command_done == 18) ) 
     { // delay between JSON printing
         unsigned long kRuntime= millis() - serial_print_started_at;
         if ((kRuntime) > ((unsigned long)SERIAL_PRINT_DELAY_MILSEC))

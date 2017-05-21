@@ -10,11 +10,32 @@ LED = B5
 LED_START_FLASHES = 0
 BOOT_FLASH_SECTION_START = 0x7e00
 VERSION_PLACED_AT_FLASH_LOCATION = 0x7ffe
+
+# the efuse uses the lower three bits, so some tools read it as 0x05.
+# also the lockbit uses the lower five bits, so some tools read unlock as 0xFF and lock as 0xEF
+# http://eleccelerator.com/fusecalc/fusecalc.php?chip=atmega328p&LOW=FF&HIGH=DE&EXTENDED=05&LOCKBIT=3F
 LOW_FUSE = 0xFF
 HIGH_FUSE = 0xDE
 EXTENDED_FUSE = 0xFD
 UNLOCK_FUSE = 0x3F
 LOCK_FUSE = 0x2F
+
+CPPFLAGS = -DF_CPU=$(F_CPU) -DBAUD=$(BAUD)
+CPPFLAGS += -DLED_START_FLASHES=$(LED_START_FLASHES)
+CPPFLAGS += $(LED_DATA_FLASH_CMD) -DLED=$(LED) 
+
+# BIGBOOT adds extra features, but takes up 1K.
+# CPPFLAGS += -DBIGBOOT=1
+
+# SOFT_UART: AVR305 soft-UART instead of hardware UART
+# CPPFLAGS += -DSOFT_UART=1
+
+# LED_DATA_FLASH: Flash LED when transferring data
+# CPPFLAGS += -DLED_DATA_FLASH=1
+
+# UART: number (0..n) for devices with more than  one hardware uart (644P, 1284P, etc)
+# CPPFLAGS += -DUART=0
+
 
 ## Cross-compilation
 CC = avr-gcc
@@ -27,53 +48,27 @@ BOOT_PORT = /dev/ttyUSB0
 ISP_PORT = /dev/ttyACM0
 
 ## Compiler/linker options
-COMMON_OPTIONS = -DBAUD=$(BAUD) -DLED_START_FLASHES=$(LED_START_FLASHES)
-COMMON_OPTIONS += $(LED_DATA_FLASH_CMD) -DLED=$(LED) 
+CFLAGS  = -g -Wall -Os -fno-split-wide-types -mrelax -fno-caller-saves 
 
-# BIGBOOT adds extra features, but takes up 1K.
-# COMMON_OPTIONS += -DBIGBOOT=1
-
-# SOFT_UART: AVR305 soft-UART instead of hardware UART
-# COMMON_OPTIONS += -DSOFT_UART=1
-
-# LED_DATA_FLASH: Flash LED when transferring data
-# COMMON_OPTIONS += -DLED_DATA_FLASH=1
-
-# UART: number (0..n) for devices with more than  one hardware uart (644P, 1284P, etc)
-# COMMON_OPTIONS += -DUART=0
-
-CFLAGS  = -g -Wall -Os -fno-split-wide-types -mrelax -fno-caller-saves -mmcu=$(MCU) -DF_CPU=$(F_CPU)
-CFLAGS += $(COMMON_OPTIONS)
+TARGET_ARCH = -mmcu=$(MCU)
 
 LDFLAGS = -Wl,--section-start=.text=$(BOOT_FLASH_SECTION_START) -Wl,--section-start=.version=$(VERSION_PLACED_AT_FLASH_LOCATION) -Wl,--relax -nostartfiles -nostdlib
 #-Wl,--gc-sections
 
 
-# Note about fuses:
-# the efuse should really be 0xf8; since, however, only the lower
-# three bits of that byte are used on the atmega168, avrdude gets
-# confused if you specify 1's for the higher bits.
-#
-# similarly, the lock bits should be 0xff instead of 0x3f (to
-# unlock the bootloader section) and 0xcf instead of 0x2f (to
-# lock it), but since the high two bits of the lock byte are
-# unused, avrdude would get confused.
-
 all: $(TARGET)_$(MCU)_-b$(BAUD)_F_CPU$(F_CPU).hex $(TARGET)_$(MCU)_-b$(BAUD)_F_CPU$(F_CPU).lst
 
-FORCE:
-
-baudcheck: FORCE
+baudcheck: 
 	- @$(CC) --version
-	- @$(CC) $(CFLAGS) -E baudcheck.c -o baudcheck.tmp.sh
+	- @$(CC) $(CFLAGS) -DF_CPU=$(F_CPU) -DBAUD=$(BAUD) -E baudcheck.c -o baudcheck.tmp.sh
 	- @bash baudcheck.tmp.sh
 	rm -f baudcheck.tmp.sh
 
 # platforms support EEPROM and large bootloaders need the eeprom functions that
-# are defined in libc (e.g. the -lc option), even though it was explicity remove it with 
+# are defined in libc (e.g. the -lc option), even though they were explicity remove with 
 # -nostdlib to save space.
-%.elf: $(OBJECTS) baudcheck FORCE
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< -lc
+%.elf: $(OBJECTS) baudcheck
+	$(CC) $(LDFLAGS) $(TARGET_ARCH) -o $@ $< -lc
 	$(SIZE) $@
 
 fuse: 

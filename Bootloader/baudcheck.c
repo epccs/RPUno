@@ -21,7 +21,7 @@
  * First strip any trailing "L" from the defined constants.  To do this
  * we need to make the constants into shell variables first.
  */
-bpsx=BAUD_RATE
+bpsx=BAUD
 bps=${bpsx/L/}
 bps=${bps/U/}
 fcpux=F_CPU

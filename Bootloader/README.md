@@ -6,7 +6,9 @@ AVR microcontrollers are usually programmed through an In-circuit Serial Program
 
 ![Simplified Core Logic](./SimplifiedCoreLogic.png "Simplified Core Logic")
 
-Unfortunalty to install a serial bootloader requires an ICSP tool. Arduino has an ArduinoISP.ino <../ArduinoISP> file that I load into a seperate ATmega328 board to use as an ICSP tool.
+Unfortunalty to install a serial bootloader requires an ICSP tool. Arduino has an [ArduinoISP] sketch that I load into a Arduino Unod to use as an ICSP tool.
+
+[ArduinoISP]: https://github.com/arduino/Arduino/blob/master/build/shared/examples/11.ArduinoISP/ArduinoISP/ArduinoISP.ino
 
 It is a two step process. First run "make fuse" which will unlock the boot flash section and set fuses (LOW, HIGH, EXTENDED). The changed fuse setting will switch operation form the internal oscilator to the exteranl crystal, if it is missing the MCU will be locked up. The second step is "make isp" which will load the bootloader and lock the boot flash section, which should prohibit the Store Program Memory (SPM) instruction from running in the boot flash section. 
 

@@ -1,14 +1,15 @@
 # Makefile
-TARGET = optiboot_flash
+TARGET = optiboot_rpuno
+OBJECTS = main.o
 
 ## Chip and project-specific global definitions
 MCU = atmega328p
 F_CPU = 16000000L
-BAUD = 250000
+BAUD = 115200
 LED = B5
 LED_START_FLASHES = 3
-BOOTLOAD_START = 0x7e00
-BOOTLOAD_VERSION_FLASH_LOCATION = 0x7ffe
+BOOT_FLASH_SECTION_START = 0x7e00
+VERSION_PLACED_AT_FLASH_LOCATION = 0x7ffe
 LOW_FUSE = 0xFF
 HIGH_FUSE = 0xDE
 EXTENDED_FUSE = 0xFD
@@ -26,7 +27,7 @@ BOOT_PORT = /dev/ttyUSB0
 ISP_PORT = /dev/ttyACM0
 
 ## Compiler/linker options
-COMMON_OPTIONS = -DBAUD_RATE=$(BAUD) -DLED_START_FLASHES=$(LED_START_FLASHES)
+COMMON_OPTIONS = -DBAUD=$(BAUD) -DLED_START_FLASHES=$(LED_START_FLASHES)
 COMMON_OPTIONS += $(LED_DATA_FLASH_CMD) -DLED=$(LED) 
 
 # BIGBOOT adds extra features, but takes up 1K.
@@ -44,7 +45,7 @@ COMMON_OPTIONS += $(LED_DATA_FLASH_CMD) -DLED=$(LED)
 CFLAGS  = -g -Wall -Os -fno-split-wide-types -mrelax -fno-caller-saves -mmcu=$(MCU) -DF_CPU=$(F_CPU)
 CFLAGS += $(COMMON_OPTIONS)
 
-LDFLAGS = -Wl,--section-start=.text=$(BOOTLOAD_START) -Wl,--section-start=.version=$(BOOTLOAD_VERSION_FLASH_LOCATION) -Wl,--relax -nostartfiles -nostdlib
+LDFLAGS = -Wl,--section-start=.text=$(BOOT_FLASH_SECTION_START) -Wl,--section-start=.version=$(VERSION_PLACED_AT_FLASH_LOCATION) -Wl,--relax -nostartfiles -nostdlib
 #-Wl,--gc-sections
 
 
@@ -58,7 +59,7 @@ LDFLAGS = -Wl,--section-start=.text=$(BOOTLOAD_START) -Wl,--section-start=.versi
 # lock it), but since the high two bits of the lock byte are
 # unused, avrdude would get confused.
 
-all: $(TARGET)_$(MCU)_$(BAUD)_$(F_CPU).hex $(TARGET)_$(MCU)_$(BAUD)_$(F_CPU).lst
+all: $(TARGET)_$(MCU)_-b$(BAUD)_F_CPU$(F_CPU).hex $(TARGET)_$(MCU)_-b$(BAUD)_F_CPU$(F_CPU).lst
 
 FORCE:
 
@@ -71,7 +72,7 @@ baudcheck: FORCE
 # platforms support EEPROM and large bootloaders need the eeprom functions that
 # are defined in libc (e.g. the -lc option), even though it was explicity remove it with 
 # -nostdlib to save space.
-%.elf: $(TARGET).o baudcheck FORCE
+%.elf: $(OBJECTS) baudcheck FORCE
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< -lc
 	$(SIZE) $@
 
@@ -79,8 +80,8 @@ fuse:
 	avrdude -v -p $(MCU) -c stk500v1 -P /dev/ttyACM0 -b 19200 -e -U lock:w:$(UNLOCK_FUSE):m -U lfuse:w:$(LOW_FUSE):m -U hfuse:w:$(HIGH_FUSE):m -U efuse:w:$(EXTENDED_FUSE):m
 
 # ISCP tool is a Uno with ArduinoISP sketch: https://github.com/arduino/Arduino/blob/master/build/shared/examples/11.ArduinoISP/ArduinoISP/ArduinoISP.ino
-isp: $(TARGET)_$(MCU)_$(BAUD)_$(F_CPU).hex
-	avrdude -v -p $(MCU) -c stk500v1 -P $(ISP_PORT) -b 19200 -e -U flash:w:$(TARGET)_$(MCU)_$(BAUD)_$(F_CPU).hex -U lock:w:$(LOCK_FUSE):m
+isp: $(TARGET)_$(MCU)_-b$(BAUD)_F_CPU$(F_CPU).hex
+	avrdude -v -p $(MCU) -c stk500v1 -P $(ISP_PORT) -b 19200 -e -U flash:w:$(TARGET)_$(MCU)_-b$(BAUD)_F_CPU$(F_CPU).hex -U lock:w:$(LOCK_FUSE):m
 
 clean:
 	rm -f *.o *.elf *.lst *.map *.sym *.lss *.eep *.srec *.bin *.hex *.tmp.sh

@@ -101,7 +101,7 @@
 /* Build a 1k bootloader, not 512 bytes. This turns on    */
 /* extra functionality.                                   */
 /*                                                        */
-/* BAUD_RATE:                                             */
+/* BAUD:                                             */
 /* Set bootloader baud rate.                              */
 /*                                                        */
 /* SOFT_UART:                                             */
@@ -270,15 +270,15 @@ optiboot_version = 256*(OPTIBOOT_MAJVER + OPTIBOOT_CUSTOMVER) + OPTIBOOT_MINVER;
 #endif
 
 /* set the UART baud rate defaults */
-#ifndef BAUD_RATE
+#ifndef BAUD
 #if F_CPU >= 8000000L
-#define BAUD_RATE   115200L // Highest rate Avrdude win32 will support
+#define BAUD   115200L // Highest rate Avrdude win32 will support
 #elif F_CPU >= 1000000L
-#define BAUD_RATE   9600L   // 19200 also supported, but with significant error
+#define BAUD   9600L   // 19200 also supported, but with significant error
 #elif F_CPU >= 128000L
-#define BAUD_RATE   4800L   // Good for 128kHz internal RC
+#define BAUD   4800L   // Good for 128kHz internal RC
 #else
-#define BAUD_RATE 1200L     // Good even at 32768Hz
+#define BAUD 1200L     // Good even at 32768Hz
 #endif
 #endif
 
@@ -286,30 +286,30 @@ optiboot_version = 256*(OPTIBOOT_MAJVER + OPTIBOOT_CUSTOMVER) + OPTIBOOT_MINVER;
 #define UART 0
 #endif
 
-#define BAUD_SETTING (( (F_CPU + BAUD_RATE * 4L) / ((BAUD_RATE * 8L))) - 1 )
+#define BAUD_SETTING (( (F_CPU + BAUD * 4L) / ((BAUD * 8L))) - 1 )
 #define BAUD_ACTUAL (F_CPU/(8 * ((BAUD_SETTING)+1)))
-#if BAUD_ACTUAL <= BAUD_RATE
-  #define BAUD_ERROR (( 100*(BAUD_RATE - BAUD_ACTUAL) ) / BAUD_RATE)
+#if BAUD_ACTUAL <= BAUD
+  #define BAUD_ERROR (( 100*(BAUD - BAUD_ACTUAL) ) / BAUD)
   #if BAUD_ERROR >= 5
-    #error BAUD_RATE error greater than -5%
+    #error BAUD error greater than -5%
   #elif BAUD_ERROR >= 2
-    #warning BAUD_RATE error greater than -2%
+    #warning BAUD error greater than -2%
   #endif
 #else
-  #define BAUD_ERROR (( 100*(BAUD_ACTUAL - BAUD_RATE) ) / BAUD_RATE)
+  #define BAUD_ERROR (( 100*(BAUD_ACTUAL - BAUD) ) / BAUD)
   #if BAUD_ERROR >= 5
-    #error BAUD_RATE error greater than 5%
+    #error BAUD error greater than 5%
   #elif BAUD_ERROR >= 2
-    #warning BAUD_RATE error greater than 2%
+    #warning BAUD error greater than 2%
   #endif
 #endif
 
-#if (F_CPU + BAUD_RATE * 4L) / (BAUD_RATE * 8L) - 1 > 250
-#error Unachievable baud rate (too slow) BAUD_RATE 
+#if (F_CPU + BAUD * 4L) / (BAUD * 8L) - 1 > 250
+#error Unachievable baud rate (too slow) BAUD 
 #endif // baud rate slow check
-#if (F_CPU + BAUD_RATE * 4L) / (BAUD_RATE * 8L) - 1 < 3
+#if (F_CPU + BAUD * 4L) / (BAUD * 8L) - 1 < 3
 #if BAUD_ERROR != 0 // permit high bitrates (ie 1Mbps@16MHz) if error is zero
-#error Unachievable baud rate (too fast) BAUD_RATE 
+#error Unachievable baud rate (too fast) BAUD 
 #endif
 #endif // baud rate fastn check
 
@@ -556,12 +556,12 @@ int main(void) {
   UCSRA = _BV(U2X); //Double speed mode USART
   UCSRB = _BV(RXEN) | _BV(TXEN);  // enable Rx & Tx
   UCSRC = _BV(URSEL) | _BV(UCSZ1) | _BV(UCSZ0);  // config USART; 8N1
-  UBRRL = (uint8_t)( (F_CPU + BAUD_RATE * 4L) / (BAUD_RATE * 8L) - 1 );
+  UBRRL = (uint8_t)( (F_CPU + BAUD * 4L) / (BAUD * 8L) - 1 );
 #else
   UART_SRA = _BV(U2X0); //Double speed mode USART0
   UART_SRB = _BV(RXEN0) | _BV(TXEN0);
   UART_SRC = _BV(UCSZ00) | _BV(UCSZ01);
-  UART_SRL = (uint8_t)( (F_CPU + BAUD_RATE * 4L) / (BAUD_RATE * 8L) - 1 );
+  UART_SRL = (uint8_t)( (F_CPU + BAUD * 4L) / (BAUD * 8L) - 1 );
 #endif
 #endif
 
@@ -862,9 +862,9 @@ uint8_t getch(void) {
 }
 
 #ifdef SOFT_UART
-// AVR305 equation: #define UART_B_VALUE (((F_CPU/BAUD_RATE)-23)/6)
+// AVR305 equation: #define UART_B_VALUE (((F_CPU/BAUD)-23)/6)
 // Adding 3 to numerator simulates nearest rounding for more accurate baud rates
-#define UART_B_VALUE (((F_CPU/BAUD_RATE)-20)/6)
+#define UART_B_VALUE (((F_CPU/BAUD)-20)/6)
 #if UART_B_VALUE > 255
 #error Baud rate too slow for soft UART
 #endif

@@ -6,7 +6,7 @@ AVR microcontrollers are usually programmed through an In-circuit Serial Program
 
 ![Simplified Core Logic](./SimplifiedCoreLogic.png "Simplified Core Logic")
 
-Unfortunalty to install a serial bootloader requires an ICSP tool. Arduino has an [ArduinoISP] sketch that I load into a Arduino Unod to use as an ICSP tool.
+Unfortunalty to install a serial bootloader requires an ICSP tool. Arduino has an [ArduinoISP] sketch that I load into a Arduino Uno to use as an ICSP tool.
 
 [ArduinoISP]: https://github.com/arduino/Arduino/blob/master/build/shared/examples/11.ArduinoISP/ArduinoISP/ArduinoISP.ino
 
@@ -17,7 +17,4 @@ It is a two step process. First run "make fuse" which will unlock the boot flash
 The bootloader is from MiniCore
 https://github.com/MCUdude/MiniCore
 
-I am using it at 250k bit/sec serial
-
 The Makefile was nuked, such things should be kept simple.
-

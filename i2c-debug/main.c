@@ -40,29 +40,29 @@ void ProcessCmd()
 { 
     if ( (strcmp_P( command, PSTR("/id?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
     {
-        Id("I2Cdebug");
+        Id("I2Cdebug^1");
     }
-    if ( (strcmp_P( command, PSTR("/scan?")) == 0) && (arg_count == 0) )
+    if ( (strcmp_P( command, PSTR("/iscan?")) == 0) && (arg_count == 0) )
     {
         I2c_scan();
     }
-    if ( (strcmp_P( command, PSTR("/address")) == 0) && (arg_count == 1) )
+    if ( (strcmp_P( command, PSTR("/iaddr")) == 0) && (arg_count == 1) )
     {
         I2c_address();
     }
-    if ( (strcmp_P( command, PSTR("/buffer")) == 0) )
+    if ( (strcmp_P( command, PSTR("/ibuff")) == 0) )
     {
         I2c_txBuffer();
     }
-    if ( (strcmp_P( command, PSTR("/buffer?")) == 0) && (arg_count == 0) )
+    if ( (strcmp_P( command, PSTR("/ibuff?")) == 0) && (arg_count == 0) )
     {
         I2c_txBuffer();
     }
-    if ( (strcmp_P( command, PSTR("/write")) == 0) && (arg_count == 0) )
+    if ( (strcmp_P( command, PSTR("/iwrite")) == 0) && (arg_count == 0) )
     {
         I2c_write();
     }
-    if ( (strcmp_P( command, PSTR("/read?")) == 0) && (arg_count == 1) )
+    if ( (strcmp_P( command, PSTR("/iread?")) == 0) && (arg_count == 1) )
     {
         I2c_read();
     }

@@ -2,7 +2,10 @@
 
 ## Overview
 
-PwrMgt is an interactive command line program that demonstrates control of RPUno's ability to turn off power to the RPUno VIN pin (i.e. to the Shield), and turn off the current sources used for the FT/Pulse input.
+PwrMgt is an interactive command line program that demonstrates control of RPUno's ability to turn off power to the RPUno VIN pin (i.e. to the Shield), and turn off the current sources used for the FT/Pulse input. Commands from [i2c-debug] and [Adc] are also available.
+
+[i2c-debug]: ../i2c-debug
+[Adc]: ../Adc
 
 This command is available on the serial bus to tell the RPUno to have the bus manager (over I2C) shutdown the Pi on an [RPUpi] shield. The bus manager is connected to a switch that when monitored by the Pi [Shutdown] script will halt the Pi. The bus manager uses a weak pull-up that the Pi can read to keep running. When a person presses the shutdown button or the manager pulls it down the Pi will [Shutdown]. This program demonstrates a number of states that may help prevent SD card file corruption (but keep in mind this is just my guess at how to do it, i.e. trust at your own risk).
 
@@ -118,5 +121,22 @@ Return the shutdown_detected value from the bus manager over I2C, this will indi
 ```
 
 
-
 ## [/0/analog? 0..7[,0..7[,0..7[,0..7[,0..7]]]]](../Adc#0analog-0707070707)
+
+
+## [/0/iscan?](../i2c-debug#0iscan)
+
+
+## [/0/iaddr 0..127](../i2c-debug#0iaddr-0127)
+
+
+## [/0/ibuff 0..255[,0..255[,0..255[,0..255[,0..255]]]]](../i2c-debug#0ibuff-02550255025502550255)
+
+
+## [/0/ibuff?](../i2c-debug#0ibuff)
+
+
+## [/0/iwrite](../i2c-debug#0iwrite)
+
+
+## [/0/iread? [1..32]](../i2c-debug#0iread-132)

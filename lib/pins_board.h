@@ -61,7 +61,7 @@
 #define TX0 1
 
 // VIN  pin shield power control
-#define SHLD_VOUT_EN 2
+#define SHLD_VIN_EN 2
 
 // Plugable Digital Input/Outputs with Level shift
 #define DIO3 3

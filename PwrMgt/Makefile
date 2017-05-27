@@ -5,6 +5,8 @@ OBJECTS = main.o \
 	power.o \
 	../Uart/id.o \
 	../Adc/analog.o \
+	../i2c-debug/i2c-cmd.o \
+	../i2c-debug/i2c-scan.o \
 	$(LIBDIR)/timers.o \
 	$(LIBDIR)/uart.o \
 	$(LIBDIR)/twi.o \

@@ -61,8 +61,8 @@ void VinPwr(void)
         serial_print_started_at = millis();
         if (strcmp_P( arg[0], PSTR("UP")) == 0 ) 
         {
-            digitalWrite(VIN_POWER,HIGH);
-            pinMode(VIN_POWER, OUTPUT);
+            digitalWrite(SHLD_VIN_EN,HIGH);
+            pinMode(SHLD_VIN_EN, OUTPUT);
             printf_P(PSTR("{\"VIN\":\"UP\"}\r\n"));
             initCommandBuffer();
         }
@@ -147,8 +147,8 @@ void VinPwr(void)
     else if ( (command_done == 15) )
     {
         stable_power_needed = 0;
-        digitalWrite(VIN_POWER,LOW);
-        pinMode(VIN_POWER, OUTPUT);
+        digitalWrite(SHLD_VIN_EN,LOW);
+        pinMode(SHLD_VIN_EN, OUTPUT);
         uint8_t shutdown_detected = detect_Rpu_shutdown(); 
         if (shutdown_detected)
         {
@@ -183,15 +183,15 @@ void PulseLoopPwr(void)
         serial_print_started_at = millis();
         if (strcmp_P( arg[0], PSTR("UP")) == 0 ) 
         {
-            digitalWrite(FT_POWER,HIGH);
-            pinMode(FT_POWER, OUTPUT);
+            digitalWrite(CURR_SOUR_EN,HIGH);
+            pinMode(CURR_SOUR_EN, OUTPUT);
             printf_P(PSTR("{\"FT\":\"UP\"}\r\n"));
             initCommandBuffer();
         }
         else
         {
-            digitalWrite(FT_POWER,LOW);
-            pinMode(FT_POWER, OUTPUT);
+            digitalWrite(CURR_SOUR_EN,LOW);
+            pinMode(CURR_SOUR_EN, OUTPUT);
             printf_P(PSTR("{\"FT\":\"DOWN\"}\r\n"));
             initCommandBuffer();
         }

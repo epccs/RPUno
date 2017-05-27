@@ -1,5 +1,5 @@
 /*
-Digital is a command line controled demonstration of ATmega328p digital input and output
+PwrMgt is a command line controled demonstration of Power Management, like how to turn off the VIN pin on a RPUno
 Copyright (C) 2016 Ronald Sutherland
 
 This program is free software; you can redistribute it and/or
@@ -27,6 +27,8 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/pins_board.h"
 #include "../Uart/id.h"
 #include "../Adc/analog.h"
+#include "../i2c-debug/i2c-scan.h"
+#include "../i2c-debug/i2c-cmd.h"
 #include "power.h"
 
 // running the ADC burns some power, which can be reduced by delaying its use
@@ -58,6 +60,30 @@ void ProcessCmd()
     if ( (strcmp_P( command, PSTR("/analog?")) == 0) && ( (arg_count >= 1 ) && (arg_count <= 5) ) )
     {
         Analog();
+    }
+    if ( (strcmp_P( command, PSTR("/iscan?")) == 0) && (arg_count == 0) )
+    {
+        I2c_scan();
+    }
+    if ( (strcmp_P( command, PSTR("/iaddr")) == 0) && (arg_count == 1) )
+    {
+        I2c_address();
+    }
+    if ( (strcmp_P( command, PSTR("/ibuff")) == 0) )
+    {
+        I2c_txBuffer();
+    }
+    if ( (strcmp_P( command, PSTR("/ibuff?")) == 0) && (arg_count == 0) )
+    {
+        I2c_txBuffer();
+    }
+    if ( (strcmp_P( command, PSTR("/iwrite")) == 0) && (arg_count == 0) )
+    {
+        I2c_write();
+    }
+    if ( (strcmp_P( command, PSTR("/iread?")) == 0) && (arg_count == 1) )
+    {
+        I2c_read();
     }
 }
 

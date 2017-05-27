@@ -22,16 +22,17 @@ Hardware files and notes for referance.
 
 ## Example with RPU BUS (RS-422)
 
-A serial bus that allows multiple microcontroller boards to be connected to a host serial port. An [RPUftdi] shield with an on board USB device (a UART bridge) is placed near the host computer (USB cables can only reach about 2 meters). The remote MCU board(s) use an [RPUadpt] shield and are connected as a daisy-chain up to perhaps 1000 meters with CAT5 cable. 
+This example shows an RS-422 serial bus that allows multiple microcontroller boards to be connected to a single computer serial port. It has an [RPUftdi] shield with a USB device that acts as a UART bridge that is placed near the computer (USB cables should be less than 2 meters). I normally use an Uno Clone under the RPUftdi. The remote MCU boards are RPUno (or [Irrigate7]) and have an [RPUadpt] shield that daisy-chains the RS-422 over CAT5 cable with RJ45 connectors. 
 
 [RPUftdi]: https://github.com/epccs/RPUftdi
 [RPUadpt]: https://github.com/epccs/RPUadpt
+[Irrigate7]: https://github.com/epccs/Irrigate7
 
 ![MultiDrop](./Hardware/Documents/MultiDrop.png "RPUno MultiDrop")
 
-Why not use plain RS485? I want the host computer to use common serial programs (e.g. avrdude, PySerial, picocom...), and the microcontroller to work with common UART control libraries (e.g. Arduino Uno core). Modbus could be used on both the host and the bare metal side but does not have firmware update tools. RS-422 (with the transceivers automatically activated) work with the common UART libraries and host programs for RS-232 so bootloaders can work as expected and so do the other serial programs (e.g. picocom and PySerial). 
+The transceivers are automatically activated, so common serial programs (e.g. avrdude, PySerial, picocom...) can be used. Also, the microcontroller's common UART libraries (e.g. like in the Arduino Uno core) work, but care must be taken to ensure only one microcontroller answeres.
 
-I prefer a Command Line Interface (CLI), so that is what the examples use. The CLI is programmed to respond to commands terminated with a newline, so remember to press enter (which sends a newline) before starting a command. The command includes an address with a leading and trailing forward slash "/". The command echo starts after the address (second byte) is sent. The first byte ('/') will cause any transmitting device to stop and dump its outgoing buffer which should prevent collisions since the echo is delayed until after the second byte. 
+I prefer a Command Line Interface (CLI), so that is what the examples use. The CLI example programs respond to commands terminated with a newline, so remember to press enter (which sends a newline) before starting a command. The command includes an address with a leading and trailing forward slash "/". The command echo starts after the address (second byte) is sent. The first byte ('/') will cause any transmitting device to stop and dump its outgoing buffer which should prevent collisions since the echo is delayed until after the second byte. 
 
 As a short example, I'll connect with SSH (e.g. from a Pi) to the machine (an old x86 with Ubuntu) that has a USB connection to the [RPUftdi] board. These machines have matching usernames and keys placed so I don't need to use passwords. Then I will use picocom to interact with two different RPUno boards. They are on the serial bus at addresses '1' and '0' (note that ASCII '1' is 0x31, and ASCII '0' is 0x30, so they have an address that looks good on picocom but is probably not what was expected).  
 

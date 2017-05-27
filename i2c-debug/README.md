@@ -51,72 +51,72 @@ identify
 {"id":{"name":"I2Cdebug","desc":"RPUno Board /w atmega328p and LT3652","avr-gcc":"4.9"}}
 ```
 
-## /0/scan?
+## /0/iscan?
 
 Scan of I2C bus shows all 7 bit devices found. I have a PCA9554 at 0x38 and an 24C02AN eeprom at 0x50.
 
 ``` 
-/0/scan?
+/0/iscan?
 {"scan":[{"addr":"0x38"},{"addr":"0x50"}]}
 ```
 
 Note: the address does not include the Read/Write bit. 
 
 
-## /0/address (0..127)
+## /0/iaddr 0..127
 
 Set the I2C address 
 
 ``` 
-/0/address 56
+/0/iaddr 56
 {"address":"0x38"}
 ```
 
 Note: Set it with the decimel value, it will return the hex value. This value is used durring read and write, it will also reset the xtBuffer.
 
 
-## /0/buffer (0..255)[,(0..255)[,(0..255)[,(0..255)[,(0..255)]]]]
+## /0/ibuff 0..255[,0..255[,0..255[,0..255[,0..255]]]]
 
 Add up to five bytes to I2C transmit buffer. JSON reply is the full buffer. 
 
 ``` 
-/0/buffer 3,0
+/0/ibuff 3,0
 {"txBuffer":["data":"0x3","data":"0x0"]}
 ``` 
 
 
-## /0/buffer?
+## /0/ibuff?
 
 Show buffer data.
 
 ``` 
-/0/buffer?
+/0/ibuff?
 {"txBuffer":["data":"0x3","data":"0x0"]}
 ``` 
 
-## /0/write
+## /0/iwrite
 
 Attempt to become master and write the txBuffer bytes to I2C address (PCA9554). The txBuffer will clear if write was a success.
 
 ``` 
-/0/address 56
+/0/iaddr 56
 {"address":"0x38"}
-/0/buffer 3,0
+/0/ibuff 3,0
 {"txBuffer":["data":"0x3","data":"0x0"]}
-/0/write
+/0/iwrite
 {"returnCode":"success"}
 ``` 
 
-## /0/read? [1..32]
+## /0/iread? [1..32]
 
-If buffer has values, attempt to become master and write the byte(s) in buffer (e.g. command byte) to I2C address (exampel is for a PCA9554) without a stop condition. The txBuffer will clear if write was a success. Then send a repeated Start condition, followed by address and obtain readings.
+If txBuffer has values, attempt to become master and write the byte(s) in buffer (e.g. command byte) to I2C address (example is for a PCA9554) without a stop condition. The txBuffer will clear if write was a success. Then send a repeated Start condition, followed by address and obtain readings into rxBuffer.
 
 ``` 
-/0/address 56
+/0/iaddr 56
 {"address":"0x38"}
-/0/buffer 3
+/0/ibuff 3
 {"txBuffer":["data":"0x3"}
-/0/read? 1
+/0/iread? 1
 {"rxBuffer":[{"data":"0xFF"}]}
 ``` 
 
@@ -128,19 +128,19 @@ Note the PCA9554 has been power cycled in this example, so the reading is the de
 Load the PCA9554 configuration register 3 (DDR) with zero to set the port as output. Then alternate register 1 (the output port) with 85 and 170 to toggle its output pins. 
 
 ``` 
-/0/address 56
+/0/iaddr 56
 {"address":"0x38"}
-/0/buffer 3,0
-{"buffer":["data":"0x3","data":"0x0"]}
-/0/write
+/0/ibuff 3,0
+{"txBuffer":["data":"0x3","data":"0x0"]}
+/0/iwrite
 {"returnCode":"success"}
-/0/buffer 1,170
-{"buffer":[{"data":"0x1"},{"data":"0xAA"}]}
-/0/write
+/0/ibuff 1,170
+{"txBuffer":[{"data":"0x1"},{"data":"0xAA"}]}
+/0/iwrite
 {"returnCode":"success"}
-/0/buffer 1,85
-{"buffer":[{"data":"0x1"},{"data":"0x55"}]}
-/0/write
+/0/ibuff 1,85
+{"txBuffer":[{"data":"0x1"},{"data":"0x55"}]}
+/0/iwrite
 {"returnCode":"success"}
 ``` 
 
@@ -154,10 +154,10 @@ Load the PCA9554 configuration register 3 (DDR) with zero to set the port as out
 Command 0xE3 measures temperature, the clock is streached until data is ready.
 
 ``` 
-/0/address 64
+/0/iaddr 64
 {"address":"0x40"}
-/0/buffer 227
-{"buffer":["data":"0xE3"]}
+/0/ibuff 227
+{"txBuffer":["data":"0xE3"]}
 /0/read? 3
 {"rxBuffer":[{"data":"0x6A"},{"data":"0xC"},{"data":"0xC6"}]}
 ``` 
@@ -174,10 +174,10 @@ Temp
 Command 0xE5 measures humidity, again the clock is streached until data is ready.
 
 ``` 
-/0/address 64
+/0/iaddr 64
 {"address":"0x40"}
-/0/buffer 229
-{"buffer":["data":"0xE5"]}
+/0/ibuff 229
+{"txBuffer":["data":"0xE5"]}
 /0/read? 3
 {"rxBuffer":[{"data":"0x65"},{"data":"0x96"},{"data":"0xBC"}]}
 ``` 

@@ -2,12 +2,15 @@
 
 ## Overview
 
-PwrMgt is an interactive command line program that demonstrates control of RPUno's ability to turn off power to the RPUno VIN pin (i.e. to the Shield), and turn off the current sources used for the FT/Pulse input. Commands from [i2c-debug] and [Adc] are also available.
+PwrMgt is an interactive command line program that demonstrates control of RPUno's ability to turn off the power to the SHLD_VIN pin (i.e. to the Shield), and turn off the current sources used for ICP1 and analog loops. Commands from [i2c-debug], [Adc], [Digital], [DayNight] and [AmpHr] are also available.
 
 [i2c-debug]: ../i2c-debug
 [Adc]: ../Adc
+[Digital]: ../Digital
+[DayNight]: ../DayNight
+[AmpHr]: ../AmpHr
 
-This command is available on the serial bus to tell the RPUno to have the bus manager (over I2C) shutdown the Pi on an [RPUpi] shield. The bus manager is connected to a switch that when monitored by the Pi [Shutdown] script will halt the Pi. The bus manager uses a weak pull-up that the Pi can read to keep running. When a person presses the shutdown button or the manager pulls it down the Pi will [Shutdown]. This program demonstrates a number of states that may help prevent SD card file corruption (but keep in mind this is just my guess at how to do it, i.e. trust at your own risk).
+These commands are available on the RPUno UART. Some of the commands can be used to control the bus manager (over I2C) in order to shutdown a Pi Zero on an [RPUpi] shield. The bus manager is connected to a switch that when monitored by the Pi [Shutdown] script will halt the Pi. The bus manager uses a weak pull-up that the Pi can read to keep running. When a person presses the shutdown button or the manager pulls it down the Pi will [Shutdown]. This program demonstrates a number of states that may help prevent SD card file corruption (but keep in mind this is just my guess at how to do it, i.e. trust at your own risk).
 
 [RPUpi]: https://github.com/epccs/RPUpi/
 [Shutdown]: https://github.com/epccs/RPUpi/tree/master/Shutdown
@@ -26,7 +29,7 @@ rsutherland@conversion:~/Samba/RPUno/PwrMgt$ make bootload
 avrdude done.  Thank you.
 ``` 
 
-Now connect with picocom (or ilk). Note I am often at another computer doing this through SSH. The Samba folder is for editing the files from Windows.
+Now connect with picocom (or ilk). Note I am often at another computer doing this through SSH. 
 
 ``` 
 #exit is C-a, C-x
@@ -140,3 +143,9 @@ Return the shutdown_detected value from the bus manager over I2C, this will indi
 
 
 ## [/0/iread? [1..32]](../i2c-debug#0iread-132)
+
+
+## [/0/day?](../DayNight#0day)
+
+
+## [/0/charge?](../AmpHr#0charge)

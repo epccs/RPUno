@@ -1,5 +1,5 @@
 /*
-PwrMgt is a command line controled demonstration of Power Management, like how to turn off the VIN pin on a RPUno
+PwrMgt is a command line controled demonstration of Power Management on RPUno
 Copyright (C) 2016 Ronald Sutherland
 
 This program is free software; you can redistribute it and/or
@@ -29,11 +29,24 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../Adc/analog.h"
 #include "../i2c-debug/i2c-scan.h"
 #include "../i2c-debug/i2c-cmd.h"
+#include "../DayNight/day_night.h"
+#include "../AmpHr/power_storage.h"
 #include "power.h"
 
-// running the ADC burns some power, which can be reduced by delaying its use
-#define ADC_DELAY_MILSEC 200UL
+// how fast does the charge and discharge reading change? (it can be fast)
+// at 16MHz the adc clock runs at 125kHz (see the core file ../lib/adc.c)
+// the first reading takes 25 ADC clocks and the next takes 13 ADC clocks.
+// since the channel changes with each new reading it always takes 25 ADC clocks for each reading.
+// which means the max reading rate is about 5000 per sec.
+// Fill the adc array every 10mSec with readings on all channels (e.g. 800 reading per sec, ) 
+// The ADC is off 84% of the time so most of the power saving is relized.
+#define ADC_DELAY_MILSEC 10UL
 static unsigned long adc_started_at;
+
+#define DAYNIGHT_STATUS_LED 4
+#define DAYNIGHT_BLINK 500UL
+static unsigned long day_status_blink_started_at;
+
 #define BLINK_DELAY 1000UL
 static unsigned long blink_started_at;
 static unsigned long blink_delay;
@@ -47,44 +60,59 @@ void ProcessCmd()
     }
     if ( (strcmp_P( command, PSTR("/vin")) == 0) && ( (arg_count == 1 ) ) )
     {
-        VinPwr();
+        VinPwr(); // ./power.c
     }
     if ( (strcmp_P( command, PSTR("/pulseloop")) == 0) && ( (arg_count == 1 ) ) )
     {
-        PulseLoopPwr();
+        PulseLoopPwr(); // ./power.c
     }
     if ( (strcmp_P( command, PSTR("/vin?")) == 0) && ( (arg_count == 0 ) ) )
     {
-        ShutdownDetected();
+        ShutdownDetected(); // ./power.c
     }
     if ( (strcmp_P( command, PSTR("/analog?")) == 0) && ( (arg_count >= 1 ) && (arg_count <= 5) ) )
     {
-        Analog();
+        Analog(); // ../Adc/analog.c
     }
     if ( (strcmp_P( command, PSTR("/iscan?")) == 0) && (arg_count == 0) )
     {
-        I2c_scan();
+        I2c_scan(); // ../i2c-debug/i2c-scan.c
     }
     if ( (strcmp_P( command, PSTR("/iaddr")) == 0) && (arg_count == 1) )
     {
-        I2c_address();
+        I2c_address(); // ../i2c-debug/i2c-cmd.c
     }
     if ( (strcmp_P( command, PSTR("/ibuff")) == 0) )
     {
-        I2c_txBuffer();
+        I2c_txBuffer(); // ../i2c-debug/i2c-cmd.c
     }
     if ( (strcmp_P( command, PSTR("/ibuff?")) == 0) && (arg_count == 0) )
     {
-        I2c_txBuffer();
+        I2c_txBuffer(); // ../i2c-debug/i2c-cmd.c
     }
     if ( (strcmp_P( command, PSTR("/iwrite")) == 0) && (arg_count == 0) )
     {
-        I2c_write();
+        I2c_write(); // ../i2c-debug/i2c-cmd.c
     }
     if ( (strcmp_P( command, PSTR("/iread?")) == 0) && (arg_count == 1) )
     {
-        I2c_read();
+        I2c_read(); // ../i2c-debug/i2c-cmd.c
     }
+    if ( (strcmp_P( command, PSTR("/day?")) == 0) && ( (arg_count == 0 ) ) )
+    {
+        Day(); // ../DayNight/day_night.c
+    }
+    if ( (strcmp_P( command, PSTR("/charge?")) == 0) && ( (arg_count == 0 ) ) )
+    {
+        Charge(); // ../AmpHr/power_storage.c
+    }
+}
+
+//At start of each day determine the remaining charge and zero the charge and discharge values.
+// consider that DayNigh has no includes for power_storage but I can pass it in a callback... is that not odd?
+void callback_for_day_attach(void)
+{
+    init_ChargAccumulation(); // ../AmpHr/power_storage.c
 }
 
 void setup(void) 
@@ -92,7 +120,11 @@ void setup(void)
 	// RPUuno has no LED, but the LED_BUILTIN is defined as digital 13 (SCK) anyway.
     pinMode(LED_BUILTIN,OUTPUT);
     digitalWrite(LED_BUILTIN,HIGH);
-    
+
+    // A DayNight status LED is on digital pin 4
+    pinMode(DAYNIGHT_STATUS_LED,OUTPUT);
+    digitalWrite(DAYNIGHT_STATUS_LED,HIGH);
+
     // Initialize Timers and clear bootloader, Arduino does these with init() in wiring.c
     initTimers(); //Timer0 Fast PWM mode, Timer1 & Timer2 Phase Correct PWM mode.
     init_ADC_single_conversion(EXTERNAL_AVCC); // warning AREF must not be connected to anything
@@ -115,6 +147,7 @@ void setup(void)
     sei(); 
     
     blink_started_at = millis();
+    day_status_blink_started_at = millis();
     
     rpu_addr = get_Rpu_address();
     blink_delay = BLINK_DELAY;
@@ -125,6 +158,9 @@ void setup(void)
         rpu_addr = '0';
         blink_delay = BLINK_DELAY/4;
     }
+    
+    // set callback. so the DayNight state machine can reset the accumulated charge and discharge values
+    Day_AttachDayWork(callback_for_day_attach);
 }
 
 void blink(void)
@@ -144,6 +180,51 @@ void blink(void)
     }
 }
 
+void blink_day_status(void)
+{
+    if (stable_power_needed) // do not blink,  power usage needs to be very stable to tell if the host has haulted. 
+    {
+        return;
+    }
+    
+    unsigned long kRuntime = millis() - day_status_blink_started_at;
+    uint8_t state = DayState();
+    if ( ( (state == DAYNIGHT_EVENING_DEBOUNCE_STATE) || \
+           (state == DAYNIGHT_MORNING_DEBOUNCE_STATE) ) && \
+           (kRuntime > (DAYNIGHT_BLINK/2) ) )
+    {
+        digitalToggle(DAYNIGHT_STATUS_LED);
+        
+        // set for next toggle 
+        day_status_blink_started_at += DAYNIGHT_BLINK/2; 
+    }
+    if ( ( (state == DAYNIGHT_DAY_STATE) ) && \
+           (kRuntime > (DAYNIGHT_BLINK) ) )
+    {
+        digitalWrite(DAYNIGHT_STATUS_LED,HIGH);
+        
+        // set for next toggle 
+        day_status_blink_started_at += DAYNIGHT_BLINK; 
+    }
+    if ( ( (state == DAYNIGHT_NIGHT_STATE) ) && \
+           (kRuntime > (DAYNIGHT_BLINK) ) )
+    {
+        digitalWrite(DAYNIGHT_STATUS_LED,LOW);
+        
+        // set for next toggle 
+        day_status_blink_started_at += DAYNIGHT_BLINK; 
+    }
+    if ( ( (state == DAYNIGHT_FAIL_STATE) ) && \
+           (kRuntime > (DAYNIGHT_BLINK/8) ) )
+    {
+        digitalToggle(DAYNIGHT_STATUS_LED);
+        
+        // set for next toggle 
+        day_status_blink_started_at += DAYNIGHT_BLINK/8; 
+    }
+}
+
+
 void adc_burst(void)
 {
     unsigned long kRuntime= millis() - adc_started_at;
@@ -162,10 +243,19 @@ int main(void)
     { 
         // use LED to show if I2C has a bus manager
         blink();
-        
+
+        // use DAYNIGHT_STATUS_LED to show day_state
+        blink_day_status();
+
+        // Check Day Light is a function that operates a day-night state machine.
+        CheckDayLight(); // ../DayNight/day_night.c
+
         // delay between ADC burst
         adc_burst();
-        
+
+        // check how much charge went into battery
+        CheckChrgAccumulation();
+
         // check if character is available to assemble a command, e.g. non-blocking
         if ( (!command_done) && uart0_available() ) // command_done is an extern from parse.h
         {

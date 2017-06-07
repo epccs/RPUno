@@ -26,6 +26,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/pin_num.h"
 #include "../lib/pins_board.h"
 #include "../Uart/id.h"
+#include "../Digital/digital.h"
 #include "../Adc/analog.h"
 #include "../i2c-debug/i2c-scan.h"
 #include "../i2c-debug/i2c-cmd.h"
@@ -105,6 +106,22 @@ void ProcessCmd()
     if ( (strcmp_P( command, PSTR("/charge?")) == 0) && ( (arg_count == 0 ) ) )
     {
         Charge(); // ../AmpHr/power_storage.c
+    }
+    if ( (strcmp_P( command, PSTR("/pinMode")) == 0) && ( (arg_count == 2 ) ) )
+    {
+        Mode(); // ../Digital/digital.c
+    }
+    if ( (strcmp_P( command, PSTR("/digitalWrite")) == 0) && ( (arg_count == 2 ) ) )
+    {
+        Write(); // ../Digital/digital.c
+    }
+    if ( (strcmp_P( command, PSTR("/digitalToggle")) == 0) && ( (arg_count == 1 ) ) )
+    {
+        Toggle(); // ../Digital/digital.c
+    }
+    if ( (strcmp_P( command, PSTR("/digitalRead?")) == 0) && ( (arg_count == 1 ) ) )
+    {
+        Read(); // ../Digital/digital.c
     }
 }
 

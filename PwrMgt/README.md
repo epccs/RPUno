@@ -149,3 +149,15 @@ Return the shutdown_detected value from the bus manager over I2C, this will indi
 
 
 ## [/0/charge?](../AmpHr#0charge)
+
+
+## [/0/pinMode 3|4|10|11|12,INPUT|OUTPUT](..//Digital#0pinmode-34101112inputoutput)
+
+
+## [/0/digitalWrite 3|4|10|11|12,HIGH|LOW](..//Digital#0digitalwrite-34101112highlow)
+
+
+## [/0/digitalToggle 3|4|10|11|12](..//Digital#0digitaltoggle-34101112)
+
+
+## [/0/digitalRead? 3|4|10|11|12](..//Digital#0digitalread-34101112)

@@ -3,6 +3,7 @@ TARGET = PwrMgt
 LIBDIR = ../lib
 OBJECTS = main.o \
 	power.o \
+	../Digital/digital.o \
 	../Adc/analog.o \
 	../i2c-debug/i2c-cmd.o \
 	../i2c-debug/i2c-scan.o \

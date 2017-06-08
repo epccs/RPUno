@@ -39,16 +39,16 @@ The IO13 pin is used as LED_BUILTIN and blinks on and off for a second when an r
 [![RPUno^5 With K3^0](http://rpubus.org/bb/download/file.php?id=25)](http://rpubus.org/Video/14140%5E5WithK3%5E0.mp4 "RPUno^5 With K3^0")
 
 
-# Memory map 
+# EEPROM Memory map 
 
-EEPROM has the values that are loaded after initialization (if the id value is correct). 
+A map of the solenoid settings in EEPROM. 
 
 ```
-function            type       addr:K1  K2  K3
+function            type    ee_addr:K1  K2  K3
 id                  UINT16          40  60  80
-delay_start_in_sec  UINT32          42  62  82
-runtiem_in_sec      UINT32          46  66  86
-delay_in_sec        UINT32          50  70  90
+delay_start_sec     UINT32          42  62  82
+runtime_sec         UINT32          46  66  86
+delay_sec           UINT32          50  70  90
 flow_stop           UINT32          54  74  94
 cycles              UINT8           58  78  98
 ```

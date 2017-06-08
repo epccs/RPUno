@@ -34,7 +34,20 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #define A0 10
 #define A1 11
 #define A2 12
-// note 13 is used to blink I2C status in main()
+// 13 is used to blink I2C status in main()
+// 4 is used to blink Day-Night status in main()
+
+//The EEPROM memory usage is as follows. 
+#define EE_SOLENOID_BASE_ADDR 40
+// each solenoid K1..K3 has an array of settings offset by
+#define EE_SOLENOID_ARRAY_OFFSET 20
+// each setting is at this byte from the array offset
+#define EE_SOLENOID_ID 0
+#define EE_SOLENOID_DLY_STRT 2
+#define EE_SOLENOID_RUNTIME 6
+#define EE_SOLENOID_DELAY 10
+#define EE_SOLENOID_FLW_STP 14
+#define EE_SOLENOID_CYCLES 18
 
 // index zero is not a solenoid (e.g. 74HC238 outputs Y0 is discharge and Y1 is boost)
 #define DISCHARGE 0
@@ -410,7 +423,7 @@ void Save(void)
             k[k_solenoid-1].flow_cnt_bank = 0;
             k[k_solenoid-1].cycle_millis_bank = 0;
             uint16_t value = ((uint16_t) (k_solenoid)) + 0x4B30; //ascii bytes for 'K1', 'K2'...
-            eeprom_write_word( (uint16_t *)((k_solenoid-1)*20+40), value);
+            eeprom_write_word( (uint16_t *)((k_solenoid-1)*EE_SOLENOID_ARRAY_OFFSET+EE_SOLENOID_BASE_ADDR+EE_SOLENOID_ID), value);
             printf_P(PSTR("{\"K%d\":{"),k_solenoid);
             command_done = 11;
         }
@@ -421,7 +434,7 @@ void Save(void)
         {
             uint8_t k_solenoid = atoi(arg[0]);
             uint32_t value = k[k_solenoid-1].delay_start_sec;
-            eeprom_write_dword( (uint32_t *)((k_solenoid-1)*20+42), value);
+            eeprom_write_dword( (uint32_t *)((k_solenoid-1)*EE_SOLENOID_ARRAY_OFFSET+EE_SOLENOID_BASE_ADDR+EE_SOLENOID_DLY_STRT), value);
             printf_P(PSTR("\"delay_start_sec\":\"%lu\","),(value));
             command_done = 12;
         }
@@ -432,7 +445,7 @@ void Save(void)
         {
             uint8_t k_solenoid = atoi(arg[0]);
             uint32_t value = k[k_solenoid-1].runtime_sec;
-            eeprom_write_dword( (uint32_t *)((k_solenoid-1)*20+46), value);
+            eeprom_write_dword( (uint32_t *)((k_solenoid-1)*EE_SOLENOID_ARRAY_OFFSET+EE_SOLENOID_BASE_ADDR+EE_SOLENOID_RUNTIME), value);
             printf_P(PSTR("\"runtime_sec\":\"%lu\","),(value));
             command_done = 13;
         }
@@ -443,7 +456,7 @@ void Save(void)
         {
             uint8_t k_solenoid = atoi(arg[0]);
             uint32_t value = k[k_solenoid-1].delay_sec;
-            eeprom_write_dword( (uint32_t *)((k_solenoid-1)*20+50), value);
+            eeprom_write_dword( (uint32_t *)((k_solenoid-1)*EE_SOLENOID_ARRAY_OFFSET+EE_SOLENOID_BASE_ADDR+EE_SOLENOID_DELAY), value);
             printf_P(PSTR("\"delay_sec\":\"%lu\","),(value));
             command_done = 14;
         }
@@ -454,7 +467,7 @@ void Save(void)
         {
             uint8_t k_solenoid = atoi(arg[0]);
             uint32_t value = k[k_solenoid-1].flow_stop;
-            eeprom_write_dword( (uint32_t *)((k_solenoid-1)*20+54), value);
+            eeprom_write_dword( (uint32_t *)((k_solenoid-1)*EE_SOLENOID_ARRAY_OFFSET+EE_SOLENOID_BASE_ADDR+EE_SOLENOID_FLW_STP), value);
             if (k[k_solenoid-1].flow_stop != FLOW_NOT_SET)
             {
                 printf_P(PSTR("\"flow_stop\":\"%lu\","),(value));
@@ -468,7 +481,7 @@ void Save(void)
         {
             uint8_t k_solenoid = atoi(arg[0]);
             uint8_t value = k[k_solenoid-1].cycles;
-            eeprom_write_byte( (uint8_t *)((k_solenoid-1)*20+58), value);
+            eeprom_write_byte( (uint8_t *)((k_solenoid-1)*EE_SOLENOID_ARRAY_OFFSET+EE_SOLENOID_BASE_ADDR+EE_SOLENOID_CYCLES), value);
             printf_P(PSTR("\"cycles\":\"%d\""),(value));
             command_done = 16;
         }
@@ -983,15 +996,15 @@ uint8_t LoadSolenoidControlFromEEPROM(uint8_t solenoid)
     uint16_t i = solenoid-1;
     if (!k[i].cycle_state)
     {
-        uint16_t id = eeprom_read_word((uint16_t*)(i*20+40));
+        uint16_t id = eeprom_read_word((uint16_t*)(i*EE_SOLENOID_ARRAY_OFFSET+EE_SOLENOID_BASE_ADDR+EE_SOLENOID_ID));
         if (id == (i+0x4B31) ) // 'K' is 0x4B and '1' is 0x31, thus K1, K2...
         {
             k[i].started_at = millis(); // delay start is from now.
-            k[i].delay_start_sec =eeprom_read_dword((uint32_t*)(i*20+42)); 
-            k[i].runtime_sec = eeprom_read_dword((uint32_t*)(i*20+46));  
-            k[i].delay_sec = eeprom_read_dword((uint32_t*)(i*20+50)); 
-            k[i].flow_stop = eeprom_read_dword((uint32_t*)(i*20+54)); 
-            k[i].cycles = eeprom_read_byte((uint8_t*)(i*20+58)); 
+            k[i].delay_start_sec =eeprom_read_dword((uint32_t*)(i*EE_SOLENOID_ARRAY_OFFSET+EE_SOLENOID_BASE_ADDR+EE_SOLENOID_DLY_STRT)); 
+            k[i].runtime_sec = eeprom_read_dword((uint32_t*)(i*EE_SOLENOID_ARRAY_OFFSET+EE_SOLENOID_BASE_ADDR+EE_SOLENOID_RUNTIME));  
+            k[i].delay_sec = eeprom_read_dword((uint32_t*)(i*EE_SOLENOID_ARRAY_OFFSET+EE_SOLENOID_BASE_ADDR+EE_SOLENOID_DELAY)); 
+            k[i].flow_stop = eeprom_read_dword((uint32_t*)(i*EE_SOLENOID_ARRAY_OFFSET+EE_SOLENOID_BASE_ADDR+EE_SOLENOID_FLW_STP)); 
+            k[i].cycles = eeprom_read_byte((uint8_t*)(i*EE_SOLENOID_ARRAY_OFFSET+EE_SOLENOID_BASE_ADDR+EE_SOLENOID_CYCLES)); 
             k[i].flow_cnt_bank = 0;
             k[i].cycle_millis_bank = 0;
             return 1;

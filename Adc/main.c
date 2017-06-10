@@ -27,6 +27,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/pins_board.h"
 #include "../Uart/id.h"
 #include "analog.h"
+#include "calibrate.h"
 
 // running the ADC burns some power, which can be reduced by delaying its use
 #define ADC_DELAY_MILSEC 10000UL
@@ -45,6 +46,22 @@ void ProcessCmd()
     if ( (strcmp_P( command, PSTR("/analog?")) == 0) && ( (arg_count >= 1 ) && (arg_count <= 5) ) )
     {
         Analog();
+    }
+    if ( (strcmp_P( command, PSTR("/avcc")) == 0) && (arg_count == 1) )
+    {
+        CalibrateAVCC();
+    }
+    if ( (strcmp_P( command, PSTR("/onevone")) == 0) && (arg_count == 1) )
+    {
+        Calibrate1V1();
+    }
+    if ( (strcmp_P( command, PSTR("/reftoee")) == 0) && (arg_count == 0) )
+    {
+        Ref2Ee();
+    }
+    if ( (strcmp_P( command, PSTR("/reffrmee")) == 0) && (arg_count == 0) )
+    {
+        ReFmEe();
     }
 }
 

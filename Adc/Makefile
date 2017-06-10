@@ -3,6 +3,8 @@ TARGET = Adc
 LIBDIR = ../lib
 OBJECTS = main.o \
 	analog.o \
+	calibrate.o \
+	references.o \
 	../Uart/id.o \
 	$(LIBDIR)/timers.o \
 	$(LIBDIR)/uart.o \

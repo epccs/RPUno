@@ -17,6 +17,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 */
 #include <avr/pgmspace.h>
 #include <util/atomic.h>
+#include <avr/eeprom.h> 
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -25,6 +26,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/timers.h"
 #include "../lib/pins_board.h"
 #include "analog.h"
+#include "references.h"
 
 #define SERIAL_PRINT_DELAY_MILSEC 60000
 static unsigned long serial_print_started_at;
@@ -46,6 +48,14 @@ void Analog(void)
                 return;
             }
         }
+        // laod reference calibration or show an error if they are not in eeprom
+        if ( ! LoadAnalogRefFromEEPROM() )
+        {
+            printf_P(PSTR("{\"err\":\"AdcRefNotInEeprom\"}\r\n"));
+            initCommandBuffer();
+            return;
+        }
+
         // print in steps otherwise the serial buffer will fill and block the program from running
         serial_print_started_at = millis();
         printf_P(PSTR("{"));
@@ -102,25 +112,25 @@ void Analog(void)
         uint8_t arg_indx_channel =atoi(arg[adc_arg_index]);
 
         // There are values from 0 to 1023 for 1024 slots where each reperesents 1/1024 of the reference. Last slot has issues
-        // https://forum.arduino.cc/index.php?topic=303189.0        
+        // https://forum.arduino.cc/index.php?topic=303189.0 
         if (arg_indx_channel == 0)
         {
-            printf_P(PSTR("\"%1.2f\""),(analogRead(0)*5.0/1024.0));
+            printf_P(PSTR("\"%1.2f\""),(analogRead(0)*(ref_extern_avcc_uV/1.0E6)/1024.0));
         }
 
         if (arg_indx_channel == 1)
         {
-            printf_P(PSTR("\"%1.2f\""),(analogRead(0)*5.0/1024.0));
+            printf_P(PSTR("\"%1.2f\""),(analogRead(0)*(ref_extern_avcc_uV/1.0E6)/1024.0));
         }
 
         if (arg_indx_channel == CHRG_I) // RPUno has ADC2 connected to high side current sense to measure battery charging.
         {
-            printf_P(PSTR("\"%1.3f\""),(analogRead(CHRG_I)*(5.0/1024.0)/(0.068*50.0)));
+            printf_P(PSTR("\"%1.3f\""),(analogRead(CHRG_I)*((ref_extern_avcc_uV/1.0E6)/1024.0)/(0.068*50.0)));
         }
 
         if (arg_indx_channel == DISCHRG_I) // RPUno has ADC3 connected to high side current sense to measure battery discharg.
         {
-            printf_P(PSTR("\"%1.3f\""),(analogRead(DISCHRG_I)*(5.0/1024.0)/(0.068*50.0)));
+            printf_P(PSTR("\"%1.3f\""),(analogRead(DISCHRG_I)*((ref_extern_avcc_uV/1.0E6)/1024.0)/(0.068*50.0)));
         }
 
         if (arg_indx_channel == 4) // RPUno has ADC4 is used for I2C SDA function
@@ -135,12 +145,12 @@ void Analog(void)
 
         if (arg_indx_channel == PV_V) // RPUno has ADC6 connected to a voltage divider from the solar input.
         {
-            printf_P(PSTR("\"%1.2f\""),(analogRead(PV_V)*(5.0/1024.0)*(532.0/100.0)));
+            printf_P(PSTR("\"%1.2f\""),(analogRead(PV_V)*((ref_extern_avcc_uV/1.0E6)/1024.0)*(532.0/100.0)));
         }
 
         if (arg_indx_channel == PWR_V) // RPUno has ADC7 connected a voltage divider from the battery (PWR).
         {
-            printf_P(PSTR("\"%1.2f\""),(analogRead(PWR_V)*(5.0/1024.0)*(3.0/1.0)));
+            printf_P(PSTR("\"%1.2f\""),(analogRead(PWR_V)*((ref_extern_avcc_uV/1.0E6)/1024.0)*(3.0/1.0)));
         }
 
         if ( (adc_arg_index+1) >= arg_count) 
@@ -170,4 +180,3 @@ void Analog(void)
         initCommandBuffer();
     }
 }
-

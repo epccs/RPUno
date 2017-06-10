@@ -5,6 +5,7 @@ OBJECTS = main.o \
 	power_storage.o \
 	../DayNight/day_night.o \
 	../Adc/analog.o \
+	../Adc/references.o \
 	../Uart/id.o \
 	$(LIBDIR)/timers.o \
 	$(LIBDIR)/uart.o \

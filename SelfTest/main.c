@@ -48,8 +48,8 @@ void setup(void)
     digitalWrite(CURR_SOUR_EN,LOW);
 
     // Turn Off VOUT to shield (e.g. disconnect VIN from shield)
-    pinMode(SHLD_VOUT_EN,OUTPUT);
-    digitalWrite(SHLD_VOUT_EN,LOW);
+    pinMode(SHLD_VIN_EN,OUTPUT);
+    digitalWrite(SHLD_VIN_EN,LOW);
 
     // Battery disconnect (don't let the pin glitch with a high)
     digitalWrite(BAT_DISCONNECT,LOW);

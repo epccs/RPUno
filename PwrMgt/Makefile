@@ -5,6 +5,7 @@ OBJECTS = main.o \
 	power.o \
 	../Digital/digital.o \
 	../Adc/analog.o \
+	../Adc/references.o \
 	../i2c-debug/i2c-cmd.o \
 	../i2c-debug/i2c-scan.o \
 	../DayNight/day_night.o \

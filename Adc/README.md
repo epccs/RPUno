@@ -121,7 +121,7 @@ Save the reference in static memory to EEPROM.
 
 ##  /0/reffrmee
 
-Load the reference in static memory from EEPROM.
+Load the reference from EEPROM into static memory.
 
 ```
 /1/reffrmee

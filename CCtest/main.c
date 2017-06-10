@@ -97,7 +97,7 @@ int main(void)
             initCommandBuffer();
             
             //Enable the LT3652, which may have been turned off
-            digitalWrite(SHUTDOWN, LOW);
+            digitalWrite(CC_SHUTDOWN, LOW);
             
             // trun off the load
             load_step(0);

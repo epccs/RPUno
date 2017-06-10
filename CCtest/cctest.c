@@ -35,6 +35,7 @@ static uint8_t absorption;
 static uint8_t runtest;
 
 // ADC channels: 7 is battery, 6 is PV, 5 is I2C:SCL 4 is I2C:SDA, 3 is battery discharge, 2 is battery charge, 1 is PV_I.
+#define PV_I ADC1
 #define START_CHANNEL 1
 #define END_CHANNEL 7
 static uint8_t adc_index;
@@ -76,8 +77,8 @@ void init_pv(void)
 {
     // set digital lines to contorl the LT3652 PV MPPT buck converter and turn it on
     // note R4 may have been removed if JTAG was used
-    pinMode(SHUTDOWN,OUTPUT);
-    digitalWrite(SHUTDOWN, LOW);
+    pinMode(CC_SHUTDOWN,OUTPUT);
+    digitalWrite(CC_SHUTDOWN, LOW);
 }
 
 void load_step(uint8_t step)
@@ -161,7 +162,7 @@ void CCtest(void)
             absorption = 0;
             
             //Shutdown the LT3652
-            digitalWrite(SHUTDOWN, HIGH);
+            digitalWrite(CC_SHUTDOWN, HIGH);
             command_done = 11;
         }
         
@@ -360,7 +361,7 @@ void CCtest(void)
                 runtest =1;
                 
                 //Enable the LT3652
-                digitalWrite(SHUTDOWN, LOW);
+                digitalWrite(CC_SHUTDOWN, LOW);
                 
                 // verfiy that we have MPPT mode
                 command_done = 19;
@@ -384,10 +385,10 @@ void CCtest(void)
             else if ( (pv_v > 18.0 ) && ( (arg_count == 0) || (arg_count == 3) ) )
             {
                 // shutdown PV so the the full discharge load is shown for each step
-                if ( (step_index == start_ld_step) && (digitalRead(SHUTDOWN) == LOW) && (!runtest) )
+                if ( (step_index == start_ld_step) && (digitalRead(CC_SHUTDOWN) == LOW) && (!runtest) )
                 {
                     //Shutdown the LT3652 (note R4 may have been removed if JTAG was used)
-                    digitalWrite(SHUTDOWN, HIGH);
+                    digitalWrite(CC_SHUTDOWN, HIGH);
                     bat_report = FIRST_DISCHARGE/1000.0;
                 }
                 else if (!runtest)
@@ -481,7 +482,7 @@ void CCtest(void)
                 load_step(step_index);
                 
                 //Shutdown the LT3652 
-                digitalWrite(SHUTDOWN, HIGH);
+                digitalWrite(CC_SHUTDOWN, HIGH);
                 bat_report = FIRST_DISCHARGE/1000.0;
                 command_done = 20;
             }

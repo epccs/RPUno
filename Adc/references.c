@@ -68,10 +68,14 @@ uint8_t IsValidValFor1V1Ref(uint32_t *value)
 
 uint8_t WriteEeReferenceId() 
 {
+    uint16_t ee_id = eeprom_read_word((uint16_t*)(EE_ANALOG_BASE_ADDR+EE_ANALOG_ID));
     if ( eeprom_is_ready() )
     {
         uint16_t value = 0x4144; // 'A' is 0x41 and 'D' is 0x44;
-        eeprom_write_word( (uint16_t *)(EE_ANALOG_BASE_ADDR+EE_ANALOG_ID), value);
+        if (ee_id != value)
+        {
+            eeprom_write_word( (uint16_t *)(EE_ANALOG_BASE_ADDR+EE_ANALOG_ID), value);
+        }
         return 1;
     }
     else
@@ -82,9 +86,13 @@ uint8_t WriteEeReferenceId()
 
 uint8_t WriteEeReferenceAvcc() 
 {
+    uint32_t ee_ref_extern_avcc_uV = eeprom_read_dword((uint32_t*)(EE_ANALOG_BASE_ADDR+EE_ANALOG_REF_EXTERN_AVCC)); 
     if ( eeprom_is_ready() )
     {
-        eeprom_write_dword( (uint32_t *)(EE_ANALOG_BASE_ADDR+EE_ANALOG_REF_EXTERN_AVCC), ref_extern_avcc_uV);
+        if (ee_ref_extern_avcc_uV != ref_extern_avcc_uV)
+        {
+            eeprom_write_dword( (uint32_t *)(EE_ANALOG_BASE_ADDR+EE_ANALOG_REF_EXTERN_AVCC), ref_extern_avcc_uV);
+        }
         return 1;
     }
     else
@@ -95,9 +103,13 @@ uint8_t WriteEeReferenceAvcc()
 
 uint8_t WriteEeReference1V1() 
 {
+    uint32_t ee_ref_intern_1v1_uV = eeprom_read_dword((uint32_t*)(EE_ANALOG_BASE_ADDR+EE_ANALOG_REF_INTERN_1V1)); 
     if ( eeprom_is_ready() )
     {
-        eeprom_write_dword( (uint32_t *)(EE_ANALOG_BASE_ADDR+EE_ANALOG_REF_INTERN_1V1), ref_intern_1v1_uV);
+        if (ee_ref_intern_1v1_uV != ref_intern_1v1_uV)
+        {
+            eeprom_write_dword( (uint32_t *)(EE_ANALOG_BASE_ADDR+EE_ANALOG_REF_INTERN_1V1), ref_intern_1v1_uV);
+        }
         return 1;
     }
     else

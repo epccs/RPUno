@@ -2,6 +2,7 @@
 TARGET = SelfTest
 LIBDIR = ../lib
 OBJECTS = main.o \
+	../Adc/references.o \
 	$(LIBDIR)/uart.o \
 	$(LIBDIR)/twi.o \
 	$(LIBDIR)/rpu_mgr.o \

@@ -69,7 +69,7 @@ baudcheck:
 # -nostdlib to save space.
 %.elf: $(OBJECTS) baudcheck
 	$(CC) $(LDFLAGS) $(TARGET_ARCH) -o $@ $< -lc
-	$(SIZE) $@
+	$(SIZE) -C --mcu=$(MCU) $@
 
 fuse: 
 	avrdude -v -p $(MCU) -c stk500v1 -P /dev/ttyACM0 -b 19200 -e -U lock:w:$(UNLOCK_FUSE):m -U lfuse:w:$(LOW_FUSE):m -U hfuse:w:$(HIGH_FUSE):m -U efuse:w:$(EXTENDED_FUSE):m

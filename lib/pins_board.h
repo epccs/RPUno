@@ -122,6 +122,8 @@
 #define DISCHRG_I 3
 
 // ADC4 and ADC5 are used for I2C with the RPUadpt/RPUftdi/RPUpi shields
+#define ADC4 4
+#define ADC5 5
 
 // PV_IN_ADC6 voltage is analogRead(PV_V)*(5.0/1024.0)*(532.0/100.0)
 #define PV_V 6 

@@ -55,7 +55,7 @@ $(TARGET).hex: $(TARGET).elf
 ## stk500v1 is for Arduino as ISP (e.g. it is an example in the Arduino.cc IDE 1.6.7+)
 ## to reduce dupliction I only show the fuse setting in ../Bootloader
 
-## 328p can lock the bootloader section, which is a good idea even if it is not used
+## lock the bootloader section, which is a good idea even if it is not used
 isp: $(TARGET).hex
 	avrdude -v -p $(MCU) -c stk500v1 -P $(ISP_PORT) -b 19200 -e -U flash:w:$(TARGET).hex -U lock:w:0x2f:m
 

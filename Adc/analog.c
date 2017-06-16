@@ -66,16 +66,11 @@ void Analog(void)
     { // use the channel as an index in the JSON reply
         uint8_t arg_indx_channel =atoi(arg[adc_arg_index]);
         
-        if (arg_indx_channel == 0) //ADC0
+        if ( (arg_indx_channel == ADC0) || (arg_indx_channel == ADC1) || (arg_indx_channel == ADC4) || (arg_indx_channel == ADC5) )//ADC0, ADC1
         {
             printf_P(PSTR("\"ADC%s\":"),arg[adc_arg_index]);
         }
 
-        if (arg_indx_channel == 1) //ADC1
-        {
-            printf_P(PSTR("\"ADC%s\":"),arg[adc_arg_index]);
-        }
-        
         if (arg_indx_channel == CHRG_I) //ADC2
         {
             printf_P(PSTR("\"CHRG_A\":"));
@@ -84,16 +79,6 @@ void Analog(void)
         if (arg_indx_channel == DISCHRG_I) //ADC3
         {
             printf_P(PSTR("\"DISCHRG_A\":"));
-        }
-
-        if (arg_indx_channel == 4)
-        {
-            printf_P(PSTR("\"ADC4\":"));
-        }
-
-        if (arg_indx_channel == 5)
-        {
-            printf_P(PSTR("\"ADC5\":"));
         }
 
         if (arg_indx_channel == PV_V) //ADC6
@@ -113,44 +98,35 @@ void Analog(void)
 
         // There are values from 0 to 1023 for 1024 slots where each reperesents 1/1024 of the reference. Last slot has issues
         // https://forum.arduino.cc/index.php?topic=303189.0 
-        if (arg_indx_channel == 0)
+        if ( (arg_indx_channel == ADC0) || (arg_indx_channel == ADC1) )
         {
-            printf_P(PSTR("\"%1.2f\""),(analogRead(0)*(ref_extern_avcc_uV/1.0E6)/1024.0));
+            printf_P(PSTR("\"%1.2f\""),(analogRead(arg_indx_channel)*(ref_extern_avcc_uV/1.0E6)/1024.0));
         }
 
-        if (arg_indx_channel == 1)
+        // RPUno has ADC2 and ADC3 connected to high side current sense to measure battery charging and discharging.
+        if ( (arg_indx_channel == CHRG_I) || (arg_indx_channel == DISCHRG_I) )
         {
-            printf_P(PSTR("\"%1.2f\""),(analogRead(0)*(ref_extern_avcc_uV/1.0E6)/1024.0));
+            printf_P(PSTR("\"%1.3f\""),(analogRead(arg_indx_channel)*((ref_extern_avcc_uV/1.0E6)/1024.0)/(0.068*50.0)));
         }
 
-        if (arg_indx_channel == CHRG_I) // RPUno has ADC2 connected to high side current sense to measure battery charging.
-        {
-            printf_P(PSTR("\"%1.3f\""),(analogRead(CHRG_I)*((ref_extern_avcc_uV/1.0E6)/1024.0)/(0.068*50.0)));
-        }
-
-        if (arg_indx_channel == DISCHRG_I) // RPUno has ADC3 connected to high side current sense to measure battery discharg.
-        {
-            printf_P(PSTR("\"%1.3f\""),(analogRead(DISCHRG_I)*((ref_extern_avcc_uV/1.0E6)/1024.0)/(0.068*50.0)));
-        }
-
-        if (arg_indx_channel == 4) // RPUno has ADC4 is used for I2C SDA function
+        if (arg_indx_channel == ADC4) // RPUno has ADC4 is used for I2C SDA function
         {
             printf_P(PSTR("\"SDA\""));
         }
 
-        if (arg_indx_channel == 5) // RPUno has ADC5 is used for I2C SCL function
+        if (arg_indx_channel == ADC5) // RPUno has ADC5 is used for I2C SCL function
         {
             printf_P(PSTR("\"SCL\""));
         }
 
         if (arg_indx_channel == PV_V) // RPUno has ADC6 connected to a voltage divider from the solar input.
         {
-            printf_P(PSTR("\"%1.2f\""),(analogRead(PV_V)*((ref_extern_avcc_uV/1.0E6)/1024.0)*(532.0/100.0)));
+            printf_P(PSTR("\"%1.2f\""),(analogRead(arg_indx_channel)*((ref_extern_avcc_uV/1.0E6)/1024.0)*(532.0/100.0)));
         }
 
         if (arg_indx_channel == PWR_V) // RPUno has ADC7 connected a voltage divider from the battery (PWR).
         {
-            printf_P(PSTR("\"%1.2f\""),(analogRead(PWR_V)*((ref_extern_avcc_uV/1.0E6)/1024.0)*(3.0/1.0)));
+            printf_P(PSTR("\"%1.2f\""),(analogRead(arg_indx_channel)*((ref_extern_avcc_uV/1.0E6)/1024.0)*(3.0/1.0)));
         }
 
         if ( (adc_arg_index+1) >= arg_count) 

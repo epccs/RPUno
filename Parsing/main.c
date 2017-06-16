@@ -55,7 +55,7 @@ int main(void) {
             AssembleCommand(getchar());
 
             // address is the ascii value for '0' note: a null address will terminate the command string. 
-            StartEchoWhenAddressed('0');
+            StartEchoWhenAddressed(rpu_addr);
         }
         
         // check if the character is available, and if so stop transmit and the command in process.

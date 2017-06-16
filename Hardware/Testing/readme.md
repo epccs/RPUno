@@ -47,12 +47,12 @@ The bottom pad on U1 dissipates heat as well as providing a ground, it is not co
 
 ## Reverse Battery Protection
 
-Apply a current limited (&lt;20mA) supply set with 14V to the +BAT and -BAT connector in reverse and verify that the voltage does not get through to TP4 (^4 PWR). Note some voltage (.2V) will be seen on TP4 because of how the shutdown through Q3 works.
+Apply a current limited (20mA) supply set with 14V to the +BAT and -BAT connector in reverse and verify that the voltage does not get through to TP4 (^4 PWR). Note some voltage (.2V) will be seen on TP4 because of how the shutdown through Q3 works.
     
 
 ## Battery Disconnect
 
-Apply a current limited (&lt;20mA) supply set with 14V to the +BAT and -BAT connector and verify that voltage does not get through to TP4. 
+Apply a current limited (20mA) supply set with 14V to the +BAT and -BAT connector and verify that voltage does not get through to TP4. 
 
 
 ## Power Protection
@@ -62,7 +62,7 @@ Apply a current limited (20mA) supply to the PV input with reverse polarity and 
 
 ## TPS3700 Window Comparator 
 
-Apply a current limited (&lt;30mA) supply starting at 12V to the +BAT and -BAT connector. Connect 1k ohm between U2 pin 1 and pin 2 to give the VIN latch a load. Short S2 and then release it, which will force the battery to connect. Check that PWR has been latched to the battery with TP4 and that the VIN latch has not set with U2 pin 1. Increase the supply slowly until VIN on U2 pin 1 has power, but no more than 14V. This is the voltage at which the load connects, and should be about 13.1V. Now slowly reduce the supply until the LED turns off. This is the voltage at which the battery disconnects and should be about 11.58V.
+Apply a current limited (30mA) supply starting at 12V to the +BAT and -BAT connector. Connect 1k ohm between U2 pin 1 and pin 2 to give the VIN latch a load. Short S2 and then release it, which will force the battery to connect. Check that PWR has been latched to the battery with TP4 and that the VIN latch has not set with U2 pin 1. Increase the supply slowly until VIN on U2 pin 1 has power, but no more than 14V. This is the voltage at which the load connects, and should be about 13.1V. Now slowly reduce the supply until the LED turns off. This is the voltage at which the battery disconnects and should be about 11.58V.
 
 ```
 { "LOAD_CONNNECT":[12.95,12.99,13.00,13.08,13.00,12.99,13.03,13.01,],
@@ -114,7 +114,7 @@ Install Git and AVR toolchain on Ubuntu (16.04, on an old computer try https://w
 sudo apt-get install git gcc-avr binutils-avr gdb-avr avr-libc avrdude
 ```
 
-Clone the RPUadpt repository.
+Clone the RPUno repository.
 
 ```
 cd ~

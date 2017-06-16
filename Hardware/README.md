@@ -61,25 +61,29 @@ Bootloader options include [optiboot] and [xboot]. Uploading through a bootloade
         ^6  Done: Design, Layout, BOM, Review*, Order Boards, Assembly, Testing,
             WIP: Evaluation.
             Todo: 
+            note: two test units made, four units made to see if anyone is intrested.
             *during review the Design may change without changing the revision.
-            use ADC6 to measure the raw PV on Anode of dark blocking diode.  
+                    2017-3-24 T1^6 damaged MCU while taking power example image.
+                    2017-3-25 T2^6 using on test bench.
+                    2017-6-12 T1^6 replaced MCU from scrped ^4 and tested again.
 
-        ^5  location: 2016-12-18 Test Bench /w an RPUpi^1, start power management testing
-                      2017-1-1 This^5 had ADC7 parts (and BOM) changed to measre battery.
-                      2017-1-5 This^5 had ADC6 hacked to measure raw PV.
-                      2017-2-4 moved to SWall Encl /w K3^1, RPUadpt^4, SLP003-12U, 12V battery.
-                      2017-3-19 remove 10k thermistor which was used by  LT3652 to turn off chrg when over 40 C
 
-        ^4  location: 2016-12-1 SWall Encl /w K3^0, RPUadpt^4, SLP003-12U, 12V battery.
-                      2017-1-1 This^4 had ADC7 parts changed to measre battery.
-                      2017-1-1 This^4 had ADC6 hacked to measure raw PV.
-                      2017-1-5 RPUadpt^4 had ICP1 hacked open.
-                      2017-2-4 an equalizing charge seems to have tripped a fault on the LT3652. 
-                      2017-2-4 moved from SWall Encl to Test Bench (it will not control VIN for the RPUpi^1).
-                      
-        ^2  location: 2016-8-1 SEPortch Encl /w CCtest^0, RPUadpt^2, SLP003-12U, 6V SLA.
-                      2017-1-17 running but not doing anything useful
-                      2017-3-19 scraped
+        ^5  only unit of this version made
+            location: 2016-12-18 Test Bench /w an RPUpi^1, start power management testing
+                    2017-1-1 had ADC7 parts (and BOM) changed to measre battery.
+                    2017-1-5 had ADC6 hacked to measure raw PV.
+                    2017-2-4 moved to SWall Encl /w K3^1, RPUadpt^4, SLP003-12U, 12V battery.
+                    2017-3-19 remove 10k thermistor which was used by  LT3652 to turn off chrg when over 40 C
+                    2017-4-17 running Solenoid fw, @ SWall Encl, Update K3^2, Update RPUadpt^5, SLP003-12U, 12V battery.
+
+        ^4  only unit of this version made
+            location: 2016-12-1 SWall Encl /w K3^0, RPUadpt^4, SLP003-12U, 12V battery.
+                    2017-1-1 This^4 had ADC7 parts changed to measre battery.
+                    2017-1-1 This^4 had ADC6 hacked to measure raw PV.
+                    2017-1-5 RPUadpt^4 had ICP1 hacked open.
+                    2017-2-4 an equalizing charge seems to have tripped a fault on the LT3652. 
+                    2017-2-4 moved from SWall Encl to Test Bench (it will not control VIN for the RPUpi^1).
+                    2017-6-12 scraped
 ```
 
 Debugging and fixing problems i.e. [Schooling](./Schooling/)

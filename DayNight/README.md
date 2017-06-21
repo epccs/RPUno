@@ -59,6 +59,7 @@ Report status of the state machine.
 {"day_state":"EVENING"}
 ... 15 min
 {"day_state":"EVENING"}
+TurnOnLED's
 {"day_state":"NIGHT"}
 ... 12 hr
 {"day_state":"NIGHT"}

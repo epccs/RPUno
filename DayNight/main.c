@@ -56,7 +56,15 @@ void ProcessCmd()
 void callback_for_day_attach(void)
 {
     // This shows where to place a task to run when the dayState changes to DAYNIGHT_WORK_STATE
-    printf_P(PSTR("WaterTheGarden")); // used for debuging
+    printf_P(PSTR("WaterTheGarden\r\n")); // used for debuging
+    return;
+}
+
+//At start of each night do this
+void callback_for_night_attach(void)
+{
+    // This shows where to place a task to run when the dayState changes to DAYNIGHT_WORK_STATE
+    printf_P(PSTR("TurnOnLED's\r\n")); // used for debuging
     return;
 }
 
@@ -104,8 +112,9 @@ void setup(void)
         blink_delay = BLINK_DELAY/4;
     }
     
-    // set callback. See Solenoid for another example, where it loads the EEPROM values used at the start of each day
-    Day_AttachDayWork(callback_for_day_attach);
+    // set callback(s). See Solenoid for another example, where it loads the EEPROM values used at the start of each day
+    Day_AttachWork(callback_for_day_attach);
+    Night_AttachWork(callback_for_night_attach);
 }
 
 void blink(void)

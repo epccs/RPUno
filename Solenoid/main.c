@@ -195,7 +195,7 @@ void setup(void)
     solenoids_initalized = 0;
     
     // set callback. See Solenoid for another example, where it loads the EEPROM values used at the start of each day
-    Day_AttachDayWork(callback_for_day_attach);
+    Day_AttachWork(callback_for_day_attach);
 }
 
 void blink(void)

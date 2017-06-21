@@ -58,6 +58,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 uint8_t dayState = 0; 
 unsigned long dayTmrStarted;
 static void (*dayState_atDayWork)(void);
+static void (*dayState_atNightWork)(void);
 
 #define SERIAL_PRINT_DELAY_MILSEC 60000UL
 static unsigned long serial_print_started_at;
@@ -65,9 +66,14 @@ static unsigned long serial_print_started_at;
 /* set function callback that provides the task to do at start of each day
  * Input    function: callback function to use
  */
-void Day_AttachDayWork( void (*function)(void)  )
+void Day_AttachWork( void (*function)(void)  )
 {
     dayState_atDayWork = function;
+}
+
+void Night_AttachWork( void (*function)(void)  )
+{
+    dayState_atNightWork = function;
 }
 
 void Day(void)
@@ -97,6 +103,11 @@ void Day(void)
             printf_P(PSTR("\"EVENING\""));
         }
 
+       if (state == DAYNIGHT_NIGHTWORK_STATE) 
+        {
+            printf_P(PSTR("\"NIGHTWORK\""));
+        }
+
         if (state == DAYNIGHT_NIGHT_STATE) 
         {
             printf_P(PSTR("\"NIGHT\""));
@@ -107,9 +118,9 @@ void Day(void)
             printf_P(PSTR("\"MORNING\""));
         }
 
-        if (state == DAYNIGHT_WORK_STATE) 
+        if (state == DAYNIGHT_DAYWORK_STATE) 
         {
-            printf_P(PSTR("\"WORK\""));
+            printf_P(PSTR("\"DAYWORK\""));
         }
 
         if (state == DAYNIGHT_FAIL_STATE) 
@@ -186,7 +197,7 @@ void CheckDayLight(void)
             unsigned long kRuntime= millis() - dayTmrStarted;
             if ((kRuntime) > ((unsigned long)EVENING_DEBOUCE)) 
             {
-                dayState = DAYNIGHT_NIGHT_STATE;
+                dayState = DAYNIGHT_NIGHTWORK_STATE;
                 dayTmrStarted = millis();
             } 
         } 
@@ -197,7 +208,15 @@ void CheckDayLight(void)
         }
         return;
     }
-  
+
+    if(dayState == DAYNIGHT_NIGHTWORK_STATE) 
+    { 
+        //do some work, e.g. load night light settings at the start of a night
+        dayState_atNightWork();
+        dayState = DAYNIGHT_NIGHT_STATE;
+        return;
+    }
+
     if(dayState == DAYNIGHT_NIGHT_STATE) 
     { //night
         if (analogRead(PV_V) > Morning_Threshold ) 
@@ -221,7 +240,7 @@ void CheckDayLight(void)
             unsigned long kRuntime= millis() - dayTmrStarted;
             if ((kRuntime) > ((unsigned long)MORNING_DEBOUCE)) 
             {
-                dayState = DAYNIGHT_WORK_STATE;
+                dayState = DAYNIGHT_DAYWORK_STATE;
             }
         }
         else 
@@ -231,7 +250,7 @@ void CheckDayLight(void)
         return;
     }
 
-    if(dayState == DAYNIGHT_WORK_STATE) 
+    if(dayState == DAYNIGHT_DAYWORK_STATE) 
     { 
         //do some work, e.g. load irrigation settings at the start of a day
         dayState_atDayWork();

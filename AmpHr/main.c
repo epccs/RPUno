@@ -122,7 +122,7 @@ void setup(void)
     }
     
     // set callback. so the DayNight state machine can reset the accumulated charge and discharge values
-    Day_AttachDayWork(callback_for_day_attach);
+    Day_AttachWork(callback_for_day_attach);
 }
 
 void blink(void)

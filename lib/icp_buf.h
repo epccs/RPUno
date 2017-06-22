@@ -20,10 +20,6 @@
 #ifndef Icp_buf_h
 #define Icp_buf_h
 
-#ifdef  __cplusplus
-extern "C" {
-#endif
-
 // only the first 32 bytes can be accessed quickly using the AVR ldd instruction.
 // this means that the total array size needs to be held bellow that
 // however I want to capture up to 32 events so a struct is not helpful
@@ -66,9 +62,5 @@ typedef  struct icp_buf_struct_local
 } ICP;
 
 extern void double_buffer_copy( ICP_ISR* from, ICP* to, uint8_t num_of_events_needed);
-
-#ifdef  __cplusplus
-}
-#endif
 
 #endif // Icp_buf_h

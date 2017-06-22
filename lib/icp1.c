@@ -51,8 +51,12 @@ ISR(TIMER1_CAPT_vect) {
     uint8_t loacal_head = (icp1.head+1) & ICP_EVENT_BUFF_MASK;
     
     // put the Capture Register bytes of timestamp onto the buffer
+#if defined(ICR1L) && defined(ICR1H)
     icp1.event.Byt0[loacal_head] = ICR1L; 
     icp1.event.Byt1[loacal_head] = ICR1H; 
+#else
+#   error missing ICR1 register which is used to hold a 16 bit capture from timer 1
+#endif
     icp1.event.status[loacal_head] = (rising & (1<<RISING));
     icp1.head = loacal_head;
     
@@ -64,6 +68,7 @@ ISR(TIMER1_CAPT_vect) {
     // setup to catch rising edge: TCCR1B |= (1<<ICES1); TIFR1 |= (1<<ICF1); rising = 1;
     // setup to catch falling edge: TCCR1B &= ~(1<<ICES1); TIFR1 |= (1<<ICF1); rising = 0; 
     // swap edge setup to catch the next edge
+#if defined(TCCR1B) && defined(ICES1) && defined(TIFR1) && defined(ICF1)
     if (icp1_edge_mode == TRACK_BOTH)
     {
         if (rising) 
@@ -71,6 +76,9 @@ ISR(TIMER1_CAPT_vect) {
         else 
         { TCCR1B |= (1<<ICES1); TIFR1 |= (1<<ICF1); rising = 1; }
     }
+#else
+#   error TCCR1B register needs bit ICES1, and TIFR1 register needs bit ICF1 to set capture edge
+#endif
 }
 
 /* Virtual timer counts each Timer1 overflow.
@@ -93,7 +101,12 @@ void initIcp1(uint8_t mode, uint8_t prescaler)
     icp1_edge_mode = mode;
     
     // Input Capture setup
+#if defined(TCCR1A)
     TCCR1A = 0;
+#else
+#   error missing TCCR1A register which is used to control Timer 1
+#endif
+
     
     // ICNC1: Enable Input Capture Noise Canceler
     // ICES1: = 1 for trigger on rising edge
@@ -103,22 +116,46 @@ void initIcp1(uint8_t mode, uint8_t prescaler)
     //   0    1    1  :   /64   prescaler
     //   1    0    0  :   /256  prescaler
     //   1    0    1  :   /1024 prescaler */
+#if defined(TCCR1B)
     TCCR1B = (prescaler & 0x7);
-    TCCR1C = 0;
+#else
+#   error missing TCCR1B register which is used to control Timer 1 prescaler
+#endif
 
+#if defined(TCCR1C)
+    TCCR1C = 0;
+#else
+#   error missing TCCR1C register which is used to control Timer 1
+#endif
+
+#if defined(TCCR1B) && defined(ICES1) && defined(TIFR1) && defined(ICF1)
     if (icp1_edge_mode) // initialize to TRACK_BOTH orTRACK_RISING
     { TCCR1B |= (1<<ICES1); TIFR1 |= (1<<ICF1); rising = 1; }
     else // initialize to TRACK_FALLING
     { TCCR1B &= ~(1<<ICES1); TIFR1 |= (1<<ICF1); rising = 0; }
+#else
+#   error TCCR1B register needs bit ICES1, and TIFR1 register needs bit ICF1 to set capture edge
+#endif
 
     // Interrupt setup
     // ICIE1: Input capture
     // TOIE1: Timer1 overflow
+#if defined(TIFR1) && defined(ICF1) && defined(TOV1)
     TIFR1 = (1<<ICF1) | (1<<TOV1);	// clear pending interrupts
+#else
+#   error TIFR1 register needs bit ICF1 set to run the ISR on ICP1 pin events and bit TOV1 to run the ISR on Timer 1 overflow events
+#endif
+#if defined(TIMSK1) && defined(ICIE1) && defined(TOIE1)
     TIMSK1 = (1<<ICIE1) | (1<<TOIE1);	// enable interupts
+#else
+#   error TIMSK1 register needs bit ICIE1 set to enable interrupts from ICP1 pin events and bit TOIE1 to enable interupts from Timer 1 overflow events
+#endif
 
-    // Set up the Input Capture pin, ICP1, Arduino Uno pinMode(8, INPUT)
-#if defined (__AVR_ATmega328P__) || defined (__AVR_ATmega328__)
+    // Set up the Input Capture pin, ICP1, i.e. on an Arduino Uno this is what pinMode(8, INPUT) does
+#if defined(__AVR_ATmega48__) ||defined(__AVR_ATmega88__) || \
+    defined(__AVR_ATmega168__) || defined(__AVR_ATmega48P__) || \
+    defined(__AVR_ATmega88P__) || defined(__AVR_ATmega168P__) || \
+    defined(__AVR_ATmega328P__) 
     if ( (DDRB & (1<<PB0)) ) // if bit PB0 is set then it is an OUTPUT
     {
         DDRB &= ~(1<<PB0);
@@ -129,9 +166,21 @@ void initIcp1(uint8_t mode, uint8_t prescaler)
     
     // or enable the pullup by setting bit PB0 high in PORTB register. 
     // PORTB |= (1<<PB0); // Arduino Uno digitalWrite(8, 1) 
+
+#elif defined(__AVR_ATmega164P__) || defined(__AVR_ATmega324P__) \
+    || defined(__AVR_ATmega644P__) || defined(__AVR_ATmega1284P__)
+    if ( (DDRD & (1<<PD6)) ) // if bit PD6 is set then it is an OUTPUT
+    {
+        DDRD &= ~(1<<PD6);
+    }
+
+    // floating may have 60 Hz noise on it (I'll assume it is connected to a pulse source). 
+    PORTD &= ~(1<<PD6); //i.e. like Wiring's digitalWrite(8, LOW) function found in Arduino 
     
+    // or enable the pullup by setting the bit high in PORT register. 
+    // PORTD |= (1<<PD6);
 #else
-#   error mega328[p] has ICP1 on PB0, check Datasheet for your mcu and then fix this file
+#   error I do not know where ICP1 is on your MCU, check the Datasheet and then fix this file
 #endif
 }
 

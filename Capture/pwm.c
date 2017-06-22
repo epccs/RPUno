@@ -36,48 +36,88 @@ void Pwm(void)
         {
             if (strcmp_P( arg[0], PSTR("oc2a")) == 0)
             {
-                // set Data Direction Register (its what pinMode(11, OUTPUT) does more or less does)
-#if defined (__AVR_ATmega328P__) || defined (__AVR_ATmega328__)
-        
-                if ( !(DDRB & _BV(PB3)) ) // if bit PB3 is set then it is already an output 
+                // set Data Direction Register (its what pinMode(11, OUTPUT) does)
+#if defined(__AVR_ATmega48__) ||defined(__AVR_ATmega88__) || \
+    defined(__AVR_ATmega168__) || defined(__AVR_ATmega48P__) || \
+    defined(__AVR_ATmega88P__) || defined(__AVR_ATmega168P__) || \
+    defined(__AVR_ATmega328P__) 
+                if ( !(DDRB & (1<<PB3)) ) // if bit PB3 is clear then the pin is an INPUT
                 {
-                    DDRB |= _BV(PB3);
+                    DDRB |= (1<<PB3);
                 }
 
                 // connect PB3 pin to OC2A output (pwm) from timer 2, channel A set in Clear on Compare Match mode.
-                if ( !(TCCR2A & _BV(COM2A1)) ) 
+                if ( !(TCCR2A & (1<<COM2A1)) ) 
                 {
-                    TCCR2A |= _BV(COM2A1);
+                    TCCR2A |= (1<<COM2A1);
+                }
+#elif defined(__AVR_ATmega164P__) || defined(__AVR_ATmega324P__) \
+    || defined(__AVR_ATmega644P__) || defined(__AVR_ATmega1284P__)
+                if ( !(DDRD & (1<<PD7)) ) // if bit PB3 is clear then the pin is an INPUT
+                {
+                    DDRD |= (1<<PD7);
+                }
+
+                // connect PD7 pin to OC2A output (pwm) from timer 2, channel A set in Clear OC2A on Compare Match mode.
+                if ( !(TCCR2A & (1<<COM2A1)) ) 
+                {
+                    TCCR2A |= (1<<COM2A1);
                 }
 #else
-#   error mega328[p] has OC2A on PB3, check Datasheet for your mcu and then fix this file
+#   error I do not know where OC2A is on your MCU, check its Datasheet and then fix this file
 #endif
                 
+#if defined (OCR2A)
                 OCR2A = (uint8_t)(duty & 0xFF);
+#else
+#   error your MCU does not have the Output Compare Register OCR2A
+#endif
+                
                 printf_P(PSTR("{\"pwm\":{\"OCR2A\":\"%d\"}}\r\n"),OCR2A);
                 initCommandBuffer();
             }
             else if (strcmp_P( arg[0], PSTR("oc2b")) == 0)
             {
                 // set Data Direction Register (its what pinMode(3, OUTPUT) does more or less does)
-#if defined (__AVR_ATmega328P__) || defined (__AVR_ATmega328__)
-        
-                if ( !(DDRD & _BV(PD3)) ) // if bit PD3 is set then it is already an output 
+#if defined(__AVR_ATmega48__) ||defined(__AVR_ATmega88__) || \
+    defined(__AVR_ATmega168__) || defined(__AVR_ATmega48P__) || \
+    defined(__AVR_ATmega88P__) || defined(__AVR_ATmega168P__) || \
+    defined(__AVR_ATmega328P__) 
+                if ( !(DDRD & (1<<PD3)) ) // if bit PD3 is clear then the pin is an INPUT
                 {
-                    DDRD |= _BV(PD3);
+                    DDRD |= (1<<PD3);
                 }
 
                 // connect PD3 pin to OC2B output (pwm) from timer 2, channel B set in Clear on Compare Match mode.
-                if ( !(TCCR2A & _BV(COM2B1)) ) 
+                if ( !(TCCR2A & (1<<COM2B1)) ) 
                 {
-                    TCCR2A |= _BV(COM2B1);
+                    TCCR2A |= (1<<COM2B1);
                 }
+#elif defined(__AVR_ATmega164P__) || defined(__AVR_ATmega324P__) \
+    || defined(__AVR_ATmega644P__) || defined(__AVR_ATmega1284P__)
+                //On Irrigate7 PD6 is used for ICP1 input so do not use it as OC2B
 #else
-#   error mega328[p] has OC2B on PD3, check Datasheet for your mcu and then fix this file
+#   error I do not know where OC2B is on your MCU, check its Datasheet and then fix this file
 #endif
                 
+#if defined (OCR2B)
                 OCR2B = (uint8_t)(duty & 0xFF);
+#else
+#   error your MCU does not have the Output Compare Register OCR2B
+#endif
+
+#if defined(__AVR_ATmega48__) ||defined(__AVR_ATmega88__) || \
+    defined(__AVR_ATmega168__) || defined(__AVR_ATmega48P__) || \
+    defined(__AVR_ATmega88P__) || defined(__AVR_ATmega168P__) || \
+    defined(__AVR_ATmega328P__) 
                 printf_P(PSTR("{\"pwm\":{\"OCR2B\":\"%d\"}}\r\n"),OCR2B);
+#elif defined(__AVR_ATmega164P__) || defined(__AVR_ATmega324P__) \
+    || defined(__AVR_ATmega644P__) || defined(__AVR_ATmega1284P__)
+                printf_P(PSTR("{\"pwm\":{\"OCR2B\":\"NA\"}}\r\n")); // OCR2B is not available on Irrigate7 it is used for ICP1 input
+#else
+#   error I do not know what to do on your MCU
+#endif
+
                 initCommandBuffer();
             }
         }

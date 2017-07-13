@@ -4,7 +4,7 @@ From <https://github.com/epccs/RPUno/>
 
 ## Overview
 
-This no frills Solar Controller board is open hardware and programmable. It has an easy to use microcontroller and Arduino-style headers. The embedded LT3652 solar charge controller manages battery charging while the ATmega328p interfaces with it (see Hardware for more details).
+This no frills Solar Controller board is based on an ATmega328p and is programmable with the open source GCC toolchain for AVR. The MCU is a surface mount version of the microcontroller found on an Arduino Uno. The headers are based on the Arduino Uno pinout, but I have only used RPUftdi, RPUadpt, and RPUpi shields. The on board LT3652 solar charge controller manages battery charging while the ATmega328p can turn it off, detect a fault, and measure battery current and voltage, and the photovoltaic string voltage.
 
 [Forum](http://rpubus.org/bb/viewforum.php?f=6)
 

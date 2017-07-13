@@ -16,12 +16,12 @@ Bootloader options include [optiboot] and [xboot]. Uploading through a bootloade
         12V SLA with an LT3652 solar charge controller 
         High side battery current sensing ADC2 (Charging) and ADC3 (Discharging).
         Vin power will automatically disconnect when the battery is low.
-        Six pluggable digital input/outputs (DIO 3,4,10,11,12,13) with level conversion clamped to Vin.
-        Digital interface has a 22 mA current source from Vin (do not use the battery directly)
-        Pulse input for capacitive sensors HT, LT, MT, PT, VR, or OneShot.
-        Optinal 10mA source for use with flow meters that have an open collector output.
-        Two Analog Loops each with current sources from Vin.
-        Currrent sources are turned off with DIO 9.
+        Six pluggable digital input/outputs (DIO 3,4,10,11,12,13) with level conversion.
+        Digital interface has a 22 mA current source
+        Input Capture (ICP1) with current sources for CAT5 pair current loops.
+        ICP currrent sources are enabled with a digital control DIO 9.
+        Two Analog channels ADC0, ADC1.
+        Two currrent sources for analog loops are enabled with a digital control DIO 9.
         Power to the Shield Vin pin is turned off with DIO 2.
         MCU power (+5V) is converted with an SMPS from the battery power.
 ```
@@ -172,9 +172,9 @@ Both are compensated with a 100k Thermistor which is placed on a short wire moun
 
 # How To Use
 
-Fully charge the SLA battery that will be used, this step will help prevent frustration caused by waiting for the RPUno to charge it.
+Fully charge the SLA battery that will be used, this step will allow the microcontroller to receive power quickly rather than waiting for the charge controller to charge it to about 13.1V.
 
-Connect the application electronics (e.g. flow meter, Digital, and Analog) and check the connections. Then plug in the battery (which will remain disconnected). Next plug in the solar (PV) power, once the PV voltage is enough to enable the charger it will connect to the battery, and start charging (though nothing is visable, and this has caused some frustration). When the battery voltage is over 13.1V it will connect to the on board VIN and power-up. Buffered power ensures hiccup free operation. 
+Connect the application electronics (e.g. flow meter, analog current loops, and whatever the application uses) and check the connections. Then connect the battery (which will remain electronically disconnected). Next, connect the solar photovoltaic power, once the PV voltage is enough to enable the charger it will electronically connect to the battery, and start charging (though nothing is visible yet, and this has caused some frustration). When the battery voltage is over 13.1V it will connect to the on board VIN node and power the microcontroller. The buffered power ensures hiccup free operation. 
 
 In some ways, this board is like an Arduino Uno, but many functions are dedicated to the onboard hardware.  Three digital lines (IO5, IO6, IO7) are connected to the solar charge controller. Two more digital lines (IO2, IO9) are used to control power to the SHLD_VIN and current sources. Two analog lines (ADC4, ADC5) are dedicated to I2C (and not wired to the analog header). While four more analog lines (ADC7, ADC6, ADC3, ADC2) are used to measure the battery PWR voltage, PV_IN voltage, CHRG, and DISCHRG.
 

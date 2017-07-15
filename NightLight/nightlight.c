@@ -82,6 +82,18 @@ typedef struct {
 
 static ledTimer led[LEDSTRING_COUNT];
 
+typedef struct {
+  uint8_t dio;  
+} Led_Map;
+
+//  LED STRING1 is at ledMap index zero not one.
+static const Led_Map ledMap[LEDSTRING_COUNT] = {
+    [0] = { .dio=3 }, // LED1 is controled with Digital IO3
+    [1] = { .dio=10 }, // LED2 is controled with Digital IO10
+    [2] = { .dio=11 }, // LED3 is controled with Digital IO11
+    [3] = { .dio=12 }, // LED4 is controled with Digital IO12
+};
+
 static uint8_t boostInUse; // 0 if free, 1 thru LEDSTRING_COUNT and is the solenoid using boost
 static uint8_t flowInUse; // 0 only one solenoid can be active so its flow count can be measured
 
@@ -745,6 +757,18 @@ void reset_solenoid(uint8_t k_indx)
     digitalWrite(E3,HIGH);
 }
 
+#define SOLENOID_STATE_NOT_ACTIVE 0
+#define SOLENOID_STATE_PRESTART 1
+#define SOLENOID_STATE_BOOST_BEFOR_SET 2
+#define SOLENOID_STATE_SET_HBRIDGE 3
+#define SOLENOID_STATE_RUNTIME 4
+#define SOLENOID_STATE_RUNDONE_BOOST_BEFOR_RESET 5
+#define SOLENOID_STATE_RUNDONE_RESET 6
+#define SOLENOID_STATE_FLOWDONE_BOOST_BEFOR_RESET 7
+#define SOLENOID_STATE_FLOWDONE_RESET 8
+#define SOLENOID_STATE_RESET_HBRIDGE 9
+#define SOLENOID_STATE_FLOWCOUNT 10
+#define SOLENOID_STATE_DELAY 11
 /* operate the solenoid states without blocking
     cycle_state 
     0 = solenoid not active
@@ -752,9 +776,9 @@ void reset_solenoid(uint8_t k_indx)
     2 = wait for BOOST_TIME to finish, then set solenoid.
     3 = wait for PWR_HBRIDGE time to drive solenoid, then trun off H-bridge.
     4 = wait for runTime, then select state 7. or if within 16M counts of mahr_stop select state 5. 
-    5 = wait for boostInUse, then start a Boost charge
+    5 = Not needed: wait for boostInUse, then start a Boost charge
     6 = wait for mahr_stop, then reset solenoid and measure flow and slect state 9.
-    7 = wait for boostInUse, then start a Boost charge
+    7 = Not needed: wait for boostInUse, then start a Boost charge
     8 = wait for BOOST_TIME to finish, then reset solenoid and measure flow rate.
     9 = wait for PWR_HBRIDGE time to drive solenoid, then trun off H-bridge.
     10 = wait for SOLENOID_CLOSE time, then measure flow count, if cycles is set then state 0.
@@ -762,16 +786,15 @@ void reset_solenoid(uint8_t k_indx)
 */ 
 void SolenoidControl() {
     for(int i = 0; i < LEDSTRING_COUNT; i++){
-        // active, wait for start time (delay_start_sec), then start a Boost charge and setup to measure pulse count.
-        if ((led[i].cycle_state == 1) && !boostInUse && !flowInUse) 
+        // active, wait for start time (delay_start_sec), then setup to measure mAHr.
+        if ((led[i].cycle_state == SOLENOID_STATE_PRESTART) && !flowInUse) 
         {
             unsigned long kRuntime= millis() - led[i].started_at;
             if ((kRuntime) > ((unsigned long)led[i].delay_start_sec * 1000)) 
             {
                 reset_solenoid(BOOST);
-                led[i].cycle_state = 2;
+                led[i].cycle_state = SOLENOID_STATE_BOOST_BEFOR_SET;
                 led[i].started_at = millis(); // boost started
-                boostInUse = i+1; //allow this solenoid to use boost
                 flowInUse = i+1; //allow this solenoid to use flow meter
                 break;
             }
@@ -779,101 +802,101 @@ void SolenoidControl() {
         if (flowInUse == i+1) // only let the solenoid that has been allocated use of the flow meter run
         {
             // wait for BOOST_TIME to finish, then select solenoid control line to drive.
-            if ((led[i].cycle_state == 2) && (boostInUse == i+1)) 
+            if ((led[i].cycle_state == SOLENOID_STATE_BOOST_BEFOR_SET)) 
             {
                 unsigned long kRuntime= millis() - led[i].started_at;
                 if ((kRuntime) > ((unsigned long)BOOST_TIME)) 
                 {
+                    led[i].flow_cnt_start =  icp1.count;
                     set_solenoid(i+1);
                     led[i].started_at = millis(); //start time to wait for H-bridge to power a SET
-                    led[i].cycle_state = 3;
+                    led[i].cycle_state = SOLENOID_STATE_SET_HBRIDGE;
                     break;
                 }
             }
 
             // wait for PWR_HBRIDGE time to drive solenoid, then trun off H-bridge.
-            if ((led[i].cycle_state == 3) && (boostInUse == i+1)) 
+            if ((led[i].cycle_state == SOLENOID_STATE_SET_HBRIDGE)) 
             {
                 unsigned long kRuntime= millis() - led[i].started_at;
                 if ((kRuntime) > ((unsigned long)PWR_HBRIDGE)) 
                 {
-                    boostInUse = 0;
                     bridge_off();
                     led[i].started_at = millis(); //start runtime e.g. solenoid is set
                     led[i].cycle_millis_start = millis(); 
                     led[i].flow_cnt_start =  icp1.count;
-                    led[i].cycle_state = 4;
+                    led[i].cycle_state = SOLENOID_STATE_RUNTIME;
                     break;
                 }
             }
 
-            // wait for runTime, then select state 7. or if not MAHR_NOT_SET counts select state 5.
-            if (led[i].cycle_state == 4) 
+            // wait for runTime, then select STATE_RUNDONE_BOOST_BEFOR_RESET. or if not MAHR_NOT_SET counts select state STATE_FLOWDONE_BOOST_BEFOR_RESET.
+            if (led[i].cycle_state == SOLENOID_STATE_RUNTIME) 
             {
                 unsigned long kRuntime= millis() - led[i].started_at;
                 if ((kRuntime) > ((unsigned long)led[i].runtime_sec * 1000)-1) 
                 {
                     led[i].cycle_millis_stop = millis(); // correction of -1 millis was added so timer shows expected value
-                    led[i].cycle_state = 7;
+                    led[i].cycle_state = SOLENOID_STATE_RUNDONE_BOOST_BEFOR_RESET;
                 }
                 if (led[i].mahr_stop != MAHR_NOT_SET) 
                 {  
                     if ( (icp1.count - led[i].flow_cnt_start) >= led[i].mahr_stop) 
                     {
-                        led[i].cycle_state = 5;
+                        led[i].cycle_state = SOLENOID_STATE_FLOWDONE_BOOST_BEFOR_RESET;
                         break;
                     }
                 }
             }
 
             // wait for not boostInUse, then start a Boost charge
-            if ((led[i].cycle_state == 5) && !boostInUse) 
+            if ((led[i].cycle_state == SOLENOID_STATE_RUNDONE_BOOST_BEFOR_RESET) && !boostInUse) 
             {
                 reset_solenoid(BOOST);
-                led[i].cycle_state = 6;
+                led[i].cycle_state = SOLENOID_STATE_RUNDONE_RESET;
                 led[i].started_at = millis(); // boost started
                 boostInUse = i+1;
                 break;
             }
 
-            // wait for boost charge, then reset solenoid, measure flow  and select state 9.
-            if ((led[i].cycle_state == 6) && (boostInUse == i+1)) 
+            // wait for BOOST_TIME to finish, then reset solenoid and measure flow.
+            if ((led[i].cycle_state == SOLENOID_STATE_RUNDONE_RESET) && (boostInUse == i+1)) 
             {
                 unsigned long kRuntime= millis() - led[i].started_at;
                 if (((kRuntime) > ((unsigned long)BOOST_TIME)) ) 
                 {
                     reset_solenoid(i+1);
-                    led[i].started_at = millis(); //start H-bridge SET has power
-                    led[i].cycle_state = 9;
+                    led[i].started_at = millis(); //start time that H-bridge RESET has power
+                    led[i].cycle_state = SOLENOID_STATE_RESET_HBRIDGE;
                     break;
                 }
             }
 
             // wait for not boostInUse, then start a Boost charge
-            if ((led[i].cycle_state == 7) && !boostInUse)
+            if ((led[i].cycle_state == SOLENOID_STATE_FLOWDONE_BOOST_BEFOR_RESET) && !boostInUse)
             {
                 reset_solenoid(BOOST);
-                led[i].cycle_state = 8;
+                led[i].cycle_state = SOLENOID_STATE_FLOWDONE_RESET;
                 led[i].started_at = millis(); // boost started
                 boostInUse = i+1;
                 break;
             }
 
-            // wait for BOOST_TIME to finish, then reset solenoid and measure flow rate.
-            if ((led[i].cycle_state == 8) && (boostInUse == i+1)) 
+            // wait for BOOST_TIME to finish, then reset solenoid and measure flow.
+            if ((led[i].cycle_state == SOLENOID_STATE_FLOWDONE_RESET) && (boostInUse == i+1)) 
             {
                 unsigned long kRuntime= millis() - led[i].started_at;
                 if ((kRuntime) > ((unsigned long)BOOST_TIME)) 
                 {
                     reset_solenoid(i+1);
-                    led[i].started_at = millis(); //start time to wait for H-bridge to power a RESET
-                    led[i].cycle_state = 9;
+                    led[i].started_at = millis(); //start time that H-bridge RESET has power
+                    led[i].cycle_state = SOLENOID_STATE_RESET_HBRIDGE;
                     break;
                 }
             }
             
             // wait for PWR_HBRIDGE time to drive solenoid, then trun off H-bridge.
-            if ((led[i].cycle_state == 9) && (boostInUse == i+1))
+            if ((led[i].cycle_state == SOLENOID_STATE_RESET_HBRIDGE) && (boostInUse == i+1))
             {
                 unsigned long kRuntime= millis() - led[i].started_at;
                 if ((kRuntime) > ((unsigned long)PWR_HBRIDGE)) 
@@ -881,14 +904,14 @@ void SolenoidControl() {
                     boostInUse = 0;
                     bridge_off();
                     led[i].cycle_millis_bank += (led[i].cycle_millis_stop - led[i].cycle_millis_start);
-                    led[i].started_at = millis(); // Solenoid may need some time to finish closing befor recording the flow count
-                    led[i].cycle_state = 10;
+                    led[i].started_at = millis(); 
+                    led[i].cycle_state = SOLENOID_STATE_FLOWCOUNT;
                     break;
                 }
             }
               
             // wait for SOLENOID_CLOSE time, then measure flow count.
-            if ((led[i].cycle_state == 10)) 
+            if ((led[i].cycle_state == SOLENOID_STATE_FLOWCOUNT)) 
             {
                 unsigned long kRuntime= millis() - led[i].started_at;
                 if ((kRuntime) > ((unsigned long)SOLENOID_CLOSE)) 
@@ -903,13 +926,13 @@ void SolenoidControl() {
                     if (led[i].cycles)
                     {
                         led[i].started_at = millis();
-                        led[i].cycle_state = 11;
+                        led[i].cycle_state = SOLENOID_STATE_DELAY;
                         break;
                     }
                     else
                     {
                         led[i].started_at = 0;
-                        led[i].cycle_state = 0;
+                        led[i].cycle_state = SOLENOID_STATE_NOT_ACTIVE;
                         break;
                     }
                 }
@@ -917,14 +940,16 @@ void SolenoidControl() {
         }
         
         // delay after reset operation and befor next set operation
-        if ((led[i].cycle_state == 11)) 
+        if ((led[i].cycle_state == SOLENOID_STATE_DELAY)) 
         {
             unsigned long kRuntime= millis() - led[i].started_at;
             if ( (kRuntime) > ((unsigned long)led[i].delay_sec*1000UL) ) 
             {
-                // back date by delay_start_sec since it should only be used once
-                led[i].started_at = millis()-((unsigned long)led[i].delay_start_sec*1000UL);
-                led[i].cycle_state = 1;
+                reset_solenoid(BOOST);
+                led[i].cycle_state = SOLENOID_STATE_BOOST_BEFOR_SET;
+                led[i].started_at = millis(); // boost started
+                boostInUse = i+1; //allow this solenoid to use boost
+                flowInUse = i+1; //allow this solenoid to use flow meter
                 break;
             }
         }

@@ -18,6 +18,6 @@ extern uint8_t Live(uint8_t);
 extern uint8_t StartLed(uint8_t);
 extern void init_K(void);
 
-#define LEDSTRING_COUNT 3
+#define LEDSTRING_COUNT 4
 
 #endif // NightLight_H 

@@ -2,6 +2,10 @@
 
 ## Future improvements (to do)
 
+Add a wiring diagram.
+
+Stop report like led on DayNight {"K1":{"delay_start_sec":"1","runtime_sec":"1","delay_sec":"1","cycles":"1"}}
+
 Did the flow meter not stop when the valve was closed, try to close the valve again a few times. Set a status value for the command line to read, and sort out a way to do a service request, perhaps with the bus manager.
 
 Option to include some scaled time (or flow count) based on PV power received. In other words, keep the peak mA-Sec per hour charge rate and use it to scale the last measured hour of that value to add solenoid time (or flow count). 

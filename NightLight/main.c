@@ -43,11 +43,11 @@ static unsigned long day_status_blink_started_at;
 static unsigned long blink_started_at;
 static unsigned long blink_delay;
 static char rpu_addr;
-static uint8_t solenoids_initalized;
+static uint8_t leds_initalized;
 
 void ProcessCmd()
 { 
-    if (solenoids_initalized) 
+    if (leds_initalized) 
     {
         if ( (strcmp_P( command, PSTR("/id?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
         {
@@ -116,7 +116,7 @@ void ProcessCmd()
     }
     else
     {
-        if (! solenoids_initalized)
+        if (! leds_initalized)
         {
             printf_P(PSTR("{\"err\":\"NotFinishLEDinit\"}\r\n"));
         }
@@ -186,7 +186,7 @@ void setup(void)
     init_K();
     
     Reset_All_LED();
-    solenoids_initalized = 0;
+    leds_initalized = 0;
     
     // set callback. See Solenoid for another example, where it loads the EEPROM values used at the start of each day
     Night_AttachWork(callback_for_night_attach);
@@ -318,24 +318,24 @@ int main(void)
             }
         }
         
-        // Solenoid Control is a function that moves them through different states that are timed with millis() or icp1 count.
-        SolenoidControl();
+        // Led Control is a non-blocking function that moves the LED's through different states that are timed with millis().
+        LedControl();
         
-        if (!solenoids_initalized)
+        if (!leds_initalized)
         {
             // lets test if they are in use.
-            uint8_t solenoids_in_use = 0;
-            for(uint8_t solenoid = 1; solenoid <= LEDSTRING_COUNT; solenoid++)
+            uint8_t leds_in_use = 0;
+            for(uint8_t led = 1; led <= LEDSTRING_COUNT; led++)
             {
-                if (Live(solenoid))
+                if (Live(led))
                 {
-                    solenoids_in_use =1;
+                    leds_in_use =1;
                     break;
                 }
             }
-            if (! solenoids_in_use) 
+            if (! leds_in_use) 
             {
-                solenoids_initalized = 1;
+                leds_initalized = 1;
             }
         }
     }        

@@ -76,8 +76,9 @@ static const Pin_Map pinMap[NUM_DIGITAL_PINS] = {
 };
 #endif  // defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__)  || defined(__AVR_ATmega328P__)
 
-void badPinNumber(void) __attribute__((error("Pin number is too large or not a constant")));
+void badPinNumber(void) __attribute__((error("\n***rss: Dead code elimination has failed,\n***rss: becasue the compiler is not sure it can eliminate the badPinNumber() function.\n***rss: Test the pin value berfor calling the Digital function to eliminate this error.")));
 
+// dead code elimination should remove the badPinNumber function call if the compiler is sure that the pin number is within the tested range.
 static inline __attribute__((always_inline)) void badPinCheck(uint8_t pin) 
 {
     if (pin >= NUM_DIGITAL_PINS) badPinNumber();

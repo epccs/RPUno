@@ -10,8 +10,7 @@ extern void Save(void);
 extern void Load(void);
 extern void Time(void);
 extern void Stop(void);
-
-extern void SolenoidControl(void);
+extern void LedControl(void);
 extern void Reset_All_LED(void);
 extern uint8_t LoadLedControlFromEEPROM(uint8_t);
 extern uint8_t Live(uint8_t);

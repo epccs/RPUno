@@ -728,6 +728,7 @@ void LedControl() {
             if (DischargeAccum() > led[i].mahr_stop) // Discharge is from ../AmpHr/power_storage.c, this test takes a lot o machine cycles on an AVR
             {  
                 led[i].cycle_state = LED_STATE_RESET;
+                led[i].cycles = 0;
                 break;
             }
         }

@@ -157,7 +157,7 @@ void CheckChrgAccumulation(void)
 
 /* The charge and discharge accumulation values need to be zeroed at the start of the day
 */
-void init_ChargAccumulation(void) 
+uint8_t init_ChargAccumulation(void) 
 {
     remaining_accum = chrg_accum - dischrg_accum;
     chrg_accum = 0;
@@ -166,4 +166,12 @@ void init_ChargAccumulation(void)
     dischrg_accum_fine = 0;
     chrgTmrStarted = millis();
     chrgTmrStartOfAccum = chrgTmrStarted;
+    
+    // laod reference calibration from eeprom
+    if ( ! LoadAnalogRefFromEEPROM() )
+    {
+        return 0;
+    }
+    
+    return 1;
 }

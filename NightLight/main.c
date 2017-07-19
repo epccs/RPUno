@@ -125,7 +125,11 @@ void callback_for_night_attach(void)
 //At start of each day determine the remaining charge and zero the charge and discharge (bank) values.
 void callback_for_day_attach(void)
 {
-    init_ChargAccumulation(); // ../AmpHr/power_storage.c
+    // setup AmpHr accumulators and load Adc calibration reference
+    if (!init_ChargAccumulation()) // ../AmpHr/power_storage.c
+    {
+        blink_delay = BLINK_DELAY/4;
+    }
 }
 
 void setup(void) 
@@ -181,6 +185,12 @@ void setup(void)
     // set callbacks for DayNight state machine
     Night_AttachWork(callback_for_night_attach);
     Day_AttachWork(callback_for_day_attach);
+    
+    // setup AmpHr accumulators
+    if (!init_ChargAccumulation()) // ../AmpHr/power_storage.c
+    {
+        blink_delay = BLINK_DELAY/4;
+    }
 }
 
 void blink(void)

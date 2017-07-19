@@ -6,7 +6,7 @@ extern void Discharge(void);
 extern void Remaining(void);
 
 extern void CheckChrgAccumulation(void);
-extern void init_ChargAccumulation(void);
+extern uint8_t init_ChargAccumulation(void);
 
 extern float ChargeAccum(void);
 extern float DischargeAccum(void);

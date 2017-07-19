@@ -129,7 +129,11 @@ void ProcessCmd()
 // consider that DayNigh has no includes for power_storage but I can pass it in a callback... is that not odd?
 void callback_for_day_attach(void)
 {
-    init_ChargAccumulation(); // ../AmpHr/power_storage.c
+    // setup AmpHr accumulators and load Adc calibration reference
+    if (!init_ChargAccumulation()) // ../AmpHr/power_storage.c
+    {
+        blink_delay = BLINK_DELAY/4;
+    }
 }
 
 void setup(void) 

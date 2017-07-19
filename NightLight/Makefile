@@ -7,11 +7,9 @@ OBJECTS = main.o \
 	../DayNight/day_night.o \
 	../Adc/analog.o \
 	../Adc/references.o \
-	../Capture/capture.o \
+	../AmpHr/power_storage.o \
 	$(LIBDIR)/timers.o \
 	$(LIBDIR)/uart.o \
-	$(LIBDIR)/icp_buf.o \
-	$(LIBDIR)/icp1.o \
 	$(LIBDIR)/twi.o \
 	$(LIBDIR)/rpu_mgr.o \
 	$(LIBDIR)/adc.o \

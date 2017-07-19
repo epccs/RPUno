@@ -47,7 +47,7 @@ mahr_stop           UINT32          214  234  254  274
 cycles              UINT8           218  238  258  278
 ```
 
-This works like Solenoid except the mAHr_stop replaces flow_stop, it will stop the LED once that much current has been used from the battery. Also, the LED's do not have a resource constraint like the Flow Meter on Solenoid does, so all the LED's can be used at once.
+This works like Solenoid except the mAHr_stop replaces flow_stop, it will stop the LED once that much current has been used from the battery. Also, the LED's do not have a resource constraint (i.e. the Flow Meter), so all the LED's can be used at once.
 
 
 # Firmware Upload
@@ -94,7 +94,7 @@ Identify is from ../Uart/id.h Id().
 
 Start the led (1|2|3|4) operation, with option to override cycles (1..255). 
 
-If EEPROM settings have not been loaded the LED's retain the initialized values (delay_start = 1+(3*k), runtime = 1, delay = 3600, mahr_stop = MAHR_NOT_SET) that will cause each led to operate for a second after a delay_start time that spaces there operation out by 3 seconds each (it helps to test the setup).
+If EEPROM settings have not been loaded the LED's retain the initialized values (delay_start = 1+(3*led), runtime = 1, delay = 3600, mahr_stop = MAHR_NOT_SET) that will cause each led to operate for a second after a delay_start time that spaces there operation out by 3 seconds each (it helps to test the setup).
 
 After a led has entered the delay state and let go of the mAHr meter resource another solenoid that is ready to use the meter will do so. Make sure to set the delay time long enough that all the other LED's can use their runtime, or the meter becomes a resource constraint and some will get shorted. For example set all the delay times to 360 and make sure the combined runtimes do not add up to 360 (i.e. 100, 80, 120).
 
@@ -114,14 +114,14 @@ After a led has entered the delay state and let go of the mAHr meter resource an
 Save the led (1|2|3|4) with cycles (1..255) to EEPROM. A callback function is used to attach the callback_for_night_attach routine that loads these values at the start of the night (i.e. Night_AttachWork).
 
 ```
-/1/save 1,100
-{"LED1":{"delay_start_sec":"1","runtime_sec":"18","delay_sec":"41","cycles":"100"}}
-/1/save 2,100
-{"LED2":{"delay_start_sec":"10","runtime_sec":"19","delay_sec":"42","cycles":"100"}}
-/1/save 3,100
-{"LED3":{"delay_start_sec":"20","runtime_sec":"20","delay_sec":"43","cycles":"100"}}
-/1/save 4,100
-{"LED4":{"delay_start_sec":"29","runtime_sec":"21","delay_sec":"44","cycles":"100"}}
+/1/save 1,255
+{"LED1":{"delay_start_sec":"1","runtime_sec":"4","delay_sec":"2","mahr_stop":"40","cycles":"255"}}
+/1/save 2,255
+{"LED2":{"delay_start_sec":"3","runtime_sec":"5","delay_sec":"2","mahr_stop":"60","cycles":"255"}}
+/1/save 3,255
+{"LED3":{"delay_start_sec":"5","runtime_sec":"4","delay_sec":"2","mahr_stop":"80","cycles":"255"}}
+/1/save 4,255
+{"LED4":{"delay_start_sec":"7","runtime_sec":"5","delay_sec":"2","mahr_stop":"100","cycles":"255"}}
 ```
 
 ##  /0/load led
@@ -130,7 +130,13 @@ Load the led (1|2|3|4) from EEPROM. Use run to start it.
 
 ```
 /1/load 1
-{"LED1":{"delay_start_sec":"1","runtime_sec":"18","delay_sec":"41","cycles":"100"}}
+{"LED1":{"delay_start_sec":"1","runtime_sec":"4","delay_sec":"2","mahr_stop":"40","cycles":"255"}}
+/1/load 2
+{"LED2":{"delay_start_sec":"3","runtime_sec":"5","delay_sec":"2","mahr_stop":"60","cycles":"255"}}
+/1/load 3
+{"LED3":{"delay_start_sec":"5","runtime_sec":"4","delay_sec":"2","mahr_stop":"80","cycles":"255"}}
+/1/load 4
+{"LED4":{"delay_start_sec":"7","runtime_sec":"5","delay_sec":"2","mahr_stop":"100","cycles":"255"}}
 ```
 
 
@@ -153,14 +159,14 @@ Set the led (1|2|3|4) one time delay befor cycles run (1..21600, e.g. 6hr max).
 ``` 
 /1/pre 1,1
 {"LED1":{"delay_start_sec":"1"}}
-/1/pre 2,10
-{"LED2":{"delay_start_sec":"10"}}
-/1/pre 3,20
-{"LED3":{"delay_start_sec":"20"}}
-/1/pre 4,29
-{"LED4":{"delay_start_sec":"29"}}
+/1/pre 2,3
+{"LED2":{"delay_start_sec":"3"}}
+/1/pre 3,5
+{"LED3":{"delay_start_sec":"5"}}
+/1/pre 4,7
+{"LED4":{"delay_start_sec":"7"}}
 /1/run 2,1
-{"LED2":{"delay_start_sec":"10","runtime_sec":"1","delay_sec":"13","cycles":"1"}}
+{"LED2":{"delay_start_sec":"3","runtime_sec":"1","delay_sec":"13","cycles":"1"}}
 ``` 
 
 
@@ -169,35 +175,53 @@ Set the led (1|2|3|4) one time delay befor cycles run (1..21600, e.g. 6hr max).
 Set the led (1|2|3|4) run time (1..21600, e.g. 6hr max). 
 
 ``` 
-/1/runtime 1,18
-{"LED1":{"runtime_sec":"18"}}
-/1/runtime 2,19
-{"LED2":{"runtime_sec":"19"}}
-/1/runtime 3,20
-{"LED3":{"runtime_sec":"20"}}
-/1/runtime 4,21
-{"LED4":{"runtime_sec":"21"}}
+/1/runtime 1,4
+{"LED1":{"runtime_sec":"4"}}
+/1/runtime 2,5
+{"LED2":{"runtime_sec":"5"}}
+/1/runtime 3,4
+{"LED3":{"runtime_sec":"4"}}
+/1/runtime 4,5
+{"LED4":{"runtime_sec":"5"}}
 /1/run 1,1
-{"LED1":{"delay_start_sec":"1","runtime_sec":"18","delay_sec":"13","cycles":"1"}}
+{"LED1":{"delay_start_sec":"1","runtime_sec":"4","delay_sec":"13","cycles":"1"}}
 ```
 
 
-##  /0/delay k,delay_in_sec
+##  /0/delay led,delay_in_sec
 
 Set the led (1|2|3|4) delay between runs (1..86400, e.g. 24 hr max). 
 
 ```
-/1/delay 1,41
-{"LED1":{"delay_sec":"41"}}
-/1/delay 2,42
-{"LED2":{"delay_sec":"42"}}
-/1/delay 3,43
-{"LED3":{"delay_sec":"43"}}
-/1/delay 4,44
-{"LED4":{"delay_sec":"44"}}
+/1/delay 1,2
+{"LED1":{"delay_sec":"2"}}
+/1/delay 2,2
+{"LED2":{"delay_sec":"2"}}
+/1/delay 3,2
+{"LED3":{"delay_sec":"2"}}
+/1/delay 4,2
+{"LED4":{"delay_sec":"2"}}
 /1/run 3,1
-{"LED3":{"delay_start_sec":"20","runtime_sec":"20","delay_sec":"43","cycles":"1"}}
+{"LED3":{"delay_start_sec":"5","runtime_sec":"4","delay_sec":"2","cycles":"1"}}
 ```
+
+##  /0/mahrstp led,mAHr
+
+Set the led (1|2|3|4) max discharge in mAHr (1..86400, e.g. 86.4AHr). When the battery has discharged by this amount the LED will stop.
+
+```
+/1/mahrstp 1,40
+{"LED1":{"mahr_stop":"40"}}
+/1/mahrstp 2,60
+{"LED2":{"mahr_stop":"60"}}
+/1/mahrstp 3,80
+{"LED3":{"mahr_stop":"80"}}
+/1/mahrstp 4,100
+{"LED4":{"mahr_stop":"100"}}
+/1/run 3,1
+{"LED3":{"delay_start_sec":"5","runtime_sec":"4","delay_sec":"2","cycles":"1","mahr_stop":"80"}}
+```
+
 
 ##  /0/time? led
 
@@ -205,7 +229,7 @@ Report the led (1|2|3|4) runtime in millis.
 
 ``` 
 /1/time? 3
-{"LED3":{"cycle_state":"0","cycles":"0","cycle_millis":"20000"}}
+{"LED3":{"cycle_state":"0","cycles":"0","cycle_millis":"4000"}}
 ``` 
 
 ## [/0/day?](../DayNight#0day)
@@ -214,16 +238,7 @@ Report the led (1|2|3|4) runtime in millis.
 ## [/0/analog? 0..7[,0..7[,0..7[,0..7[,0..7]]]]](../Adc#0analog-0707070707)
 
 
-## [/0/initICP icp1,mode,prescale](../Capture#0initicp-icp1modeprescale)
-
-
-## [/0/count? [icp1]](../Capture#0count-icp1)
-
-
-## [/0/capture? [icp1,1..15]](../Capture#0capture-icp1115)
-
-
-## [/0/event? [icp1,1..31]](../Capture#0event-icp1131)
+## [/0/charge?](../AmpHr#0charge)
 
 
 

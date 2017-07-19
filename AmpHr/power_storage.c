@@ -24,6 +24,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/adc.h"
 #include "../lib/timers.h"
 #include "../lib/pins_board.h"
+#include "../Adc/references.h"
 #include "power_storage.h"
 
 // RPUno has an input for 36 cell PV which is feed into a LT3652 charge controler (CC).
@@ -46,17 +47,43 @@ static long remaining_accum;
 #define SERIAL_PRINT_DELAY_MILSEC 60000UL
 static unsigned long serial_print_started_at;
 
-void Charge(void)
+// Accumulated Charge in mAHr
+float ChargeAccum(void)
 {
+    return chrg_accum * ((ref_extern_avcc_uV/1.0E6)/1024.0)/(0.068*50.0)/3.6;
+}
+
+// Accumulated Discharge in mAHr
+float DischargeAccum(void)
+{
+    return dischrg_accum * ((ref_extern_avcc_uV/1.0E6)/1024.0)/(0.068*50.0)/3.6;
+}
+
+// Remaining charge in mAHr from the last init (e.g. the previous day)
+float RemainingAccum(void)
+{
+    return remaining_accum * ((ref_extern_avcc_uV/1.0E6)/1024.0)/(0.068*50.0)/3.6;
+}
+
+void Charge(void)
+{  
     if ( (command_done == 10) )
     {
+        // laod reference calibration or show an error if they are not in eeprom
+        if ( ! LoadAnalogRefFromEEPROM() )
+        {
+            printf_P(PSTR("{\"err\":\"AdcRefNotInEeprom\"}\r\n"));
+            initCommandBuffer();
+            return;
+        }
+        
         serial_print_started_at = millis();
         printf_P(PSTR("{\"CHRG_mAHr\":"));
         command_done = 11;
     }
     else if ( (command_done == 11) )
     { 
-        printf_P(PSTR("\"%1.2f\","),( (chrg_accum*(5.0/1024.0)/(0.068*50.0)))/3.6 );
+        printf_P(PSTR("\"%1.2f\","),ChargeAccum() );
         command_done = 12;
     }
     else if ( (command_done == 12) )
@@ -66,7 +93,7 @@ void Charge(void)
     }
     else if ( (command_done == 13) )
     { 
-        printf_P(PSTR("\"%1.2f\","),( (dischrg_accum*(5.0/1024.0)/(0.068*50.0)))/3.6 );
+        printf_P(PSTR("\"%1.2f\","),DischargeAccum() );
         command_done = 14;
     }
     else if ( (command_done == 14) )
@@ -76,7 +103,7 @@ void Charge(void)
     }
     else if ( (command_done == 15) )
     { 
-        printf_P(PSTR("\"%1.2f\","),( (remaining_accum*(5.0/1024.0)/(0.068*50.0)))/3.6 );
+        printf_P(PSTR("\"%1.2f\","),RemainingAccum() );
         command_done = 16;
     }
     else if ( (command_done == 16) )

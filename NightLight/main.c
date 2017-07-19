@@ -23,13 +23,12 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/adc.h"
 #include "../lib/twi.h"
 #include "../lib/rpu_mgr.h"
-#include "../lib/icp1.h"
 #include "../lib/pin_num.h"
 #include "../lib/pins_board.h"
 #include "../Uart/id.h"
 #include "../DayNight/day_night.h"
 #include "../Adc/analog.h"
-#include "../Capture/capture.h"
+#include "../AmpHr/power_storage.h"
 #include "nightlight.h"
 
 #define ADC_DELAY_MILSEC 200UL
@@ -65,9 +64,9 @@ void ProcessCmd()
         {
             Delay(); // nightlight.c
         }
-        if ( (strcmp_P( command, PSTR("/fstop")) == 0) && ( (arg_count == 2 ) ) )
+        if ( (strcmp_P( command, PSTR("/mahrstp")) == 0) && ( (arg_count == 2 ) ) )
         {
-            FlowStop(); // nightlight.c
+            AHrStop(); // nightlight.c
         }
         if ( (strcmp_P( command, PSTR("/run")) == 0) && ( (arg_count == 1) || (arg_count == 2) ) )
         {
@@ -97,21 +96,9 @@ void ProcessCmd()
         {
             Analog(); // ../Adc/analog.c
         }
-        if ( (strcmp_P( command, PSTR("/count?")) == 0) &&  ( (arg_count == 0) || ( (arg_count == 1) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
+        if ( (strcmp_P( command, PSTR("/charge?")) == 0) && ( (arg_count == 0 ) ) )
         {
-            Count(); // ../Capture/capture.c
-        }
-        if ( (strcmp_P( command, PSTR("/capture?")) == 0) && ( (arg_count == 0 ) || ( (arg_count == 2) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
-        {
-            Capture(); // ../Capture/capture.c
-        }
-        if ( (strcmp_P( command, PSTR("/event?")) == 0) && ( (arg_count == 0 ) || ( (arg_count == 2) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
-        {
-            Event(); // ../Capture/capture.c
-        }
-        if ( (strcmp_P( command, PSTR("/initICP")) == 0) && ( ( (arg_count == 3) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
-        {
-            InitICP(); // ../Capture/capture.c
+            Charge(); // ../AmpHr/power_storage.c
         }
     }
     else
@@ -125,7 +112,7 @@ void ProcessCmd()
     }
 }
 
-//At start of each night load the control settings from EEPROM and operate them.
+//At start of each night load the LED control settings from EEPROM and operate them.
 void callback_for_night_attach(void)
 {
     for(uint8_t led = 1; led <= LEDSTRING_COUNT; led++)
@@ -133,6 +120,12 @@ void callback_for_night_attach(void)
         LoadLedControlFromEEPROM(led);
         StartLed(led);
     }
+}
+
+//At start of each day determine the remaining charge and zero the charge and discharge (bank) values.
+void callback_for_day_attach(void)
+{
+    init_ChargAccumulation(); // ../AmpHr/power_storage.c
 }
 
 void setup(void) 
@@ -153,9 +146,6 @@ void setup(void)
     // put ADC in Auto Trigger mode and fetch an array of channels
     enable_ADC_auto_conversion(BURST_MODE);
     adc_started_at = millis();
-
-    /* Initialize Input Capture Unit (see ../lib/icp1.h) */
-    initIcp1(TRACK_RISING, ICP1_MCUDIV64) ;
 
     /* Initialize UART, it returns a pointer to FILE so redirect of stdin and stdout works*/
     stdout = stdin = uartstream0_init(BAUD);
@@ -182,14 +172,15 @@ void setup(void)
         blink_delay = BLINK_DELAY/4;
     }
     
-    // setup solenoid control
-    init_K();
+    // setup Led string control
+    init_Led();
     
     Reset_All_LED();
     leds_initalized = 0;
     
-    // set callback. See Solenoid for another example, where it loads the EEPROM values used at the start of each day
+    // set callbacks for DayNight state machine
     Night_AttachWork(callback_for_night_attach);
+    Day_AttachWork(callback_for_day_attach);
 }
 
 void blink(void)
@@ -270,6 +261,9 @@ int main(void)
 
         // delay between ADC burst
         adc_burst();
+
+        // check how much charge went into battery
+        CheckChrgAccumulation();
 
         // check if character is available to assemble a command, e.g. non-blocking
         if ( (!command_done) && uart0_available() ) // command_done is an extern from parse.h

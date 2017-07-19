@@ -8,4 +8,8 @@ extern void Remaining(void);
 extern void CheckChrgAccumulation(void);
 extern void init_ChargAccumulation(void);
 
+extern float ChargeAccum(void);
+extern float DischargeAccum(void);
+extern float RemainingAccum(void);
+
 #endif // PwrStrg_H

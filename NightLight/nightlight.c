@@ -24,18 +24,10 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include <stdbool.h>
 #include "../lib/parse.h"
 #include "../lib/timers.h"
-#include "../lib/icp1.h"
 #include "../lib/pin_num.h"
 #include "../lib/pins_board.h"
+#include "../AmpHr/power_storage.h"
 #include "nightlight.h"
-
-// IO on RPUno used by the K3 board
-#define E3 3
-#define A0 10
-#define A1 11
-#define A2 12
-// 13 is used to blink I2C status in main()
-// 4 is used to blink Day-Night status in main()
 
 //The EEPROM memory usage is as follows. 
 #define EE_LED_BASE_ADDR 200
@@ -48,14 +40,6 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #define EE_LED_DELAY 10
 #define EE_LED_MAHR_STP 14
 #define EE_LED_CYCLES 18
-
-// index zero is not a solenoid (e.g. 74HC238 outputs Y0 is discharge and Y1 is boost)
-#define DISCHARGE 0
-#define BOOST 0
-
-#define BOOST_TIME 650
-#define PWR_HBRIDGE 50
-#define SOLENOID_CLOSE 1000
 
 #define SEC_IN_HR 3600UL
 #define SEC_IN_6HR 21600UL
@@ -71,10 +55,6 @@ typedef struct {
     uint8_t cycle_state;
     uint8_t cycles; // keep cycling until zero
     uint32_t mahr_stop; // mAHr usage after start at which to stop the led
-    uint32_t flow_cnt_start; // pulse count when set occured (e.g. ICP1 capture events)
-    uint32_t flow_cnt_stop; // pulse count when reset occured
-    uint32_t flow_cnt_bank; // pulse count accumulate or store
-    // uint8_t use_flow_meter; // the defaut is for all solenoids to use the flow meter, but what if I want to inject fertilizers into flow
     unsigned long cycle_millis_start;
     unsigned long cycle_millis_stop;
     unsigned long cycle_millis_bank; // millis count accumulate or store
@@ -193,7 +173,7 @@ void RunTime(void)
             initCommandBuffer();
             return;
         }
-        // don't change a solenoid that is in use it needs to be stopped first
+        // don't change an led that is in use it needs to be stopped first
         if (led[led_arg0-1].cycle_state)
         {
             printf_P(PSTR("{\"err\":\"Led%dInUse\"}\r\n"),led_arg0);
@@ -240,7 +220,7 @@ void Delay(void)
             initCommandBuffer();
             return;
         }
-        // don't change a solenoid that is in use it needs to be stopped first
+        // don't change an led that is in use it needs to be stopped first
         if (led[led_arg0-1].cycle_state)
         {
             printf_P(PSTR("{\"err\":\"Led%dInUse\"}\r\n"),led_arg0);
@@ -270,7 +250,7 @@ void Delay(void)
 }
 
 // arg[0] is led, arg[1] is mahr_stop
-void FlowStop(void)
+void AHrStop(void)
 {
     if ( (command_done == 10) )
     {
@@ -287,7 +267,7 @@ void FlowStop(void)
             initCommandBuffer();
             return;
         }
-        // don't change a solenoid that is in use it needs to be stopped first
+        // don't change an led that is in use it needs to be stopped first
         if (led[led_arg0-1].cycle_state)
         {
             printf_P(PSTR("{\"err\":\"Led%dInUse\"}\r\n"),led_arg0);
@@ -311,12 +291,12 @@ void FlowStop(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"FlwStpCmdDnWTF\"}\r\n"));
+        printf_P(PSTR("{\"err\":\"AHrStpCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
 
-// arg[0] is solenoid, [arg[1] is cycles]
+// arg[0] is led, [arg[1] is cycles]
 void Run(void)
 {
     if ( (command_done == 10) )
@@ -340,7 +320,7 @@ void Run(void)
             }
         }
 
-         // don't run a solenoid that is in use it needs to be stopped first
+         // don't run a led that is in use it needs to be stopped first
         if (led[led_arg0-1].cycle_state)
         {
             printf_P(PSTR("{\"err\":\"Led%dInUse\"}\r\n"),led_arg0);
@@ -349,7 +329,6 @@ void Run(void)
         }
         led[led_arg0-1].cycle_state = 1;
         led[led_arg0-1].cycles = cycles;
-        led[led_arg0-1].flow_cnt_bank = 0;
         led[led_arg0-1].cycle_millis_bank = 0;
         led[led_arg0-1].started_at = millis(); //delay_start_sec is timed from now
         printf_P(PSTR("{\"LED%d\":{"),led_arg0);
@@ -418,7 +397,7 @@ void Save(void)
             initCommandBuffer();
             return;
         }
-         // don't save a solenoid that is in use
+         // don't save a led that is in use
         if (led[led_arg0-1].cycle_state)
         {
             printf_P(PSTR("{\"err\":\"Led%dInUse\"}\r\n"),led_arg0);
@@ -429,7 +408,6 @@ void Save(void)
         {
             led[led_arg0-1].cycle_state = 0;
             led[led_arg0-1].cycles = (uint8_t)cycles;
-            led[led_arg0-1].flow_cnt_bank = 0;
             led[led_arg0-1].cycle_millis_bank = 0;
             uint16_t value = ((uint16_t) (led_arg0)) + 0x4B30; //ascii bytes for 'K1', 'K2'...
             eeprom_write_word( (uint16_t *)((led_arg0-1)*EE_LED_ARRAY_OFFSET+EE_LED_BASE_ADDR+EE_LED_ID), value);
@@ -507,7 +485,7 @@ void Save(void)
     }
 }
 
-// arg[0] is solenoid
+// arg[0] is led
 void Load(void)
 {
     if ( (command_done == 10) )
@@ -519,7 +497,7 @@ void Load(void)
             return;
         }
 
-         // don't load a solenoid that is in use
+         // don't load a led that is in use
         if (led[led_arg0-1].cycle_state)
         {
             printf_P(PSTR("{\"err\":\"Led%dInUse\"}\r\n"),led_arg0);
@@ -530,7 +508,6 @@ void Load(void)
         {
             if (LoadLedControlFromEEPROM(led_arg0))
             {
-                led[led_arg0-1].flow_cnt_bank = 0;
                 led[led_arg0-1].cycle_millis_bank = 0;
                 printf_P(PSTR("{\"LED%d\":{"),led_arg0);
                 command_done = 11;
@@ -708,7 +685,7 @@ void Stop(void)
 #define LED_STATE_DELAY 6
 /* operate the led states without blocking
     cycle_state 
-    LED_STATE_NOT_ACTIVE = solenoid not active
+    LED_STATE_NOT_ACTIVE = led not active
     LED_STATE_PRESTART = active, wait for pre start time (delay_start_sec), 
     LED_STATE_SET = trun on LED.
     LED_STATE_RUNTIME = wait for runTime with LED on 
@@ -735,7 +712,6 @@ void LedControl() {
                 digitalWrite(ledMap[i].dio,LOW); // Use a Digital IO to sink a current source;
             led[i].started_at = millis(); //start timing runtime
             led[i].cycle_millis_start = millis(); 
-            led[i].flow_cnt_start =  icp1.count;
             led[i].cycle_state = LED_STATE_RUNTIME;
             break;
         }
@@ -749,13 +725,10 @@ void LedControl() {
                 led[i].cycle_millis_stop = millis(); // correction of -1 millis was added so timer shows expected value
                 led[i].cycle_state = LED_STATE_RESET;
             }
-            if (led[i].mahr_stop != MAHR_NOT_SET) 
+            if (DischargeAccum() > led[i].mahr_stop) // Discharge is from ../AmpHr/power_storage.c, this test takes a lot o machine cycles on an AVR
             {  
-                if ( (icp1.count - led[i].flow_cnt_start) >= led[i].mahr_stop) 
-                {
-                    led[i].cycle_state = LED_STATE_RESET;
-                    break;
-                }
+                led[i].cycle_state = LED_STATE_RESET;
+                break;
             }
         }
 
@@ -771,8 +744,6 @@ void LedControl() {
 
         if ((led[i].cycle_state == LED_STATE_CYCCOUNT)) 
         {
-            led[i].flow_cnt_stop = icp1.count; //record the flow meter pulse count after solenoid has closed
-            led[i].flow_cnt_bank += (led[i].flow_cnt_stop - led[i].flow_cnt_start);
             if (led[i].cycles)
             {
                 led[i].cycles = led[i].cycles -1;
@@ -814,14 +785,13 @@ void Reset_All_LED() {
         led[i].mahr_stop = MAHR_NOT_SET;
         led[i].cycles = 1;
         led[i].cycle_state = 1;
-        led[i].flow_cnt_bank = 0;
         led[i].cycle_millis_bank = 0;
     }
 }
 
-uint8_t LoadLedControlFromEEPROM(uint8_t solenoid) 
+uint8_t LoadLedControlFromEEPROM(uint8_t led_string) 
 {
-    uint16_t i = solenoid-1;
+    uint16_t i = led_string-1;
     if (!led[i].cycle_state)
     {
         uint16_t id = eeprom_read_word((uint16_t*)(i*EE_LED_ARRAY_OFFSET+EE_LED_BASE_ADDR+EE_LED_ID));
@@ -833,7 +803,6 @@ uint8_t LoadLedControlFromEEPROM(uint8_t solenoid)
             led[i].delay_sec = eeprom_read_dword((uint32_t*)(i*EE_LED_ARRAY_OFFSET+EE_LED_BASE_ADDR+EE_LED_DELAY)); 
             led[i].mahr_stop = eeprom_read_dword((uint32_t*)(i*EE_LED_ARRAY_OFFSET+EE_LED_BASE_ADDR+EE_LED_MAHR_STP)); 
             led[i].cycles = eeprom_read_byte((uint8_t*)(i*EE_LED_ARRAY_OFFSET+EE_LED_BASE_ADDR+EE_LED_CYCLES)); 
-            led[i].flow_cnt_bank = 0;
             led[i].cycle_millis_bank = 0;
             return 1;
         }
@@ -848,39 +817,38 @@ uint8_t LoadLedControlFromEEPROM(uint8_t solenoid)
     }
 }
 
-// return the solenoid cycle_state (e.g. tells if it is running)
-uint8_t Live(uint8_t solenoid) 
+// return the cycle_state (e.g. tells if it is running)
+uint8_t Live(uint8_t led_string) 
 {
-    uint16_t i = solenoid-1;
+    uint16_t i = led_string-1;
     if (i<LEDSTRING_COUNT)
     {
         return led[i].cycle_state;
     }
-    else return 0xFF; // not a valid solenoid 
+    else return 0xFF; // not a valid LED string 
 }
 
 // start the LED if it is not running and return cycle state
-uint8_t StartLed(uint8_t solenoid) 
+uint8_t StartLed(uint8_t led_string) 
 {
-    uint16_t i = solenoid-1;
+    uint16_t i = led_string-1;
     if (i<LEDSTRING_COUNT )
     {
         if (! led[i].cycle_state) led[i].cycle_state = 1;
         return led[i].cycle_state;
     }
-    else return 0x0; // not a valid solenoid
+    else return 0x0; // not a valid led string
 }
 
 // only use init at setup() not durring loop()
-void init_K(void) 
+void init_Led(void) 
 {
-    pinMode(E3,OUTPUT);
-    digitalWrite(E3,LOW);
-    pinMode(A0,OUTPUT);
-    digitalWrite(A0,LOW);
-    pinMode(A1,OUTPUT);
-    digitalWrite(A1,LOW);
-    pinMode(A2,OUTPUT);
-    digitalWrite(A2,LOW); 
+    for(int i = 0; i < LEDSTRING_COUNT; i++)
+    {
+        if(ledMap[i].dio < NUM_DIGITAL_PINS) // the compiler does not know that ledMap values are valid so test them befor using
+        {
+            pinMode(ledMap[i].dio,OUTPUT);
+            digitalWrite(ledMap[i].dio,HIGH);
+        }
+    }
 }
-

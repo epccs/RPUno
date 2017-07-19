@@ -3,11 +3,13 @@ TARGET = NightLight
 LIBDIR = ../lib
 OBJECTS = main.o \
 	nightlight.o \
-	../Uart/id.o \
-	../DayNight/day_night.o \
 	../Adc/analog.o \
 	../Adc/references.o \
+	../i2c-debug/i2c-cmd.o \
+	../i2c-debug/i2c-scan.o \
+	../DayNight/day_night.o \
 	../AmpHr/power_storage.o \
+	../Uart/id.o \
 	$(LIBDIR)/timers.o \
 	$(LIBDIR)/uart.o \
 	$(LIBDIR)/twi.o \

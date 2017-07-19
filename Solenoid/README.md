@@ -2,6 +2,8 @@
 
 ## Future improvements (to do)
 
+use CURR_SOUR_EN
+
 Add a wiring diagram.
 
 Stop report like led on DayNight {"K1":{"delay_start_sec":"1","runtime_sec":"1","delay_sec":"1","cycles":"1"}}

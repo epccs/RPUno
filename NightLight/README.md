@@ -6,7 +6,7 @@ RPUno has some current sources that can be used to light LED strings. Analog has
 
 The night light state machine uses non-blocking timers and cycles through the led[1|2|3|4].cycle_state for each controlled LED. The settings are loaded from EEPROM each night after the Day-Night state machine switches from an Evening debounce state to a Night state.
 
-Note: the Night_AttachWork() function is used to set a callback that will be run at the start of each night. 
+Note: the Night_AttachWork() function is given a callback that is used to check if there was solar charge gain (> 100mAHr) and if so load the LED settings from EEPROM and StartLed each night. the Day_AttachWork() function is given a callback that is used to reset the solar charge accumulation values.
 
 
 # Wiring LED Strings to RPUno
@@ -223,22 +223,34 @@ Set the led (1|2|3|4) max discharge in mAHr (1..86400, e.g. 86.4AHr). When the b
 ```
 
 
-##  /0/time? led
+##  /0/led? led
 
 Report the led (1|2|3|4) runtime in millis.
 
 ``` 
-/1/time? 3
+/1/led? 3
 {"LED3":{"cycle_state":"0","cycles":"0","cycle_millis":"4000"}}
 ``` 
 
-## [/0/day?](../DayNight#0day)
-
-
 ## [/0/analog? 0..7[,0..7[,0..7[,0..7[,0..7]]]]](../Adc#0analog-0707070707)
+
+
+## [/0/iscan?](../i2c-debug#0iscan)
+
+
+## [/0/iaddr 0..127](../i2c-debug#0iaddr-0127)
+
+
+## [/0/ibuff 0..255[,0..255[,0..255[,0..255[,0..255]]]]](../i2c-debug#0ibuff-02550255025502550255)
+
+
+## [/0/ibuff?](../i2c-debug#0ibuff)
+
+
+## [/0/iwrite](../i2c-debug#0iwrite)
 
 
 ## [/0/charge?](../AmpHr#0charge)
 
 
-
+## [/0/day?](../DayNight#0day)

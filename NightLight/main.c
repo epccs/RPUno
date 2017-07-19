@@ -26,8 +26,10 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/pin_num.h"
 #include "../lib/pins_board.h"
 #include "../Uart/id.h"
-#include "../DayNight/day_night.h"
 #include "../Adc/analog.h"
+#include "../i2c-debug/i2c-scan.h"
+#include "../i2c-debug/i2c-cmd.h"
+#include "../DayNight/day_night.h"
 #include "../AmpHr/power_storage.h"
 #include "nightlight.h"
 
@@ -80,7 +82,7 @@ void ProcessCmd()
         {
             Load(); // nightlight.c
         }
-        if ( (strcmp_P( command, PSTR("/time?")) == 0) && ( (arg_count == 1 ) ) )
+        if ( (strcmp_P( command, PSTR("/led?")) == 0) && ( (arg_count == 1 ) ) )
         {
             Time(); // nightlight.c
         }
@@ -88,13 +90,37 @@ void ProcessCmd()
         {
             Stop(); // nightlight.c
         }
-        if ( (strcmp_P( command, PSTR("/day?")) == 0) && ( (arg_count == 0 ) ) )
-        {
-            Day(); // ../DayNight/day_night.c
-        }
         if ( (strcmp_P( command, PSTR("/analog?")) == 0) && ( (arg_count >= 1 ) && (arg_count <= 5) ) )
         {
             Analog(); // ../Adc/analog.c
+        }
+        if ( (strcmp_P( command, PSTR("/iscan?")) == 0) && (arg_count == 0) )
+        {
+            I2c_scan(); // ../i2c-debug/i2c-scan.c
+        }
+        if ( (strcmp_P( command, PSTR("/iaddr")) == 0) && (arg_count == 1) )
+        {
+            I2c_address(); // ../i2c-debug/i2c-cmd.c
+        }
+        if ( (strcmp_P( command, PSTR("/ibuff")) == 0) )
+        {
+            I2c_txBuffer(); // ../i2c-debug/i2c-cmd.c
+        }
+        if ( (strcmp_P( command, PSTR("/ibuff?")) == 0) && (arg_count == 0) )
+        {
+            I2c_txBuffer(); // ../i2c-debug/i2c-cmd.c
+        }
+        if ( (strcmp_P( command, PSTR("/iwrite")) == 0) && (arg_count == 0) )
+        {
+            I2c_write(); // ../i2c-debug/i2c-cmd.c
+        }
+        if ( (strcmp_P( command, PSTR("/iread?")) == 0) && (arg_count == 1) )
+        {
+            I2c_read(); // ../i2c-debug/i2c-cmd.c
+        }
+        if ( (strcmp_P( command, PSTR("/day?")) == 0) && ( (arg_count == 0 ) ) )
+        {
+            Day(); // ../DayNight/day_night.c
         }
         if ( (strcmp_P( command, PSTR("/charge?")) == 0) && ( (arg_count == 0 ) ) )
         {
@@ -115,10 +141,14 @@ void ProcessCmd()
 //At start of each night load the LED control settings from EEPROM and operate them.
 void callback_for_night_attach(void)
 {
-    for(uint8_t led = 1; led <= LEDSTRING_COUNT; led++)
+    // If we did not have a charge gain of 100mAHr then skip running the LED's.
+    if ( (ChargeAccum() + RemainingAccum() - DischargeAccum() ) > 100.0) 
     {
-        LoadLedControlFromEEPROM(led);
-        StartLed(led);
+        for(uint8_t led = 1; led <= LEDSTRING_COUNT; led++)
+        {
+            LoadLedControlFromEEPROM(led); // nightlight.c
+            StartLed(led); // nightlight.c
+        }
     }
 }
 
@@ -141,7 +171,11 @@ void setup(void)
     // A DayNight status LED is on digital pin 4
     pinMode(DAYNIGHT_STATUS_LED,OUTPUT);
     digitalWrite(DAYNIGHT_STATUS_LED,HIGH);
-    
+
+    // RPUno current sources for ADC's and ICP are controled with Digital 9 see define in ../lib/pins_board.h
+    pinMode(CURR_SOUR_EN,OUTPUT);
+    digitalWrite(CURR_SOUR_EN,HIGH);
+
     // Initialize Timers, ADC, and clear bootloader, Arduino does these with init() in wiring.c
     initTimers(); //Timer0 Fast PWM mode, Timer1 & Timer2 Phase Correct PWM mode.
     init_ADC_single_conversion(EXTERNAL_AVCC); // warning AREF must not be connected to anything

@@ -52,31 +52,31 @@ void ProcessCmd()
         {
             Id("NightLight"); // ../Uart/id.c
         }
-        if ( (strcmp_P( command, PSTR("/pre")) == 0) && ( (arg_count == 2 ) ) )
+        if ( (strcmp_P( command, PSTR("/preled")) == 0) && ( (arg_count == 2 ) ) )
         {
             DelayStart(); // nightlight.c
         }
-        if ( (strcmp_P( command, PSTR("/runtime")) == 0) && ( (arg_count == 2 ) ) )
+        if ( (strcmp_P( command, PSTR("/runtimeled")) == 0) && ( (arg_count == 2 ) ) )
         {
             RunTime(); // nightlight.c
         }
-        if ( (strcmp_P( command, PSTR("/delay")) == 0) && ( (arg_count == 2 ) ) )
+        if ( (strcmp_P( command, PSTR("/delayled")) == 0) && ( (arg_count == 2 ) ) )
         {
             Delay(); // nightlight.c
         }
-        if ( (strcmp_P( command, PSTR("/mahrstp")) == 0) && ( (arg_count == 2 ) ) )
+        if ( (strcmp_P( command, PSTR("/mahrled")) == 0) && ( (arg_count == 2 ) ) )
         {
             AHrStop(); // nightlight.c
         }
-        if ( (strcmp_P( command, PSTR("/run")) == 0) && ( (arg_count == 1) || (arg_count == 2) ) )
+        if ( (strcmp_P( command, PSTR("/runled")) == 0) && ( (arg_count == 1) || (arg_count == 2) ) )
         {
             Run(); // nightlight.c
         }
-        if ( (strcmp_P( command, PSTR("/save")) == 0) && ( (arg_count == 2 ) ) )
+        if ( (strcmp_P( command, PSTR("/saveled")) == 0) && ( (arg_count == 2 ) ) )
         {
             Save(); // nightlight.c
         }
-        if ( (strcmp_P( command, PSTR("/load")) == 0) && ( (arg_count == 1 ) ) )
+        if ( (strcmp_P( command, PSTR("/loadled")) == 0) && ( (arg_count == 1 ) ) )
         {
             Load(); // nightlight.c
         }
@@ -84,7 +84,7 @@ void ProcessCmd()
         {
             Time(); // nightlight.c
         }
-        if ( (strcmp_P( command, PSTR("/stop")) == 0) && ( (arg_count == 1 ) ) )
+        if ( (strcmp_P( command, PSTR("/stopled")) == 0) && ( (arg_count == 1 ) ) )
         {
             Stop(); // nightlight.c
         }

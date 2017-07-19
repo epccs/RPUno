@@ -53,7 +53,7 @@ typedef struct {
     unsigned long runtime_sec; // delay after set operation and befor reset
     unsigned long delay_sec;   // delay after reset operation and befor next set operation if (cycles > 0)
     uint8_t cycle_state;
-    uint8_t cycles; // keep cycling until zero
+    uint16_t cycles; // keep cycling until zero
     uint32_t mahr_stop; // mAHr usage after start at which to stop the led
     unsigned long cycle_millis_start;
     unsigned long cycle_millis_stop;
@@ -308,11 +308,11 @@ void Run(void)
             return;
         }
         
-        uint8_t cycles = led[led_arg0-1].cycles;
+        uint16_t cycles = led[led_arg0-1].cycles;
         if (arg[1]!=NULL)
         {
-            // and arg[1] value is 1..0xFF 
-            cycles = (uint8_t) (ul_from_arg1(0xFF));
+            // valid arg[1] value is 1..0xFFFF
+            cycles = (uint16_t) (ul_from_arg1(0xFFFF));
             if (! cycles)
             {
                 initCommandBuffer();
@@ -355,7 +355,7 @@ void Run(void)
     else if ( (command_done == 14) )
     {  
         uint8_t led_arg0 = atoi(arg[0]);
-        printf_P(PSTR("\"cycles\":\"%d\""),(led[led_arg0-1].cycles));
+        printf_P(PSTR("\"cycles\":\"%u\""),(led[led_arg0-1].cycles));
         command_done = 15;
     }
     else if ( (command_done == 15) )
@@ -390,8 +390,8 @@ void Save(void)
             initCommandBuffer();
             return;
         }
-        // and arg[1] value is 1..0xFF 
-        unsigned long cycles = ul_from_arg1(0xFF);
+        // valid arg[1] value is 1..0xFFFF 
+        uint16_t cycles = ul_from_arg1(0xFFFF);
         if (! cycles)
         {
             initCommandBuffer();
@@ -407,9 +407,9 @@ void Save(void)
         if ( eeprom_is_ready() )
         {
             led[led_arg0-1].cycle_state = 0;
-            led[led_arg0-1].cycles = (uint8_t)cycles;
+            led[led_arg0-1].cycles = cycles;
             led[led_arg0-1].cycle_millis_bank = 0;
-            uint16_t value = ((uint16_t) (led_arg0)) + 0x4B30; //ascii bytes for 'K1', 'K2'...
+            uint16_t value = ((uint16_t) (led_arg0)) + 0x4C30; //ascii bytes for 'L1', 'L2'...
             eeprom_write_word( (uint16_t *)((led_arg0-1)*EE_LED_ARRAY_OFFSET+EE_LED_BASE_ADDR+EE_LED_ID), value);
             printf_P(PSTR("{\"LED%d\":{"),led_arg0);
             command_done = 11;
@@ -467,9 +467,9 @@ void Save(void)
         if ( eeprom_is_ready() )
         {
             uint8_t led_arg0 = atoi(arg[0]);
-            uint8_t value = led[led_arg0-1].cycles;
-            eeprom_write_byte( (uint8_t *)((led_arg0-1)*EE_LED_ARRAY_OFFSET+EE_LED_BASE_ADDR+EE_LED_CYCLES), value);
-            printf_P(PSTR("\"cycles\":\"%d\""),(value));
+            uint16_t value = led[led_arg0-1].cycles;
+            eeprom_write_word( (uint16_t *)((led_arg0-1)*EE_LED_ARRAY_OFFSET+EE_LED_BASE_ADDR+EE_LED_CYCLES), value);
+            printf_P(PSTR("\"cycles\":\"%u\""),(value));
             command_done = 16;
         }
     }
@@ -550,7 +550,7 @@ void Load(void)
     else if ( (command_done == 15) )
     {  
         uint8_t led_arg0 = atoi(arg[0]);
-        printf_P(PSTR("\"cycles\":\"%d\""),(led[led_arg0-1].cycles));
+        printf_P(PSTR("\"cycles\":\"%u\""),(led[led_arg0-1].cycles));
         command_done = 16;
     }
     else if ( (command_done == 16) )
@@ -588,7 +588,7 @@ void Time(void)
     else if ( (command_done == 12) )
     {  
         uint8_t led_arg0 = atoi(arg[0]);
-        printf_P(PSTR("\"cycles\":\"%d\","),(led[led_arg0-1].cycles));
+        printf_P(PSTR("\"cycles\":\"%u\","),(led[led_arg0-1].cycles));
         command_done = 13;
     }
     else if ( (command_done == 13) )
@@ -652,7 +652,7 @@ void Stop(void)
     else if ( (command_done == 14) )
     {  
         uint8_t led_arg0 = atoi(arg[0]);
-        printf_P(PSTR("\"cycles\":\"%d\""),(led[led_arg0-1].cycles));
+        printf_P(PSTR("\"cycles\":\"%u\""),(led[led_arg0-1].cycles));
         command_done = 15;
     }
     else if ( (command_done == 15) )
@@ -795,14 +795,14 @@ uint8_t LoadLedControlFromEEPROM(uint8_t led_string)
     if (!led[i].cycle_state)
     {
         uint16_t id = eeprom_read_word((uint16_t*)(i*EE_LED_ARRAY_OFFSET+EE_LED_BASE_ADDR+EE_LED_ID));
-        if (id == (i+0x4B31) ) // 'K' is 0x4B and '1' is 0x31, thus K1, K2...
+        if (id == (i+0x4C31) ) // 'L' is 0x4C and '1' is 0x31, thus L1, L2...
         {
             led[i].started_at = millis(); // delay start is from now.
             led[i].delay_start_sec =eeprom_read_dword((uint32_t*)(i*EE_LED_ARRAY_OFFSET+EE_LED_BASE_ADDR+EE_LED_DLY_STRT)); 
             led[i].runtime_sec = eeprom_read_dword((uint32_t*)(i*EE_LED_ARRAY_OFFSET+EE_LED_BASE_ADDR+EE_LED_RUNTIME));  
             led[i].delay_sec = eeprom_read_dword((uint32_t*)(i*EE_LED_ARRAY_OFFSET+EE_LED_BASE_ADDR+EE_LED_DELAY)); 
             led[i].mahr_stop = eeprom_read_dword((uint32_t*)(i*EE_LED_ARRAY_OFFSET+EE_LED_BASE_ADDR+EE_LED_MAHR_STP)); 
-            led[i].cycles = eeprom_read_byte((uint8_t*)(i*EE_LED_ARRAY_OFFSET+EE_LED_BASE_ADDR+EE_LED_CYCLES)); 
+            led[i].cycles = eeprom_read_word((uint16_t*)(i*EE_LED_ARRAY_OFFSET+EE_LED_BASE_ADDR+EE_LED_CYCLES)); 
             led[i].cycle_millis_bank = 0;
             return 1;
         }

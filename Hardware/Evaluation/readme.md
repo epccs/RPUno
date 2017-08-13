@@ -7,7 +7,8 @@ This shows the setup and method used for evaluation of RPUno.
 
 # Table Of Contents:
 
-12. [^6 Power Example](#5-power-example)
+13. [^6 AGM Battery](#6-agm-battery)
+12. [^6 Power Example](#6-power-example)
 11. [^5 Power Management](#5-power-management)
 10. [^5 Day Night](#5-day-night)
 9. [^5 Flow Meter](#5-flow-meter)
@@ -19,6 +20,13 @@ This shows the setup and method used for evaluation of RPUno.
 3. [^2 Log PV_IN and PWR for a day](#2-log-pv_in-and-pwr-for-a-day)
 2. [^2 20mA Loop With Open Collector To ICP1](#2-20ma-loop-with-open-collector-to-icp1)
 1. [^1 Mounting](#1-mounting)
+
+
+## ^6 AGM Battery
+
+![AGM Battery](./RPUno^6+RPUadpt^5WithAgmBat+4LedString "AGM Battery")
+
+10AHr AGM Sealed battery used with a SLP003-12U. Note the AGM will not charge with the thermistor so I am letting it run without temperature compensation (i.e. the thermistor is an open circuit). The charger voltage tops out at about 14.3V which should not cause much hydrogen gassing, but it will cause some. It is my understanding that the AGM will recover the gassing and allow the battery to keep working, however, it is also my understanding that the catalyst will stop working at some point. The question to ask is if this is a good compromise between damage from sulfation and damage from using up the AGM catalyst.
 
 
 ## ^6 Power Example

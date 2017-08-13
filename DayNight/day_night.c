@@ -63,8 +63,7 @@ static void (*dayState_atNightWork)(void);
 #define SERIAL_PRINT_DELAY_MILSEC 60000UL
 static unsigned long serial_print_started_at;
 
-/* set function callback that provides the task to do at start of each day
- * Input    function: callback function to use
+/* A place to register function callback that provides the task to do at start of each day
  */
 void Day_AttachWork( void (*function)(void)  )
 {
@@ -211,8 +210,8 @@ void CheckDayLight(void)
 
     if(dayState == DAYNIGHT_NIGHTWORK_STATE) 
     { 
-        //do some work, e.g. load night light settings at the start of a night
-        dayState_atNightWork();
+        //do the work (if it got registered), e.g. load night light settings at the start of a night
+        if (dayState_atNightWork != NULL) dayState_atNightWork();
         dayState = DAYNIGHT_NIGHT_STATE;
         return;
     }
@@ -252,8 +251,8 @@ void CheckDayLight(void)
 
     if(dayState == DAYNIGHT_DAYWORK_STATE) 
     { 
-        //do some work, e.g. load irrigation settings at the start of a day
-        dayState_atDayWork();
+        //do the work (if it got registered),, e.g. load irrigation settings at the start of a day
+        if (dayState_atDayWork != NULL) dayState_atDayWork();
         dayState = DAYNIGHT_DAY_STATE;
         return;
     }

@@ -6,6 +6,7 @@ extern void Day(void);
 extern void CheckDayLight(void);
 extern uint8_t DayState(void);
 
+// Warning the pointer to function will be NULL if it is not set (registered) during initialization.
 extern void Day_AttachWork( void (*)(void) );
 extern void Night_AttachWork( void (*)(void) );
 

@@ -155,11 +155,11 @@ void I2c_write(void)
             txBufferIndex = 0; 
         }
         if (returnCode == 1)
-            printf_P(PSTR("{\"returnCode\":\"bufOVF\""));
+            printf_P(PSTR("{\"rtnCode\":\"bufOVF\",\"i2c_addr\":\"%d\""),I2cAddress);
         if ( (returnCode == 2) || (returnCode == 3) )
-            printf_P(PSTR("{\"returnCode\":\"nack\""));
+            printf_P(PSTR("{\"rtnCode\":\"nack\",\"i2c_addr\":\"%d\""),I2cAddress);
         if (returnCode == 4)
-            printf_P(PSTR("{\"returnCode\":\"other\""));
+            printf_P(PSTR("{\"rtnCode\":\"other\",\"i2c_addr\":\"%d\""),I2cAddress);
         command_done = 11;
     }
     
@@ -215,11 +215,12 @@ void I2c_read(void)
             else
             {
                 if (returnCode == 1)
-                    printf_P(PSTR("{\"returnCode\":\"bufOVF\""));
+                    printf_P(PSTR("{\"rtnCode\":\"bufOVF\",\"i2c_addr\":\"%d\""),I2cAddress);
                 if ( (returnCode == 2) || (returnCode == 3) )
-                    printf_P(PSTR("{\"returnCode\":\"nack\""));
+                    printf_P(PSTR("{\"rtnCode\":\"nack\",\"i2c_addr\":\"%d\""),I2cAddress);
                 if (returnCode == 4)
-                    printf_P(PSTR("{\"returnCode\":\"other\""));
+                    printf_P(PSTR("{\"rtnCode\":\"other\",\"i2c_addr\":\"%d\""),I2cAddress);
+                printf_P(PSTR("}\r\n"));
                 initCommandBuffer();
             }
         }

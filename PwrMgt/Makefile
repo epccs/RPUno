@@ -29,9 +29,17 @@ CC = avr-gcc
 OBJCOPY = avr-objcopy
 SIZE = avr-size
 
-## programing ports. the FTDI on my board shows as ttyUSBx, while an Uno shows as ttyACMx
-BOOT_PORT = /dev/ttyUSB0
-ISP_PORT = /dev/ttyACM0
+# FTDI's USB to serial bridge shows as /dev/ttyUSB0, 
+# Uno's serial bridge (an ATmega16U2) shows as /dev/ttyACM0  (a modem,?)
+# Pi Zero on chip hardware serial shows as /dev/ttyAMA0 (hardware UART on a Linux system)
+detect_PORT := $(shell sh -c 'ls /dev/ttyAMA0 2>/dev/null || echo not')
+ifeq ($(detect_PORT),/dev/ttyAMA0)
+	BOOTLOAD_PORT = /dev/ttyAMA0
+endif
+detect_PORT := $(shell sh -c 'ls /dev/ttyUSB0 2>/dev/null || echo not')
+ifeq ($(detect_PORT),/dev/ttyUSB0)
+	BOOTLOAD_PORT = /dev/ttyUSB0
+endif
 
 ## Compiler/linker options
 CFLAGS = -Os -g -std=gnu99 -Wall
@@ -55,14 +63,6 @@ $(TARGET): $(TARGET).hex
 $(TARGET).hex: $(TARGET).elf
 	$(OBJCOPY) -j .text -j .data -O ihex $< $@
 	rm -f $(TARGET).elf
-
-## http://eleccelerator.com/fusecalc/fusecalc.php?chip=atmega328p&LOW=FF&HIGH=DE&EXTENDED=05&LOCKBIT=2F
-## stk500v1 is for Arduino as ISP (e.g. it is an example in the Arduino.cc IDE 1.6.7+)
-## to reduce dupliction I only show the fuse setting in ../Bootloader
-
-## 328p can lock the bootloader section, which is a good idea even if it is not used
-isp: $(TARGET).hex
-	avrdude -v -p $(MCU) -c stk500v1 -P $(ISP_PORT) -b 19200 -e -U flash:w:$(TARGET).hex -U lock:w:0x2f:m
 
 ## works with optiboot which erases flash without being told (e.g. -e )
 bootload: $(TARGET).hex

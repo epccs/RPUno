@@ -43,8 +43,9 @@ OBJCOPY = avr-objcopy
 OBJDUMP = avr-objdump
 SIZE = avr-size
 
-## programing ports. the FTDI on my board shows as ttyUSBx, while an Uno shows as ttyACMx
-BOOT_PORT = /dev/ttyUSB0
+# FTDI's USB to serial bridge shows as /dev/ttyUSB0, 
+# Uno's serial bridge (an ATmega16U2) shows as /dev/ttyACM0  (a modem,?)
+# Pi Zero on chip hardware serial shows as /dev/ttyAMA0 (hardware UART on a Linux system)
 ISP_PORT = /dev/ttyACM0
 
 ## Compiler/linker options
@@ -74,7 +75,8 @@ baudcheck:
 fuse: 
 	avrdude -v -p $(MCU) -c stk500v1 -P /dev/ttyACM0 -b 19200 -e -U lock:w:$(UNLOCK_FUSE):m -U lfuse:w:$(LOW_FUSE):m -U hfuse:w:$(HIGH_FUSE):m -U efuse:w:$(EXTENDED_FUSE):m
 
-# ISCP tool is a Uno with ArduinoISP sketch: https://github.com/arduino/Arduino/blob/master/build/shared/examples/11.ArduinoISP/ArduinoISP/ArduinoISP.ino
+# the Uno (with ArduinoISP sketch) is used as ICSP tool
+# https://github.com/arduino/Arduino/blob/master/build/shared/examples/11.ArduinoISP/ArduinoISP/ArduinoISP.ino
 isp: $(TARGET)_$(MCU)_-b$(BAUD)_F_CPU$(F_CPU).hex
 	avrdude -v -p $(MCU) -c stk500v1 -P $(ISP_PORT) -b 19200 -e -U flash:w:$(TARGET)_$(MCU)_-b$(BAUD)_F_CPU$(F_CPU).hex -U lock:w:$(LOCK_FUSE):m
 

@@ -20,9 +20,17 @@ CC = avr-gcc
 OBJCOPY = avr-objcopy
 SIZE = avr-size
 
-## programing ports. the FTDI on my board shows as ttyUSBx, while an Uno shows as ttyACMx
-BOOT_PORT = /dev/ttyUSB0
-ISP_PORT = /dev/ttyACM0
+# FTDI's USB to serial bridge shows as /dev/ttyUSB0, 
+# Uno's serial bridge (an ATmega16U2) shows as /dev/ttyACM0  (a modem,?)
+# Pi Zero on chip hardware serial shows as /dev/ttyAMA0 (hardware UART on a Linux system)
+detect_PORT := $(shell sh -c 'ls /dev/ttyAMA0 2>/dev/null || echo not')
+ifeq ($(detect_PORT),/dev/ttyAMA0)
+	BOOTLOAD_PORT = /dev/ttyAMA0
+endif
+detect_PORT := $(shell sh -c 'ls /dev/ttyUSB0 2>/dev/null || echo not')
+ifeq ($(detect_PORT),/dev/ttyUSB0)
+	BOOTLOAD_PORT = /dev/ttyUSB0
+endif
 
 ## Compiler/linker options
 CFLAGS = -Os -g -std=gnu99 -Wall

@@ -66,7 +66,7 @@ $(TARGET).hex: $(TARGET).elf
 
 ## works with optiboot which erases flash without being told (e.g. -e )
 bootload: $(TARGET).hex
-	avrdude -v -p $(MCU) -c arduino -P $(BOOT_PORT) -b 115200 -U flash:w:$(TARGET).hex
+	avrdude -v -p $(MCU) -c arduino -P $(BOOTLOAD_PORT) -b 115200 -U flash:w:$(TARGET).hex
 
 $(TARGET).elf: $(OBJECTS)
 	$(CC) $(LDFLAGS) $(TARGET_ARCH) $^ -o $@

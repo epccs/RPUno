@@ -87,6 +87,12 @@ The core files for this board are in the /lib folder. Each example has its files
 ```
 sudo apt-get install git gcc-avr binutils-avr gdb-avr avr-libc avrdude
 git clone https://github.com/epccs/RPUno
+cd RPUno/Adc
+make
+# serial bootload a firmware onto an ATmega328p with optiboot 
+# detected UART: FTDI (/dev/ttyUSB0), Pi Zero (/dev/ttyAMA0)
+# not detected UART: Uno (/dev/ttyACM0 it is my ICSP tool for now).
+make bootload
 ```
 
 * [gcc-avr](http://packages.ubuntu.com/search?keywords=gcc-avr)

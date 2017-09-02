@@ -22,6 +22,7 @@ sudo usermod -a -G spi rsutherland
 Compile spidev_test.c on the Pi with:
 
 ``` 
+wget https://raw.githubusercontent.com/raspberrypi/linux/rpi-3.10.y/Documentation/spi/spidev_test.c
 gcc -o spidev_test spidev_test.c
 # run with
 ./spidev_test -s 100000 -D /dev/spidev0.0

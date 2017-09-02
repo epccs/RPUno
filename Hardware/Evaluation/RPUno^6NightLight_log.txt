@@ -1,0 +1,366 @@
+Using four LED strings 
+Location: SEncl (S enclosure)
+RPUadpt^5 at address '2', RPUno^6 NightLight program has these save (eeprom) settings
+
+#Set the RPUadpt shield Address from '1' to '2'
+/1/iaddr 41
+{"address":"0x29"}
+/1/ibuff 1,50
+{"txBuffer":[{"data":"0x1"},{"data":"0x32"}]}
+/1/iread? 2
+{"rxBuffer":[{"data":"0x1"},{"data":"0x32"}]}
+
+# reset the RPUno so it will read the RPUadpt shield address from I2C, and respond to the address when seen on its UART.
+
+/2/saveled 1,5000
+{"LED1":{"delay_start_sec":"1","runtime_sec":"4","delay_sec":"2","mahr_stop":"400","cycles":"5000"}}
+/2/saveled 2,5000
+{"LED2":{"delay_start_sec":"3","runtime_sec":"5","delay_sec":"2","mahr_stop":"600","cycles":"5000"}}
+/2/saveled 3,5000
+{"LED3":{"delay_start_sec":"5","runtime_sec":"4","delay_sec":"2","mahr_stop":"500","cycles":"5000"}}
+/2/saveled 4,5000
+{"LED4":{"delay_start_sec":"7","runtime_sec":"5","delay_sec":"2","mahr_stop":"700","cycles":"5000"}}
+
+
+7/19/2017:19:54 night install and run some test 
+/2/charge?
+{"CHRG_mAHr":"0.00","DCHRG_mAHr":"31.00","RMNG_mAHr":"0.00","ACCUM_Sec":"5978.02"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.18","PV_V":"1.90","DISCHRG_A":"0.012","CHRG_A":"0.000"}
+/2/runled 1,1000
+{"LED1":{"delay_start_sec":"1","runtime_sec":"1","delay_sec":"1","cycles":"1000"}}
+/2/runled 2,900
+{"LED2":{"delay_start_sec":"4","runtime_sec":"1","delay_sec":"1","cycles":"900"}}
+/2/runled 3,800
+{"LED3":{"delay_start_sec":"7","runtime_sec":"1","delay_sec":"1","cycles":"800"}}
+/2/runled 4,1100
+{"LED4":{"delay_start_sec":"10","runtime_sec":"1","delay_sec":"1","cycles":"1100"}}
+
+7/20/2017:10:30 day, cloudy
+/2/charge?
+{"CHRG_mAHr":"11.68","DCHRG_mAHr":"33.62","RMNG_mAHr":"-182.87","ACCUM_Sec":"14030.98"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.24","PV_V":"15.93","DISCHRG_A":"0.000","CHRG_A":"0.026"}
+
+7/21/2017:13:33 day sunny
+/2/charge?
+{"CHRG_mAHr":"180.94","DCHRG_mAHr":"36.91","RMNG_mAHr":"-201.71","ACCUM_Sec":"25748.38"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.13","PV_V":"19.02","DISCHRG_A":"0.022","CHRG_A":"0.000"}
+# I am using an AGM SLA battery and it is not working like the other SLA I tried.
+# AGM can tolerate some hydrogen gassing at up to 15V so I have removed the battery thermistor to allow 
+# charging up to about 14.3V. A little low for flooded or large AGM, but that is at the ede where 
+# gassing starts when it is hot (and it is hot). 
+/2/analog? 7,6,3,2
+{"PWR_V":"13.25","PV_V":"15.09","DISCHRG_A":"0.001","CHRG_A":"0.122"}
+{"PWR_V":"13.30","PV_V":"15.15","DISCHRG_A":"0.000","CHRG_A":"0.128"}
+{"PWR_V":"13.34","PV_V":"15.09","DISCHRG_A":"0.000","CHRG_A":"0.128"}
+{"PWR_V":"13.35","PV_V":"15.12","DISCHRG_A":"0.000","CHRG_A":"0.128"}
+{"PWR_V":"13.35","PV_V":"15.09","DISCHRG_A":"0.000","CHRG_A":"0.129"}
+{"PWR_V":"13.37","PV_V":"15.15","DISCHRG_A":"0.000","CHRG_A":"0.128"}
+{"PWR_V":"13.38","PV_V":"15.12","DISCHRG_A":"0.000","CHRG_A":"0.128"}
+{"PWR_V":"13.38","PV_V":"15.15","DISCHRG_A":"0.000","CHRG_A":"0.128"}
+{"PWR_V":"13.40","PV_V":"15.09","DISCHRG_A":"0.000","CHRG_A":"0.128"}
+{"PWR_V":"13.40","PV_V":"15.04","DISCHRG_A":"0.000","CHRG_A":"0.128"}
+{"PWR_V":"13.40","PV_V":"15.02","DISCHRG_A":"0.000","CHRG_A":"0.127"}
+{"PWR_V":"13.40","PV_V":"15.04","DISCHRG_A":"0.000","CHRG_A":"0.127"}
+{"PWR_V":"13.41","PV_V":"15.02","DISCHRG_A":"0.000","CHRG_A":"0.127"}
+...
+{"PWR_V":"13.28","PV_V":"15.46","DISCHRG_A":"0.000","CHRG_A":"0.001"}
+{"PWR_V":"13.27","PV_V":"15.43","DISCHRG_A":"0.000","CHRG_A":"0.001"}
+{"PWR_V":"13.27","PV_V":"15.46","DISCHRG_A":"0.000","CHRG_A":"0.000"}
+{"PWR_V":"13.27","PV_V":"15.35","DISCHRG_A":"0.001","CHRG_A":"0.003"}
+{"PWR_V":"13.27","PV_V":"15.48","DISCHRG_A":"0.000","CHRG_A":"0.000"}
+{"PWR_V":"13.27","PV_V":"15.46","DISCHRG_A":"0.001","CHRG_A":"0.000"}
+# same day at 17:55 sun is going off the solar pannel
+/2/charge?
+{"CHRG_mAHr":"297.39","DCHRG_mAHr":"0.37","RMNG_mAHr":"0.00","ACCUM_Sec":"14750.98"}
+{"CHRG_mAHr":"297.39","DCHRG_mAHr":"0.59","RMNG_mAHr":"0.00","ACCUM_Sec":"14811.00"}
+{"CHRG_mAHr":"297.39","DCHRG_mAHr":"0.85","RMNG_mAHr":"0.00","ACCUM_Sec":"14871.00"}
+
+7/22/2017:10:21 day sunny
+/2/charge?
+{"CHRG_mAHr":"77.96","DCHRG_mAHr":"20.50","RMNG_mAHr":"-175.35","ACCUM_Sec":"14005.98"}
+# so last night it used 297.39 + 175.35 = 472.74 mAHr, string1 stop after 4700 blinks when 400mAHr was used
+/2/led? 1
+{"LED1":{"cycle_state":"0","cycles":"0","cycle_millis":"18802077"}}
+/2/led? 2
+{"LED2":{"cycle_state":"0","cycles":"0","cycle_millis":"25000001"}}
+/2/led? 3
+{"LED3":{"cycle_state":"0","cycles":"0","cycle_millis":"20000084"}}
+/2/led? 4
+{"LED4":{"cycle_state":"0","cycles":"0","cycle_millis":"25000216"}}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.37","PV_V":"15.28","DISCHRG_A":"0.000","CHRG_A":"0.147"}
+{"PWR_V":"13.37","PV_V":"15.28","DISCHRG_A":"0.000","CHRG_A":"0.154"}
+{"PWR_V":"13.34","PV_V":"15.20","DISCHRG_A":"0.000","CHRG_A":"0.082"}
+{"PWR_V":"13.31","PV_V":"15.17","DISCHRG_A":"0.000","CHRG_A":"0.058"}
+{"PWR_V":"13.28","PV_V":"15.28","DISCHRG_A":"0.000","CHRG_A":"0.047"}
+# ouch this is the clasic problem with solar power, readings are every 30 sec
+
+7/23/2017:01:55 night (lights are all blinking at this time)
+/2/charge?
+{"CHRG_mAHr":"773.64","DCHRG_mAHr":"358.80","RMNG_mAHr":"-175.35","ACCUM_Sec":"69992.87"}
+/2/analog? 7,6,3,2
+{"PWR_V":"12.96","PV_V":"1.15","DISCHRG_A":"0.049","CHRG_A":"0.000"}
+# same day at 12:15 
+/2/charge?
+{"CHRG_mAHr":"243.79","DCHRG_mAHr":"18.74","RMNG_mAHr":"271.77","ACCUM_Sec":"21746.96"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.46","PV_V":"15.09","DISCHRG_A":"0.000","CHRG_A":"0.137"}
+
+
+7/24/2017:13:17 day had rain until about 11:00
+/2/charge?
+{"CHRG_mAHr":"283.58","DCHRG_mAHr":"62.10","RMNG_mAHr":"212.35","ACCUM_Sec":"20209.14"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.46","PV_V":"15.33","DISCHRG_A":"0.000","CHRG_A":"0.024"}
+# same day at 19:53 LED just started to blink
+/2/charge?
+{"CHRG_mAHr":"482.40","DCHRG_mAHr":"98.14","RMNG_mAHr":"212.35","ACCUM_Sec":"43866.12"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.12","PV_V":"1.69","DISCHRG_A":"0.043","CHRG_A":"0.000"}
+
+7/25/2017:12:30 day monsoon season 
+/2/charge?
+{"CHRG_mAHr":"302.79","DCHRG_mAHr":"18.89","RMNG_mAHr":"-36.51","ACCUM_Sec":"21697.16"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.44","PV_V":"15.17","DISCHRG_A":"0.000","CHRG_A":"0.140"}
+# DCHRG at time accum was zeroed: 482.40 - (-36.51) = 518.91
+# same day at 22:29
+/2/charge?
+{"CHRG_mAHr":"721.43","DCHRG_mAHr":"189.65","RMNG_mAHr":"-36.51","ACCUM_Sec":"57898.34"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.02","PV_V":"1.15","DISCHRG_A":"0.040","CHRG_A":"0.000"}
+
+7/26/2017:12:12 day  
+/2/charge?
+{"CHRG_mAHr":"343.04","DCHRG_mAHr":"15.89","RMNG_mAHr":"222.88","ACCUM_Sec":"19425.74"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.46","PV_V":"15.07","DISCHRG_A":"0.000","CHRG_A":"0.137"}
+# DCHRG at time accum was zeroed: 721.43 - 222.88 = 498.55
+# night at 00:21
+/2/charge?
+{"CHRG_mAHr":"844.77","DCHRG_mAHr":"270.53","RMNG_mAHr":"222.88","ACCUM_Sec":"63224.96"}
+/2/analog? 7,6,3,2
+{"PWR_V":"12.99","PV_V":"1.22","DISCHRG_A":"0.056","CHRG_A":"0.000"}
+
+7/27/2017:13:35 day  
+/2/charge?
+{"CHRG_mAHr":"527.34","DCHRG_mAHr":"23.74","RMNG_mAHr":"351.85","ACCUM_Sec":"25720.16"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.49","PV_V":"15.02","DISCHRG_A":"0.000","CHRG_A":"0.119"}
+# DCHRG at time accum was zeroed: 844.77 - 351.85 = 492.92
+# night at 00:20
+/2/charge?
+{"CHRG_mAHr":"805.34","DCHRG_mAHr":"288.42","RMNG_mAHr":"351.85","ACCUM_Sec":"64404.02"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.00","PV_V":"1.30","DISCHRG_A":"0.055","CHRG_A":"0.000"}
+
+7/28/2017:12:58 day  
+/2/charge?
+{"CHRG_mAHr":"370.54","DCHRG_mAHr":"42.91","RMNG_mAHr":"298.97","ACCUM_Sec":"24132.60"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.47","PV_V":"15.22","DISCHRG_A":"0.000","CHRG_A":"0.094"}
+# DCHRG at time accum was zeroed: 805.34 - 298.97 = 506.37
+# night at 21:47
+/2/charge?
+{"CHRG_mAHr":"760.04","DCHRG_mAHr":"189.33","RMNG_mAHr":"298.97","ACCUM_Sec":"55910.38"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.06","PV_V":"1.28","DISCHRG_A":"0.050","CHRG_A":"0.000"}
+
+7/29/2017:22:06  
+/2/charge?
+{"CHRG_mAHr":"760.95","DCHRG_mAHr":"203.05","RMNG_mAHr":"242.24","ACCUM_Sec":"56411.48"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.03","PV_V":"1.12","DISCHRG_A":"0.049","CHRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 760.04 - 242.24 = 517.8
+
+8/3/2017:20:04  
+/2/charge?
+{"CHRG_mAHr":"814.93","DCHRG_mAHr":"116.05","RMNG_mAHr":"-113.39","ACCUM_Sec":"48909.08"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.03","PV_V":"0.86","DISCHRG_A":"0.032","CHRG_A":"0.000"}
+# missing data from 8/2
+
+8/4/2017:21:56  
+/2/charge?
+{"CHRG_mAHr":"905.86","DCHRG_mAHr":"169.31","RMNG_mAHr":"298.11","ACCUM_Sec":"55656.54"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.08","PV_V":"1.33","DISCHRG_A":"0.032","CHRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 814.93 - 298.11 = 516.82
+
+8/5/2017:22:55  
+/2/charge?
+{"CHRG_mAHr":"877.52","DCHRG_mAHr":"193.35","RMNG_mAHr":"434.56","ACCUM_Sec":"59182.16"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.08","PV_V":"1.22","DISCHRG_A":"0.042","CHRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 905.86 - 434.56 = 471.3
+# LED string on DIO12 is intermitent
+
+8/6/2017:22:49
+/2/charge?
+{"CHRG_mAHr":"840.77","DCHRG_mAHr":"214.33","RMNG_mAHr":"411.18","ACCUM_Sec":"59028.56"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.09","PV_V":"1.12","DISCHRG_A":"0.050","CHRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 877.52 - 411.18 = 466.34
+# LED string on DIO12 is not fixed
+
+8/8/2017:00:39
+/2/charge?
+{"CHRG_mAHr":"936.36","DCHRG_mAHr":"279.77","RMNG_mAHr":"355.85","ACCUM_Sec":"65569.80"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.08","PV_V":"1.04","DISCHRG_A":"0.045","CHRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 840.77 - 355.85 = 484.92
+# LED string on DIO12 is not fixed
+
+8/8/2017:23:31
+/2/charge?
+{"CHRG_mAHr":"936.09","DCHRG_mAHr":"243.59","RMNG_mAHr":"456.41","ACCUM_Sec":"61537.82"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.09","PV_V":"1.09","DISCHRG_A":"0.050","CHRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 936.36 - 456.41 = 479.95
+# LED string on DIO12 is not fixed
+
+8/9/2017:23:44
+/2/charge?
+{"CHRG_mAHr":"914.23","DCHRG_mAHr":"239.32","RMNG_mAHr":"445.27","ACCUM_Sec":"62086.60"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.12","PV_V":"1.25","DISCHRG_A":"0.032","CHRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 936.09 - 445.27 = 490.82
+# LED string on DIO12 is not fixed
+
+8/11/2017:02:34
+/2/charge?
+{"CHRG_mAHr":"355.69","DCHRG_mAHr":"359.46","RMNG_mAHr":"450.83","ACCUM_Sec":"71699.80"}
+/2/analog? 7,6,3,2
+{"PWR_V":"12.99","PV_V":"1.12","DISCHRG_A":"0.032","CHRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 914.23 - 450.83 = 463.4
+# LED string on DIO12 is not fixed
+
+8/12/2017:00:03
+/2/charge?
+{"CHRG_mAHr":"837.26","DCHRG_mAHr":"239.29","RMNG_mAHr":"-107.21","ACCUM_Sec":"63088.82"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.09","PV_V":"1.28","DISCHRG_A":"0.062","CHRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 355.69 - (-107.21) = 462.9
+# LED string on DIO12 is not fixed
+
+8/13/2017:00:58
+/2/charge?
+{"CHRG_mAHr":"866.44","DCHRG_mAHr":"299.62","RMNG_mAHr":"378.05","ACCUM_Sec":"63424.28"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.08","PV_V":"1.07","DISCHRG_A":"0.032","CHRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 837.26 - 378.05 = 459.21
+# LED string on DIO12 is not fixed
+
+8/13/2017:21:35
+/2/charge?
+{"CHRG_mAHr":"861.68","DCHRG_mAHr":"153.86","RMNG_mAHr":"373.86","ACCUM_Sec":"52005.90"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.18","PV_V":"1.25","DISCHRG_A":"0.055","CHRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 866.44 - 373.86 = 492.5
+# LED string on DIO12 is not fixed
+
+8/15/2017:00:35
+/2/charge?
+{"CHRG_mAHr":"919.25","DCHRG_mAHr":"273.11","RMNG_mAHr":"383.28","ACCUM_Sec":"63870.80"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.12","PV_V":"1.01","DISCHRG_A":"0.042","CHRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 861.68 - 383.28 = 478.4
+# LED string on DIO12 is not fixed
+
+8/15/2017:23:04
+/2/charge?
+{"CHRG_mAHr":"944.89","DCHRG_mAHr":"220.32","RMNG_mAHr":"447.03","ACCUM_Sec":"59594.34"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.15","PV_V":"0.96","DISCHRG_A":"0.036","CHRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 919.25 - 447.03 = 472.22
+# LED string on DIO12 is not fixed
+
+8/16/2017:23:02
+/2/charge?
+{"CHRG_mAHr":"973.84","DCHRG_mAHr":"215.98","RMNG_mAHr":"456.79","ACCUM_Sec":"59404.04"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.16","PV_V":"1.04","DISCHRG_A":"0.035","CHRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 944.89 - 456.79 = 488.1
+# LED string on DIO12 is not fixed
+
+8/18/2017:00:18
+/2/charge?
+{"CHRG_mAHr":"998.34","DCHRG_mAHr":"269.02","RMNG_mAHr":"487.80","ACCUM_Sec":"63844.54"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.12","PV_V":"0.86","DISCHRG_A":"0.047","HRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 973.84 - 487.80 = 486.0
+# LED string on DIO12 is not fixed
+
+8/19/2017:00:02
+/2/charge?
+{"CHRG_mAHr":"855.20","DCHRG_mAHr":"272.20","RMNG_mAHr":"514.31","ACCUM_Sec":"63012.46"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.12","PV_V":"0.94","DISCHRG_A":"0.043","CHRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 998.34 - 514.31 = 484.03
+# LED string on DIO12 is not fixed
+
+8/20/2017:00:00
+/2/charge?
+{"CHRG_mAHr":"888.40","DCHRG_mAHr":"276.99","RMNG_mAHr":"345.83","ACCUM_Sec":"62735.58"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.13","PV_V":"1.09","DISCHRG_A":"0.055","CHRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 855.20 - 345.83 = 509.37
+# LED string on DIO12 is not fixed
+
+8/20/2017:21:20
+/2/charge?
+{"CHRG_mAHr":"674.22","DCHRG_mAHr":"159.65","RMNG_mAHr":"378.24","ACCUM_Sec":"52859.04"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.18","PV_V":"1.33","DISCHRG_A":"0.059","CHRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 888.40 - 378.24 = 510.16
+# LED string on DIO12 is not fixed
+
+8/21/2017:20:14 partial solar eclipse today at about 10am
+/2/charge?
+{"CHRG_mAHr":"678.93","DCHRG_mAHr":"100.72","RMNG_mAHr":"158.60","ACCUM_Sec":"48844.04"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.21","PV_V":"1.33","DISCHRG_A":"0.085","CHRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 674.22 - 158.60 = 515.62
+# LED string on DIO12 is not fixed
+
+8/23/2017:00:25
+/2/charge?
+{"CHRG_mAHr":"839.83","DCHRG_mAHr":"300.74","RMNG_mAHr":"163.49","ACCUM_Sec":"63862.26"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.12","PV_V":"1.17","DISCHRG_A":"0.045","CHRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 678.93 - 163.49 = 515.44
+# LED string on DIO12 is not fixed
+
+8/23/2017:21:47
+/2/charge?
+{"CHRG_mAHr":"821.29","DCHRG_mAHr":"203.44","RMNG_mAHr":"333.12","ACCUM_Sec":"54544.26"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.12","PV_V":"0.99","DISCHRG_A":"0.073","CHRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 839.83 - 333.12 = 506.710
+# LED string on DIO12 is not fixed
+
+8/25/2017:01:40
+/2/charge?
+{"CHRG_mAHr":"950.24","DCHRG_mAHr":"359.83","RMNG_mAHr":"261.73","ACCUM_Sec":"68315.00"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.09","PV_V":"1.01","DISCHRG_A":"0.042","CHRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 821.29 - 261.73 = 559.56
+# LED string on DIO12 is not fixed
+
+8/26/2017:00:09
+/2/charge?
+{"CHRG_mAHr":"906.21","DCHRG_mAHr":"287.76","RMNG_mAHr":"440.58","ACCUM_Sec":"62884.94"}
+/2/analog? 7,6,3,2
+{"PWR_V":"13.12","PV_V":"1.12","DISCHRG_A":"0.072","CHRG_A":"0.000"}
+# DCHRG at time accum was zeroed: 950.24 - 440.58 = 509.66
+# LED string on DIO12 is not fixed
+
+I pulled the battery just before the sun went down and tried to charge it with a Duracell SLC10003 charger, it decided the battery was at a full charge within a few minutes. The SLC10003 goes to 14.5V with 1.5A so I guess the 150mA is doing the job even though I don't see it even reach 14.3V.
+
+The LED string on DIO12 that was intermittent would not stop acting up until I soldered the LED"s to the wires. Looks like the plating on the LED pins is oxidizing (they look black like tarnish) so perhaps some micro welding occurs each time current flows. 
+
+
+

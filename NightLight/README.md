@@ -115,13 +115,13 @@ Save the led (1|2|3|4) with cycles (1..65635) to EEPROM. A callback function is 
 
 ```
 /1/saveled 1,5000
-{"LED1":{"delay_start_sec":"1","runtime_sec":"4","delay_sec":"2","mahr_stop":"40","cycles":"5000"}}
+{"LED1":{"delay_start_sec":"1","runtime_sec":"4","delay_sec":"2","mahr_stop":"400","cycles":"5000"}}
 /1/saveled 2,5000
-{"LED2":{"delay_start_sec":"3","runtime_sec":"5","delay_sec":"2","mahr_stop":"60","cycles":"5000"}}
+{"LED2":{"delay_start_sec":"3","runtime_sec":"5","delay_sec":"2","mahr_stop":"600","cycles":"5000"}}
 /1/saveled 3,5000
-{"LED3":{"delay_start_sec":"5","runtime_sec":"4","delay_sec":"2","mahr_stop":"80","cycles":"5000"}}
+{"LED3":{"delay_start_sec":"5","runtime_sec":"4","delay_sec":"2","mahr_stop":"800","cycles":"5000"}}
 /1/saveled 4,5000
-{"LED4":{"delay_start_sec":"7","runtime_sec":"5","delay_sec":"2","mahr_stop":"100","cycles":"5000"}}
+{"LED4":{"delay_start_sec":"7","runtime_sec":"5","delay_sec":"2","mahr_stop":"1000","cycles":"5000"}}
 ```
 
 ##  /0/loadled led
@@ -130,13 +130,13 @@ Load the led (1|2|3|4) from EEPROM. Use run to start it.
 
 ```
 /1/loadled 1
-{"LED1":{"delay_start_sec":"1","runtime_sec":"4","delay_sec":"2","mahr_stop":"40","cycles":"5000"}}
+{"LED1":{"delay_start_sec":"1","runtime_sec":"4","delay_sec":"2","mahr_stop":"400","cycles":"5000"}}
 /1/loadled 2
-{"LED2":{"delay_start_sec":"3","runtime_sec":"5","delay_sec":"2","mahr_stop":"60","cycles":"5000"}}
+{"LED2":{"delay_start_sec":"3","runtime_sec":"5","delay_sec":"2","mahr_stop":"600","cycles":"5000"}}
 /1/loadled 3
-{"LED3":{"delay_start_sec":"5","runtime_sec":"4","delay_sec":"2","mahr_stop":"80","cycles":"5000"}}
+{"LED3":{"delay_start_sec":"5","runtime_sec":"4","delay_sec":"2","mahr_stop":"800","cycles":"5000"}}
 /1/loadled 4
-{"LED4":{"delay_start_sec":"7","runtime_sec":"5","delay_sec":"2","mahr_stop":"100","cycles":"5000"}}
+{"LED4":{"delay_start_sec":"7","runtime_sec":"5","delay_sec":"2","mahr_stop":"1000","cycles":"5000"}}
 ```
 
 
@@ -210,16 +210,16 @@ Set the led (1|2|3|4) delay between runs (1..86400, e.g. 24 hr max).
 Set the led (1|2|3|4) max discharge in mAHr (1..86400, e.g. 86.4AHr). When the battery has discharged by this amount the LED will stop.
 
 ```
-/1/mahrled 1,40
-{"LED1":{"mahr_stop":"40"}}
-/1/mahrled 2,60
-{"LED2":{"mahr_stop":"60"}}
-/1/mahrled 3,80
-{"LED3":{"mahr_stop":"80"}}
-/1/mahrled 4,100
-{"LED4":{"mahr_stop":"100"}}
+/1/mahrled 1,400
+{"LED1":{"mahr_stop":"400"}}
+/1/mahrled 2,600
+{"LED2":{"mahr_stop":"600"}}
+/1/mahrled 3,800
+{"LED3":{"mahr_stop":"800"}}
+/1/mahrled 4,1000
+{"LED4":{"mahr_stop":"1000"}}
 /1/runled 3,1
-{"LED3":{"delay_start_sec":"5","runtime_sec":"4","delay_sec":"2","cycles":"1","mahr_stop":"80"}}
+{"LED3":{"delay_start_sec":"5","runtime_sec":"4","delay_sec":"2","cycles":"1","mahr_stop":"800"}}
 ```
 
 

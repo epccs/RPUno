@@ -28,6 +28,10 @@ This shows the setup and method used for evaluation of RPUno.
 
 10AHr AGM Sealed battery used with a SLP003-12U. Note the AGM will not charge with the thermistor so I am letting it run without temperature compensation (i.e. the thermistor is an open circuit). The charger voltage tops out at about 14.3V which should not cause much hydrogen gassing, but it will cause some. It is my understanding that the AGM will recover the gassing and allow the battery to keep working, however, it is also my understanding that the catalyst will stop working at some point. The question to ask is if this is a good compromise between damage from sulfation and damage from using up the AGM catalyst.
 
+After running the [NightLight] for a few weeks ([RPUno^6NightLight_log]) I pulled the battery just before the sun went down and tried to charge it with a Duracell SLC10003 charger, it decided the battery was at a full charge within a few minutes. The SLC10003 goes to 14.5V with 1.5A so I guess the 150mA is doing the job even though I don't see it even reach 14.3V. 
+
+[NightLight]: https://github.com/epccs/RPUno/tree/master/NightLight
+[RPUno^6NightLight_log]: ./RPUno^6NightLight_log.txt
 
 ## ^6 Power Example
 

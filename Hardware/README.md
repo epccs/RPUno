@@ -2,9 +2,9 @@
 
 ## Overview
 
-This board has an ATmega328p microcontroller. The board is DIN mounted and has pluggable connectors for some functions. Six Digital input/output (in two groups of three plus a current source) are connected through level shifting transistors to the pluggable connectors. Two ADC inputs (each with a current source) are connected to the pluggable connectors. Capture hardware (ICP1 with current sources) is connected to pluggable connectors. The board power can be from 7 thru 36 VDC and is protected against reverse polarity with a P-channel Mosfet. The input power voltage can be measured with  ADC channel 7 and the input power current can be measured with ADC channel 6. Power to the shield VIN pin may be disabled by setting digital IO2 low. An ATmega328p can be programmed with the GCC toolchain for AVR from Debian packages (e.g. so it is available on, Ubuntu, Raspbian, OSH via brew, Windows via Windows Subsystem for Linux).
+This board has an ATmega328p microcontroller. The board is DIN mounted and has pluggable connectors for some functions. Six Digital input/output (in two groups of three plus a current source) are connected through level shifting transistors to the pluggable connectors. Two ADC inputs (each with a current source) are connected to the pluggable connectors. Capture hardware (ICP1) with current source is connected to pluggable connector. The board power can be from 7 thru 36 VDC and is protected against reverse polarity with a P-channel Mosfet. The input power voltage can be measured with ADC channel 7 and the input power current can be measured with ADC channel 6. Power to the shield VIN pin may be disabled by setting digital IO2 low. An ATmega328p can be programmed with the GCC toolchain for AVR found in Debian packages (e.g. so it is available on, Ubuntu, Raspbian, OSH via brew, Windows via Windows Subsystem for Linux).
 
-Bootloader options include [optiboot] and [xboot]. Uploading through a bootloader eliminates fuse setting errors and there are few ways to block an upload accidentally (e.g. if a bootloader does not clear the watchdog then it can get stuck in a loop). This has given the feel of robustness during my software development experience.
+Bootloader options include [optiboot] and [xboot]. Uploading through a bootloader eliminates fuse setting errors and there are not many ways to block an upload accidentally (e.g. some other bootloaders do not clear the watchdog and can get stuck in a loop). This has given the feel of robustness during my software development experience.
 
 [optiboot]: https://github.com/Optiboot/optiboot
 [xboot]: https://github.com/alexforencich/xboot
@@ -36,9 +36,9 @@ Bootloader options include [optiboot] and [xboot]. Uploading through a bootloade
             PWM Output Temperature Sensors
             PWM Output Capacitance Sensors
         Automation
-            Clear a latch-up on a device powered with shield VIN pin.
+            Clear a latch-up on a device powered with the shield VIN pin.
             Solid State Relay String (e.g. multi-phase power) control.
-            PLC replacement programmed with an open source toolchain.
+            PLC replacement that is programmed with an open source toolchain.
 ```
 
 ## Notice
@@ -146,6 +146,8 @@ The SMD reflow is done in a Black & Decker Model NO. TO1303SB which has the heat
 # How To Use
 
 Connect the application electronics (e.g. flow meter, analog current loops, and whatever the application uses) and check the connections. Then connect the input power.  
+
++5V power on J7 is not populated, when I use the power from this point I solder some wires to the through holes, it is risky to populate the pluggable connector next to the input power.
 
 This board is like an Arduino Uno, but some functions are dedicated to the onboard hardware. Three digital lines (IO5, IO6, IO7) and two analog channels (ADC3, ADC2) are reserved for off board options. Two digital lines (IO2, IO9) are used to control power to the SHLD_VIN and current sources for ICP and ADC. Two analog channels (ADC4, ADC5) are dedicated for I2C (and not wired to the analog header). While two analog channels (ADC7, ADC6) are used to measure the power input voltage and current.
 

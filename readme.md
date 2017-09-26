@@ -4,7 +4,7 @@ From <https://github.com/epccs/RPUno/>
 
 ## Overview
 
-This no-frills Controller board is based on an ATmega328p and is programmable with the open source GCC toolchain for AVR. The MCU is a surface mount version of the microcontroller found on an Arduino Uno. The headers are based on the Arduino Uno pinout, however, two of the headers are extended so Arduino Mega shields will not interfere. I designed [RPUftdi], [RPUadpt], and [RPUpi] shields to connect the UART on this board to an RS422 bus (other shields may work but I have not tried them).
+This no-frills Controller board is based on an ATmega328p and is programmable with the open source GCC toolchain for AVR. The MCU is a surface mount version of the microcontroller found on an Arduino Uno. The headers are based on the Arduino Uno pinout, however, two of the headers are extended so Arduino Mega shields will not work. I designed [RPUftdi], [RPUadpt], and [RPUpi] shields to connect the UART on this board to an RS422 bus (other shields may work but I have not tried them).
 
 [RPUftdi]: https://github.com/epccs/RPUftdi
 [RPUadpt]: https://github.com/epccs/RPUadpt
@@ -78,7 +78,7 @@ Ctrl-a,Ctrl-x
 Thanks for using picocom
 ```
 
-At present, I'm using [I2Cdebug] to set the bus manager on the [RPUftdi] shield, it needs to know which address to reset so that it can lockout the others during bootload. Solenoid is the star of the show (so far), it is an attempt to control latching irrigation valves with cycles (inspired by Vinduino) and start the cycle at a daylight based offset, flow sensing for each zone is also working.
+At present, I'm using [I2Cdebug] to set the bus manager on the [RPUftdi] shield, it needs to know which address to reset so that it can lockout the others during bootload. Solenoid is the star of the show (so far), it is an attempt to control latching irrigation valves with cycles that start after a daylight based offset, flow sensing for each zone is also working.
 
 [I2Cdebug]: ./i2c-debug
 
@@ -107,4 +107,4 @@ I am not a software developer (more of a hardware type), I started with the Ardu
 
 [Makefile Madness](http://hackaday.com/2016/03/11/embed-with-elliot-march-makefile-madness/)
 
-That was sort of my turning point, I started to use Makefiles and plane C. C++ is C plus stuff to implements object-oriented programing. Unfortunately, some of the OOP stuff uses the heap memory system, and that seems to have been my problem. To be sure the heap was clean I ended up porting the C++ things I wanted to C. I think OOP is fine on a Raspberry Pi, but without an operating system that at the very least handles an out of memory fault when the heap memory system and stack memory system collide I don't want my programing language to use the heap. C does not use the heap unless explicitly told to, while C++ uses (fragments) it in ways I am not interested in understanding.
+That was sort of my turning point, I started to use Makefiles and plane C. C++ is C plus stuff to implement object-oriented programing. Unfortunately, some of the OOP stuff uses the heap memory system, and that seems to have been my problem. To keep the heap clean I ended up porting the C++ things I wanted to C. I think OOP is fine on a Raspberry Pi, but without an operating system that at the very least handles an out of memory fault when the heap memory system and stack memory system collide I don't want my programing language to use the heap. C does not use the heap unless explicitly told to, while C++ uses (and fragments the memory system) it in ways I am not interested in understanding.

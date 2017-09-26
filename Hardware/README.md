@@ -2,9 +2,9 @@
 
 ## Overview
 
-This board is solar powered and has an ATmega328p. The Capture (ICP1) hardware is connected to an inverting open collector transistor that pulls down the ICP1 pin when current (e.g. 10mA) is flowing through a 100 Ohm sense resistor. The captured value is accurate to within one crystal count of the event (e.g. pulse edge caused by the transition of 3mA to 10mA from a current loop or a sensor output that goes open after it was a shunt for the 10mA source). This captured value is an excellent (e.g. crystal is 30ppm + drift) method for data acquisition from a flow meter or for other pulse interpolation task. The board also has six digital interfaces with voltage level conversion up to the board's internal supply voltage (VIN on schematic), and two analog inputs with current sources for two current loops. The ATmega328p can be programmed with the AVR toolchain on Debian, Ubuntu, Raspbian, and others. The toolchain is also available with the Arduino IDE, and PlatformIO.
+This board has an ATmega328p microcontroller. The board is DIN mounted and has pluggable connectors for some functions. Six Digital input/output (in two groups of three plus a current source) are connected through level shifting transistors to the pluggable connectors. Two ADC inputs (each with a current source) are connected to the pluggable connectors. Capture hardware (ICP1 with current sources) is connected to pluggable connectors. The board power can be from 7 thru 36 VDC and is protected against reverse polarity with a P-channel Mosfet. The input power voltage can be measured with  ADC channel 7 and the input power current can be measured with ADC channel 6. Power to the shield VIN pin may be disabled by setting digital IO2 low. An ATmega328p can be programmed with the GCC toolchain for AVR from Debian packages (e.g. so it is available on, Ubuntu, Raspbian, OSH via brew, Windows via Windows Subsystem for Linux).
 
-Bootloader options include [optiboot] and [xboot]. Uploading through a bootloader eliminates fuse setting errors and there are few register settings that can block an upload accidentally (some other bootloaders don't clear the watchdog and can get stuck in a loop). This has given the feel of robustness during my software development experience.
+Bootloader options include [optiboot] and [xboot]. Uploading through a bootloader eliminates fuse setting errors and there are few ways to block an upload accidentally (e.g. if a bootloader does not clear the watchdog then it can get stuck in a loop). This has given the feel of robustness during my software development experience.
 
 [optiboot]: https://github.com/Optiboot/optiboot
 [xboot]: https://github.com/alexforencich/xboot
@@ -12,27 +12,33 @@ Bootloader options include [optiboot] and [xboot]. Uploading through a bootloade
 ## Inputs/Outputs/Functions
 
 ```
-        ATmega328p is a minimalistic easy to use microcontroller
-        12V SLA with an LT3652 solar charge controller 
-        High side battery current sensing ADC2 (Charging) and ADC3 (Discharging).
-        Vin power will automatically disconnect when the battery is low.
+        ATmega328p programs are compiled with open source tools that run nearly everywhere.
+        Input power can range from 7 to 36V DC
+        High side current sense on input power connected to ADC6.
+        Input power voltage is divided down and connected to ADC7.
         Six pluggable digital input/outputs (DIO 3,4,10,11,12,13) with level conversion.
-        Digital interface has a 22 mA current source
-        Input Capture (ICP1) with current sources for CAT5 pair current loops.
-        ICP currrent sources are enabled with a digital control DIO 9.
+        Digital interface has two 22 mA current source
+        Input Capture (ICP1) with current sources for current loops.
         Two Analog channels ADC0, ADC1.
-        Two currrent sources for analog loops are enabled with a digital control DIO 9.
+        Two current sources for analog loops are enabled with a digital control DIO 9.
+        ICP and ADC current sources are enabled with a digital control DIO 9.
         Power to the Shield Vin pin is turned off with DIO 2.
-        MCU power (+5V) is converted with an SMPS from the battery power.
+        MCU power (+5V) is converted with an SMPS from the input power.
+        Up to an Amp can be safely used from the +5V.
 ```
 
 ## Uses
 
 ```
-        General Purpose Solar Controller
-        Flow Meter Data Acquisition using Capture Hardware (ICP1).
-        VIN to the shield can be powered down while the RPUno continues to run.
-        Power-maintained Bootstrap hardware e.g. starts a generator to pump some water on a blue moon.
+        Data Acquisition using Capture Hardware (ICP1).
+            Flow Meter
+            Rotating Hardware
+            PWM Output Temperature Sensors
+            PWM Output Capacitance Sensors
+        Automation
+            Clear a latch-up on a device powered with shield VIN pin.
+            Solid State Relay String (e.g. multi-phase power) control.
+            PLC replacement programmed with an open source toolchain.
 ```
 
 ## Notice
@@ -58,14 +64,23 @@ Bootloader options include [optiboot] and [xboot]. Uploading through a bootloade
 ![Status](./status_icon.png "RPUno Status")
 
 ```
-        ^6  Done: Design, Layout, BOM, Review*, Order Boards, Assembly, Testing,
-            WIP: Evaluation.
-            Todo: 
-            note: two test units made, four units made to see if anyone is intrested.
+        ^7  Done: Design, Layout, BOM,
+            WIP: Review*,
+            Todo: Order Boards, Assembly, Testing, Evaluation.
             *during review the Design may change without changing the revision.
-                    2017-3-24 T1^6 damaged MCU while taking power example image.
+            use an ESD_NODE like Irrigate7.
+            don't turn off the current source used with digital outputs since the digital IO's can do that. 
+            DIO protection resistor (change 182 Ohm to 127 Ohm)
+            remove LT3652 and reduce size of board.
+            add an IDC connector for everything that was used with LT3652 (5,6,7,ADC2,ADC3).
+            add JSK plug for I2C
+
+        ^6  two test units (T1,T2) made, four units made to see if anyone is intrested.
+            location: 2017-3-24 T1^6 damaged MCU while taking power example image.
                     2017-3-25 T2^6 using on test bench.
-                    2017-6-12 T1^6 replaced MCU from scrped ^4 and tested again.
+                    2017-6-12 T1^6 replaced MCU from a scrped RPUno^4 and tested again.
+                    2017-7-19 T2^6 + RPUadpt^5 in SEncl NightLight testing.
+                    2017-8-26 T2^6 NightLight ended, unit is in an enclosure with battey but is not in use.
 
 
         ^5  only unit of this version made
@@ -75,15 +90,6 @@ Bootloader options include [optiboot] and [xboot]. Uploading through a bootloade
                     2017-2-4 moved to SWall Encl /w K3^1, RPUadpt^4, SLP003-12U, 12V battery.
                     2017-3-19 remove 10k thermistor which was used by  LT3652 to turn off chrg when over 40 C
                     2017-4-17 running Solenoid fw, @ SWall Encl, Update K3^2, Update RPUadpt^5, SLP003-12U, 12V battery.
-
-        ^4  only unit of this version made
-            location: 2016-12-1 SWall Encl /w K3^0, RPUadpt^4, SLP003-12U, 12V battery.
-                    2017-1-1 This^4 had ADC7 parts changed to measre battery.
-                    2017-1-1 This^4 had ADC6 hacked to measure raw PV.
-                    2017-1-5 RPUadpt^4 had ICP1 hacked open.
-                    2017-2-4 an equalizing charge seems to have tripped a fault on the LT3652. 
-                    2017-2-4 moved from SWall Encl to Test Bench (it will not control VIN for the RPUpi^1).
-                    2017-6-12 scraped
 ```
 
 Debugging and fixing problems i.e. [Schooling](./Schooling/)
@@ -100,33 +106,10 @@ The board is 0.063 thick, FR4, two layer, 1 oz copper with ENIG (gold) finish.
 ![Bottom](./Documents/14140,Bottom.png "RPUno Bottom")
 ![BAssy](./Documents/14140,BAssy.jpg "RPUno Bottom Assy")
 
-## Electrical Parameters (Typical)
+## Electrical Parameters
 
 ```
-PV Power Point Voltage: 18V7@0ºC,16V8@25ºC,15V7@40ºC,14V5@70ºC
-PV Watage: 3 thrugh 20W
-Max Power Point tracks 36 cell silicon PV with 100k B=4250 Thermistor
-Charge Controler type: 12V SLA also tracks with 100k B=4250 Thermistor
-Charge Voltage: 13.278V@40ºC,13.63V@25ºC,14.068V@0ºC
-Charge rate: about .055A per PV watt at 25ºC
-MCU type: ATMega328p
-MCU clock: 16MHz
-MCU Voltage: 5V (e.g. IOREF is 5V)
-CAPTURE INPUTS: ICP1
-CAPTURE CURR SOURCE: 17mA.
-CAPTURE OC CURR SOURCE: 10mA used to feed an open collector sensor that can shunt it.
-PULSE CURR LOOP TERMINATION: 100 Ohm. Used to bias a NPN transistor that pulls down ICP1.
-DIGITAL CURR SOURCES: 20mA source from VIN.
-DIGITAL: six level translated (to 5V) and diode clamped (to VIN) input/outputs.
-ANALOG CURR SOURCES two 20 mA sources from VIN which may feed 4-20mA sensors.
-ANALOG: two ADC channels with MCU voltage used as the reference (or an internal bandgap).
-```
-
-## Operating Temperature
-
-```
-        Charge control will shut down when outside 0 to 40 ºC
-        Also refer to the parts used for storage and operation limits.
+Power Voltage: 7 thru 36V
 ```
 
 ## Mounting
@@ -157,37 +140,22 @@ The board is assembled with CHIPQUIK no-clean solder SMD291AX (RoHS non-complian
 
 The SMD reflow is done in a Black & Decker Model NO. TO1303SB which has the heating elements controlled by a Solid State Relay and an ATMega328p loaded with this [Reflow] firmware.
 
-[Reflow]: ../Reflow
-
-## 100k Ohm Thermistor
-
-The LT3652 has a control loop for regulating the input voltage, which can be compensated to track the maximum power point of silicon photovoltaic string (36 cell's in this case). The power point of a silicon PV cell is well known and so is the amount it changes with temperature, so compensation is possible.
-
-Another control loop in the LT3652 is for regulating the SLA voltage, which needs to be compensated so that the charging voltage tracks with temperature to prevent battery damage.
-
-Both are compensated with a 100k Thermistor which is placed on a short wire mounted in heat shrink with some thermoplastic and connected to the pluggable screw terminals. When in use the installer will need to place a sensor under the PV panel and the other sensor near the battery. Use a sunlight resistant cable between the PV panel and the enclosure, and for the battery temperature sensor use wiring appropriate for the enclosure. These sensors should be wired with twisted pair to minimize injecting noise into the charge controller.   
-
-![100kThermistor](./Documents/100kThermistor.jpg)
+[Reflow]: https://github.com/epccs/RPUno/tree/master/Reflow
 
 
 # How To Use
 
-Fully charge the SLA battery that will be used, this step will allow the microcontroller to receive power quickly rather than waiting for the charge controller to charge it to about 13.1V.
+Connect the application electronics (e.g. flow meter, analog current loops, and whatever the application uses) and check the connections. Then connect the input power.  
 
-Connect the application electronics (e.g. flow meter, analog current loops, and whatever the application uses) and check the connections. Then connect the battery (which will remain electronically disconnected). Next, connect the solar photovoltaic power, once the PV voltage is enough to enable the charger it will electronically connect to the battery, and start charging (though nothing is visible yet, and this has caused some frustration). When the battery voltage is over 13.1V it will connect to the on board VIN node and power the microcontroller. The buffered power ensures hiccup free operation. 
+This board is like an Arduino Uno, but some functions are dedicated to the onboard hardware. Three digital lines (IO5, IO6, IO7) and two analog channels (ADC3, ADC2) are reserved for off board options. Two digital lines (IO2, IO9) are used to control power to the SHLD_VIN and current sources for ICP and ADC. Two analog channels (ADC4, ADC5) are dedicated for I2C (and not wired to the analog header). While two analog channels (ADC7, ADC6) are used to measure the power input voltage and current.
 
-In some ways, this board is like an Arduino Uno, but many functions are dedicated to the onboard hardware.  Three digital lines (IO5, IO6, IO7) are connected to the solar charge controller. Two more digital lines (IO2, IO9) are used to control power to the SHLD_VIN and current sources. Two analog lines (ADC4, ADC5) are dedicated to I2C (and not wired to the analog header). While four more analog lines (ADC7, ADC6, ADC3, ADC2) are used to measure the battery PWR voltage, PV_IN voltage, CHRG, and DISCHRG.
+The [Solenoid] firmware is looking fairly interesting, it is a solenoid control state machine with some of the states using a timer with a programmed value. [Solenoid] also reads a flow sensor on ICP1 in order to accumulate the flow count (i.e. the pulse count from a flow meter) for an irrigation zone feed by the solenoid valve. It allows operating the valves several times with a delay between each operation. This should allow the drip irrigation to be done in small doses several times (e.g. 10 times with 5-minute watering and hour delays between watering) during the day, rather than in one big pool (i.e. for 50 minutes). The idea is to give the vegetables a chance to use the water before it sinks bellow where their roots have access. In the soil in my yard, the water sinks in fairly quick. 
 
-Without connecting anything more than a battery and a solar panel there is a lot of firmware options to consider. How well suited this board is for a task is not easy to answer. 
+[Solenoid]: https://github.com/epccs/RPUno/tree/master/Solenoid
 
-The [Solenoid] firmware is looking fairly interesting, it is a solenoid control state machine with some of the states using a timer with a programmed value. [Solenoid] also reads the flow sensor at specific states in order to accumulate the flow count (i.e. the pulse count from a flow meter) into an irrigation zone feed by a solenoid valve. It allows operating the valves several times with a delay between each operation. This should allow the drip irrigation to be done in small doses several times (e.g. 10 times with 5-minute watering and 30-minute delays between watering) during the day, rather than in one big pool (i.e. for 50 minutes). The idea is to give the vegetables a chance to use the water before it sinks bellow where their roots have access. In my porous soil, the water sinks in fairly quick. 
+## Solar
 
-[Solenoid]: ../Solenoid
+Previous versions of this board included a solar charge controller, which has been removed. My experiments have confirmed that charging a battery can be done directly through a diode when the PV charge is less than or about .02C (e.g. 200mA into a 10AHr battery). This means that the need for a charge controller depends on how the user wants to ratio the PV and battery storage. The charge controller I was using worked fine, but it was doing nothing for a SLP003-12U panel on a 10AHr AGM battery that a diode alone would not do. 
 
-## MPPT
+Regarding the MPPT function, it turns out that a 15% power loss through the buck converter is a wash when compared to operating the PV at the battery voltage for room temperature conditions (e.g. PV MPP 16.2V and bat is 13.8V), and at a higher temperature, losses from buck power conversion favors a direct connection. The LT3652 is a fine chip but there needs to be a sizable voltage change from the solar panel to the battery voltage for it to be beneficial.
 
-Is about optimizing the captured power (see [HackADay]).
-
-[HackADay]: https://hackaday.com/2017/03/17/are-you-down-with-mppt-yeah-you-know-me/#more-245987
-
-If you do not want to run a twisted parir to the solar panel then keep the thermistor connected to its input inside the enclosure, it will then track with the enclosure temperature, which is not bad especialy when the enclosure is in the sun near the solar panel.

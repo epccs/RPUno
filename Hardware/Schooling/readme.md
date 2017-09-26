@@ -4,6 +4,7 @@ Some lessons I learned doing RPUno.
 
 # Table Of Contents:
 
+11. [^6 Solar](#6-solar)
 10. [^5 LT3652 NTC 10k](#5-lt3652-ntc-10k)
 9. [^5 Baud Rate Framing Error](#5-baud-rate-framing-error)
 8. [^5 Current Source Power Off](#5-current-source-power-off)
@@ -14,6 +15,19 @@ Some lessons I learned doing RPUno.
 3. [^1 Reduce Current Sense Noise](#1-reduce-current-sense-noise)
 2. [^1 Battery Connector Polarity](#1-battery-connector-polarity)
 1. [^0 Add Reversed Battery Protection](#0-add-reversed-battery-protection)
+
+
+## ^6 Solar
+
+It turns out that a 15% power loss through the buck converter is a wash when compared to operating the PV at the battery voltage for room temperature conditions (e.g. PV MPP is 16.2V and battery is 13.8V), and at a higher temperature, losses from the buck power conversion favors a direct connection. The LT3652 is a fine chip but there needs to be a sizable voltage change from the solar panel MPP to the battery voltage for it to be beneficial.
+
+I knew the value of the LT3652 was greatly diminished when I changed from 6V SLA to 12V SLA (^4) but I did not know that a lead-acid battery was surprisingly self-regulating durring trickle charging. Seeing this in action while running some LED's at night ([NightLight]) is what has convinced me that I needed to remove the solar charge controller from my MCU boards.
+
+[NightLight]: https://github.com/epccs/RPUno/tree/master/NightLight
+
+There are plenty of solar charge controllers like [SS-6L-12V] on the market, though I do have some ideas I may want to try.
+
+[SS-6L-12V]: https://www.solar-electric.com/ss-6l.html
 
 
 ## ^5 LT3652 NTC 10k

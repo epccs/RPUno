@@ -4,7 +4,11 @@ From <https://github.com/epccs/RPUno/>
 
 ## Overview
 
-This no frills Solar Controller board is based on an ATmega328p and is programmable with the open source GCC toolchain for AVR. The MCU is a surface mount version of the microcontroller found on an Arduino Uno. The headers are based on the Arduino Uno pinout, but I have only used RPUftdi, RPUadpt, and RPUpi shields. The on board LT3652 solar charge controller manages battery charging while the ATmega328p can turn it off, detect a fault, and measure battery current and voltage, and the photovoltaic string voltage.
+This no-frills Controller board is based on an ATmega328p and is programmable with the open source GCC toolchain for AVR. The MCU is a surface mount version of the microcontroller found on an Arduino Uno. The headers are based on the Arduino Uno pinout, however, two of the headers are extended so Arduino Mega shields will not interfere. I designed [RPUftdi], [RPUadpt], and [RPUpi] shields to connect the UART on this board to an RS422 bus (other shields may work but I have not tried them).
+
+[RPUftdi]: https://github.com/epccs/RPUftdi
+[RPUadpt]: https://github.com/epccs/RPUadpt
+[RPUpi]: https://github.com/epccs/RPUpi
 
 [Forum](http://rpubus.org/bb/viewforum.php?f=6)
 
@@ -24,8 +28,6 @@ Hardware files and notes for referance.
 
 This example shows an RS-422 serial bus that allows multiple microcontroller boards to be connected to a single computer serial port. It has an [RPUftdi] shield with a USB device that acts as a UART bridge that is placed near the computer (USB cables should be less than 2 meters). I normally use an Uno Clone under the RPUftdi. The remote MCU boards are RPUno (or [Irrigate7]) and have an [RPUadpt] shield that daisy-chains the RS-422 over CAT5 cable with RJ45 connectors. 
 
-[RPUftdi]: https://github.com/epccs/RPUftdi
-[RPUadpt]: https://github.com/epccs/RPUadpt
 [Irrigate7]: https://github.com/epccs/Irrigate7
 
 ![MultiDrop](./Hardware/Documents/MultiDrop.png "RPUno MultiDrop")
@@ -101,8 +103,8 @@ make bootload
 * [avr-libc](http://packages.ubuntu.com/search?keywords=avr-libc)
 * [avrdude](http://packages.ubuntu.com/search?keywords=avrdude)
 
-I am not a software developer (more of a hardware type), I started with the Arduino IDE and an Uno board and found it easy to do cool stuff, unfortunately, when I tried to do my own board it was more pain than gain. I noticed Elliot Williams articles on "Makefile Madness" on Hack-a-day, and that was sort of a turning point. 
+I am not a software developer (more of a hardware type), I started with the Arduino IDE and an Uno board and found some things I like and some I did not. When I did my own boards I found the Arduino IDE to have more pain than gain. I also was having problems with C++ that was difficult to nail down. When I noticed an article from Elliot Williams on "Makefile Madness" at Hack-a-day. 
 
 [Makefile Madness](http://hackaday.com/2016/03/11/embed-with-elliot-march-makefile-madness/)
 
-
+That was sort of my turning point, I started to use Makefiles and plane C. C++ is C plus stuff to implements object-oriented programing. Unfortunately, some of the OOP stuff uses the heap memory system, and that seems to have been my problem. To be sure the heap was clean I ended up porting the C++ things I wanted to C. I think OOP is fine on a Raspberry Pi, but without an operating system that at the very least handles an out of memory fault when the heap memory system and stack memory system collide I don't want my programing language to use the heap. C does not use the heap unless explicitly told to, while C++ uses (fragments) it in ways I am not interested in understanding.

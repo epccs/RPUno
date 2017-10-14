@@ -7,6 +7,7 @@ This shows the setup and method used for evaluation of RPUno.
 
 # Table Of Contents:
 
+15. [^5 Flow Meter](#5-flow-meter)
 13. [^6 AGM Battery](#6-agm-battery)
 12. [^6 Power Example](#6-power-example)
 11. [^5 Power Management](#5-power-management)
@@ -22,9 +23,22 @@ This shows the setup and method used for evaluation of RPUno.
 1. [^1 Mounting](#1-mounting)
 
 
+## ^5 Flow Meter
+
+The Adafruit 833 has been running for almost a year at which point the electrical connector corroded and separated. I thought the meter was leaking but inspecting shows that the pressure regulator was the culprit.
+
+![Adafruit 833 Flow Meter](./RPUno^5_HadAF833NearlyAYear.jpg "Adafruit 833 Flow Meter")
+
+I changed the flow meter with an Orbit 52212 that was gutted and the electronics [replaced] with a A1190 hall sensor. The leaking pressure regulater was also replaced and I am now ready for more testing (last batch is [K3^2log]).
+
+[replaced]: https://github.com/epccs/Document/tree/master/FlowMeter
+[K3^2og]: ./K3^2log.txt
+
+![Orbit 52212 Flow Meter](./RPUno^5_FlowSensorOrbit52212WithHallSensorA1190.jpg "Orbit 52212 Flow Meter")
+
 ## ^6 AGM Battery
 
-![AGM Battery](./RPUno^6+RPUadpt^5WithAgmBat+4LedString "AGM Battery")
+![AGM Battery](./RPUno^6+RPUadpt^5WithAgmBat+4LedString.jpg "AGM Battery")
 
 10AHr AGM Sealed battery used with a SLP003-12U. Note the AGM will not charge with the thermistor so I am letting it run without temperature compensation (i.e. the thermistor is an open circuit). The charger voltage tops out at about 14.3V which should not cause much hydrogen gassing, but it will cause some. It is my understanding that the AGM will recover the gassing and allow the battery to keep working, however, it is also my understanding that the catalyst will stop working at some point. The question to ask is if this is a good compromise between damage from sulfation and damage from using up the AGM catalyst.
 

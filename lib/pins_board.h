@@ -61,26 +61,24 @@
 #define TX0 1
 
 // VIN  pin shield power control
+#define DIO2 2
 #define SHLD_VIN_EN 2
 
 // Plugable Digital Input/Outputs with Level shift
 #define DIO3 3
 #define DIO4 4
 
-// Charge Controler
-#define CC_SHUTDOWN 5
-
-// Battery Control (Warning this will disconnect the battery)
-#define BAT_DISCONNECT 6
-
-// Charge Controler not Fault (note use a weak pull up to read fault state) 
-#define CC_nFAULT 7
+// J13 CONN
+#define DIO5 5
+#define DIO6 6
+#define DIO7 7
 
 // ICP1 pin reads inverted from the plugable input with 100 Ohm termination
 #define ICP1 8
 
 // Current Source Enable
-#define CURR_SOUR_EN 9
+#define DIO9 9
+#define CS_EN 9
 
 // Plugable Digital Input/Outputs with Level shift
 // SPI on RPUno is maped to the DIO
@@ -115,20 +113,20 @@
 // its voltage is analogRead(ADC1)*(5.0/1024.0)
 #define ADC1 1
 
-// CHRG_ADC2 voltage is analogRead(CHRG_I)*(5.0/1024.0)/(0.068*50.0)
+// ADC2 voltage is analogRead(CHRG_I)*(5.0/1024.0)/(0.068*50.0)
 #define CHRG_I 2
 
-// DISCHRG_ADC3 voltage is analogRead(DISCHRG_I)*(5.0/1024.0)/(0.068*50.0)
+// ADC3 voltage is analogRead(DISCHRG_I)*(5.0/1024.0)/(0.068*50.0)
 #define DISCHRG_I 3
 
 // ADC4 and ADC5 are used for I2C with the RPUadpt/RPUftdi/RPUpi shields
 #define ADC4 4
 #define ADC5 5
 
-// PV_IN_ADC6 voltage is analogRead(PV_V)*(5.0/1024.0)*(532.0/100.0)
-#define PV_V 6 
+// ADC6 voltage is analogRead(PV_V)*(5.0/1024.0)*(5.0/1024.0)/(0.068*50.0)
+#define PWR_I 6 
 
-// PWR_ADC7 or Battery voltage is analogRead(PWR_V)*(5.0/1024.0)*(3.0/2.0)
+// ADC7 or input voltage is analogRead(PWR_V)*(5.0/1024.0)*(115.8.0/15.8)
 #define PWR_V 7
 
 #endif // Pins_Board_h

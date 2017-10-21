@@ -64,9 +64,9 @@ Bootloader options include [optiboot] and [xboot]. Uploading through a bootloade
 ![Status](./status_icon.png "RPUno Status")
 
 ```
-        ^7  Done: Design, Layout, BOM,
-            WIP: Review*,
-            Todo: Order Boards, Assembly, Testing, Evaluation.
+        ^7  Done: Design, Layout, BOM, Review*, Order Boards, Assembly,
+            WIP: Testing,
+            Todo:  Evaluation.
             *during review the Design may change without changing the revision.
             use an ESD_NODE like Irrigate7.
             don't turn off the current source used with digital outputs since the digital IO's can do that. 

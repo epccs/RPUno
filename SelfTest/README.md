@@ -2,33 +2,23 @@
 
 ## Overview
 
-Check RPUno Board Functions, runs once after a reset and then loops in a do noting section.
+Check RPUno Board Functions, runs once after a reset and then loops in a blink led section.
 
-Three 20mA current sources feed a 47 Ohm resistor and that is measured with ADC0. The 20mA digital current source connects to DIO13 and DIO12 befor going through a red LED and then feeding into the 47 Ohm resistor. The 20mA ADC1 current source connects to DIO11 and DIO10 befor going through a red LED and then feeding into the 47 Ohm resistor. 
+Current sources feed a 50 Ohm resistor and that is measured with ADC0. One of the 22mA digital current source connect to DIO13 and DIO12 befor going through a yellow LED and then feeding into the 50 Ohm resistor. The other 22mA digital current source connect to DIO3 and DIO10 befor going through a yellow LED and then feeding into the 50 Ohm resistor. The 22mA ADC0 current source connects to DIO11 befor going through a red LED and feeding into the 50 Ohm resistor. 
 
-If DIO12 or DIO13 shunt the digital current sources the ADC0's measurement is 20mA less. If DIO11 or DIO10 shunt the ADC1 current source then ADC0's measurement is 20mA less. 
+ICP1 has a 100 Ohm resistor on board and a 10mA current source jumper that feeds it, the voltage is measured with ADC1. Additionaly a 17mA current source is connected to DIO4 and feeds the ICP1 resistor through a green LED. 
 
-ICP1 has a 100 Ohm resistor on board and a 10mA current source jumper that feeds it, the voltage is measured with ADC1. Additionaly a 16mA current source is connected to DIO3 and DIO4 and feeds the ICP1 resistor through a green LED. 
-
-If DIO3 or DIO4 shunt the 16mA current source then ADC1's measurement is less by 16mA.
-
-The red and green LED are used to indicate test status.
+The red and green LED are also used to indicate test status.
 
 ## Wiring Needed for RPUno
 
 ![Wiring](./Setup/SelfTestWiring.png)
 
-## Battery
-
-Connect a fairly large 12V SLA battery and a 100k Ohm resistor to the battery thermistor input. The test looks for an MPPT voltage so the battery should be less than the float voltage. 
-
-The battery needs to charge to 13.1V before the VIN that powers MCU will connect. A large battery will give sufficient time to load the firmware and run a test before the float voltage is reached and the MPPT mode terminates.
 
 ## Power Supply
 
-Connect a power supply with CV and CC mode. Set CC at 150mA then increase CV to 21V. The charge controler will turn on and regulate the input voltage at its MPPT (assuming the battery is not at its float voltage). 
+Connect a power supply with CV and CC mode. Set CC at 300mA then increase CV to 12.8V.
 
-Note: I adjust CC to speed up charging until VIN connects and then return it to the 150mA setting.
 
 ## Firmware Upload
 
@@ -42,10 +32,10 @@ AVR Memory Usage
 ----------------
 Device: atmega328p
 
-Program:   12704 bytes (38.8% Full)
+Program:   11824 bytes (36.1% Full)
 (.text + .data + .bootloader)
 
-Data:        240 bytes (11.7% Full)
+Data:        260 bytes (12.7% Full)
 (.data + .bss + .noinit)
 ...
 avrdude -v -p atmega328p -c arduino -P /dev/ttyUSB0 -b 115200 -U flash:w:SelfTest.hex
@@ -62,37 +52,25 @@ rsutherland@conversion:~/Samba/RPUno/SelfTest$ picocom -b 38400 /dev/ttyUSB0
 picocom v1.7
 ...
 Terminal ready
-Self Test date: Feb 18 2017
+Self Test date: Oct 21 2017
 I2C provided address 0x31 from RPU bus manager
-+5V needs measured and then set as ADC_REF: 4.950 V
-Charging with CURR_SOUR_EN==off: 0.108 A
-PWR (Battery) at: 13.385 V
-MPPT at: 16.999 V
-ADC0 at: 0.000 V
-ADC1 at: 0.000 V
-ICP1 /w 0mA on plug termination reads: 1
-CC_nFAULT measured with a weak pull-up: 1
-Charging delta with CURR_SOUR_EN==on: 0.087 A
-ADC0 with its own 20mA source on R1: 0.022 A
-ADC1 with ICP1's 10mA on ICP1_TERM: 0.010 A
-ICP1 /w 10mA on plug termination reads: 0
-Dischrging at: 0.101 A
-PV open circuit (LT3652 off) at: 21.242 V
-ADC0 and digital curr source on R1: 0.044 A
-ADC0 measure curr on R1 with DIO12 shunting: 0.028 A
-ADC0 measure curr on R1 with DIO13 shunting: 0.028 A
-ADC0 and ADC1 curr source on R1: 0.044 A
-ADC0 measure curr on R1 with DIO10 shunting: 0.028 A
-ADC0 measure curr on R1 with DIO11 shunting: 0.028 A
-ICP1 10mA + 16mA curr source on ICP1_TERM: 0.028 A
-ICP1 curr on ICP1_TERM with DIO4 shunting: 0.013 A
-ICP1 curr on ICP1_TERM with DIO3 shunting: 0.013 A
-To disconnect battery turn off the PV supply and LED should stop blinking
+REF_EXTERN_AVCC saved in eeprom: 4.944 V
+PWR_I with CS_EN==off: 0.055 A
+PWR at: 12.668 V
+ADC0 /w shunts on & CS_EN==off: 0.000 V
+ADC1 /w shunts on & CS_EN==off: 0.000 V
+ICP1 /w 0mA on plug termination reads: 1 
+PWR_I with CS_EN==on: 0.125 A
+ADC1_22mA source on R1: 0.023 A
+ICP1's 10mA on ICP1_TERM: 0.010 A
+ICP1 /w 10mA on plug termination reads: 0 
+Add DIO11_22MA curr source to R1: 0.042 A
+DIO12 shunting DIO11_22mA: 0.025 A
+DIO13 shunting DIO11_22mA: 0.024 A
+Add DIO3_22MA curr source to R1: 0.042 A
+DIO10 shunting DIO3_22mA: 0.024 A
+DIO3 shunting DIO3_22mA: 0.024 A
+ICP1 10mA + 17mA curr source on ICP1's PL plug: 0.027 A
 [PASS]
 
-
-
-Only open the ESD shield bag in an ESD safe area.
-Remove the shipping box and this paper from the area
-before opening the ESD shield bag.
 ``` 

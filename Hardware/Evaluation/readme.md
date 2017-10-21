@@ -29,10 +29,10 @@ The Adafruit 833 has been running for almost a year at which point the electrica
 
 ![Adafruit 833 Flow Meter](./RPUno^5_HadAF833NearlyAYear.jpg "Adafruit 833 Flow Meter")
 
-I changed the flow meter with an Orbit 52212 that was gutted and the electronics [replaced] with a A1190 hall sensor. The leaking pressure regulater was also replaced and I am now ready for more testing (last batch is [K3^2log]).
+I changed the flow meter with an Orbit 52212 that was gutted and the electronics [replaced] with a A1190 hall sensor. The leaking pressure regulater was also replaced and I am now ready for more testing (last batch is [K3^2log] ).
 
 [replaced]: https://github.com/epccs/Document/tree/master/FlowMeter
-[K3^2og]: ./K3^2log.txt
+[K3^2log]: ./K3^2log.txt
 
 ![Orbit 52212 Flow Meter](./RPUno^5_FlowSensorOrbit52212WithHallSensorA1190.jpg "Orbit 52212 Flow Meter")
 

@@ -81,9 +81,9 @@ void Analog(void)
             printf_P(PSTR("\"DISCHRG_A\":"));
         }
 
-        if (arg_indx_channel == PV_V) //ADC6
+        if (arg_indx_channel == PWR_I) //ADC6
         {
-            printf_P(PSTR("\"PV_V\":"));
+            printf_P(PSTR("\"PWR_A\":"));
         }
         
         if (arg_indx_channel == PWR_V) //ADC7
@@ -103,30 +103,25 @@ void Analog(void)
             printf_P(PSTR("\"%1.2f\""),(analogRead(arg_indx_channel)*(ref_extern_avcc_uV/1.0E6)/1024.0));
         }
 
-        // RPUno has ADC2 and ADC3 connected to high side current sense to measure battery charging and discharging.
-        if ( (arg_indx_channel == CHRG_I) || (arg_indx_channel == DISCHRG_I) )
+        // ADC2, ADC3 and ADC6 are connected to high side current sense.
+        if ( (arg_indx_channel == CHRG_I) || (arg_indx_channel == DISCHRG_I) || (arg_indx_channel == PWR_I))
         {
             printf_P(PSTR("\"%1.3f\""),(analogRead(arg_indx_channel)*((ref_extern_avcc_uV/1.0E6)/1024.0)/(0.068*50.0)));
         }
 
-        if (arg_indx_channel == ADC4) // RPUno has ADC4 is used for I2C SDA function
+        if (arg_indx_channel == ADC4) // On RPUno ADC4 is used for I2C SDA function
         {
             printf_P(PSTR("\"SDA\""));
         }
 
-        if (arg_indx_channel == ADC5) // RPUno has ADC5 is used for I2C SCL function
+        if (arg_indx_channel == ADC5) // On RPUno ADC5 is used for I2C SCL function
         {
             printf_P(PSTR("\"SCL\""));
         }
 
-        if (arg_indx_channel == PV_V) // RPUno has ADC6 connected to a voltage divider from the solar input.
-        {
-            printf_P(PSTR("\"%1.2f\""),(analogRead(arg_indx_channel)*((ref_extern_avcc_uV/1.0E6)/1024.0)*(532.0/100.0)));
-        }
-
         if (arg_indx_channel == PWR_V) // RPUno has ADC7 connected a voltage divider from the battery (PWR).
         {
-            printf_P(PSTR("\"%1.2f\""),(analogRead(arg_indx_channel)*((ref_extern_avcc_uV/1.0E6)/1024.0)*(3.0/1.0)));
+            printf_P(PSTR("\"%1.2f\""),(analogRead(arg_indx_channel)*((ref_extern_avcc_uV/1.0E6)/1024.0)*(115.8/15.8)));
         }
 
         if ( (adc_arg_index+1) >= arg_count) 

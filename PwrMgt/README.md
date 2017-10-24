@@ -2,6 +2,8 @@
 
 ## Overview
 
+__Do not use this program__ it was for RPUno^6 and does not work on ^7 (yet).
+
 PwrMgt is an interactive command line program that demonstrates control of RPUno's ability to turn off the power to the SHLD_VIN pin (i.e. to the Shield), and turn off the current sources used for ICP1 and analog loops. Commands from [i2c-debug], [Adc], [Digital], [DayNight] and [AmpHr] are also available.
 
 [i2c-debug]: ../i2c-debug

@@ -48,7 +48,7 @@ identify
 
 ``` 
 /0/id?
-{"id":{"name":"I2Cdebug","desc":"RPUno Board /w atmega328p and LT3652","avr-gcc":"4.9"}}
+{"id":{"name":"I2Cdebug","desc":"RPUno (14140^7) Board /w atmega328p","avr-gcc":"4.9"}}
 ```
 
 ## /0/iscan?

@@ -42,7 +42,7 @@ identify
 
 ``` 
 /1/id?
-{"id":{"name":"Capture","desc":"RPUno Board /w atmega328p and LT3652","avr-gcc":"4.9"}}
+{"id":{"name":"Capture","desc":"RPUno (14140^7) Board /w atmega328p","avr-gcc":"4.9"}}
 ```
 
 ## /0/initICP icp1,mode,prescale

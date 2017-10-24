@@ -2,9 +2,9 @@
 
 ## Overview
 
-Adc is an interactive command line program that demonstrates control of an ATmega328p Analog-to-Digital Converter from pins PC0 through PC7. 
+Adc is an interactive command line program that demonstrates control of an Analog-to-Digital Converter from pins PC0 through PC7 on an ATmega328p. 
 
-Note Arduino marked there Uno board as A0 though A5, which is somtimes confused as PA0, I think they wanted it to mean the ADMUX value. 
+Arduino Uno is marked as A0 though A5, which is sometimes confused as PA0. The ADMUX register is set to 0 when selecting ADC channel 0.  The analog channel has nothing to do with the digital pin number used by the inline Wiring(ish) functions. The pin used by ADC channel 0 has been assigned the number 14 for the digital Wiring functions (but that is not important). 
 
 
 # EEPROM Memory map 
@@ -67,8 +67,8 @@ Commands and their arguments follow.
 identify 
 
 ``` 
-/0/id?
-{"id":{"name":"Adc","desc":"RPUno Board /w atmega328p and LT3652","avr-gcc":"4.9"}}
+/1/id?
+{"id":{"name":"Adc","desc":"RPUno (14140^7) Board /w atmega328p","avr-gcc":"4.9"}}
 ```
 
 ##  /0/analog? 0..7[,0..7[,0..7[,0..7[,0..7]]]]    
@@ -76,17 +76,15 @@ identify
 Analog-to-Digital Converter reading from up to 5 ADMUX channels. The reading repeats every 60 Seconds until the Rx buffer gets a character. On RPUno channel 6 is the solar input voltage, channel 7 is the main power node (PWR) voltage, channel 3 is the battery discharge current, channel 2 is the battery charging current, channel 1 and channel 0 each have a current source available (I also have a 100 Ohm sense resistor to measure the current source).  Note ADC4 and ADC5 are used for I2C on RPUno.
 
 ``` 
-/1/analog? 2,3,6,7
-{"CHRG_A":"0.076","DISCHRG_A":"0.000","PV_V":"19.04","PWR_V":"13.54"}
-{"CHRG_A":"0.076","DISCHRG_A":"0.000","PV_V":"19.04","PWR_V":"13.54"}
+/1/analog? 6,7
+{"PWR_A":"0.128","PWR_V":"12.74"}
 /1/analog? 0,1
-{"ADC0":"2.09","ADC1":"2.09"}
-{"ADC0":"2.09","ADC1":"2.09"}
+{"ADC0":"3.60","ADC1":"2.67"}
 /1/analog? 4,5
 {"ADC4":"SDA","ADC5":"SCL"}
 ```
 
-The value reported is based on the referance value which is saved in EEPROM, see bellow.
+The value reported is based on the avcc referance value which is saved in EEPROM, see bellow.
 
 
 ##  /0/avcc 4500000..5500000
@@ -125,6 +123,6 @@ Load the reference from EEPROM into static memory.
 
 ```
 /1/reffrmee
-{"REF":{"extern_avcc":"5.0090","intern_1v1":"1.1000",}}
+{"REF":{"extern_avcc":"4.9438","intern_1v1":"1.1000",}}
 ```
 

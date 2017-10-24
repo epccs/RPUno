@@ -2,6 +2,8 @@
 
 ## Overview
 
+This is not working on RPUno^7 since it does not have solar power for the day-nigh state machine.
+
 On RPUno ADC2 is connected to a high side current sense for charging and ADC3 is connected to one for discharging. The [Adc] firmware is used to take the direct readings. This interactive command line program demonstrates how the ATmega328p can be used to estimate the solar power that has been stored, or discharged. 
 
 [Adc]: ../Adc

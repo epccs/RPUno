@@ -2,6 +2,8 @@
 
 ## Future improvements (to do)
 
+__Do not use this program__ it was for RPUno^6 and does not work on ^7 (yet).
+
 use CURR_SOUR_EN
 
 Add a wiring diagram.

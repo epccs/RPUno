@@ -6,7 +6,7 @@ Combines Capture and Adc to track tempeture, humidity, and solar power.
 
 Referance [Capture](../Capture) and [Adc](../Adc).
 
-The capture ISR was shown to skip events when less than 300 machine cycles are available between them, see [Capture](../Capture). This adds an Adc ISR which may cause skipping at even  higher machine cycle counts. 
+The capture ISR will skip events when less than 300 machine cycles are available between them, see [Capture](../Capture). This adds an Adc ISR which may cause skipping at higher machine cycle counts. 
 
 ## Firmware Upload
 

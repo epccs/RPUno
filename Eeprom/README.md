@@ -4,6 +4,23 @@
 
 Eeprom is an interactive command line program that demonstrates the control of EEPROM on an ATmega328p.
 
+# EEPROM Memory map 
+
+A map of how some of my applications use the EEPROM. 
+
+```
+function                    type        ee_addr:
+Adc::id                     UINT16      30
+Adc::ref_extern_avcc        UINT32      32
+Adc::ref_intern_1v1         UINT32      36
+Solenoid::id                UINT16      40  60  80
+Solenoid::delay_start_sec   UINT32      42  62  82
+Solenoid::runtime_sec       UINT32      46  66  86
+Solenoid::delay_sec         UINT32      50  70  90
+Solenoid::flow_stop         UINT32      54  74  94
+Solenoid::cycles            UINT8       58  78  98
+```
+
 ## Firmware Upload
 
 With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
@@ -40,7 +57,7 @@ identify
 
 ``` 
 /0/id?
-{"id":{"name":"Eeprom","desc":"RPUno Board /w atmega328p and LT3652","avr-gcc":"4.9"}}
+{"id":{"name":"Eeprom","desc":"RPUno (14140^7) Board /w atmega328p","avr-gcc":"4.9"}}
 ```
 
 ##  /0/ee? address[,type]
@@ -50,19 +67,17 @@ Return the EEPROM value at address [0..1023 on RPUno]. Type is UINT8, UINT16 or 
 ``` 
 /1/ee? 0
 {"EE[0]":{"r":"255"}}
-/1/ee? 1
-{"EE[1]":{"r":"128"}}
-/1/ee? 2
-{"EE[2]":{"r":"255"}}
-/1/ee? 3,UINT8
-{"EE[3]":{"r":"32"}}
-/1/ee? 2,UINT16
-{"EE[2]":{"r":"65535"}}
-/1/ee? 0,UINT32
-{"EE[0]":{"r":"553615615"}}
+/1/ee? 0,UINT8
+{"EE[3]":{"r":"255"}}
+/1/ee? 30,UINT16
+{"EE[30]":{"r":"16708"}}
+/1/ee? 32,UINT32
+{"EE[32]":{"r":"4943800"}}
+/1/ee? 36,UINT3
+{"EE[36]":{"r":"1100000"}}
 ```
 
-Note: 553615615 is 0x20FF80FF, so the numbers are packed little endian by the gcc compiler (AVR itself has no endianness)
+Note: The numbers are packed little endian by the gcc compiler (AVR itself has no endianness). The AVCC calibration value is 4.9438V.
 
 
 ##  /0/ee address,value[,type]

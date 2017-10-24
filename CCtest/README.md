@@ -6,6 +6,8 @@ __Do not use this program__ it was for RPUno^2 and has not been updated.
 
 I made a board that has high side current sensing for the PV input and battery charging and discharging. The high side sensor only measures one direction so two are needed for the battery. The battery current sensing is now part of RPUno ^4. A load is also provided, it has four digital control lines that enable current sinks. 
 
+On RPUno ^7 the solar charge control has been droped
+
 At startup, the program waits until the PV_IN is over 18V which means the solar has charged the battery to its float level. It then delays for 3hr to allow an absorption cycle to complete. After which a delay occurs until PV_IN has dropped to less than 5V (e.g. night). Next, the load settings are stepped through for a record. Then it discharges and reports as the Battery voltage crosses 50mV thresholds until the discharge voltage is reached. If the serial receives a character it will interrupt the test and enable charging.
 
 ## Firmware Upload

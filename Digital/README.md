@@ -2,7 +2,7 @@
 
 ## Overview
 
-Digital is an interactive command line program that demonstrates control of RPUno's Digital input/output from its ATmega328p pins PD3 (IO3), PD4 (IO4), and PB2 through PB4 (nSS, MOSI, and MISO). LED_BUILTIN is maped to PB5 (SCK) and blinks on for a second and off for a second. The RPUno has these I/O's wired to a pluggable onboard connector. They are level converted to 5V and clamped to the on board VIN level (which is the battery voltage when it is connected by way of the TPS3700 used for battery management). Do not apply a voltage from a source that exceeds the on board VIN. A 20mA current source is provided from VIN, its voltage can get nearly to VIN in saturation, but will only allow about 22mA when shorted. The current source is completely safe to use with the digital and allows driving MOSFET gates or a LED string from the battery voltage.
+Digital is an interactive command line program that demonstrates control of RPUno's Digital input/output from its ATmega328p pins PD3 (3), PD4 (4), and PB2 through PB5 (10..13). The RPUno has these I/O's wired to the pluggable onboard connectors. They are level converted for the microcontroller and clamped to an ESD node. The 22mA current sources provide power from VIN during saturation but will limit the current to about 22mA when shorted. The current source is intrinsically safe to use with a digital input and allows driving a MOSFET gate or a string of solid state relays from the power provided to VIN.
 
 ## Firmware Upload
 
@@ -42,7 +42,7 @@ Identify is from ../Uart/id.h Id().
 
 ``` 
 /1/id?
-{"id":{"name":"Digital","desc":"RPUno Board /w atmega328p and LT3652","avr-gcc":"4.9"}}
+{"id":{"name":"Digital","desc":"RPUno (14140^7) Board /w atmega328p","avr-gcc":"4.9"}}
 ```
 
 ##  /0/pinMode 3|4|10|11|12,INPUT|OUTPUT    

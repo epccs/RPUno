@@ -90,7 +90,7 @@ identify
 
 ``` 
 /1/id?
-{"id":{"name":"SpiSlv","desc":"RPUno Board /w atmega328p and LT3652","avr-gcc":"4.8"}}
+{"id":{"name":"SpiSlv","desc":"RPUno (14140^7) Board /w atmega328p","avr-gcc":"4.8"}}
 ``` 
 
 

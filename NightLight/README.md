@@ -2,6 +2,8 @@
 
 ## Overview
 
+__Do not use this program__ it was for RPUno^6 and does not work on ^7 (yet).
+
 RPUno has some current sources that can be used to light LED strings. Analog has two 22mA souces, Digital has one 22mA source and the ICP has a 17mA source. Use the pluggable Digital IO's 3,10,11,12 for LED control, i.e. to sink a current source. Most of the examples use digital 13 as an I2C status, and the Day-Night state machine is using digital 4 as a status. 
 
 The night light state machine uses non-blocking timers and cycles through the led[1|2|3|4].cycle_state for each controlled LED. The settings are loaded from EEPROM each night after the Day-Night state machine switches from an Evening debounce state to a Night state.

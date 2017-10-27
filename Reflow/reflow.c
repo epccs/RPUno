@@ -1,5 +1,5 @@
 /*
-capture is part of Capture, it returns the ICP1 timing counts for the high and low signal state, 
+reflow is part of Reflow
 Copyright (C) 2016 Ronald Sutherland
 
 This program is free software; you can redistribute it and/or
@@ -26,15 +26,17 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/timers.h"
 #include "../lib/pin_num.h"
 #include "../Eeprom/ee.h"
+#include "../Adc/references.h"
 #include "reflow.h"
 
 #define REFLOW_ZONE_DELAY_MILSEC 2000UL
 static unsigned long reflow_zone_started_at;
 
-//Solid State Relay is on Arduino pin 7 (aka D7)
-#define SSR 7
-//Buzzer is on Arduino pin 6 (aka D6)
-#define BUZZER 6
+//Solid State Relay
+#define SSR 4
+#define BUZZER 3
+#define REFLOW_PWM_START 42
+
 
 static uint16_t eeprom_offset;
 static uint8_t pwm;
@@ -57,7 +59,7 @@ void Reflow(void)
 
     if ( (command_done == 10) )
     {
-        eeprom_offset = 0;
+        eeprom_offset = REFLOW_PWM_START;
         pwm =0;
         last_pwm =0;
         reflow_zone_started_at = millis();
@@ -67,6 +69,14 @@ void Reflow(void)
         
         pinMode(BUZZER, OUTPUT);
         digitalWrite(BUZZER, LOW);
+        
+        // laod reference calibration or show an error if they are not in eeprom
+        if ( ! LoadAnalogRefFromEEPROM() )
+        {
+            printf_P(PSTR("{\"err\":\"AdcRefNotInEeprom\"}\r\n"));
+            initCommandBuffer();
+            return;
+        }
 
         command_done = 11;
     }
@@ -107,9 +117,10 @@ void Reflow(void)
 
     else if ( (command_done == 13) )
     {
-        // analog channel 0 may be connected to the Fluke 80TK Thermocouple Module set in deg F output
-        float Thermocouple = analogRead(0)*1.0; // (1.1/1023.0)*(1000.0);
-        printf_P(PSTR("\"deg_c\":\"%1.2f\""),(Thermocouple -32.0) * (5.0/9.0) );
+        // analog channel 0 may be connected to the Fluke 80TK Thermocouple Module set in deg F per mV
+        float Adc0_mV = analogRead(0)*((ref_intern_1v1_uV/1.0E3)/1024.0);
+        //printf_P(PSTR("\"deg_c\":\"%1.2f\""),(Adc0_mV -32.0) * (5.0/9.0) );
+        printf_P(PSTR("\"ADC0_mV\":\"%1.2f\""),(Adc0_mV) );
         command_done = 24;
     }
     

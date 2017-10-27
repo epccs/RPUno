@@ -3,17 +3,23 @@ TARGET = Reflow
 LIBDIR = ../lib
 OBJECTS = main.o \
 	reflow.o \
+	../Adc/analog.o \
+	../Adc/references.o \
+	../i2c-debug/i2c-cmd.o \
+	../i2c-debug/i2c-scan.o \
 	../Eeprom/ee.o \
 	../Uart/id.o \
 	$(LIBDIR)/timers.o \
 	$(LIBDIR)/uart.o \
+	$(LIBDIR)/twi.o \
+	$(LIBDIR)/rpu_mgr.o \
 	$(LIBDIR)/adc.o \
 	$(LIBDIR)/parse.o
 
 ## Chip and project-specific global definitions
 MCU   =  atmega328p
 F_CPU = 16000000UL  
-BAUD  =  9600UL
+BAUD  =  38400UL
 CPPFLAGS = -DF_CPU=$(F_CPU) -DBAUD=$(BAUD) -I. 
 
 ## Cross-compilation

@@ -4,36 +4,58 @@
 
 Controls a 20A Solid State Relay (SSR) and a buzzer. 
 
-Every two seconds a byte is taken from EEPROM to control the PWM rate of the SSR for the next two seconds. The thermocouple is not used for direct feedback control since I would not feel safe walking away from such a setup. I use the thermocouple to get the profile correct, but once set the profile is hard wired into the control loop. If I made an error in the software it will be repeated each time, it will not be hidden by a chance mistake in PID logic. For this to work the starting condition needs to be the same (near room temperature) for each run, I find it takes about ten minutes.
+Every two seconds a byte is taken from EEPROM to control the PWM rate of the SSR for the next two seconds. The thermocouple is not used for direct feedback control. The thermocouple is used to get the profile correct, but once set the profile is locked in. The idea is that any error in the software will show up each time, it will not be hidden by PID control logic. The starting condition of the oven needs to be near the same for each run, I find it takes at least fifteen minutes between runs.
 
 Reads a Fluke 80TK Thermocouple Module (1mV/deg F) on channel zero. 
 
 ![Profile](https://raw.githubusercontent.com/epccs/RPUno/master/Reflow/profile/walmartBD,160622.png "Profile for Black & Decker Model NO. TO1303SB")
 
-Do not modify the oven, if you do and it burns down your house the insurance may be able to deny payment. Turn the knobs so it is always on (as shown in the image) and set the temperature high enough that it will not turn off the oven. Now the Solid State Relay (SSR) can modulate power to the heating elements, the modulation does not need to be fast since they have a five-second thermal response, in fact, a two second PWM is fine. The SSR needs to be placed in a certified electrical enclosure to make sure insurance will pay (I'm not an expert, and there are always more rules). 
+Do not modify the oven, if you modify it and it burns down your house the insurance may deny payment. Turn the knobs so it is always on (as shown in the image) and set the temperature high enough that it will not turn off the oven. Now the Solid State Relay (SSR) can modulate power to the heating elements, the modulation does not need to be fast since they have a long thermal response, in fact, a two second PWM is more than enough. The SSR also needs to be placed in a certified electrical enclosure to improve the chance of getting insurance to pay (I'm not an expert, and there are always more rules). 
 
 ![Setup](https://raw.githubusercontent.com/epccs/RPUno/master/Reflow/profile/WalmartBD,TO1303SB.jpg "Setup of Black & Decker Model NO. TO1303SB")
 
 A 255 value in EEPROM will turn on the buzzer on pin 6 for two seconds, while two consecutive values will terminate the profile. The program will otherwise run to the end of EEPROM memory.
 
-## Firmware Upload
+
+# EEPROM Memory map 
+
+A map of how this application uses the EEPROM. 
+
+```
+function                    type        ee_addr:
+Adc::id                     UINT16      30
+Adc::ref_extern_avcc        UINT32      32
+Adc::ref_intern_1v1         UINT32      36
+Reflow::id                  UINT16      40
+Reflow::pwm                 UINT8       42
+...
+Reflow::pwm                 UINT8       1024
+```
+
+pwm values used by Reflow start at address 42.
+
+
+# Wiring to RPUno
+
+![Wiring](./Setup/ReflowWiring.png)
+
+
+# Profile
+
+The profile sub folder has the Python3 program that I use to load the profile. 
+
+
+# Notes
+
+I Used a Fluke 80TK Thermocouple Module set to Fahrenheit scale so the output voltage runs up to almost .5V, and set the ADC to use the internal 1.1V bandgap referance and that means nearly half that ADC scale is used. 
+
+
+# Firmware Upload
 
 With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the Atmega328 board run 'make bootload' and it should compile and then flash the MCU.
 
 ``` 
 rsutherland@straightneck:~/Samba/RPUno/Reflow$ make bootload
-...
-avr-size -C --mcu=atmega328p Reflow.elf
-AVR Memory Usage
-----------------
-Device: atmega328p
-
-Program:    9676 bytes (29.5% Full)
-(.text + .data + .bootloader)
-
-Data:        189 bytes (9.2% Full)
-(.data + .bss + .noinit)
-
 ...
 avrdude done.  Thank you.
 ``` 
@@ -42,20 +64,19 @@ Now connect with picocom (or ilk). Note I am often at another computer doing thi
 
 ``` 
 #exit picocom with C-a, C-x
-picocom -b 9600 /dev/ttyUSB0
+picocom -b 38400 /dev/ttyUSB0
 ``` 
 
 log a terminal session to check the profile
 
 ``` 
-script -f -c "picocom -b 9600 /dev/ttyUSB0" stuff.log
+script -f -c "picocom -b 38400 /dev/ttyUSB0" stuff.log
 ``` 
 
 
 # Commands
 
-Commands are interactive over the serial interface at 9600 baud rate. The echo will start after second charactor of a new line. 
-Commands are interactive over the serial interface at 9600 baud rate. The echo will start after the second character of a new line. 
+Commands are interactive over the serial interface at 38400 baud rate. The echo will start after the second character of a new line.
 
 ## /0/id? [name|desc|avr-gcc]
 
@@ -63,7 +84,7 @@ identify
 
 ``` 
 /0/id?
-{"id":{"name":"Reflow","desc":"RPUno Board /w atmega328p and LT3652","avr-gcc":"4.9"}}
+{"id":{"name":"Reflow","desc":"RPUno (14140^7) Board /w atmega328p","avr-gcc":"4.9"}}
 ```
 
 ## /0/reflow?
@@ -76,33 +97,22 @@ Start the reflow profile and read the Fluke 80TK Thermocouple Module set to Fahr
 {"millis":"2010","pwm":"50","deg_c":"26.11"}
 ```
 
-##  /0/ee? 0..1023
-
-Return the EEPROM value at address. This checks if eeprom_is_ready() befor trying to read the EEPROM, if it is not ready the program loops back through the round robin where a received charactor may terminate the command. 
-
-``` 
-/0/ee? 0
-{"EE[0]":"255"}
-```
-
-##  /0/ee 0..1023,0..255
-
-Write the value given as argument one to the address given as Argument zero. This checks if eeprom_is_ready() befor trying to write to the EEPROM, if it is not ready the program loops back through the round robin where a received charactor may terminate the command. If the command is terminated the write may not occure. The JSON response is a read of the EEPROM. 
-
-Warning writing EEPROM can lead to device failure, it is only rated for 100k write cycles.
-
-``` 
-/0/ee 0,255
-{"EE[0]":"255"}
-```
+## [/0/ee? address[,type]](../Eeprom#0ee-addresstype)
 
 
-# Profile
-
-The profile sub folder has Python3 program(s) that load the profile using ee and ee? commands. 
+## [/0/ee address,value[,type]](../Eeprom#0ee-addressvaluetype)
 
 
-# Notes
+## [/0/iscan?](../i2c-debug#0iscan)
 
-I Used a Fluke 80TK Thermocouple Module set to Fahrenheit scale so the output voltage runs up to almost .5V, and set the ADC to use the internal 1.1V bandgap referance and that means nearly half that ADC scale is used. 
 
+## [/0/iaddr 0..127](../i2c-debug#0iaddr-0127)
+
+
+## [/0/ibuff 0..255[,0..255[,0..255[,0..255[,0..255]]]]](../i2c-debug#0ibuff-02550255025502550255)
+
+
+## [/0/ibuff?](../i2c-debug#0ibuff)
+
+
+## [/0/iwrite](../i2c-debug#0iwrite)

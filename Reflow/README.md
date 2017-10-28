@@ -14,7 +14,7 @@ Do not modify the oven, if you modify it and it burns down your house the insura
 
 ![Setup](https://raw.githubusercontent.com/epccs/RPUno/master/Reflow/profile/WalmartBD,TO1303SB.jpg "Setup of Black & Decker Model NO. TO1303SB")
 
-A 255 value in EEPROM will turn on the buzzer on pin 6 for two seconds, while two consecutive values will terminate the profile. The program will otherwise run to the end of EEPROM memory.
+A 255 value in EEPROM will turn on the buzzer on DIO3 for two seconds, while two consecutive values will terminate the profile. The program will otherwise run to the end of EEPROM memory.
 
 
 # EEPROM Memory map 
@@ -83,7 +83,7 @@ Commands are interactive over the serial interface at 38400 baud rate. The echo 
 identify 
 
 ``` 
-/0/id?
+/1/id?
 {"id":{"name":"Reflow","desc":"RPUno (14140^7) Board /w atmega328p","avr-gcc":"4.9"}}
 ```
 
@@ -92,7 +92,7 @@ identify
 Start the reflow profile and read the Fluke 80TK Thermocouple Module set to Fahrenheit scale on analog channel zero.
 
 ``` 
-/0/reflow?
+/1/reflow?
 {"millis":"10","pwm":"255","deg_c":"26.11"}
 {"millis":"2010","pwm":"50","deg_c":"26.11"}
 ```

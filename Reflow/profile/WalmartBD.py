@@ -15,6 +15,9 @@ import serial
 # import io
 from time import sleep
 
+# address on the RPU_BUS to load oven pwm settings
+rpu_addr = '1'
+
 # pwm settings (uint8_t) for eeprom, each is used for two seconds.
 profile_pwm = [ 255, # buzzer
                 50, 127, 190, 200, 200, # 10 sec of profile run hard until flux activation 
@@ -71,41 +74,48 @@ profile_pwm = [ 255, # buzzer
                 0, 0, 0, 0, 0, # 230 sec of profile
                 0, 255, 0, 255, 255] # 240 sec of profile ... end of profile is marked by two buzzer values
 
-sio = serial.Serial("/dev/ttyUSB0",9600, timeout=3)
+# Opening the port will cause nDTR and nRTS to be set active which will then run the bootloader.
+# On an RPUno with an RPUadpt this is controled using the management pair (e.g. DTR)  whicih needs to 
+# reset (e.g. send the bootload address) the device to upload these oven pwm settings to.
+sio = serial.Serial("/dev/ttyUSB0",38400, timeout=3)
 
-# PySerial has this example which does seem to fix some of the accii to Unicode issues, but caused other problems and ran slow for me.
-#sio = io.TextIOWrapper(io.BufferedRWPair(ser, ser), newline='', line_buffering=True, write_through=True)
 
+# the bootloader takes about 2 seconds and a timeout of 3 seconds is provided
 reflow_echo = sio.readline().strip()
+
+# status for user to see
 print("init: " + reflow_echo[-10:].decode("utf-8")) 
 
-# checking if /0/reflow? command was printed 
-if ( reflow_echo[-3:] == b'ow?'):
+# checking if /reflow? command was printed 
+if ( reflow_echo[-7:] == b'reflow?'):
     # stop the refow that should be running after reset
     sio.write(("\n").encode('ascii'))
     sleep(0.2)
-    sio.write(("/0\n").encode('ascii'))
+    command = "/"+rpu_addr
+    sio.write((command + "\n").encode('ascii'))
     reflow_echo = sio.readline().strip()
-    print("cmd: " + reflow_echo.decode("utf-8"))
-    while (not (reflow_echo[-2:] == b"/0")) :
+    print("echo: " + reflow_echo.decode("utf-8"))
+    while (not (reflow_echo == (command).encode('ascii') ) ) :
         sleep(0.2)
         print("miss catch of command prompt, trying again")
-        sio.write(("/0\n").encode('ascii'))
+        sio.write((command + "\n").encode('ascii'))
         reflow_echo = sio.readline().strip()
-        print("cmd: " + reflow_echo.decode("utf-8"))
+        print("echo: " + reflow_echo.decode("utf-8"))
 
     print("Profile has been Stopped ready for command")
+else:
+    print("I did not see a /reflow? command running")
+    exit()
 
-# now we can load the eeprom
-eeprom_offset = 0
+# now we can load the eeprom pwm values starting at address 42
+eeprom_offset = 42
 for pwm in profile_pwm:
 
-    # notice how print, sendline, and expect differ in there line ending,
-    command = "/0/ee? " + str(eeprom_offset)
+    command = "/"+rpu_addr+"/ee? " + str(eeprom_offset)
     sio.write((command  + "\n").encode('ascii')) 
     sleep(0.2)
     reflow_echo = sio.readline().strip()
-    print("ascii cmd: ".encode('ascii') + reflow_echo)
+    print("cmd echo: ".encode('ascii') + reflow_echo)
 
     # print("echo match: " + str(reflow_echo == (command).encode('ascii') ))
     while (not (reflow_echo == (command).encode('ascii') ) ) :
@@ -113,23 +123,24 @@ for pwm in profile_pwm:
         print("miss catch of read command, trying again")
         sio.write((command  + "\n").encode('ascii'))
         reflow_echo = sio.readline().strip()
-        print("cmd: ".encode('ascii') + reflow_echo)
+        print("cmd echo: ".encode('ascii') + reflow_echo)
     
      # JSON line after command
     reflow_echo = sio.readline().strip()
     print ("JSON: ".encode('ascii') + reflow_echo)
     json_reply = reflow_echo.decode("utf-8")
     
-    # deserialize the JSON line into a python object
+    # deserialize the JSON (e.g. {"EE[42]":{"r":"255"}} ) line into a python object
     data = json.loads(json_reply) # this will cause an error if JSON is not valid
-    pwm_in_eeprom = data["EE["+str(eeprom_offset)+"]"]
+    pwm_in_eeprom = data["EE["+str(eeprom_offset)+"]"]["r"]
     
+    # don't write the same data again, note the /ee comand will check also
     while (int(pwm_in_eeprom) != pwm):
-        command = "/0/ee " + str(eeprom_offset) + "," + str(pwm)
+        command = "/"+rpu_addr+"/ee " + str(eeprom_offset) + "," + str(pwm)
         sio.write((command + '\n').encode('ascii'))
         sleep(0.2)
         reflow_echo = sio.readline().strip()
-        print("cmd: ".encode('ascii') + reflow_echo)
+        print("cmd echo: ".encode('ascii') + reflow_echo)
         while (not (reflow_echo == (command).encode('ascii') ) ) :
             sleep(0.2)
             print("miss catch of write command, manualy run again")
@@ -139,8 +150,11 @@ for pwm in profile_pwm:
         reflow_echo = sio.readline().strip()
         print ("JSON: ".encode('ascii') + reflow_echo)
         json_reply = reflow_echo.decode("utf-8")
-    
+        
+        # deserialize the JSON (e.g. {"EE[42]":{"byte":"255","r":"255"}} ) line into a python object
+        # byte: is what the mcu was sent
+        # r: is the reading taken from EEPROM after writing was done, if it is different then EEPROM may have failed
         data = json.loads(json_reply) # this will cause an error if JSON is not valid
-        pwm_in_eeprom = data["EE["+str(eeprom_offset)+"]"]
+        pwm_in_eeprom = data["EE["+str(eeprom_offset)+"]"]["r"]
     eeprom_offset += 1 
 

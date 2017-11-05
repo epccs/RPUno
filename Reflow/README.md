@@ -2,6 +2,8 @@
 
 ## Overview
 
+__Not for multidrop use__ this firmware outputs to the serial after reset without being addressed.
+
 Controls a 20A Solid State Relay (SSR) and a buzzer. 
 
 Every two seconds a byte is taken from EEPROM to control the PWM rate of the SSR for the next two seconds. The thermocouple is not used for direct feedback control. The thermocouple is used to get the profile correct, but once set the profile is locked in. The idea is that any error in the software will show up each time, it will not be hidden by PID control logic. The starting condition of the oven needs to be near the same for each run, I find it takes at least fifteen minutes between runs.

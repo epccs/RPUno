@@ -18,14 +18,15 @@ Bootloader options include [optiboot] and [xboot]. Serial bootloaders can't chan
         Input power can range from 7 to 36V DC
         High side current sense on input power connected to ADC6.
         Input power voltage is divided down and connected to ADC7.
-        Six pluggable digital input/outputs (DIO 3,4,10,11,12,13) with level conversion.
-        Digital interface has two 22 mA current source
+        Six digital input/outputs (DIO 3,4,10,11,12,13) with level conversion.
+        Digital IO is grouped in two pluggable interfaces each with a 22 mA current source and ground.
+        Digital 22mA current sources enabled with DIO 7.
         Input Capture (ICP1) with current sources for current loops.
+        ICP1 17mA current source enabled with DIO 7.
+        ICP1 10mA current source enabled with digital control DIO 9.
         Two Analog channels ADC0, ADC1.
         ADC0 22mA current source enabled with DIO 5.
         ADC1 22mA current source enabled with DIO 6.
-        Both Digital 22mA and ICP1 17mA current sources enabled with DIO 7.
-        ICP1 10mA current source enabled with digital control DIO 9.
         Power to the Shield Vin pin is turned off with DIO 2.
         MCU power (+5V) is converted with an SMPS from the input power.
         Up to an Amp can be safely used from the +5V.
@@ -145,7 +146,20 @@ Check correct assembly and function with [Testing](./Testing/)
 
 # Bill of Materials
 
-Import the [BOM](./Design/14140,BOM.csv) into LibreOffice Calc (or Excel) with semicolon separated values, or use a text editor.
+The BOM is a CVS file, import it into a spreadsheet program like LibreOffice Calc (or Excel), or use a text editor.
+
+Option | BOM's included
+----- | ----- 
+A. | [BRD] 
+M. | [BRD] [SMD] [HDR] 
+W. | [BRD] [SMD] [HDR] [PLUG]
+Z. | [BRD] [SMD] [HDR] [PLUG] [DIN]
+
+[BRD]: ./Design/14140BRD,BOM.csv
+[SMD]: ./Design/14140SMD,BOM.csv
+[HDR]: ./Design/14140HDR,BOM.csv
+[PLUG]: ./Design/14140PLUG,BOM.csv
+[DIN]: ./Design/14140DIN,BOM.csv
 
 
 # Assembly

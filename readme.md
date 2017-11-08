@@ -4,7 +4,7 @@ From <https://github.com/epccs/RPUno/>
 
 ## Overview
 
-This no-frills Controller board has an ATmega328p that is programmable with the open source GCC toolchain for AVR. The headers are for the shields [RPUftdi], [RPUadpt], and [RPUpi] that connect the controller UART to an RS422 bus.
+This Controller board has an ATmega328p that is programmable with the open source GCC toolchain for AVR. The headers are for the shields [RPUftdi], [RPUadpt], and [RPUpi] that connect the controller UART to an RS422 bus.
 
 [RPUftdi]: https://github.com/epccs/RPUftdi
 [RPUadpt]: https://github.com/epccs/RPUadpt
@@ -34,9 +34,9 @@ This example shows an RS-422 serial bus that allows multiple microcontroller boa
 
 The transceivers are automatically activated, so common serial programs (e.g. avrdude, PySerial, picocom...) can be used. Also, the microcontroller's common UART libraries (e.g. like in the Arduino Uno core) work, but care must be taken to ensure only one microcontroller answeres.
 
-I prefer a Command Line Interface (CLI), so that is what the examples use. The CLI example programs respond to commands terminated with a newline, so remember to press enter (which sends a newline) before starting a command. The command includes an address with a leading and trailing forward slash "/". The command echo starts after the address (second byte) is sent. The first byte ('/') will cause any transmitting device to stop and dump its outgoing buffer which should prevent collisions since the echo is delayed until after the second byte. 
+Most of the examples use a Command Line Interface (CLI) on the controler's serial port (UART). The CLI responds to commands terminated with a newline, so remember to press enter (which sends a newline) before starting a command. The command includes an address with a leading and trailing forward slash "/". The command echo starts after the address (second byte) is sent. The first byte ('/') will cause any transmitting device to stop and dump its outgoing buffer which should prevent collisions since the echo is delayed until after the second byte. 
 
-As a short example, I'll connect with SSH (e.g. from a Pi) to the machine (an old x86 with Ubuntu) that has a USB connection to the [RPUftdi] board. These machines have matching usernames and keys placed so I don't need to use passwords. Then I will use picocom to interact with two different RPUno boards. They are on the serial bus at addresses '1' and '0' (note that ASCII '1' is 0x31, and ASCII '0' is 0x30, so they have an address that looks good on picocom but is probably not what was expected).  
+As a short example, I'll connect with SSH (e.g. from a Raspberry Pi) to an old x86 machine (Ubuntu) that has a USB connection to the [RPUftdi] board. These machines have matching usernames and SSH keys placed (e.g. passwords are not used). Once on the x86 machine, I use picocom to interact with two different RPUno boards. They are on the same serial bus at addresses '1' and '0' (note that ASCII '1' is 0x31, and ASCII '0' is 0x30, so they have an address that looks good on picocom but is probably not what was expected).  
 
 ```
 rsutherland@raspberrypi:~ $ ssh conversion.local

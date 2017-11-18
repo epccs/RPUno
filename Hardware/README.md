@@ -2,7 +2,7 @@
 
 ## Overview
 
-This board has an ATmega328p microcontroller. The board is DIN mounted and has pluggable connectors for some functions. Six Digital input/output (in two groups of three plus a current source) are connected through level shifting transistors to the pluggable connectors. Two ADC inputs (each with a current source) are connected to the pluggable connectors. Capture hardware (ICP1) with a current source is connected to the pluggable connector. The board power can be from 7 thru 36 VDC and is protected against reverse polarity with a P-channel Mosfet. The input power voltage can be measured with ADC channel 7 and the input power current can be measured with ADC channel 6. Power to the shield VIN pin may be disabled by setting digital IO2 low. An ATmega328p can be programmed with the GCC toolchain for AVR found in Debian packages (e.g. so it is available on, Ubuntu, Raspbian, OSH via brew, Windows via Windows Subsystem for Linux).
+This board has an ATmega328p microcontroller. The board has options for DIN mount and pluggable connectors for some functions. Six Digital input/output (in two groups of three plus a current source) are connected through level shifting transistors to the pluggable connectors. Two ADC inputs (each with a current source) are connected to the pluggable connectors. Capture hardware (ICP1) with a current source is connected to the pluggable connector. The board power can be from 7 thru 36 VDC and is protected against reverse polarity with a P-channel Mosfet. The input power voltage can be measured with ADC channel 7 and the input power current can be measured with ADC channel 6. Power to the shield VIN pin may be disabled by setting digital IO2 low. An ATmega328p can be programmed with the GCC toolchain for AVR found in Debian packages (e.g. so it is available on, Ubuntu, Raspbian, OSH via brew, Windows via Windows Subsystem for Linux).
 
 Bootloader options include [optiboot] and [xboot]. Serial bootloaders can't change the hardware fuse setting which reduces programming errors that can accidentally brick the controller. Note that [optiboot] clears the watchdog so it will not get stuck in a watchdog loop.
 
@@ -38,12 +38,12 @@ Bootloader options include [optiboot] and [xboot]. Serial bootloaders can't chan
         Data Acquisition using Capture Hardware (ICP1).
             Flow Meter
             Rotating Hardware
-            PWM Output Temperature Sensors
-            PWM Output Capacitance Sensors
+            Pulse Output Temperature Sensors
+            Pulse Output Capacitance Sensors
         Automation
-            Power Off shield VIN which the RPUpi shield uses to power a Raspberry Pi Zero.
-            Solid State Relay String (e.g. multi-phase power) control.
-            PLC replacement that is programmed with an open source toolchain.
+            Shield VIN pin can power down a Raspberry Pi Zero on the RPUpi shield.
+            String current through inputs of Solid State Relays for multi-phase power control.
+            PLC replacement that is programmed in C with an open source toolchain.
 ```
 
 ## Notice
@@ -78,12 +78,10 @@ Bootloader options include [optiboot] and [xboot]. Serial bootloaders can't chan
             IO6 control CS1
             IO7 control CS (22MA_DIO3, 22MA_DIO11, 17MA_ICP1)
             IO9 control CS_ICP1_10MA.
-            remove J9.
+            remove J9 (10mA on ICP1 is controlled with IO9).
 
         ^7  Done: Design, Layout, BOM, Review*, Order Boards, Assembly, Testing,
             WIP: Evaluation.
-            Todo:  
-            *during review the Design may change without changing the revision.
             use an ESD_NODE like Irrigate7.
             don't turn off the current source used with digital outputs since the digital IO's can do that. 
             DIO protection resistor (change 182 Ohm to 127 Ohm)

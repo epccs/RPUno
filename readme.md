@@ -16,7 +16,7 @@ This Controller board has an ATmega328p that is programmable with the open sourc
 
 ## Status
 
-Available through [Tindie](https://www.tindie.com/products/ron-sutherland/rpuno-a-solar-powered-atmega328p-board/)
+Available through [Tindie](https://www.tindie.com/products/8862/)
 
 ![Status](./Hardware/status_icon.png "Status")
 

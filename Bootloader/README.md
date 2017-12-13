@@ -17,4 +17,4 @@ It is a two step process. First run "make fuse" which will unlock the boot flash
 The bootloader is from MiniCore
 https://github.com/MCUdude/MiniCore
 
-The Makefile was nuked, such things should be kept simple.
+The Makefile shows the options I use, it is kept simple so I can see what I did. The hex filename is extra crufty, but that is how I like it.

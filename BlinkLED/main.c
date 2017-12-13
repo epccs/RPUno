@@ -32,7 +32,7 @@ static int got_a;
 
 void setup(void) 
 {
-	// RPUuno has no LED, but LED_BUILTIN is defined as pin 13 anyway.
+    // RPUuno has no LED, but LED_BUILTIN is defined as pin 13 anyway.
     pinMode(LED_BUILTIN,OUTPUT);
     digitalWrite(LED_BUILTIN,HIGH);
 

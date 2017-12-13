@@ -17,8 +17,12 @@ VERSION_PLACED_AT_FLASH_LOCATION = 0x7ffe
 LOW_FUSE = 0xFF
 HIGH_FUSE = 0xDE
 EXTENDED_FUSE = 0xFD
-UNLOCK_FUSE = 0x3F
-LOCK_FUSE = 0x2F
+# avrdude -v <= 6.2 
+#UNLOCK_FUSE = 0x3F
+#LOCK_FUSE = 0x2F
+# avrdude -v >= 6.3 : "1" is returned for unused bits for -c stk500v1
+UNLOCK_FUSE = 0xFF
+LOCK_FUSE = 0xEF
 
 CPPFLAGS = -DF_CPU=$(F_CPU) -DBAUD=$(BAUD)
 CPPFLAGS += -DLED_START_FLASHES=$(LED_START_FLASHES)
@@ -74,6 +78,10 @@ baudcheck:
 
 fuse: 
 	avrdude -v -p $(MCU) -c stk500v1 -P /dev/ttyACM0 -b 19200 -e -U lock:w:$(UNLOCK_FUSE):m -U lfuse:w:$(LOW_FUSE):m -U hfuse:w:$(HIGH_FUSE):m -U efuse:w:$(EXTENDED_FUSE):m
+
+## set fuse like they are from factory, i.e. 8MHz internal, B.O.D. disabled.
+oem: 
+	avrdude -v -p atmega328p -c stk500v1 -P /dev/ttyACM0 -b 19200 -e -U lock:w:$(UNLOCK_FUSE):m -U lfuse:w:0x62:m -U hfuse:w:0xD9:m -U efuse:w:0xFF:m
 
 # the Uno (with ArduinoISP sketch) is used as ICSP tool
 # https://github.com/arduino/Arduino/blob/master/build/shared/examples/11.ArduinoISP/ArduinoISP/ArduinoISP.ino

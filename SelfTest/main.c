@@ -33,9 +33,9 @@ along with the Arduino DigitalIO Library.  If not, see
 
 // Save the Value of the References for ADC converter 
 // measure AVCC and put it hear in uV 
-#define REF_EXTERN_AVCC 4943800UL
-// I am not sure how to measure the 1V1 bandgap, this is just a holding place
-#define REF_INTERN_1V1 1100000UL
+#define REF_EXTERN_AVCC 5008600UL
+// ref_intern_1v1_uV is calculated based on the above value and the ICP1 PL resistor
+
 
 #define R1 50.0
 #define ICP1_TERM 100.0
@@ -47,25 +47,25 @@ static uint8_t passing;
 
 void setup(void) 
 {
-    // Turn Off Curr Sources
+    // Turn Off 22MA_DIO3, 22MA_DIO11, 17MA_ICP1 Curr Sources
     pinMode(CS_EN,OUTPUT);
     digitalWrite(CS_EN,LOW);
+    
+    // Turn Off 22MA_A0 Curr Source
+    pinMode(CS0_EN,OUTPUT);
+    digitalWrite(CS0_EN,LOW);
+    
+    // Turn Off 22MA_A1 Curr Source
+    pinMode(CS1_EN,OUTPUT);
+    digitalWrite(CS1_EN,LOW);
 
+    // Turn Off 10MA PL Curr Source
+    pinMode(CS_ICP1_10MA_EN,OUTPUT);
+    digitalWrite(CS_ICP1_10MA_EN,LOW);
+    
     // Turn Off VOUT to shield (e.g. disconnect VIN from shield)
     pinMode(SHLD_VIN_EN,OUTPUT);
     digitalWrite(SHLD_VIN_EN,LOW);
-
-    // Battery disconnect (not used on RPUno^7)
-    digitalWrite(DIO7,LOW);
-    pinMode(DIO7,OUTPUT);
-
-    // Charge control (not used on RPUno^7)
-    digitalWrite(DIO5,LOW);
-    pinMode(DIO5,OUTPUT);
-
-    // To Check CC fault state drive pin with a weak pull-up
-    digitalWrite(DIO6,HIGH);
-    pinMode(DIO6,INPUT);
 
     // Set plugable DIO to shunt current sources, each has 127 Ohm. (e.g. turn LED's off) 
     pinMode(DIO3,OUTPUT);
@@ -109,10 +109,6 @@ void setup(void)
     
     // set the referances and save them in EEPROM
     ref_extern_avcc_uV = REF_EXTERN_AVCC;
-    ref_intern_1v1_uV = REF_INTERN_1V1;
-    while ( !WriteEeReferenceId() ) {};
-    while ( !WriteEeReferenceAvcc() ) {};
-    while ( !WriteEeReference1V1() ) {};
 }
 
 void test(void)
@@ -120,33 +116,29 @@ void test(void)
     // Info
     printf_P(PSTR("Self Test date: %s\r\n"), __DATE__);
     
-    // I2C is used to read RPU bus manager address
+    // I2C is used to read serial bus manager address 
     if (rpu_addr == '1')
     {
-        printf_P(PSTR("I2C provided address 0x31 from RPU bus manager\r\n"));
+        printf_P(PSTR("I2C provided address 0x31 from serial bus manager\r\n"));
     } 
     else  
     { 
         passing = 0; 
-        printf_P(PSTR(">>> I2C failed, or address not 0x31 from RPU bus manager\r\n"));
+        printf_P(PSTR(">>> I2C failed, or address not 0x31 from serial bus manager\r\n"));
         return;
     }
 
-    // +5V is used as the ADC reference
-    printf_P(PSTR("REF_EXTERN_AVCC saved in eeprom: %1.3f V\r\n"), (ref_extern_avcc_uV/1.0E6));
-
-    // Current sources are off but 22MA_DIO3 and 22MA_DIO11 are on
-    // Input current
-    _delay_ms(1000) ; // busy-wait delay 
+    // With current sources off measure input current
+    _delay_ms(1000) ; // busy-wait to let the 1uF settle
     float input_i = analogRead(PWR_I)*((ref_extern_avcc_uV/1.0E6)/1024.0)/(0.068*50.0);
     printf_P(PSTR("PWR_I with CS_EN==off: %1.3f A\r\n"), input_i);
-    if (input_i > 0.08) 
+    if (input_i > 0.025) 
     { 
         passing = 0; 
         printf_P(PSTR(">>> Input curr is to high.\r\n"));
         return;
     }
-    if (input_i < 0.04) 
+    if (input_i < 0.01) 
     { 
         passing = 0; 
         printf_P(PSTR(">>> Input curr is to low.\r\n"));
@@ -171,9 +163,9 @@ void test(void)
     
     // ADC0 and ADC1 with current sources off
     float adc0_v = analogRead(ADC0)*((ref_extern_avcc_uV/1.0E6)/1024.0);
-    printf_P(PSTR("ADC0 /w shunts on & CS_EN==off: %1.3f V\r\n"), adc0_v);
+    printf_P(PSTR("ADC0 without curr in R1: %1.3f V\r\n"), adc0_v);
     float adc1_v = analogRead(ADC1)*((ref_extern_avcc_uV/1.0E6)/1024.0);
-    printf_P(PSTR("ADC1 /w shunts on & CS_EN==off: %1.3f V\r\n"), adc1_v);
+    printf_P(PSTR("ADC1 without curr in PL for ICP1: %1.3f V\r\n"), adc1_v);
     if ( (adc0_v > 0.01)  || (adc1_v > 0.01) )
     { 
         passing = 0; 
@@ -182,28 +174,98 @@ void test(void)
     }
 
     // ICP1 pin is inverted from to the plug interface, which should have zero mA on its 100 Ohm Termination now
-    printf_P(PSTR("ICP1 /w 0mA on plug termination reads: %d \r\n"), digitalRead(ICP1));
+    printf_P(PSTR("ICP1's PL input has 0mA input and reads: %d \r\n"), digitalRead(ICP1));
     if (!digitalRead(ICP1)) 
     { 
         passing = 0; 
         printf_P(PSTR(">>> ICP1 should be high.\r\n"));
     }
     
-    // enable the current sources
-    digitalWrite(CS_EN,HIGH);
-    _delay_ms(1000) ; // busy-wait delay
-    float input_withcs_i = analogRead(PWR_I)*((ref_extern_avcc_uV/1.0E6)/1024.0)/(0.068*50.0);
-    printf_P(PSTR("PWR_I with CS_EN==on: %1.3f A\r\n"), input_withcs_i);
+    // enable 22MA_A0 which DIO11 can shunt with selftest wiring
+    digitalWrite(CS0_EN,HIGH);
+    pinMode(DIO11,INPUT);
+    _delay_ms(100); // busy-wait delay
     
-    // ADC0 hos ADC1's curr source, but DIO11 shunts ADC0's curr source, 
-    // DIO3 and DIO10 shunt DIO3's curr source, 
-    // DIO12 and DIO13 shunt DIO11's curr source.
+    // R1 hos 22MA_A0 on it
+    float adc0_22mA_i = analogRead(ADC0)*((ref_extern_avcc_uV/1.0E6)/1024.0) / R1;
+    printf_P(PSTR("22MA_A0 source on R1: %1.3f A\r\n"), adc0_22mA_i);
+    if (adc0_22mA_i < 0.018) 
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> 22MA_A0 curr is to low.\r\n"));
+        return;
+    }
+    if (adc0_22mA_i > 0.026) 
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> 22MA_A0 curr is to high.\r\n"));
+        return;
+    }
+    digitalWrite(CS0_EN,LOW);
+    pinMode(DIO11,OUTPUT);
+
+    // enable 22MA_A1
+    digitalWrite(CS1_EN,HIGH);
+    _delay_ms(100); // busy-wait delay
+    
+    // R1 hos 22MA_A1 on it
     float adc1_22mA_i = analogRead(ADC0)*((ref_extern_avcc_uV/1.0E6)/1024.0) / R1;
-    printf_P(PSTR("ADC1_22mA source on R1: %1.3f A\r\n"), adc1_22mA_i);
-    
-    // ADC1 has ICP1's 10mA source
+    printf_P(PSTR("22MA_A1 source on R1: %1.3f A\r\n"), adc1_22mA_i);
+    if (adc1_22mA_i < 0.018) 
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> 22MA_A1 curr is to low.\r\n"));
+    }
+    if (adc1_22mA_i > 0.026) 
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> 22MA_A1 curr is to high.\r\n"));
+    }
+
+    // enable 10mA into PL input for ICP1
+    digitalWrite(CS1_EN,LOW);
+    digitalWrite(CS_ICP1_10MA_EN,HIGH);
+    _delay_ms(100); // busy-wait delay
+
+    // ADC1 reads 100 Ohm on ICP1's PL input with 10mA
     float icp1_10mA_i = analogRead(ADC1)*((ref_extern_avcc_uV/1.0E6)/1024.0) / ICP1_TERM;
-    printf_P(PSTR("ICP1's 10mA on ICP1_TERM: %1.3f A\r\n"), icp1_10mA_i);
+    printf_P(PSTR("ICP1's PL input with 10mA: %1.3f A\r\n"), icp1_10mA_i);
+    
+    //This is a good place to swap ADC referances and find the band-gap voltage
+    init_ADC_single_conversion(INTERNAL_1V1); 
+    _delay_ms(100); // busy-wait delay
+    int adc1_used_for_ref_intern_1v1_uV = analogRead(ADC1);
+    printf_P(PSTR("   ADC1 reading used to calculate ref_intern_1v1_uV: %d A\r\n"), adc1_used_for_ref_intern_1v1_uV);
+    float _ref_intern_1v1_uV = 1.0E6*1024.0 * ((icp1_10mA_i * ICP1_TERM) / adc1_used_for_ref_intern_1v1_uV);
+    uint32_t temp_ref_intern_1v1_uV = (uint32_t)_ref_intern_1v1_uV;
+    printf_P(PSTR("   calculated ref_intern_1v1_uV: %lu uV\r\n"), temp_ref_intern_1v1_uV);
+    uint32_t temp_ref_extern_avcc_uV = ref_extern_avcc_uV;
+    
+    // check for old referance values
+    if (LoadAnalogRefFromEEPROM())
+    {
+        printf_P(PSTR("REF_EXTERN_AVCC old value was in eeprom: %lu uV\r\n"), ref_extern_avcc_uV);
+        printf_P(PSTR("REF_INTERN_1V1 old value was in eeprom: %lu uV\r\n"), ref_intern_1v1_uV);
+    }
+    ref_extern_avcc_uV = temp_ref_extern_avcc_uV;
+    ref_intern_1v1_uV = temp_ref_intern_1v1_uV;
+    if ((ref_intern_1v1_uV > 1050000UL)  || (ref_intern_1v1_uV < 1150000UL) )
+    {
+        while ( !WriteEeReferenceId() ) {};
+        while ( !WriteEeReferenceAvcc() ) {};
+        while ( !WriteEeReference1V1() ) {};
+        printf_P(PSTR("REF_EXTERN_AVCC saved in eeprom: %lu uV\r\n"), ref_extern_avcc_uV);
+        printf_P(PSTR("REF_INTERN_1V1 saved in eeprom: %lu uV\r\n"), ref_intern_1v1_uV);
+    }
+    else
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> REF_* for ADC not saved in eeprom.\r\n"));
+    }
+    
+    //swap back to the AVCC referance 
+    init_ADC_single_conversion(EXTERNAL_AVCC); 
+    _delay_ms(100); // busy-wait delay
     
     // ICP1 pin is inverted from to the plug interface, which should have 10 mA on its 100 Ohm Termination now
     printf_P(PSTR("ICP1 /w 10mA on plug termination reads: %d \r\n"), digitalRead(ICP1));
@@ -212,104 +274,112 @@ void test(void)
         passing = 0; 
         printf_P(PSTR(">>> ICP1 should be low with 10mA.\r\n"));
     }
-    
-    // DIO13 and DIO12 high-z to add DIO11's curr source to R1
+    digitalWrite(CS_ICP1_10MA_EN,LOW);
+
+    // enable the  22MA_DIO3, 22MA_DIO11, 17MA_ICP1 current sources
+    digitalWrite(CS_EN,HIGH);
+    _delay_ms(1000); // busy-wait delay
+    float input_withcs_i = analogRead(PWR_I)*((ref_extern_avcc_uV/1.0E6)/1024.0)/(0.068*50.0);
+    printf_P(PSTR("PWR_I with CS_EN==on: %1.3f A\r\n"), input_withcs_i);
+
+    // DIO13 and DIO12 high-z to place 22MA_DIO11 on R1
     pinMode(DIO13,INPUT);
     pinMode(DIO12,INPUT);
     _delay_ms(50) ; // busy-wait delay
-    float dio11_22mA_adc1_22mA_i = analogRead(ADC0)*((ref_extern_avcc_uV/1.0E6)/1024.0) / R1;
-    printf_P(PSTR("Add DIO11_22MA curr source to R1: %1.3f A\r\n"), dio11_22mA_adc1_22mA_i);
-    if (dio11_22mA_adc1_22mA_i < 0.040) 
+    float dio11_22mA_i = analogRead(ADC0)*((ref_extern_avcc_uV/1.0E6)/1024.0) / R1;
+    printf_P(PSTR("22MA_DIO11 curr source on R1: %1.3f A\r\n"), dio11_22mA_i);
+    if (dio11_22mA_i < 0.018) 
     { 
         passing = 0; 
-        printf_P(PSTR(">>> DIO11_22MA curr is to low.\r\n"));
+        printf_P(PSTR(">>> 22MA_DIO11 curr is to low.\r\n"));
     }
-    if (dio11_22mA_adc1_22mA_i > 0.047) 
+    if (dio11_22mA_i > 0.026) 
     { 
         passing = 0; 
-        printf_P(PSTR(">>> DIO11_22MA curr is to high.\r\n"));
+        printf_P(PSTR(">>> 22MA_DIO11 curr is to high.\r\n"));
     }
 
-    // DIO13 high-z and DIO12 shunting curr 
+    // DIO12 shunting 
     pinMode(DIO13,INPUT);
     pinMode(DIO12,OUTPUT);
     _delay_ms(50) ; // busy-wait delay
     float dio12_shunt_i = analogRead(ADC0)*((ref_extern_avcc_uV/1.0E6)/1024.0) / R1;
-    printf_P(PSTR("DIO12 shunting DIO11_22mA: %1.3f A\r\n"), dio12_shunt_i);
-    if (dio12_shunt_i > 0.039) 
+    printf_P(PSTR("DIO12 shunting 22MA_DIO11: %1.3f A\r\n"), dio12_shunt_i);
+    if (dio12_shunt_i > 0.015) 
     { 
         passing = 0; 
         printf_P(PSTR(">>> DIO12 is not shunting.\r\n"));
     }
 
-    // DIO12 high-z and DIO13 shunting most of the digital curr source from going through R1
+    // DIO13 shunting
     pinMode(DIO12,INPUT);
     pinMode(DIO13,OUTPUT);
     _delay_ms(50) ; // busy-wait delay
     float dio13_shunt_i = analogRead(ADC0)*((ref_extern_avcc_uV/1.0E6)/1024.0) / R1;
-    printf_P(PSTR("DIO13 shunting DIO11_22mA: %1.3f A\r\n"), dio13_shunt_i);
-    if (dio13_shunt_i > 0.039) 
+    printf_P(PSTR("DIO13 shunting 22MA_DIO11: %1.3f A\r\n"), dio13_shunt_i);
+    if (dio13_shunt_i > 0.015) 
     { 
         passing = 0; 
         printf_P(PSTR(">>> DIO13 is not shunting.\r\n"));
     }
     pinMode(DIO12,OUTPUT);
 
-    // DIO3 and DIO10 high-z to add DIO3's curr source to R1
+    // DIO3 and DIO10 high-z to place 22MA_DIO3 on R1
     pinMode(DIO3,INPUT);
     pinMode(DIO10,INPUT);
     _delay_ms(50) ; // busy-wait delay
-    float dio3_22mA_adc1_22mA_i  = analogRead(ADC0)*((ref_extern_avcc_uV/1.0E6)/1024.0) / R1;
-    printf_P(PSTR("Add DIO3_22MA curr source to R1: %1.3f A\r\n"), dio3_22mA_adc1_22mA_i);
-    if (dio3_22mA_adc1_22mA_i < 0.040) 
+    float dio3_22mA_i  = analogRead(ADC0)*((ref_extern_avcc_uV/1.0E6)/1024.0) / R1;
+    printf_P(PSTR("22MA_DIO3 curr source on R1: %1.3f A\r\n"), dio3_22mA_i);
+    if (dio3_22mA_i < 0.018) 
     { 
         passing = 0; 
-        printf_P(PSTR(">>> DIO3_22MA curr is to low.\r\n"));
+        printf_P(PSTR(">>> 22MA_DIO3 curr is to low.\r\n"));
     }
-    if (dio3_22mA_adc1_22mA_i > 0.047) 
+    if (dio3_22mA_i > 0.026) 
     { 
         passing = 0; 
-        printf_P(PSTR(">>> DIO3_22MA curr is to high.\r\n"));
+        printf_P(PSTR(">>> 22MA_DIO3 curr is to high.\r\n"));
     }
 
-    // DIO3 high-z and DIO10 shunting curr 
+    // DIO10 shunting 
     pinMode(DIO3,INPUT);
     pinMode(DIO10,OUTPUT);
     _delay_ms(50) ; // busy-wait delay
     float dio10_shunt_i = analogRead(ADC0)*((ref_extern_avcc_uV/1.0E6)/1024.0) / R1;
-    printf_P(PSTR("DIO10 shunting DIO3_22mA: %1.3f A\r\n"), dio10_shunt_i);
-    if (dio10_shunt_i > 0.039) 
+    printf_P(PSTR("DIO10 shunting 22MA_DIO3: %1.3f A\r\n"), dio10_shunt_i);
+    if (dio10_shunt_i > 0.015) 
     { 
         passing = 0; 
         printf_P(PSTR(">>> DIO10 is not shunting.\r\n"));
     }
 
-    // DIO10 high-z and DIO3 shunting curr
+    // DIO3 shunting
     pinMode(DIO10,INPUT);
     pinMode(DIO3,OUTPUT);
     _delay_ms(50) ; // busy-wait delay
     float dio3_shunt_i = analogRead(ADC0)*((ref_extern_avcc_uV/1.0E6)/1024.0) / R1;
-    printf_P(PSTR("DIO3 shunting DIO3_22mA: %1.3f A\r\n"), dio3_shunt_i);
-    if (dio3_shunt_i > 0.039) 
+    printf_P(PSTR("DIO3 shunting 22MA_DIO3: %1.3f A\r\n"), dio3_shunt_i);
+    if (dio3_shunt_i > 0.015) 
     { 
         passing = 0; 
         printf_P(PSTR(">>> DIO3 is not shunting.\r\n"));
     }
+    pinMode(DIO10,OUTPUT);
 
-    // DIO4 high-z to add icp1's 10mA and 17mA curr source to ICP1's PL plug.
+    // DIO4 high-z to allow17mA curr source to ICP1's PL input.
     pinMode(DIO4,INPUT);
     _delay_ms(50) ; // busy-wait delay
-    float icp1_17mA_icp1_10mA_i = analogRead(ADC1)*((ref_extern_avcc_uV/1.0E6)/1024.0) / ICP1_TERM;
-    printf_P(PSTR("ICP1 10mA + 17mA curr source on ICP1's PL plug: %1.3f A\r\n"), icp1_17mA_icp1_10mA_i);
-    if (icp1_17mA_icp1_10mA_i < 0.025) 
+    float icp1_17mA_i = analogRead(ADC1)*((ref_extern_avcc_uV/1.0E6)/1024.0) / ICP1_TERM;
+    printf_P(PSTR("ICP1 17mA curr source on ICP1's PL plug: %1.3f A\r\n"), icp1_17mA_i);
+    if (icp1_17mA_i < 0.012) 
     { 
         passing = 0; 
-        printf_P(PSTR(">>> ICP1 10mA & 17mA curr source is to low\r\n"));
+        printf_P(PSTR(">>> ICP1 17mA curr source is to low\r\n"));
     }
-    if (icp1_17mA_icp1_10mA_i > 0.031) 
+    if (icp1_17mA_i > 0.022) 
     { 
         passing = 0; 
-        printf_P(PSTR(">>> ICP1 10mA & 16mA curr source is to high.\r\n"));
+        printf_P(PSTR(">>> ICP1 17mA curr source is to high.\r\n"));
     }
     pinMode(DIO4,OUTPUT);
 
@@ -327,6 +397,22 @@ void test(void)
 
 void led_setup_after_test(void)
 {
+    // Turn Off 22MA_DIO3, 22MA_DIO11, 17MA_ICP1 Curr Sources
+    pinMode(CS_EN,OUTPUT);
+    digitalWrite(CS_EN,LOW);
+    
+    // Turn Off 22MA_A0 Curr Source
+    pinMode(CS0_EN,OUTPUT);
+    digitalWrite(CS0_EN,LOW);
+    
+    // Turn Off 22MA_A1 Curr Source
+    pinMode(CS1_EN,OUTPUT);
+    digitalWrite(CS1_EN,LOW);
+
+    // Turn Off 10MA PL Curr Source
+    pinMode(CS_ICP1_10MA_EN,OUTPUT);
+    digitalWrite(CS_ICP1_10MA_EN,LOW);
+
     if (passing)
     {
         pinMode(DIO3,OUTPUT);
@@ -340,6 +426,7 @@ void led_setup_after_test(void)
         digitalWrite(DIO12,LOW);
         pinMode(DIO13,OUTPUT);
         digitalWrite(DIO13,LOW);
+        digitalWrite(CS_EN,HIGH);
     }
     else
     {
@@ -354,6 +441,7 @@ void led_setup_after_test(void)
         digitalWrite(DIO12,LOW);
         pinMode(DIO13,OUTPUT);
         digitalWrite(DIO13,LOW);
+        digitalWrite(CS0_EN,HIGH);
     }
 }
 
@@ -362,7 +450,14 @@ void blink(void)
     unsigned long kRuntime = millis() - blink_started_at;
     if ( kRuntime > blink_delay)
     {
-        digitalToggle(CS_EN);
+        if (passing)
+        {
+            digitalToggle(CS_EN);
+        }
+        else
+        {
+            digitalToggle(CS0_EN);
+        }
         
         // next toggle 
         blink_started_at += blink_delay; 

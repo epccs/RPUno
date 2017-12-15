@@ -47,7 +47,7 @@
     5 PD4 {20} (D 4) T0 []
     4 PD5 {21} (D 5) T1 OC0B []
     3 PD6 {22} (D 6) OC0A []
-    2 PD7 {23} (D 7) []
+    2 PD7 {23} (D 7) [CS_EN]
 */
 
 #define NUM_DIGITAL_PINS            20
@@ -68,42 +68,45 @@
 #define DIO3 3
 #define DIO4 4
 
-// J13 CONN
+// Current Source Enable
 #define DIO5 5
+#define CS0_EN 5
 #define DIO6 6
+#define CS1_EN 6
 #define DIO7 7
+#define CS_EN 7
 
 // ICP1 pin reads inverted from the plugable input with 100 Ohm termination
 #define ICP1 8
 
 // Current Source Enable
 #define DIO9 9
-#define CS_EN 9
+#define CS_ICP1_10MA_EN 9
 
 // Plugable Digital Input/Outputs with Level shift
 // SPI on RPUno is maped to the DIO
 #define DIO10 10
-#define nSS DIO10 
+#define nSS 10
 
 #define DIO11 11
-#define MOSI DIO11
+#define MOSI 11
 
 #define DIO12 12
-#define MISO DIO12
+#define MISO 12
 
 #define DIO13 13
-#define SCK DIO13
+#define SCK 13
 
 // RPUno board has no led but this is the normal place it would be found
-#define LED_BUILTIN DIO13 
+#define LED_BUILTIN 13 
 
 // I2C on RPUno
 #define SDA 18
 #define SCL 19
 
 // ADC channels
-// There are values from 0 to 1023 for 1024 slots where each reperesents 1/1024 of the reference. Last slot has issues
-// https://forum.arduino.cc/index.php?topic=303189.0      
+// Values range from 0 to 1023 for 1024 slots which each reperesents 1/1024 of the reference. The last slot has some issues
+// https://forum.arduino.cc/index.php?topic=303189.0 
 
 // ADC0 has a Plugable input with a 20mA current source
 // its voltage is analogRead(ADC0)*(5.0/1024.0)
@@ -113,11 +116,8 @@
 // its voltage is analogRead(ADC1)*(5.0/1024.0)
 #define ADC1 1
 
-// ADC2 voltage is analogRead(CHRG_I)*(5.0/1024.0)/(0.068*50.0)
-#define CHRG_I 2
-
-// ADC3 voltage is analogRead(DISCHRG_I)*(5.0/1024.0)/(0.068*50.0)
-#define DISCHRG_I 3
+#define ADC2 2
+#define ADC3 3
 
 // ADC4 and ADC5 are used for I2C with the RPUadpt/RPUftdi/RPUpi shields
 #define ADC4 4

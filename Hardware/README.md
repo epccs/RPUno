@@ -69,9 +69,18 @@ Bootloader options include [optiboot] and [xboot]. Serial bootloaders can't chan
 ![Status](./status_icon.png "RPUno Status")
 
 ```
-        ^8  Done: Design, Layout, BOM, Review*,
-            WIP: Order Boards,
-            Todo: Assembly, Testing, Evaluation.
+        ^9  Done: 
+            WIP: 
+            Todo: Design, Layout, BOM, Review*, Order Boards, Assembly, Testing, Evaluation.
+            *during review the Design may change without changing the revision.
+            ADC2 and ADC3 on plugable 
+            Remove SPI pins from plugable
+            Remove GND from ICP1 
+            Add a high side PMOS switch to allow disconnect from a PV string.
+
+        ^8  Done: Design, Layout, BOM, Review*, Order Boards, Assembly, Testing,
+            WIP: Evaluation
+            Todo: 
             *during review the Design may change without changing the revision.
             J13 lbl ADC5 to ADC1
             IO5 control CS0

@@ -8,7 +8,9 @@ Current sources feed a 50 Ohm resistor and that is measured with ADC0. One of th
 
 ICP1 has a 100 Ohm resistor on board and a 10mA current source jumper that feeds it, the voltage is measured with ADC1. Additionaly a 17mA current source is connected to DIO4 and feeds the ICP1 resistor through a green LED. 
 
-The red and green LED are also used to indicate test status.
+Voltage references are saved in EEPROM for use with Adc and other applications. Measure the +5V supply accurately and set the REF_EXTERN_AVCC value in the main.c file. The band-gap reference is calculated and also saved.
+
+The red and green LED are used to indicate the test status.
 
 ## Wiring Needed for RPUno
 
@@ -25,52 +27,44 @@ Connect a power supply with CV and CC mode. Set CC at 300mA then increase CV to 
 With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
 
 ``` 
-rsutherland@conversion:~/Samba/RPUno/SelfTest$ make bootload
-...
-avr-size -C --mcu=atmega328p SelfTest.elf
-AVR Memory Usage
-----------------
-Device: atmega328p
-
-Program:   11824 bytes (36.1% Full)
-(.text + .data + .bootloader)
-
-Data:        260 bytes (12.7% Full)
-(.data + .bss + .noinit)
-...
-avrdude -v -p atmega328p -c arduino -P /dev/ttyUSB0 -b 115200 -U flash:w:SelfTest.hex
+make bootload
 ...
 avrdude done.  Thank you.
-rsutherland@conversion:~/Samba/RPUno/SelfTest$ make clean
+make clean
 rm -f SelfTest.hex SelfTest.map
 ``` 
 
 Now connect with picocom (exit is C-a, C-x). 
 
 ``` 
-rsutherland@conversion:~/Samba/RPUno/SelfTest$ picocom -b 38400 /dev/ttyUSB0
+picocom -b 38400 /dev/ttyUSB0
 picocom v1.7
 ...
 Terminal ready
-Self Test date: Oct 21 2017
-I2C provided address 0x31 from RPU bus manager
-REF_EXTERN_AVCC saved in eeprom: 4.944 V
-PWR_I with CS_EN==off: 0.055 A
-PWR at: 12.668 V
-ADC0 /w shunts on & CS_EN==off: 0.000 V
-ADC1 /w shunts on & CS_EN==off: 0.000 V
-ICP1 /w 0mA on plug termination reads: 1 
-PWR_I with CS_EN==on: 0.125 A
-ADC1_22mA source on R1: 0.023 A
-ICP1's 10mA on ICP1_TERM: 0.010 A
-ICP1 /w 10mA on plug termination reads: 0 
-Add DIO11_22MA curr source to R1: 0.042 A
-DIO12 shunting DIO11_22mA: 0.025 A
-DIO13 shunting DIO11_22mA: 0.024 A
-Add DIO3_22MA curr source to R1: 0.042 A
-DIO10 shunting DIO3_22mA: 0.024 A
-DIO3 shunting DIO3_22mA: 0.024 A
-ICP1 10mA + 17mA curr source on ICP1's PL plug: 0.027 A
+Self Test date: Dec 14 2017
+I2C provided address 0x31 from serial bus manager
+PWR_I with CS_EN==off: 0.016 A
+PWR at: 12.834 V
+ADC0 without curr in R1: 0.000 V
+ADC1 without curr in PL for ICP1: 0.000 V
+ICP1's PL input has 0mA input and reads: 1
+22MA_A0 source on R1: 0.022 A
+22MA_A1 source on R1: 0.022 A
+ICP1's PL input with 10mA: 0.010 A
+   ADC1 reading used to calculate ref_intern_1v1_uV: 940 A
+   calculated ref_intern_1v1_uV: 1076316 uV
+REF_EXTERN_AVCC old value was in eeprom: 5008600 uV
+REF_INTERN_1V1 old value was in eeprom: 1070621 uV
+REF_EXTERN_AVCC saved in eeprom: 5008600 uV
+REF_INTERN_1V1 saved in eeprom: 1076316 uV
+ICP1 /w 10mA on plug termination reads: 0
+PWR_I with CS_EN==on: 0.078 A
+22MA_DIO11 curr source on R1: 0.022 A
+DIO12 shunting 22MA_DIO11: 0.007 A
+DIO13 shunting 22MA_DIO11: 0.007 A
+22MA_DIO3 curr source on R1: 0.022 A
+DIO10 shunting 22MA_DIO3: 0.007 A
+DIO3 shunting 22MA_DIO3: 0.007 A
+ICP1 17mA curr source on ICP1's PL plug: 0.018 A
 [PASS]
-
 ``` 

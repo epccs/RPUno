@@ -73,10 +73,8 @@ Bootloader options include [optiboot] and [xboot]. Serial bootloaders can't chan
             WIP: 
             Todo: Design, Layout, BOM, Review*, Order Boards, Assembly, Testing, Evaluation.
             *during review the Design may change without changing the revision.
-            ADC2 and ADC3 on plugable 
-            Remove SPI pins from plugable
-            Remove GND from ICP1 
-            Add a high side PMOS switch to allow disconnect from a PV string.
+            RPUipc^0 is what I ended up with after trying to figure out what to do with this board.
+            TBD
 
         ^8  Done: Design, Layout, BOM, Review*, Order Boards, Assembly, Testing,
             WIP: Evaluation

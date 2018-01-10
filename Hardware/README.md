@@ -2,9 +2,9 @@
 
 ## Overview
 
-This board has an ATmega328p microcontroller. The board has options for DIN mount and pluggable connectors for some functions. Six Digital input/output (in two groups of three plus a current source) are connected through level shifting transistors to the pluggable connectors. Two ADC inputs (each with a current source) are connected to the pluggable connectors. Capture hardware (ICP1) with a current source is connected to the pluggable connector. The board power can be from 7 thru 36 VDC and is protected against reverse polarity with a P-channel Mosfet. The input power voltage can be measured with ADC channel 7 and the input power current can be measured with ADC channel 6. Power to the shield VIN pin may be disabled by setting digital IO2 low. An ATmega328p can be programmed with the GCC toolchain for AVR found in Debian packages (e.g. so it is available on, Ubuntu, Raspbian, OSH via brew, Windows via Windows Subsystem for Linux).
+ATmega328P based controller board with options for DIN mounts and 3.5mm pluggable connections. Eight digital I/O (10, 11, 12, 13, 14*, 15*, 16*, 17*) with level shift, the last four (*) are also analog channels (ADC0, ADC1, ADC2, ADC3). Four 22mA current source used with loop sensors are available with enables (5, 6, 3, 4). One 17mA current source for a pulse sensor and it has an enable (7). ICP1 is pulled down when enough current (>7mA) arrives from the pulse sensor. Alternate power input may be enabled (9), and power to the shield VIN pin may be disabled (2). Power with 7 thru 36V DC.
 
-Bootloader options include [optiboot] and [xboot]. Serial bootloaders can't change the hardware fuse setting which reduces programming errors that can accidentally brick the controller. Note that [optiboot] clears the watchdog so it will not get stuck in a watchdog loop.
+The ATmega328p can be programmed with the GCC based toolchain for AVR found in Debian packages (e.g. so it is available on, Ubuntu, Raspbian, Mac via brew, Windows via Windows Subsystem for Linux). Bootloader options include [optiboot] and [xboot]. Serial bootloaders can't change the hardware fuse setting which reduces programming errors that can accidentally brick the controller. Note that [optiboot] clears the watchdog so it will not get stuck in a watchdog loop.
 
 [optiboot]: https://github.com/Optiboot/optiboot
 [xboot]: https://github.com/alexforencich/xboot
@@ -18,18 +18,13 @@ Bootloader options include [optiboot] and [xboot]. Serial bootloaders can't chan
         Input power can range from 7 to 36V DC
         High side current sense on input power connected to ADC6.
         Input power voltage is divided down and connected to ADC7.
-        Six digital input/outputs (DIO 3,4,10,11,12,13) with level conversion.
-        Digital IO is grouped in two pluggable interfaces each with a 22 mA current source and ground.
-        Digital 22mA current sources enabled with DIO 7.
-        Input Capture (ICP1) with current sources for current loops.
-        ICP1 17mA current source enabled with DIO 7.
-        ICP1 10mA current source enabled with digital control DIO 9.
-        Two Analog channels ADC0, ADC1.
-        ADC0 22mA current source enabled with DIO 5.
-        ADC1 22mA current source enabled with DIO 6.
-        Power to the Shield Vin pin is turned off with DIO 2.
+        Eight digital input/outputs (10,11,12,13,14*,15*,16*,17*) with level conversion.
+        Four of the DIO may be used for ADC (*) channels 0..3 (ADC0,ADC1,ADC2,ADC3)
+        Four 22mA current sources with enable (5,6,3,4).
+        One 17mA current source with enable (7).
+        Power to the shield VIN pin may be disabled (2).
+        Alternate power input may be enabled (9).
         MCU power (+5V) is converted with an SMPS from the input power.
-        Up to an Amp can be safely used from the +5V.
 ```
 
 ## Uses
@@ -42,8 +37,8 @@ Bootloader options include [optiboot] and [xboot]. Serial bootloaders can't chan
             Pulse Output Capacitance Sensors
         Automation
             Shield VIN pin can power down a Raspberry Pi Zero on the RPUpi shield.
-            String current through inputs of Solid State Relays for multi-phase power control.
-            PLC replacement that is programmed in C with an open source toolchain.
+            A current source may string through inputs of multiple Solid State Relays to control multi-phase power.
+            Program in C with an open source toolchain (e.g. GCC, avrdude...).
 ```
 
 ## Notice
@@ -69,12 +64,19 @@ Bootloader options include [optiboot] and [xboot]. Serial bootloaders can't chan
 ![Status](./status_icon.png "RPUno Status")
 
 ```
-        ^9  Done: 
-            WIP: 
-            Todo: Design, Layout, BOM, Review*, Order Boards, Assembly, Testing, Evaluation.
+        ^9  Done: Design, Layout,
+            WIP: BOM,
+            Todo: Review*, Order Boards, Assembly, Testing, Evaluation.
             *during review the Design may change without changing the revision.
-            RPUipc^0 is what I ended up with after trying to figure out what to do with this board.
-            TBD
+            Remove ICP1 10mA pull-up
+            Replace digital curr sources with CS2 and CS3
+            Replace IO3 and IO4 with ADC2 and ADC3
+            Swap MOSI (IO11) with ADC3
+            Use IO3 and IO4 to enalbe 22mA CS2 and CS3
+            Add level shift to ADC0 and ADC1 so they can be used as digital IO
+            Add bootload port (e.g. for Adafruit Friend)
+            Add alternate power input (e.g. disconnect a solar pannel to stop charge)
+            Pull-down IO9 to make sure alt power is off at init
 
         ^8  Done: Design, Layout, BOM, Review*, Order Boards, Assembly, Testing,
             WIP: Evaluation

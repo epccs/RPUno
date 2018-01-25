@@ -64,9 +64,9 @@ The ATmega328p can be programmed with the GCC based toolchain for AVR found in D
 ![Status](./status_icon.png "RPUno Status")
 
 ```
-        ^9  Done: Design, Layout,
-            WIP: BOM,
-            Todo: Review*, Order Boards, Assembly, Testing, Evaluation.
+        ^9  Done: Design, Layout, BOM,
+            WIP: Review*,
+            Todo: Order Boards, Assembly, Testing, Evaluation.
             *during review the Design may change without changing the revision.
             Remove ICP1 10mA pull-up
             Replace digital curr sources with CS2 and CS3
@@ -76,7 +76,7 @@ The ATmega328p can be programmed with the GCC based toolchain for AVR found in D
             Add level shift to ADC0 and ADC1 so they can be used as digital IO
             Add bootload port (e.g. for Adafruit Friend)
             Add alternate power input (e.g. disconnect a solar pannel to stop charge)
-            Pull-down IO9 to make sure alt power is off at init
+            Pull-down IO9 and 100k ohm on zener to make sure alt power is off at init
 
         ^8  Done: Design, Layout, BOM, Review*, Order Boards, Assembly, Testing,
             WIP: Evaluation

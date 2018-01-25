@@ -1,8 +1,6 @@
-# Makefile simple cross compiler example for learning
+# Makefile simple example for learning
 # see Elliot Williams write up
 # http://hackaday.com/2016/03/15/embed-with-elliot-microcontroller-makefiles
-# https://en.wikipedia.org/wiki/Make_%28software%29
-# http://ix.io/seE
 #
 # to see the implicit rules which automagicly turn blinkLED.c into blinkLED.o run
 # make -p

@@ -31,14 +31,16 @@ Items used for test.
 
 ## Assembly check
 
-After assembly check the circuit carefully to make sure all parts are soldered and correct, note that the device making is labeled on the schematic and assembly drawing.
+After assembly check the circuit carefully to make sure all parts are soldered and correct. The device marking is labeled on the schematic and assembly drawing.
     
 NOTE: U2 is not yet on the board, so +5V will not have power.
 
 
 ## IC Solder Test
 
-Check that a diode drop is present from each pin to 0V by measuring with a DMM's diode test between each pin and the 0V plane (reversed polarity). U1 pins 12, 10 and 9 are connected to L1 and R3 and read with a low (.13V) value. U2 not pop yet. U1 diode value on pins 1,3,4, and 5, pins 3 and 4 shorted through R4. U3 pin 3, 5, 21 are connectd to the 0V plane and should have a short.
+U2 is not yet populated. Check that a diode drop to 0V is present from a circuit board pad that is connected to each of the pins of U1, and U3 by measuring with a DMM's diode test set up for reversed polarity. Consult the schematic to determine which pins can be skipped (e.g. ground, power rail, ...).
+
+This is a simplified In-Circuit Test (ICT). It could become more valuable if the node voltage driven with the current source is recorded for each tested location and then used with statistics to determine test limits for each location. 
 
 
 ## Power Protection

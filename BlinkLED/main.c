@@ -1,4 +1,4 @@
-/* RPUno Blink LED
+/* Blink LED
 Copyright (C) 2017 Ronald Sutherland
 
 This program is free software; you can redistribute it and/or

@@ -13,75 +13,36 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License 
- * along with the Arduino DigitalIO Library.  If not, see
+ * along with the DigitalIO Library.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
 #ifndef Pins_Board_h
 #define Pins_Board_h
 
-//#include <avr/pgmspace.h>
-/* 
-    32TQFPpin
-        ATTMEGA328P reg-bit
-              {PCINT}
-                     (Digital IO#)
-                            function #notes [RPUno]
-    12 PB0 {0} (D 8) ICP1 []
-    13 PB1 {1} (D 9) OC1A []
-    14 PB2 {2} (D 10) SS OC1B [SS]
-    15 PB3 {3} (D 11) MOSI OC2A [MOSI]
-    16 PB4 {4} (D 12) MISO [MISO]
-    17 PB5 {5} (D 13) SCK [SCK]
-    23 PC0 {8} (D 14) ADC0 []
-    24 PC1 {9} (D 15) ADC1 []
-    25 PC2 {10} (D 16) ADC2 []
-    26 PC3 {11} (D 17) ADC3 []
-    27 PC4 {12} (D 18) ADC4 SDA [SDA]
-    28 PC5 {13} (D 19) ADC5 SCL [SCL]
-    19 (D 20) ADC6 []
-    22 (D 21) ADC7 []
-    9 PD0 {16} (D 0) RXD [RX]
-    8 PD1 {17} (D 1) TXD [TX]
-    7 PD2 {18} (D 2) INT0 []
-    6 PD3 {19} (D 3) INT1 OC2B []
-    5 PD4 {20} (D 4) T0 []
-    4 PD5 {21} (D 5) T1 OC0B []
-    3 PD6 {22} (D 6) OC0A []
-    2 PD7 {23} (D 7) [CS_EN]
-*/
-
 #define NUM_DIGITAL_PINS            20
 #define NUM_ANALOG_INPUTS        8
-// analogInputToDigitalPin() takes an AVR analog channel number and returns the digital pin number otherwise -1.
-// #define analogInputToDigitalPin(p)  ((p < 8) ? (p) + 14 : -1)
+
 #define digitalPinHasPWM(p)         ((p) == 3 || (p) == 5 || (p) == 6 || (p) == 9 || (p) == 10 || (p) == 11)
 
 // UART on RPUno is for serial communication (never use these pins)
-#define RX0 0 
-#define TX0 1
+#define RX 0 
+#define TX 1
 
 // VIN  pin shield power control
-#define DIO2 2
 #define SHLD_VIN_EN 2
 
-// Plugable Digital Input/Outputs with Level shift
-#define DIO3 3
-#define DIO4 4
-
 // Current Source Enable
-#define DIO5 5
+#define CS2_EN 3
+#define CS3_EN 4
 #define CS0_EN 5
-#define DIO6 6
 #define CS1_EN 6
-#define DIO7 7
-#define CS_EN 7
+#define CS_ICP1_EN 7
 
 // ICP1 pin reads inverted from the plugable input with 100 Ohm termination
 #define ICP1 8
 
-// Current Source Enable
-#define DIO9 9
-#define CS_ICP1_10MA_EN 9
+// ALTernat power ENable
+#define ALT_EN 9
 
 // Plugable Digital Input/Outputs with Level shift
 // SPI on RPUno is maped to the DIO
@@ -100,6 +61,12 @@
 // RPUno board has no led but this is the normal place it would be found
 #define LED_BUILTIN 13 
 
+//ADC0 thur ADC3 can also be used for digital IO from the plugable connector
+#define DIO14 14
+#define DIO15 15
+#define DIO16 16
+#define DIO17 17
+
 // I2C on RPUno
 #define SDA 18
 #define SCL 19
@@ -108,25 +75,34 @@
 // Values range from 0 to 1023 for 1024 slots which each reperesents 1/1024 of the reference. The last slot has some issues
 // https://forum.arduino.cc/index.php?topic=303189.0 
 
-// ADC0 has a Plugable input with a 20mA current source
-// its voltage is analogRead(ADC0)*(5.0/1024.0)
+// referance include 
+//          AVCC which is the SMPS. It is about 5V but changes somewhat with temperature and input voltage.
+//          1V1 internal badgap, which is measured during a selftest and placed in the eeprom.
+
+// ADC0 is at the same pin that was defined as digital 14, it could have been defined as digital 0 but this matches the Uno numbers
+// its voltage is analogRead(ADC0)*(<referance>/1024.0)
 #define ADC0 0
 
-// ADC1 has a Plugable input with a 20mA current source
-// its voltage is analogRead(ADC1)*(5.0/1024.0)
+// ADC1 is at the same pin that was defined as digital 15
+// its voltage is analogRead(ADC1)*(<referance>/1024.0)
 #define ADC1 1
 
+// ADC2 is at the same pin that was defined as digital 16
 #define ADC2 2
+
+// ADC3 is at the same pin that was defined as digital 17
 #define ADC3 3
 
 // ADC4 and ADC5 are used for I2C with the RPUadpt/RPUftdi/RPUpi shields
 #define ADC4 4
 #define ADC5 5
 
-// ADC6 voltage is analogRead(PV_V)*(5.0/1024.0)*(5.0/1024.0)/(0.068*50.0)
+// ADC6 voltage is analogRead(PWR_I)*(<referance>/1024.0)/(0.018*50.0)
 #define PWR_I 6 
 
-// ADC7 or input voltage is analogRead(PWR_V)*(5.0/1024.0)*(115.8.0/15.8)
+// ADC7 or input voltage is analogRead(PWR_V)*(<referance>/1024.0)*(101.5/1.5)
 #define PWR_V 7
+
+// note ADC6 and ADC7 do not have digital hardware on a 328p so can only be used as analog channels
 
 #endif // Pins_Board_h

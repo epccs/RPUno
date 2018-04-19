@@ -234,25 +234,25 @@ Report the led (1|2|3|4) runtime in millis.
 {"LED3":{"cycle_state":"0","cycles":"0","cycle_millis":"4000"}}
 ``` 
 
-## [/0/analog? 0..7[,0..7[,0..7[,0..7[,0..7]]]]](../Adc#0analog-0707070707)
+## \[/0/analog? 0..7\[,0..7\[,0..7\[,0..7\[,0..7\]\]\]\]\](../Adc#0analog-0707070707)
 
 
-## [/0/iscan?](../i2c-debug#0iscan)
+## \[/0/iscan?\](../i2c-debug#0iscan)
 
 
-## [/0/iaddr 0..127](../i2c-debug#0iaddr-0127)
+## \[/0/iaddr 0..127\](../i2c-debug#0iaddr-0127)
 
 
-## [/0/ibuff 0..255[,0..255[,0..255[,0..255[,0..255]]]]](../i2c-debug#0ibuff-02550255025502550255)
+## \[/0/ibuff 0..255\[,0..255\[,0..255\[,0..255\[,0..255\]\]\]\]\](../i2c-debug#0ibuff-02550255025502550255)
 
 
-## [/0/ibuff?](../i2c-debug#0ibuff)
+## \[/0/ibuff?\](../i2c-debug#0ibuff)
 
 
-## [/0/iwrite](../i2c-debug#0iwrite)
+## \[/0/iwrite\](../i2c-debug#0iwrite)
 
 
-## [/0/charge?](../AmpHr#0charge)
+## \[/0/charge?\](../AmpHr#0charge)
 
 
-## [/0/day?](../DayNight#0day)
+## \[/0/day?\](../DayNight#0day)

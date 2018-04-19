@@ -14,29 +14,31 @@ The ATmega328p can be programmed with the GCC based toolchain for AVR found in D
 ## Inputs/Outputs/Functions
 
 ```
-        ATmega328p programs are compiled with open source tools that run nearly everywhere.
-        Input power can range from 7 to 36V DC
+        Toolchain: gcc-avr binutils-avr gdb-avr avr-libc avrdude
+        Wide input power range from 7..36V DC
         High side current sense on input power connected to ADC6.
         Input power voltage is divided down and connected to ADC7.
         Eight digital input/outputs (10,11,12,13,14*,15*,16*,17*) with level conversion.
         Four of the DIO may be used for ADC (*) channels 0..3 (ADC0,ADC1,ADC2,ADC3)
-        Four 22mA current sources with enable (5,6,3,4).
+        Four 22mA current sources with enable (3,4,5,6).
         One 17mA current source with enable (7).
         Power to the shield VIN pin may be disabled (2).
         Alternate power input may be enabled (9).
-        MCU power (+5V) is converted with an SMPS from the input power.
+        MCU power (+5V) is converted with an SMPS from the 7..36V input power.
 ```
 
 ## Uses
 
 ```
+        General Purpose Control for Automation
+            Bare Matal (e.g. infinite main loop checks inputs, performs algorithm, and writes outputs)
         Data Acquisition using Capture Hardware (ICP1).
             Flow Meter
             Rotating Hardware
             Pulse Output Temperature Sensors
             Pulse Output Capacitance Sensors
         Automation
-            Shield VIN pin can power down a Raspberry Pi Zero on the RPUpi shield.
+            Shield VIN pin can power down a Raspberry Pi on the RPUpi shield.
             A current source may string through inputs of multiple Solid State Relays to control multi-phase power.
             Program in C with an open source toolchain (e.g. GCC, avrdude...).
 ```
@@ -64,9 +66,9 @@ The ATmega328p can be programmed with the GCC based toolchain for AVR found in D
 ![Status](./status_icon.png "RPUno Status")
 
 ```
-        ^9  Done: Design, Layout, BOM,
-            WIP: Review*,
-            Todo: Order Boards, Assembly, Testing, Evaluation.
+        ^9  Done: Design, Layout, BOM, Review*, Order Boards,
+            WIP: Assembly, 
+            Todo:Testing, Evaluation.
             *during review the Design may change without changing the revision.
             Remove ICP1 10mA pull-up
             Replace digital curr sources with CS2 and CS3
@@ -78,8 +80,8 @@ The ATmega328p can be programmed with the GCC based toolchain for AVR found in D
             Add alternate power input (e.g. disconnect a solar pannel to stop charge)
             Pull-down IO9 and 100k ohm on zener to make sure alt power is off at init
 
-        ^8  Done: Design, Layout, BOM, Review*, Order Boards, Assembly, Testing,
-            WIP: Evaluation
+        ^8  Done: Design, Layout, BOM, Review*, Order Boards,
+            WIP: 
             Todo: 
             *during review the Design may change without changing the revision.
             J13 lbl ADC5 to ADC1
@@ -88,6 +90,7 @@ The ATmega328p can be programmed with the GCC based toolchain for AVR found in D
             IO7 control CS (22MA_DIO3, 22MA_DIO11, 17MA_ICP1)
             IO9 control CS_ICP1_10MA.
             remove J9 (10mA on ICP1 is controlled with IO9).
+            all boards scraped, no assembly done
 
         ^7  Done: Design, Layout, BOM, Review*, Order Boards, Assembly, Testing,
             WIP: Evaluation.
@@ -97,7 +100,7 @@ The ATmega328p can be programmed with the GCC based toolchain for AVR found in D
             remove LT3652 and reduce size of board.
             add an IDC connector for everything that was used with LT3652 (5,6,7,ADC2,ADC3).
             add JSK plug for I2C
-            location: 2017-11-1 T1^7 reflow oven.
+            location: 2017-11-1 reflow oven.
 
         ^6  two test units (T1,T2) made, four units made to see if anyone is intrested.
             location: 2017-3-24 T1^6 damaged MCU while taking power example image.
@@ -105,6 +108,7 @@ The ATmega328p can be programmed with the GCC based toolchain for AVR found in D
                     2017-6-12 T1^6 replaced MCU from a scrped RPUno^4 and tested again.
                     2017-7-19 T2^6 + RPUadpt^5 in SEncl NightLight testing.
                     2017-8-26 T2^6 NightLight ended, unit is in an enclosure with battey but is not in use.
+                    2018-4-15 T1 and T2 scap.
 
 
         ^5  only unit of this version made

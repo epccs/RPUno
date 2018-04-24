@@ -31,8 +31,28 @@ static volatile uint8_t twi_slarw;
 static volatile uint8_t twi_sendStop;			// should the transaction end with a stop
 static volatile uint8_t twi_inRepStart;			// in the middle of a repeated start
 
-static void (*twi_onSlaveTransmit)(void);
-static void (*twi_onSlaveReceive)(uint8_t*, int);
+// used to initalize the Transmit functions in case they are not used.
+void transmit_default(void)
+{
+    return;
+}
+
+typedef void (*PointerToTransmit)(void);
+
+// used to initalize the Receive functions in case they are not used.
+void receive_default(uint8_t *rxBuffer, int rxBufferIndex)
+{
+    // ignore the received data
+    // the receive event happens once after an I2C stop or repeated-start
+    // that will need the slave to have data ready to transmit
+    // repeated-start is usd for atomic operation e.g. prevents others from using bus 
+    return;
+}
+
+typedef void (*PointerToReceive)(uint8_t*, int);
+
+static PointerToTransmit twi_onSlaveTransmit = transmit_default;
+static PointerToReceive twi_onSlaveReceive = receive_default;
 
 static uint8_t twi_masterBuffer[TWI_BUFFER_LENGTH];
 static volatile uint8_t twi_masterBufferIndex;

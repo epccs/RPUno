@@ -66,9 +66,9 @@ The ATmega328p can be programmed with the GCC based toolchain for AVR found in D
 ![Status](./status_icon.png "RPUno Status")
 
 ```
-        ^9  Done: Design, Layout, BOM, Review*, Order Boards,
-            WIP: Assembly, 
-            Todo:Testing, Evaluation.
+        ^9  Done: Design, Layout, BOM, Review*, Order Boards, Assembly,
+            WIP: Testing,
+            Todo: Evaluation.
             *during review the Design may change without changing the revision.
             Remove ICP1 10mA pull-up
             Replace digital curr sources with CS2 and CS3
@@ -186,7 +186,7 @@ The SMD reflow is done in a Black & Decker Model NO. TO1303SB which has the heat
 
 # How To Use
 
-Connect the application electronics (e.g. flow meter, analog current loops, and digital) and check the connections. Then connect the input power.  
+Connect the application electronics (e.g. flow meter, analog current loops, and digital) and check the connections. Then connect the input power.
 
 +5V power on J7 is not populated, when I use the power from this point I solder some wires to the through holes, it is risky to populate the pluggable connector next to the input power.
 
@@ -195,4 +195,10 @@ This board has an ATmega328p like an Arduino Uno but is dedicated to the onboard
 ## Solar
 
 Trickle charging a battery can be done directly through a diode when the PV source is less than or about .02C (e.g. 200mA into a 10AHr battery). This means that the need for a charge controller depends on if the user wants to ratio the PV and battery storage for trickle or quick charging (i.e. >0.02C). I am using an SLP003-12U panel that charges at less than 200mA and a 10AHr AGM battery with a diode that blocks dark current (e.g. no charge controller at all). 
+
+## Input Power LC 
+
+Input wiring can have inductance that oscilates as an [LC circuit] with the input capacitor. The problem can show up when the SMPS has a frequancy component that drives the oscilation. There are many ways to deal with the issue, a few examples include twisting the input power wires to lower there inductance, adding a ferite to dampen the oscilation, adding a bypass or two along the line to shift the oscilation nodes.
+
+[LC circuit]: https://en.wikipedia.org/wiki/LC_circuit
 

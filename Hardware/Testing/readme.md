@@ -20,7 +20,7 @@ This is a list of Test preformed on each RPUno after assembly.
 
 ## Basics
 
-These tests are for an assembled RPUno board 14140^6 which may be referred to as a Unit Under Test (UUT). If the UUT fails and can be reworked then do so, otherwise it needs to be scraped. 
+These tests are for an assembled RPUno board 14140^9 which may be referred to as a Unit Under Test (UUT). If the UUT fails and can be reworked then do so, otherwise it needs to be scraped. 
 
 **Warning: never use a soldering iron to rework ceramic capacitors due to the thermal shock.**
     
@@ -52,13 +52,12 @@ Apply a current limited (20mA) supply set with 5V to the PWR and 0V connector J8
 
 Apply a current limited (20mA) supply set with 7V to the PWR and 0V connector J8 and verify that the voltage does get through. Adjust the supply so the LED is on and stable and measure voltage, adjust supply to 30V measure input current. 
 
-NOTE the zener voltage on Q3 is for referance and will change with each unit.
+NOTE for referance the zener voltage on Q6 is 7.75V at 30V.
 
 ```
-{ "LEDON_V":[10.7,10.7,],
-  "PWR@7V_mA":[0.3,0.07,],
-  "PWR@30V_mA":[2.6,1.4,],
-  "Q3ZEN@30V_V":[7.75,7.76,]}
+{ "LEDON_V":[10.7,10.7,10.8,],
+  "PWR@7V_mA":[0.3,0.07,0.08,],
+  "PWR@30V_mA":[2.6,1.4,1.3,]}
 ```
 
 
@@ -67,7 +66,7 @@ NOTE the zener voltage on Q3 is for referance and will change with each unit.
 Apply a 30mA current limited 5V source to +5V (J7). Check that the input current is for a blank MCU (e.g. less than 7mA). Turn off the power.
 
 ```
-{ "I_IN_BLANKMCU_mA":[4.7,2.2,]}
+{ "I_IN_BLANKMCU_mA":[4.7,2.2,3.1,]}
 ```
 
 
@@ -102,7 +101,7 @@ make isp
 Disconnect the ICSP tool and measure the input current, wait for the power to be settled. Turn off the power.
 
 ```
-{ "I_IN_16MHZ_EXT_CRYST_mA":[12.7,11.2,]}
+{ "I_IN_16MHZ_EXT_CRYST_mA":[12.7,11.2,11.1,]}
 ```
 
 Add U2 to the board now. Measurement of the input current is for referance (takes a long time to settle, 10mA ICP1 jumper is off).
@@ -110,13 +109,14 @@ Add U2 to the board now. Measurement of the input current is for referance (take
 
 ## Install SMPS
 
-Install U2 and measure its output voltage and input current with the supply set at 12.8V and a 30mA current limit. Measure recover voltage after dropout (e.g. PWR voltage at which +5V recovers after droping).
+Install U2 and measure its output voltage and input current with the supply set at 12.8V and a 30mA current limit. Check the SMPS recovers after low voltage dropout (e.g. normaly the +5V recovers at about 6V without load).
 
 ```
-{ "+5V_V":[4.94,5.00,],
-  "PWR12V8_mA":[9.00,7.2,],
-  "PWR-DR_V":[6.2,6.5,]}
+{ "+5V_V":[4.94,5.00,5.00,],
+  "PWR12V8_mA":[9.00,7.2,6.9,]}
 ```
+
+If the +5V does not recover at the expeced voltage then the wires from the power supply are most likely resonating with the +5V SMPS. Try a few thing: twist the wires to reduce inductance which changes the resonating frequancy. Add ferites to dampen. Finaly add bypass in one or more places along the wires to shift the nodes.
 
 
 ## Self Test
@@ -146,13 +146,13 @@ Exit picocom (Cntl^a and Cntl^x). Plug an [RPUadpt] shield with [Remote] firmwar
 [RPUadpt]: https://github.com/epccs/RPUadpt
 [Remote]: https://github.com/epccs/RPUadpt/tree/master/Remote
 
-Connect the Self Test [Harness] to the UUT. Connect 100 kOhm resistor to both the PV side and BAT side thermistor inputs to simulate room temperature. Connect a 12.8V supply with CC set at 150mA.
+Connect the Self Test [Harness] to the UUT. Connect a 12.8V supply with CC set at 150mA.
 
 [Harness]: https://raw.githubusercontent.com/epccs/RPUno/master/SelfTest/Setup/SelfTestWiring.png
 
 Once the UUT has power check that the VIN pin on the shield has power (this is not tested by the self-test so it has to be done manually).
 
-Measure the +5V supply at J7 pin 1 and pin 2.
+Measure the +5V supply at J7 pin 4.
 
 Edit the SelfTest main.c such that "#define REF_EXTERN_AVCC 5008600UL" has the correct value. Next, run the bootload rule in the Makefile to upload the self-test firmware to the UUT that the remote shield is mounted on.
 
@@ -172,31 +172,34 @@ picocom -b 38400 /dev/ttyUSB0
 picocom v1.7
 ...
 Terminal ready
-Self Test date: Dec 14 2017
-I2C provided address 0x31 from serial bus manager
-PWR_I with CS_EN==off: 0.016 A
-PWR at: 12.834 V
-ADC0 without curr in R1: 0.000 V
-ADC1 without curr in PL for ICP1: 0.000 V
-ICP1's PL input has 0mA input and reads: 1
-22MA_A0 source on R1: 0.022 A
-22MA_A1 source on R1: 0.022 A
-ICP1's PL input with 10mA: 0.010 A
-   ADC1 reading used to calculate ref_intern_1v1_uV: 940 A
-   calculated ref_intern_1v1_uV: 1076316 uV
-REF_EXTERN_AVCC old value was in eeprom: 5008600 uV
-REF_INTERN_1V1 old value was in eeprom: 1070621 uV
-REF_EXTERN_AVCC saved in eeprom: 5008600 uV
-REF_INTERN_1V1 saved in eeprom: 1076316 uV
-ICP1 /w 10mA on plug termination reads: 0
-PWR_I with CS_EN==on: 0.078 A
-22MA_DIO11 curr source on R1: 0.022 A
-DIO12 shunting 22MA_DIO11: 0.007 A
-DIO13 shunting 22MA_DIO11: 0.007 A
-22MA_DIO3 curr source on R1: 0.022 A
-DIO10 shunting 22MA_DIO3: 0.007 A
-DIO3 shunting 22MA_DIO3: 0.007 A
-ICP1 17mA curr source on ICP1's PL plug: 0.018 A
+RPUno Self Test date: Apr 23 2018
+avr-gcc --version: 5.4.0
+I2C provided address 0x31 from RPUadpt serial bus manager
+adc reading for PWR_V: 355
+PWR at: 12.722 V
+ADC0 R1 /W all CS off: 0.000 V
+ADC1 at ICP1 TERM /w all CS off: 0.000 V
+ADC2 at GN LED /w DIO13 sinking and all CS off: 0.000 V
+ADC3 at YE LED /w DIO10 sinking and all CS off: 0.000 V
+ICP1 input should be HIGH with 0mA loop current: 1 
+CS0 on R1: 0.022 A
+DIO11 shunting CS0: 0.014 A
+CS1 source on R1: 0.022 A
+   ADC0 reading used to calculate ref_intern_1v1_uV: 689 A
+   calculated ref_intern_1v1_uV: 1082791 uV
+REF_EXTERN_AVCC old value found in eeprom: 5007000 uV
+REF_INTERN_1V1 old value found in eeprom: 1082204 uV
+REF_EXTERN_AVCC from eeprom is same
+PWR_I at no load use INTERNAL_1V1: 0.012 A
+CS2 source on R1: 0.022 A
+Yellow LED D4 fwd /w CS2 V: 2.112 V
+DIO10 shunting CS2: 0.015 A
+CS3 source on R1: 0.022 A
+DIO12 shunting CS3: 0.015 A
+CS_ICP1 in UUT PL input: 0.018 A
+Green LED D1 fwd /w CS_ICP1 V: 2.147 V
+ICP1 /w 17mA on termination reads: 0 
+DIO13 shunting CS_ICP1: 0.015 A
 [PASS]
 ```
 

@@ -1,5 +1,5 @@
 /*
-Uart is a demonstration of Interrupt-Driven UART with stdio redirect. 
+Uart is a demonstration of an Interrupt-Driven UART with stdio redirect. 
 Copyright (C) 2016 Ronald Sutherland
 
 This program is free software; you can redistribute it and/or
@@ -26,8 +26,10 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/pins_board.h"
 #include "id.h"
 
-#define BLINK_DELAY 1000UL
+// 22mA current sources enabled with CS0_EN and CS1_EN which are defined in ../lib/pins_board.h
+#define STATUS_LED CS0_EN
 
+#define BLINK_DELAY 1000UL
 static unsigned long blink_started_at;
 static unsigned long blink_delay;
 static char rpu_addr;
@@ -42,9 +44,8 @@ void ProcessCmd()
 
 void setup(void) 
 {
-	// RPUuno has no LED, but LED_BUILTIN is defined as pin 13 anyway.
-    pinMode(LED_BUILTIN,OUTPUT);
-    digitalWrite(LED_BUILTIN,HIGH);
+    pinMode(STATUS_LED,OUTPUT);
+    digitalWrite(STATUS_LED,HIGH);
     
     //Timer0 Fast PWM mode, Timer1 & Timer2 Phase Correct PWM mode.
     initTimers(); 
@@ -79,7 +80,7 @@ void blink(void)
     unsigned long kRuntime = millis() - blink_started_at;
     if ( kRuntime > blink_delay)
     {
-        digitalToggle(LED_BUILTIN);
+        digitalToggle(STATUS_LED);
         
         // next toggle 
         blink_started_at += blink_delay; 
@@ -92,7 +93,7 @@ int main(void) {
 
     while(1) 
     {
-        // use LED to see if I2C has a bus manager
+        // use STATUS_LED to show if I2C has a bus manager
         blink();
         
         // check if character is available to assemble a command, e.g. non-blocking

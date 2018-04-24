@@ -58,9 +58,6 @@
 #define DIO13 13
 #define SCK 13
 
-// RPUno board has no led but this is the normal place it would be found
-#define LED_BUILTIN 13 
-
 //ADC0 thur ADC3 can also be used for digital IO from the plugable connector
 #define DIO14 14
 #define DIO15 15

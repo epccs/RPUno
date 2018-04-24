@@ -63,7 +63,7 @@ void Id(char name[])
     }
     else if ( command_done == 12 )
     {
-        printf_P(PSTR("\"desc\":\"RPUno (14140^7) " ));
+        printf_P(PSTR("\"desc\":\"RPUno (14140^9) " ));
         command_done = 13;
     }
     else if ( command_done == 13 )

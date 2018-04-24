@@ -28,7 +28,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "analog.h"
 #include "references.h"
 
-#define SERIAL_PRINT_DELAY_MILSEC 60000
+#define SERIAL_PRINT_DELAY_MILSEC 2000
 static unsigned long serial_print_started_at;
 
 static uint8_t adc_arg_index;
@@ -66,24 +66,14 @@ void Analog(void)
     { // use the channel as an index in the JSON reply
         uint8_t arg_indx_channel =atoi(arg[adc_arg_index]);
         
-        if ( (arg_indx_channel == ADC0) || (arg_indx_channel == ADC1) || (arg_indx_channel == ADC4) || (arg_indx_channel == ADC5) )//ADC0, ADC1
+        if ( (arg_indx_channel == ADC0) || (arg_indx_channel == ADC1) || (arg_indx_channel == ADC2) || (arg_indx_channel == ADC3) || (arg_indx_channel == ADC4) || (arg_indx_channel == ADC5) )//ADC0, ADC1
         {
             printf_P(PSTR("\"ADC%s\":"),arg[adc_arg_index]);
         }
 
-        if (arg_indx_channel == CHRG_I) //ADC2
-        {
-            printf_P(PSTR("\"CHRG_A\":"));
-        }
-
-        if (arg_indx_channel == DISCHRG_I) //ADC3
-        {
-            printf_P(PSTR("\"DISCHRG_A\":"));
-        }
-
         if (arg_indx_channel == PWR_I) //ADC6
         {
-            printf_P(PSTR("\"PWR_A\":"));
+            printf_P(PSTR("\"PWR_I\":"));
         }
         
         if (arg_indx_channel == PWR_V) //ADC7
@@ -96,17 +86,12 @@ void Analog(void)
     {
         uint8_t arg_indx_channel =atoi(arg[adc_arg_index]);
 
-        // There are values from 0 to 1023 for 1024 slots where each reperesents 1/1024 of the reference. Last slot has issues
+       // There are values from 0 to 1023 for 1024 slots where each reperesents 1/1024 of the reference. Last slot has issues
         // https://forum.arduino.cc/index.php?topic=303189.0 
-        if ( (arg_indx_channel == ADC0) || (arg_indx_channel == ADC1) )
+        // The BSS138 level shift will block voltages over 3.5V
+        if ( (arg_indx_channel == ADC0) || (arg_indx_channel == ADC1) || (arg_indx_channel == ADC2) || (arg_indx_channel == ADC3))
         {
             printf_P(PSTR("\"%1.2f\""),(analogRead(arg_indx_channel)*(ref_extern_avcc_uV/1.0E6)/1024.0));
-        }
-
-        // ADC2, ADC3 and ADC6 are connected to high side current sense.
-        if ( (arg_indx_channel == CHRG_I) || (arg_indx_channel == DISCHRG_I) || (arg_indx_channel == PWR_I))
-        {
-            printf_P(PSTR("\"%1.3f\""),(analogRead(arg_indx_channel)*((ref_extern_avcc_uV/1.0E6)/1024.0)/(0.068*50.0)));
         }
 
         if (arg_indx_channel == ADC4) // On RPUno ADC4 is used for I2C SDA function
@@ -119,7 +104,13 @@ void Analog(void)
             printf_P(PSTR("\"SCL\""));
         }
 
-        if (arg_indx_channel == PWR_V) // RPUno has ADC7 connected a voltage divider from the battery (PWR).
+        // ADC6 is connected to a 50V/V high side current sense.
+        if (arg_indx_channel == PWR_I)
+        {
+            printf_P(PSTR("\"%1.3f\""),(analogRead(arg_indx_channel)*((ref_extern_avcc_uV/1.0E6)/1024.0)/(0.068*50.0)));
+        }
+
+        if (arg_indx_channel == PWR_V) // RPUno has ADC7 connected a voltage divider from VIN.
         {
             printf_P(PSTR("\"%1.2f\""),(analogRead(arg_indx_channel)*((ref_extern_avcc_uV/1.0E6)/1024.0)*(115.8/15.8)));
         }

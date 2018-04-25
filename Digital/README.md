@@ -2,13 +2,15 @@
 
 ## Overview
 
-Digital is an interactive command line program that demonstrates control of RPUno's Digital input/output from its ATmega328p pins PD3 (3), PD4 (4), and PB2 through PB5 (10..13). The RPUno has these I/O's wired to the pluggable onboard connectors. They are level converted for the microcontroller and clamped to an ESD node. The 22mA current sources provide power from VIN during saturation but will limit the current to about 22mA when shorted. The current source is intrinsically safe to use with a digital input and allows driving a MOSFET gate or a string of solid state relays from the power provided to VIN.
+Digital is an interactive command line program that demonstrates control of the Digital input/output from ATmega328p pins PB2..PB5 (10..13) and PC0..PC3 (14..17).
 
 ## Firmware Upload
 
 With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
 
 ``` 
+git clone https://github.com/epccs/RPUno/
+cd /RPUno/Digital
 rsutherland@conversion:~/Samba/RPUno/Digital$ make bootload
 ...
 avrdude done.  Thank you.
@@ -42,57 +44,56 @@ Identify is from ../Uart/id.h Id().
 
 ``` 
 /1/id?
-{"id":{"name":"Digital","desc":"RPUno (14140^7) Board /w atmega328p","avr-gcc":"4.9"}}
+{"id":{"name":"Digital","desc":"RPUno (14140^9) Board /w atmega328p","avr-gcc":"5.4.0"}}
 ```
 
-##  /0/pinMode 3|4|10|11|12,INPUT|OUTPUT    
+##  /0/pMod 10..17,INPUT|OUTPUT    
 
 Set the Data Direction Register (DDRx) bit that sets a pin as INPUT or OUTPUT.
 
 ``` 
-/1/pinMode 3,OUTPUT
-{"PD3":"OUTPUT"}
-/1/pinMode 10,INPUT
-{"PB2":"INPUT"}
+/1/pMod 10,OUTPUT
+{"PB2":"OUTPUT"}
+/1/pMod 14,INPUT
+{"PC0":"INPUT"}
 ```
 
 
-##  /0/digitalWrite 3|4|10|11|12,HIGH|LOW    
+##  /0/dWrt 10..17,HIGH|LOW    
 
 Set the Port Data Register (PORTx) bit that drives the pin or if mode (e.g. Port Input Register bit) is set as an INPUT enables a pullup. Returns the Port Input Register PINx bit (e.g. same as read command)
 
 ``` 
-/1/digitalWrite 3,LOW
-{"PD3":"LOW"}
-/1/digitalWrite 10,HIGH
-{"PB2":"HIGH"}
+/1/dWrt 10,LOW
+{"PB2":"LOW"}
+/1/dWrt 14,HIGH
+{"PC0":"LOW"}
 ```
 
+Pin 14 is set as INPUT so it is not in the push-pull mode, the HIGH turns on a weak pullup and a LOW turns off the pullup. Since I have the SelfTest setup connected the ADC0 has 33.3 Ohm to ground and reads back a LOW.
 
-##  /0/digitalToggle 3|4|10|11|12  
+
+##  /0/dTog 10..17
 
 Toggle the Port Data Register (PORTx) bit if the Data Direction Register (DDRx) bit is set as an OUTPUT. Returns the Port Input Register PINx bit (e.g. same as read command)
 
 ``` 
-/1/digitalToggle 3
-{"PD3":"HIGH"}
-/1/digitalToggle 3
-{"PD3":"LOW"}
-/1/digitalToggle 3
-{"PD3":"HIGH"}
-
+/1/dTog 10
+{"PC0":"HIGH"}
+/1/dTog 10
+{"PC0":"LOW"}
 ```
 
+The board has a 127 Ohm output resistor that goes to the SelfTest wiring thus about 23mA is in the yellow LED when digital pin 10 is HIGH. 
 
-##  /0/digitalRead? 3|4|10|11|12 
+
+##  /0/dRe? 10..17
 
 Read the Port Input Register (PINx) bit that was latched during last low edge of the system clock.
 
 ``` 
-/1/digitalRead? 3
-{"PD3":"HIGH"}
-/1/digitalRead? 10
+/1/dRe? 14
+{"PC0":"LOW"}
+/1/dRe? 10
 {"PB2":"LOW"}
-
 ```
-I have a 1k Ohm resistor on the nSS pin (digital 10) to ground that causes it to read low, the ATmega328p pull-up is about 60k Ohm.

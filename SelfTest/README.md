@@ -28,7 +28,7 @@ With a serial port setup for serial bootloading (see BOOT_PORT in Makefile) and 
 
 ``` 
 git clone https://github.com/epccs/RPUno/
-cd /RPUux/SelfTest
+cd /RPUno/SelfTest
 make bootload
 ...
 avrdude done.  Thank you.

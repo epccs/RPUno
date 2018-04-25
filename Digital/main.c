@@ -27,6 +27,8 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../Uart/id.h"
 #include "digital.h"
 
+#define STATUS_LED CS0_EN
+
 #define BLINK_DELAY 1000UL
 static unsigned long blink_started_at;
 static unsigned long blink_delay;
@@ -38,19 +40,19 @@ void ProcessCmd()
     {
         Id("Digital");
     }
-    if ( (strcmp_P( command, PSTR("/pinMode")) == 0) && ( (arg_count == 2 ) ) )
+    if ( (strcmp_P( command, PSTR("/pMod")) == 0) && ( (arg_count == 2 ) ) )
     {
         Mode();
     }
-    if ( (strcmp_P( command, PSTR("/digitalWrite")) == 0) && ( (arg_count == 2 ) ) )
+    if ( (strcmp_P( command, PSTR("/dWrt")) == 0) && ( (arg_count == 2 ) ) )
     {
         Write();
     }
-    if ( (strcmp_P( command, PSTR("/digitalToggle")) == 0) && ( (arg_count == 1 ) ) )
+    if ( (strcmp_P( command, PSTR("/dTog")) == 0) && ( (arg_count == 1 ) ) )
     {
         Toggle();
     }
-    if ( (strcmp_P( command, PSTR("/digitalRead?")) == 0) && ( (arg_count == 1 ) ) )
+    if ( (strcmp_P( command, PSTR("/dRe?")) == 0) && ( (arg_count == 1 ) ) )
     {
         Read();
     }
@@ -58,9 +60,8 @@ void ProcessCmd()
 
 void setup(void) 
 {
-	// RPUuno has no LED, but the LED_BUILTIN is defined as digital 13 (SCK) anyway.
-    pinMode(LED_BUILTIN,OUTPUT);
-    digitalWrite(LED_BUILTIN,HIGH);
+    pinMode(STATUS_LED,OUTPUT);
+    digitalWrite(STATUS_LED,HIGH);
     
     // Initialize Timers and clear bootloader, Arduino does these with init() in wiring.c
     initTimers(); //Timer0 Fast PWM mode, Timer1 & Timer2 Phase Correct PWM mode.
@@ -96,7 +97,7 @@ void blink(void)
     unsigned long kRuntime = millis() - blink_started_at;
     if ( kRuntime > blink_delay)
     {
-        digitalToggle(LED_BUILTIN);
+        digitalToggle(STATUS_LED);
         
         // next toggle 
         blink_started_at += blink_delay; 

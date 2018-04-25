@@ -1,5 +1,5 @@
 /*
-id is part of RPUno, it adds the identify command to an RPU_BUS command line interface, 
+id is part of Uart
 Copyright (C) 2016 Ronald Sutherland
 
 This program is free software; you can redistribute it and/or
@@ -81,7 +81,7 @@ void Id(char name[])
     }
     else if ( command_done == 14 )
     {
-        printf_P(PSTR("\"avr-gcc\":\"%d.%d\""),__GNUC__,__GNUC_MINOR__);
+        printf_P(PSTR("\"avr-gcc\":\"%s\""),__VERSION__);
         command_done = 15; 
     }
     else if ( command_done == 15 )

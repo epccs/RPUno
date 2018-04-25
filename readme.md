@@ -125,3 +125,12 @@ The Arduino IDE can use the [Uno's AVR core] files that are included (my [core] 
 [Uno's AVR core]: https://github.com/arduino/Arduino/tree/master/hardware/arduino/avr/cores/arduino
 [core]: https://github.com/epccs/RPUlux/tree/master/lib
 
+
+## Visual Studio Code
+
+VSC is an editor with some IDE features, it is happy with Makefiles. The feature that is driving me to use VSC is [IntelliSense]. It is configured with JSON files in [.vscode]. 
+
+[IntelliSense]: https://code.visualstudio.com/docs/editor/intellisense
+[.vscode]: https://github.com/epccs/RPUno/tree/master/.vscode
+
+IntelliSense needs access to the toolchain includes. The AVR toolchain has some in avr-libc (/usr/lib/avr/include), and gcc-avr (/usr/lib/gcc/avr/5.4.0/include). So I copy them into a Samba share for VSC to see (e.g. Y:/lib/avr-libc, and Y:/lib/gcc-avr) which is also where I edit the source (e.g. Y:/git/RPUlux).

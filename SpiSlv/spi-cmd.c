@@ -31,6 +31,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "spi-cmd.h"
 
 volatile uint8_t spi_data;
+static uint8_t pin_used_in_place_of_missing_chip_select; // pin used to drive nSS pin, that is a fugly hack.
 
 // SPDR is used to shift data in and out, so it will echo back on SPI what was last sent.
 // A copy is made for local use (i.e. SPDR will shift when the master drives SCK)
@@ -41,15 +42,18 @@ ISR(SPI_STC_vect)
     spi_data = SPDR;
 }
 
-void spi_init(void)
+// hack: RPUpi CE0 or CE1 should  be used to drive nSS...
+// BUT, it is not wired on the RPUpi board yet so for now it is done with an MCU pin
+void spi_init(uint8_t hack)
 {
+    pin_used_in_place_of_missing_chip_select = hack;
     // SPI slave setup 
     pinMode(MOSI, INPUT);
     pinMode(MISO, OUTPUT);
     pinMode(SCK, INPUT);             // SPI slave is cloced by the master
     pinMode(nSS, INPUT);             // in slave mode nSS is used for synchronization
-    pinMode(DIO3, OUTPUT);           // used to drive nSS active when given /spi? ON
-    digitalWrite(DIO3,HIGH);         // SPI nSS is active low
+    pinMode(pin_used_in_place_of_missing_chip_select, OUTPUT);           // used to drive nSS active when given /spi? ON
+    digitalWrite(pin_used_in_place_of_missing_chip_select,HIGH);         // SPI nSS is active low
 }
 
 void EnableSpi(void)
@@ -71,13 +75,13 @@ void EnableSpi(void)
             // CPHA bit zero sample data on active going SCK edge and setup on the non-active going edge
             SPCR = (1<<SPE)|(1<<SPIE);       // SPI Enable and SPI interrupt enable bit
             SPDR = 0;                        // SPI data register used for shifting data
-            digitalWrite(DIO3,LOW);          // SPI nSS is active low
+            digitalWrite(pin_used_in_place_of_missing_chip_select,LOW);          // SPI nSS is active low
             printf_P(PSTR("{\"SPI\":\"UP\"}\r\n"));
             initCommandBuffer();
         }
         else
         {
-            digitalWrite(DIO3,HIGH);         // SPI nSS is active low
+            digitalWrite(pin_used_in_place_of_missing_chip_select,HIGH);         // SPI nSS is active low
             SPCR = 0;                        // SPI Disanable SPI
             SPDR = 0;                        // SPI data register used for shifting data
             printf_P(PSTR("{\"SPI\":\"DOWN\"}\r\n"));

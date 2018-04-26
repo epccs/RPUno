@@ -2,7 +2,7 @@
 
 ## Overview
 
-SPI slave with an interactive command line program. DIO4 is used as status LED. DIO3 can be used to drive nSS (which is on DIO10) to enable slave functions (Note: nSS is not connected to the Pi Zero).
+SPI slave with an interactive command line program. CS0 is used to operate a status LED. DIO16 (ADC2) is used to drive nSS (which is on DIO10) to enable slave functions (Note: nSS is not connected on the RPUpi board).
 
 
 ## Pi SPI
@@ -45,7 +45,7 @@ FF DE AD BE EF BA
 AD F0
 ``` 
 
-Note: The output is offset a byte since it was sent back from the AVR. I see errors at 1MHz and 2MHz. The RPUpi^3 has a 74LVC07 buffer that pulls down through a 10kOhm resistor on SCK and MOSI. The circuit between that resistor and the AVR has some capacitance which will limit the speed (if there is a need for higher speed it may be possible to swap in a 1k resistor).
+Note: The output is offset a byte since it was sent back from the AVR. I see errors at 1MHz and 2MHz. The RPUpi^3 has a 74LVC07 buffer that pulls down through a 10kOhm resistor on SCK and MOSI. The circuit between that resistor and the AVR has some capacitance which will limit the speed (if there is a need for higher speed it may be possible to use a 1k resistor).
 
 
 ## Wiring Setup

@@ -29,8 +29,10 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../i2c-debug/i2c-cmd.h"
 #include "spi-cmd.h"
 
-#define BLINK_DELAY 1000UL
+// 22mA current source enabled with CS0_EN which are defined in ../lib/pins_board.h
+#define STATUS_LED CS0_EN
 
+#define BLINK_DELAY 1000UL
 static unsigned long blink_started_at;
 static unsigned long blink_delay;
 static char rpu_addr;
@@ -73,12 +75,8 @@ void ProcessCmd()
 
 void setup(void) 
 {
-	// RPUuno has no LED
-    // LED_BUILTIN is defined as pin 13 in pins_board.h, 
-    // but it is needed for SCK when SPI is enabled.
-    // So for this I use DIO4 as the status blinker
-    pinMode(DIO4,OUTPUT);
-    digitalWrite(DIO4,HIGH);
+    pinMode(STATUS_LED,OUTPUT);
+    digitalWrite(STATUS_LED,HIGH);
     
     //Timer0 Fast PWM mode, Timer1 & Timer2 Phase Correct PWM mode.
     initTimers(); 
@@ -90,7 +88,7 @@ void setup(void)
     twi_init(TWI_PULLUP);
 
     /* Initialize SPI*/
-    spi_init();
+    spi_init(DIO16);
 
     /* Clear and setup the command buffer, (probably not needed at this point) */
     initCommandBuffer();
@@ -116,7 +114,7 @@ void blink(void)
     unsigned long kRuntime = millis() - blink_started_at;
     if ( kRuntime > blink_delay)
     {
-        digitalToggle(DIO4);
+        digitalToggle(STATUS_LED);
         
         // next toggle 
         blink_started_at += blink_delay; 
@@ -129,7 +127,7 @@ int main(void) {
 
     while(1) 
     {
-        // use LED to see if I2C has a bus manager
+        // use LED to show if I2C has a bus manager
         blink();
         
         // check if character is available to assemble a command, e.g. non-blocking

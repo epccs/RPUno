@@ -76,12 +76,17 @@ static const Pin_Map pinMap[NUM_DIGITAL_PINS] = {
 };
 #endif  // defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__)  || defined(__AVR_ATmega328P__)
 
-void badPinNumber(void) __attribute__((error("\n***rss: Dead code elimination has failed,\n***rss: becasue the compiler is not sure it can eliminate the badPinNumber() function.\n***rss: Test the pin value berfor calling the Digital function to eliminate this error.")));
-
-// dead code elimination should remove the badPinNumber function call if the compiler is sure that the pin number is within the tested range.
-static inline __attribute__((always_inline)) void badPinCheck(uint8_t pin) 
+// note: the use of dead code elimination tricks is not standard C. 
+static inline __attribute__((always_inline)) uint8_t badPin(uint8_t pin) 
 {
-    if (pin >= NUM_DIGITAL_PINS) badPinNumber();
+    if (pin >= NUM_DIGITAL_PINS) 
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 static inline __attribute__((always_inline))
@@ -106,33 +111,39 @@ void bitWrite(volatile uint8_t* register_addr, uint8_t bit_offset, bool value_fo
 static inline __attribute__((always_inline))
 bool digitalRead(uint8_t pin_num) 
 {
-    badPinCheck(pin_num);
-    return (*pinMap[pin_num].pin >> pinMap[pin_num].bit) & 1;
+    if (!badPin(pin_num)) 
+    {
+        return (*pinMap[pin_num].pin >> pinMap[pin_num].bit) & 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 /* set pin value HIGH and LOW */
 static inline __attribute__((always_inline))
 void digitalWrite(uint8_t pin_num, bool value_for_bit) {
-  badPinCheck(pin_num);
-  bitWrite(pinMap[pin_num].port, pinMap[pin_num].bit, value_for_bit);
+    if (!badPin(pin_num)) bitWrite(pinMap[pin_num].port, pinMap[pin_num].bit, value_for_bit);
 }
 
 /* toggle pin number  */
 static inline __attribute__((always_inline))
-void digitalToggle(uint8_t pin) {
-    badPinCheck(pin);
-    // Ckeck if pin is in OUTPUT mode befor changing it
-    if( ( ( (*pinMap[pin].ddr) >> pinMap[pin].bit ) & 1) == OUTPUT )  
+void digitalToggle(uint8_t pin_num) {
+    if (!badPin(pin_num)) 
     {
-        digitalWrite(pin, !digitalRead(pin));
+        // Ckeck if pin is in OUTPUT mode befor changing it
+        if( ( ( (*pinMap[pin_num].ddr) >> pinMap[pin_num].bit ) & 1) == OUTPUT )  
+        {
+            digitalWrite(pin_num, !digitalRead(pin_num));
+        }
     }
 }
 
 /* set pin mode INPUT and OUTPUT */
 static inline __attribute__((always_inline))
 void pinMode(uint8_t pin_num, bool output_mode) {
-  badPinCheck(pin_num);
-  bitWrite(pinMap[pin_num].ddr, pinMap[pin_num].bit, output_mode);
+    if (!badPin(pin_num)) bitWrite(pinMap[pin_num].ddr, pinMap[pin_num].bit, output_mode);
 }
 
 #endif  // DigitalPin_h

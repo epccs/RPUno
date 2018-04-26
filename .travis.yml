@@ -1,0 +1,35 @@
+# This file is used to configure Travis CI
+language: c
+dist: trusty
+sudo: required
+
+env:
+  matrix:
+    # Each line in the matrix will be a separate job when Travis CI runs the script section
+    # Travis does the clone like this
+    # git clone --depth=50 --branch=master https://github.com/epccs/RPUno.git epccs/RPUno
+    # so the path to each Makefile is as follows
+
+    - APP_PATH="SelfTest"
+    - APP_PATH="BlinkLED"
+    - APP_PATH="Uart"
+    - APP_PATH="Adc"
+    - APP_PATH="Digital"
+    - APP_PATH="i2c-debug"
+    - APP_PATH="SpiSlv"
+
+before_install:
+  - sudo apt-get update -qq
+
+install:
+  - sudo apt-get install -qq gcc-avr binutils-avr avr-libc
+
+script:
+  - avr-gcc --version
+  - cd $APP_PATH
+  - make
+
+notifications:
+  email:
+    on_success: never
+    on_failure: always

@@ -4,7 +4,9 @@ From <https://github.com/epccs/RPUno/>
 
 ## Overview
 
-This general purpose programmable controller board has a bare metal ATmega328p microcontroller which has several programing options.  The headers are for the shields [RPUadpt], and [RPUpi] that connect the controller UART to a multidrop serial bus.
+A general purpose ATmega328p controller board with level shift IO and current sources that operate over the wide input voltage range.
+
+The onboard bare metal is a well-known microcontroller and has several programming options (I use ISCP and bootloader). It is selected because the toolchain is available on a Raspberry Pi, and can be interfaced with 5V hardware (note that level shifting affects the push-pull high voltage). The header pins are directly connected to the microcontroller. I use the headers with my shields [RPUadpt], and [RPUpi] that connect the board to a multidrop serial bus. The board can measure input Voltage, and current and disconnect power to the shield's VIN pin. [RPUpi] wires that VIN pin power to an SMPS that powers the Raspberry Pi computer.
 
 [RPUadpt]: https://github.com/epccs/RPUadpt
 [RPUpi]: https://github.com/epccs/RPUpi
@@ -16,6 +18,8 @@ This general purpose programmable controller board has a bare metal ATmega328p m
 ## Status
 
 Available through [Tindie](https://www.tindie.com/products/8862/)
+
+[![Build Status](https://travis-ci.org/epccs/RPUno.svg?branch=master)](https://travis-ci.org/epccs/RPUno)
 
 ![Status](./Hardware/status_icon.png "Status")
 
@@ -116,6 +120,13 @@ make bootload
 ```
 
 The software is a guide, it is in C because that is my preference when lacking an operating system.
+
+
+## Continuous Integration
+
+Continuous Integration (CI) is the practice of automatically compiling and testing each time the mainline source is updated (e.g. git push). Travis CI is using a painfully out of date version of Ubuntu (14.04) as there host environment for doing the test build. The build machine allows pulling in any packages I want including the AVR cross compiler. I don't do anything fancy, just run make. A rule like "make test" could be used if the test build machine had hardware connected (e.g. "make bootload" and then "make test") to the machine, but that is not practical in the foreseeable future. This board was painless to set up for Travis because the ATmega328p was in production and Arduino was so popular at that time that the founders were starting to fight for a chance to get rich.
+
+[https://travis-ci.org/epccs/RPUno](https://travis-ci.org/epccs/RPUno)
 
 
 ## Arduino IDE

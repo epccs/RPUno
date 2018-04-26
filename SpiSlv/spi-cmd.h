@@ -2,7 +2,7 @@
 #define SpiCmd_H
 
 extern void EnableSpi(void);
-extern void spi_init(void);
+extern void spi_init(uint8_t);
 
 extern volatile uint8_t spi_data;
 

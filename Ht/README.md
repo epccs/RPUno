@@ -48,7 +48,14 @@ script -f -c "picocom -b 38400 /dev/ttyUSB0" stuff,ht.log
 
 Commands are interactive over the serial interface at 38400 baud rate. The echo will start after the second character of a new line. 
 
-## /0/id? [name|desc|avr-gcc]
+
+## /\[rpu_address\]/\[command \[arg\]\]
+
+rpu_address is taken from the I2C address 0x29 (e.g. get_Rpu_address() which is included form ../lib/rpu_mgr.h). The value of rpu_address is used as a character in a string, which means don't use a null value (C strings are null terminated) as an adddress. The ASCII value for '1' (0x31) is easy and looks nice, though I fear it will cause some confusion when it is discovered that the actual address value is 49.
+
+Commands and their arguments follow.
+
+## /0/id? \[name|desc|avr-gcc\]
 
 identify 
 
@@ -66,7 +73,7 @@ Initialize Input Capture ICP1. Set the Input Capture Edge Select mode. Set the p
 {"icp1":{"edgSel":"both", "preScalr":"1"}}
 ```
 
-## /0/count? [icp1]
+## /0/count? \[icp1\]
 
 Return count of ICP1 (ATmega328 pin PB0. Uno pin 8) event captures. A zero means icp1 captures are not happening (because I forgot to connect a sensor).
 
@@ -77,7 +84,7 @@ Return count of ICP1 (ATmega328 pin PB0. Uno pin 8) event captures. A zero means
 {"icp1":{"count":"0"}}
 ```
 
-## /0/capture? [icp1,1..15] 
+## /0/capture? \[icp1,1..15\] 
 
 return ICP1 timer delta(s) as a pair of low and high timing values from the buffered capture events. These can be used to find the duty or period. The count is the number of event captures (now I've connected a [HT](http://epccs.org/indexes/Board/HT/) sensor). Note that a group of consecutive captures is, in fact, continous, there are no timing gaps. The resolution of continuous timing events can approach that of the stability of the timing sources (both timing sources have to be stable to gain maximum resolution). Pulse interpolation is a way of using a fast time source to measure a slow time source, but the fast time source occurs in buckets (e.g. quantum) and to measure something with those buckets to 100ppm requires 10k of them. 
 
@@ -96,7 +103,7 @@ return ICP1 timer delta(s) as a pair of low and high timing values from the buff
 
 It takes three events to aggregate the data for a capture report. The status reports only the most recent event status since the other two events can be inferred. 
 
-## /0/event? [icp1,1..31] 
+## /0/event? \[icp1,1..31\] 
 
 return ICP1 event timer values as a 16 bit unsign integer, which continuously rolls over. The status bit 0 shows rising (0 is falling) edge.
 

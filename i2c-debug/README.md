@@ -42,7 +42,14 @@ picocom -b 38400 /dev/ttyUSB0
 
 Commands are interactive over the serial interface at 38400 baud rate. The echo will start after the second character of a new line. 
 
-## /0/id? [name|desc|avr-gcc]
+
+## /\[rpu_address\]/\[command \[arg\]\]
+
+rpu_address is taken from the I2C address 0x29 (e.g. get_Rpu_address() which is included form ../lib/rpu_mgr.h). The value of rpu_address is used as a character in a string, which means don't use a null value (C strings are null terminated) as an adddress. The ASCII value for '1' (0x31) is easy and looks nice, though I fear it will cause some confusion when it is discovered that the actual address value is 49.
+
+Commands and their arguments follow.
+
+## /0/id? \[name|desc|avr-gcc\]
 
 identify 
 
@@ -75,7 +82,7 @@ Set the I2C address
 Note: Set it with the decimel value, it will return the hex value. This value is used durring read and write, it will also reset the xtBuffer.
 
 
-## /0/ibuff 0..255[,0..255[,0..255[,0..255[,0..255]]]]
+## /0/ibuff 0..255\[,0..255\[,0..255\[,0..255\[,0..255\]\]\]\]
 
 Add up to five bytes to I2C transmit buffer. JSON reply is the full buffer. 
 
@@ -107,7 +114,7 @@ Attempt to become master and write the txBuffer bytes to I2C address (PCA9554). 
 {"returnCode":"success"}
 ``` 
 
-## /0/iread? [1..32]
+## /0/iread? \[1..32\]
 
 If txBuffer has values, attempt to become master and write the byte(s) in buffer (e.g. command byte) to I2C address (example is for a PCA9554) without a stop condition. The txBuffer will clear if write was a success. Then send a repeated Start condition, followed by address and obtain readings into rxBuffer.
 

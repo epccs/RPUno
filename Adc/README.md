@@ -35,7 +35,7 @@ With a serial port connection (set the BOOT_PORT in Makefile) and optiboot insta
 
 ``` 
 git clone https://github.com/epccs/RPUno/
-cd /RPUux/Adc
+cd /RPUno/Adc
 make bootload
 ...
 avrdude done.  Thank you.

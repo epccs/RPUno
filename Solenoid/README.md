@@ -106,16 +106,16 @@ picocom -b 38400 /dev/ttyUSB0
 Commands are interactive over the serial interface at 38400 baud rate. The echo will start after the second character of a new line. 
 
 
-## /[rpu_address]/[command [arg]]
+## /\[rpu_address\]/\[command \[arg\]\]
 
 rpu_address is taken from the I2C address 0x29 (e.g. ../Uart/id.h get_Rpu_address() ). The value of rpu_address is used as a character in a string, which means don't use a null value (C strings are null terminated), but the ASCII value for '1' (0x31) is easy and looks nice, though I fear it will cause some confusion when it is discovered that the actual address value is 49.
 
-The LED_BUILTIN is bliked fast (twice per second) if the I2C address is not found, also the rpu_address defaults to '0'. 
+The STATUS_LED is bliked fast (twice per second) if the I2C address is not found, also the rpu_address defaults to '0'. 
 
 Commands and their arguments follow.
 
 
-## /0/id? [name|desc|avr-gcc]
+## /0/id? \[name|desc|avr-gcc\]
 
 Identify is from ../Uart/id.h Id().
 
@@ -125,7 +125,7 @@ Identify is from ../Uart/id.h Id().
 ```
 
 
-##  /0/run k[,cycles] 
+##  /0/run k\[,cycles\] 
 
 Start the solenoid k (1|2|3) operation, with option to override cycles (1..255). 
 
@@ -266,16 +266,16 @@ Report the solenoid k (1|2|3) runtime in millis.
 ## [/0/day?](../DayNight#0day)
 
 
-## [/0/analog? 0..7[,0..7[,0..7[,0..7[,0..7]]]]](../Adc#0analog-0707070707)
+## [/0/analog? 0..7\[,0..7\[,0..7\[,0..7\[,0..7\]\]\]\]](../Adc#0analog-0707070707)
 
 
 ## [/0/initICP icp1,mode,prescale](../Capture#0initicp-icp1modeprescale)
 
 
-## [/0/count? [icp1]](../Capture#0count-icp1)
+## [/0/count? \[icp1\]](../Capture#0count-icp1)
 
 
-## [/0/capture? [icp1,1..15]](../Capture#0capture-icp1115)
+## [/0/capture? \[icp1,1..15\]](../Capture#0capture-icp1115)
 
 
-## [/0/event? [icp1,1..31]](../Capture#0event-icp1131)
+## [/0/event? \[icp1,1..31\]](../Capture#0event-icp1131)

@@ -44,16 +44,16 @@ picocom -b 38400 /dev/ttyUSB0
 Commands are interactive over the serial interface at 38400 baud rate. The echo will start after the second character of a new line. 
 
 
-## /[rpu_address]/[command [arg]]
+## /\[rpu_address\]/\[command \[arg\]\]
 
 rpu_address is taken from the I2C address 0x29 (e.g. ../Uart/id.h get_Rpu_address() ). The value of rpu_address is used as a character in a string, which means don't use a null value (C strings are null terminated), but the ASCII value for '1' (0x31) is easy and looks nice, though I fear it will cause some confusion when it is discovered that the actual address value is 49.
 
-The LED_BUILTIN is bliked fast (twice per second) if the I2C address is not found, also the rpu_address defaults to '0'. 
+The STATUS_LED is bliked fast (twice per second) if the I2C address is not found, also the rpu_address defaults to '0'. 
 
 Commands and their arguments follow.
 
 
-## /0/id? [name|desc|avr-gcc]
+## /0/id? \[name|desc|avr-gcc\]
 
 Identify is from ../Uart/id.h Id().
 
@@ -126,7 +126,7 @@ Return the shutdown_detected value from the bus manager over I2C, this will indi
 ```
 
 
-## [/0/analog? 0..7[,0..7[,0..7[,0..7[,0..7]]]]](../Adc#0analog-0707070707)
+## [/0/analog? 0..7\[,0..7\[,0..7\[,0..7\[,0..7\]\]\]\]](../Adc#0analog-0707070707)
 
 
 ## [/0/iscan?](../i2c-debug#0iscan)
@@ -135,7 +135,7 @@ Return the shutdown_detected value from the bus manager over I2C, this will indi
 ## [/0/iaddr 0..127](../i2c-debug#0iaddr-0127)
 
 
-## [/0/ibuff 0..255[,0..255[,0..255[,0..255[,0..255]]]]](../i2c-debug#0ibuff-02550255025502550255)
+## [/0/ibuff 0..255\[,0..255\[,0..255\[,0..255\[,0..255\]\]\]\]](../i2c-debug#0ibuff-02550255025502550255)
 
 
 ## [/0/ibuff?](../i2c-debug#0ibuff)
@@ -153,13 +153,13 @@ Return the shutdown_detected value from the bus manager over I2C, this will indi
 ## [/0/charge?](../AmpHr#0charge)
 
 
-## [/0/pinMode 3|4|10|11|12,INPUT|OUTPUT](..//Digital#0pinmode-34101112inputoutput)
+## [/0/pMod 10..17,INPUT|OUTPUT](..//Digital#0pmod-1017inputoutput)
 
 
-## [/0/digitalWrite 3|4|10|11|12,HIGH|LOW](..//Digital#0digitalwrite-34101112highlow)
+## [/0/dWrt 10..17,HIGH|LOW ](..//Digital#0dwrt-1017highlow)
 
 
-## [/0/digitalToggle 3|4|10|11|12](..//Digital#0digitaltoggle-34101112)
+## [/0/dTog 10..17](..//Digital#0dtog-1017)
 
 
-## [/0/digitalRead? 3|4|10|11|12](..//Digital#0digitalread-34101112)
+## [/0/dRe? 10..17](..//Digital#0dre-1017)

@@ -78,9 +78,16 @@ script -f -c "picocom -b 38400 /dev/ttyUSB0" stuff.log
 
 # Commands
 
-Commands are interactive over the serial interface at 38400 baud rate. The echo will start after the second character of a new line.
+Commands are interactive over the serial interface at 38400 baud rate. The echo will start after the second character of a new line. 
 
-## /0/id? [name|desc|avr-gcc]
+
+## /\[rpu_address\]/\[command \[arg\]\]
+
+rpu_address is taken from the I2C address 0x29 (e.g. get_Rpu_address() which is included form ../lib/rpu_mgr.h). The value of rpu_address is used as a character in a string, which means don't use a null value (C strings are null terminated) as an adddress. The ASCII value for '1' (0x31) is easy and looks nice, though I fear it will cause some confusion when it is discovered that the actual address value is 49.
+
+Commands and their arguments follow.
+
+## /0/id? \[name|desc|avr-gcc\]
 
 identify 
 
@@ -99,10 +106,10 @@ Start the reflow profile and read the Fluke 80TK Thermocouple Module set to Fahr
 {"millis":"2010","pwm":"50","deg_c":"26.11"}
 ```
 
-## [/0/ee? address[,type]](../Eeprom#0ee-addresstype)
+## [/0/ee? address\[,type\]](../Eeprom#0ee-addresstype)
 
 
-## [/0/ee address,value[,type]](../Eeprom#0ee-addressvaluetype)
+## [/0/ee address,value\[,type\]](../Eeprom#0ee-addressvaluetype)
 
 
 ## [/0/iscan?](../i2c-debug#0iscan)
@@ -111,7 +118,7 @@ Start the reflow profile and read the Fluke 80TK Thermocouple Module set to Fahr
 ## [/0/iaddr 0..127](../i2c-debug#0iaddr-0127)
 
 
-## [/0/ibuff 0..255[,0..255[,0..255[,0..255[,0..255]]]]](../i2c-debug#0ibuff-02550255025502550255)
+## [/0/ibuff 0..255\[,0..255\[,0..255\[,0..255\[,0..255\]\]\]\]](../i2c-debug#0ibuff-02550255025502550255)
 
 
 ## [/0/ibuff?](../i2c-debug#0ibuff)

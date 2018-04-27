@@ -24,17 +24,18 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/pin_num.h"
 #include "../lib/pins_board.h"
 
-#define BLINK_DELAY 1000UL
+// 22mA current sources enabled with CS0_EN and CS1_EN which are defined in ../lib/pins_board.h
+#define STATUS_LED CS0_EN
 
+#define BLINK_DELAY 1000UL
 static unsigned long blink_started_at;
 
 static int got_a;
 
 void setup(void) 
 {
-    // RPUno has no LED, but LED_BUILTIN is defined as pin 13 anyway.
-    pinMode(LED_BUILTIN,OUTPUT);
-    digitalWrite(LED_BUILTIN,HIGH);
+    pinMode(STATUS_LED,OUTPUT);
+    digitalWrite(STATUS_LED,HIGH);
 
     /* Initialize UART, it returns a pointer to FILE so redirect of stdin and stdout works*/
     stdout = stdin = uartstream0_init(BAUD);
@@ -55,7 +56,7 @@ void blink(void)
     unsigned long kRuntime = millis() - blink_started_at;
     if ( kRuntime > BLINK_DELAY)
     {
-        digitalToggle(LED_BUILTIN);
+        digitalToggle(STATUS_LED);
         
         // next toggle 
         blink_started_at += BLINK_DELAY; 

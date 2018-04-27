@@ -44,14 +44,14 @@ picocom -b 38400 /dev/ttyUSB0
 Commands are interactive over the serial interface at 38400 baud rate. The echo will start after the second character of a new line. 
 
 
-## /[rpu_address]/[command [arg]]
+## /\[rpu_address\]/\[command \[arg\]\]
 
 rpu_address is taken from the I2C address 0x29 (e.g. get_Rpu_address() which is included form ../Uart/id.h). The value of rpu_address is used as a character in a string, which means don't use a null value (C strings are null terminated), but the ASCII value for '1' (0x31) is easy and looks nice, though I fear it will cause some confusion when it is discovered that the actual address value is 49.
 
 Commands and their arguments follow.
 
 
-## /0/id? [name|desc|avr-gcc]
+## /0/id? \[name|desc|avr-gcc\]
 
 identify 
 
@@ -60,7 +60,7 @@ identify
 {"id":{"name":"Eeprom","desc":"RPUno (14140^7) Board /w atmega328p","avr-gcc":"4.9"}}
 ```
 
-##  /0/ee? address[,type]
+##  /0/ee? address\[,type\]
 
 Return the EEPROM value at address [0..1023 on RPUno]. Type is UINT8, UINT16 or UINT32. Default type is UINT8. This checks if eeprom_is_ready() befor trying to read the EEPROM, if not ready it loops back through the program. 
 
@@ -80,7 +80,7 @@ Return the EEPROM value at address [0..1023 on RPUno]. Type is UINT8, UINT16 or 
 Note: The numbers are packed little endian by the gcc compiler (AVR itself has no endianness). The AVCC calibration value is 4.9438V.
 
 
-##  /0/ee address,value[,type]
+##  /0/ee address,value\[,type\]
 
 Write the value to the address [0..1023 on RPUno] as type. Type is Type is UINT8, UINT16 or UINT32. Default type is UINT8. This checks if eeprom_is_ready() befor trying to read the EEPROM, if not ready it loops back through the program. The JSON response is a read of the EEPROM. 
 

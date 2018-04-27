@@ -74,16 +74,16 @@ picocom -b 38400 /dev/ttyUSB0
 
 Commands are interactive over the serial interface at 38400 baud rate. The echo will start after the second character of a new line. 
 
-## /[rpu_address]/[command [arg]]
+## /\[rpu_address\]/\[command \[arg\]\]
 
 rpu_address is taken from the I2C address 0x29 (e.g. ../Uart/id.h get_Rpu_address() ). The value of rpu_address is used as a character in a string, which means don't use a null value (C strings are null terminated), but the ASCII value for '1' (0x31) is easy and looks nice, though I fear it will cause some confusion when it is discovered that the actual address value is 49.
 
-The LED_BUILTIN is bliked fast (twice per second) if the I2C address is not found, also the rpu_address defaults to '0'. 
+The STATUS_LED is bliked fast (twice per second) if the I2C address is not found, also the rpu_address defaults to '0'. 
 
 Commands and their arguments follow.
 
 
-## /0/id? [name|desc|avr-gcc]
+## /0/id? \[name|desc|avr-gcc\]
 
 Identify is from ../Uart/id.h Id().
 
@@ -92,7 +92,7 @@ Identify is from ../Uart/id.h Id().
 {"id":{"name":"NightLight","desc":"RPUno Board /w atmega328p and LT3652","avr-gcc":"4.9"}}
 ```
 
-##  /0/runled led[,cycles] 
+##  /0/runled led\[,cycles\] 
 
 Start the led (1|2|3|4) operation, with option to override cycles (1..65635). 
 
@@ -234,25 +234,25 @@ Report the led (1|2|3|4) runtime in millis.
 {"LED3":{"cycle_state":"0","cycles":"0","cycle_millis":"4000"}}
 ``` 
 
-## \[/0/analog? 0..7\[,0..7\[,0..7\[,0..7\[,0..7\]\]\]\]\](../Adc#0analog-0707070707)
+## [/0/analog? 0..7\[,0..7\[,0..7\[,0..7\[,0..7\]\]\]\]](../Adc#0analog-0707070707)
 
 
-## \[/0/iscan?\](../i2c-debug#0iscan)
+## [/0/iscan?](../i2c-debug#0iscan)
 
 
-## \[/0/iaddr 0..127\](../i2c-debug#0iaddr-0127)
+## [/0/iaddr 0..127](../i2c-debug#0iaddr-0127)
 
 
-## \[/0/ibuff 0..255\[,0..255\[,0..255\[,0..255\[,0..255\]\]\]\]\](../i2c-debug#0ibuff-02550255025502550255)
+## [/0/ibuff 0..255\[,0..255\[,0..255\[,0..255\[,0..255\]\]\]\]](../i2c-debug#0ibuff-02550255025502550255)
 
 
-## \[/0/ibuff?\](../i2c-debug#0ibuff)
+## [/0/ibuff?](../i2c-debug#0ibuff)
 
 
-## \[/0/iwrite\](../i2c-debug#0iwrite)
+## [/0/iwrite](../i2c-debug#0iwrite)
 
 
-## \[/0/charge?\](../AmpHr#0charge)
+## [/0/charge?](../AmpHr#0charge)
 
 
-## \[/0/day?\](../DayNight#0day)
+## [/0/day?](../DayNight#0day)

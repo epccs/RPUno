@@ -31,7 +31,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 static unsigned long serial_print_started_at;
 
 // pin number must be valid in arg[0] from parse
-void echo_pin_in_json_rply(void)
+void echo_digital_pin_in_json_rply(void)
 {
     if (atoi(arg[0]) == 10) 
     {
@@ -109,7 +109,7 @@ void Mode(void)
     }
     else if ( (command_done == 11) )
     {  
-        echo_pin_in_json_rply();
+        echo_digital_pin_in_json_rply();
         printf_P(PSTR("\":\""));
         command_done = 12;
     }
@@ -168,7 +168,7 @@ void Write(void)
     }
     else if ( (command_done == 11) )
     {  
-        echo_pin_in_json_rply();
+        echo_digital_pin_in_json_rply();
         printf_P(PSTR("\":\""));
         command_done = 12;
     }
@@ -226,7 +226,7 @@ void Toggle(void)
     }
     else if ( (command_done == 11) )
     {  
-        echo_pin_in_json_rply();
+        echo_digital_pin_in_json_rply();
         printf_P(PSTR("\":\""));
         command_done = 12;
     }
@@ -283,7 +283,7 @@ void Read(void)
     }
     else if ( (command_done == 11) )
     {  
-        echo_pin_in_json_rply();
+        echo_digital_pin_in_json_rply();
         printf_P(PSTR("\":\""));
         command_done = 12;
     }

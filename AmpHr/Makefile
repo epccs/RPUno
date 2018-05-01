@@ -2,10 +2,15 @@
 TARGET = AmpHr
 LIBDIR = ../lib
 OBJECTS = main.o \
-	power_storage.o \
-	../DayNight/day_night.o \
+	chrg_accum.o \
+	../CurrSour/cs.o \
+	../CurrSour/csp.o \
+	../CurrSour/status.o \
+	../Digital/digital.o \
 	../Adc/analog.o \
 	../Adc/references.o \
+	../i2c-debug/i2c-cmd.o \
+	../i2c-debug/i2c-scan.o \
 	../Uart/id.o \
 	$(LIBDIR)/timers.o \
 	$(LIBDIR)/uart.o \

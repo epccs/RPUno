@@ -15,8 +15,11 @@ env:
     - APP_PATH="Uart"
     - APP_PATH="Adc"
     - APP_PATH="Digital"
+    - APP_PATH="CurrSour"
     - APP_PATH="i2c-debug"
     - APP_PATH="SpiSlv"
+    - APP_PATH="AmpHr"
+    - APP_PATH="Capture"
 
 before_install:
   - sudo apt-get update -qq

@@ -1,5 +1,5 @@
 /*
-DayNight is a command line controled demonstration of how RPUno's on board photovoltaic voltage can be usd to track the day and night, 
+DayNight is a command line controled demonstration of how the photovoltaic voltage of a red LED can be usd to track the day and night.
 Copyright (C) 2016 Ronald Sutherland
 
 This program is free software; you can redistribute it and/or
@@ -31,7 +31,9 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #define ADC_DELAY_MILSEC 200UL
 static unsigned long adc_started_at;
 
-#define DAYNIGHT_STATUS_LED 4
+// 22mA current sources enabled with CS0_EN and CS1_EN which are defined in ../lib/pins_board.h
+#define STATUS_LED CS0_EN
+#define DAYNIGHT_STATUS_LED CS1_EN
 #define DAYNIGHT_BLINK 500UL
 static unsigned long day_status_blink_started_at;
 
@@ -70,11 +72,9 @@ void callback_for_night_attach(void)
 
 void setup(void) 
 {
-	// RPUuno has no LED, but the LED_BUILTIN is defined as digital 13 (SCK) anyway.
-    pinMode(LED_BUILTIN,OUTPUT);
-    digitalWrite(LED_BUILTIN,HIGH);
+    pinMode(STATUS_LED,OUTPUT);
+    digitalWrite(STATUS_LED,HIGH);
     
-    // A DayNight status LED is on digital pin 4
     pinMode(DAYNIGHT_STATUS_LED,OUTPUT);
     digitalWrite(DAYNIGHT_STATUS_LED,HIGH);
     
@@ -122,7 +122,7 @@ void blink(void)
     unsigned long kRuntime = millis() - blink_started_at;
     if ( kRuntime > blink_delay)
     {
-        digitalToggle(LED_BUILTIN);
+        digitalToggle(STATUS_LED);
         
         // next toggle 
         blink_started_at += blink_delay; 
@@ -186,59 +186,61 @@ int main(void)
     { 
         // use LED to show if I2C has a bus manager
         blink();
-        
+
         // use LED to show day_state
         day_status();
-        
+
         // Check Day Light is a function that operates a day-night state machine.
         CheckDayLight(); // day_night.c
 
         // delay between ADC burst
         adc_burst();
-        
+
         // check if character is available to assemble a command, e.g. non-blocking
         if ( (!command_done) && uart0_available() ) // command_done is an extern from parse.h
         {
             // get a character from stdin and use it to assemble a command
-            AssembleCommand(getchar());
+            AssembleCommand(getchar()); // ../lib/parse.c
 
             // address is an ascii value, warning: a null address would terminate the command string. 
-            StartEchoWhenAddressed(rpu_addr);
+            StartEchoWhenAddressed(rpu_addr); // ../lib/parse.c
         }
-        
+
         // check if a character is available, and if so flush transmit buffer and nuke the command in process.
         // A multi-drop bus can have another device start transmitting after getting an address byte so
         // the first byte is used as a warning, it is the onlly chance to detect a possible collision.
         if ( command_done && uart0_available() )
         {
             // dump the transmit buffer to limit a collision 
-            uart0_flush(); 
+            uart0_flush();  // ../lib/uart.c
             initCommandBuffer();
         }
-        
+
         // finish echo of the command line befor starting a reply (or the next part of a reply)
         if ( command_done && (uart0_availableForWrite() == UART_TX0_BUFFER_SIZE) )
         {
             if ( !echo_on  )
             { // this happons when the address did not match 
-                initCommandBuffer();
+                initCommandBuffer(); // ../lib/parse.c
             }
             else
             {
-                if (command_done == 1)  
-                {
-                    findCommand();
+                if (command_done == 1) 
+                { 
+                    findCommand(); // ../lib/parse.c
+                    // steps 2..9 are skipped. Reserved for more complex parse
                     command_done = 10;
                 }
-                
+
                 // do not overfill the serial buffer since that blocks looping, e.g. process a command in 32 byte chunks
                 if ( (command_done >= 10) && (command_done < 250) )
                 {
+                    // setps 10..249 are moved through by the procedure selected
                      ProcessCmd();
                 }
                 else 
                 {
-                    initCommandBuffer();
+                    initCommandBuffer(); // ../lib/parse.c
                 }
             }
         }

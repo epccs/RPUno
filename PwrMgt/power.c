@@ -68,33 +68,33 @@ void VinPwr(void)
         }
         else
         {
-            // turn off the charge control
-            digitalWrite(CC_SHUTDOWN,HIGH);
-            pinMode(CC_SHUTDOWN, OUTPUT);
-            printf_P(PSTR("{\"VIN\":\"CCSHUTDOWN\"}\r\n"));
+            // should alt power turn off?
+            // digitalWrite(ALT_EN,LOW);
+            // pinMode(ALT_EN, OUTPUT);
+            printf_P(PSTR("{\"VIN\":\"ALT_DWN?\"}\r\n"));
             command_done = 11;
         }
     }
     else if ( (command_done == 11) )
     {  
-        if( set_Rpu_shutdown() ) 
+        if( set_Rpu_shutdown() ) // ../lib/rpu_mgr.h 
         {
-            printf_P(PSTR("{\"VIN\":\"I2CHAULT\"}\r\n"));
+            printf_P(PSTR("{\"VIN\":\"I2C_HAULT\"}\r\n"));
             stable_power_needed = 1;
             command_done = 12;
         }
     }
     else if ( (command_done == 12) )
     {
-        // check that discharge current is less than the hault threshold
-        // adc_output = analogRead(DISCHRG_I) is a value from 0 to 1023
+        // check that current is less than the hault threshold
+        // adc_output = analogRead(PWR_I) is a value from 0 to 1023
         // Discharge_10uA_Cnt =  adc_output * 100000*(5.0/1024.0)/(0.068*50.0) 
-        // which is to say each adc count has a value of about 144 * 10uA  or 1.44mA
-        long Discharge_10uA_Cnt = analogRead(DISCHRG_I) * 144;
+        // which is to say each ADC count has a value of about 144 * 10uA  or 1.44mA
+        long Discharge_10uA_Cnt = analogRead(PWR_I) * 144;
         if (Discharge_10uA_Cnt < DISCHRG_I_10uA_CNT_AFTER_HAULT)
         {
-            // If 70mA is accepted as the hault value, then the adc needs to be less than 49
-            printf_P(PSTR("{\"VIN\":\"ATHAULTCURR\"}\r\n"));
+            // If 70mA is the hault value, then the ADC*144 needs to be less
+            printf_P(PSTR("{\"VIN\":\"AT_HAULT_CURR\"}\r\n"));
             hault_started_at = millis();
             command_done = 13;
         }
@@ -116,7 +116,7 @@ void VinPwr(void)
         // check that discharge current is less than the hault threshold and has been stable for a few readings
         if (! last_wearlevel)
         {
-            last_wearlevel = analogRead(DISCHRG_I);
+            last_wearlevel = analogRead(PWR_I);
             wearlevel_check_started_at = millis();
         }
         else
@@ -124,7 +124,7 @@ void VinPwr(void)
             unsigned long kRuntime= millis() - wearlevel_check_started_at;
             if ((kRuntime) > ((unsigned long)WEARLEVEL_CHECK_MILSEC))
             {
-                int new_wearlevel = analogRead(DISCHRG_I);
+                int new_wearlevel = analogRead(PWR_I);
                 //printf_P(PSTR("{\"VIN\":\"adc %d\"}\r\n"),new_wearlevel);
                 if ( (new_wearlevel < (last_wearlevel + 2) ) && (new_wearlevel > (last_wearlevel - 2) ) )
                 {
@@ -158,47 +158,14 @@ void VinPwr(void)
         {
             printf_P(PSTR("{\"VIN\":\"DOWN_I2CBAD\"}\r\n"));
         }
-        digitalWrite(CC_SHUTDOWN,LOW);
-        pinMode(CC_SHUTDOWN, INPUT);
+        // should ALT power turned on
+        // digitalWrite(ALT_EN,HIGH);
+        // pinMode(ALT_EN, OUTPUT);
         initCommandBuffer();
     }
     else
     {
         printf_P(PSTR("{\"err\":\"VinCmdDnWTF\"}\r\n"));
-        initCommandBuffer();
-    }
-}
-
-void PulseLoopPwr(void)
-{
-    if ( (command_done == 10) )
-    {
-        // check arg[0] is not ('UP' or 'DOWN')
-        if ( !( (strcmp_P( arg[0], PSTR("UP")) == 0) || (strcmp_P( arg[0], PSTR("DOWN")) == 0) ) ) 
-        {
-            printf_P(PSTR("{\"err\":\"FTNaMode\"}\r\n"));
-            initCommandBuffer();
-            return;
-        }
-        serial_print_started_at = millis();
-        if (strcmp_P( arg[0], PSTR("UP")) == 0 ) 
-        {
-            digitalWrite(CURR_SOUR_EN,HIGH);
-            pinMode(CURR_SOUR_EN, OUTPUT);
-            printf_P(PSTR("{\"FT\":\"UP\"}\r\n"));
-            initCommandBuffer();
-        }
-        else
-        {
-            digitalWrite(CURR_SOUR_EN,LOW);
-            pinMode(CURR_SOUR_EN, OUTPUT);
-            printf_P(PSTR("{\"FT\":\"DOWN\"}\r\n"));
-            initCommandBuffer();
-        }
-    }
-    else
-    {
-        printf_P(PSTR("{\"err\":\"FTCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }

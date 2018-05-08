@@ -28,6 +28,8 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../Uart/id.h"
 #include "ee.h"
 
+#define STATUS_LED CS0_EN
+
 #define ADC_DELAY_MILSEC 10000UL
 static unsigned long adc_started_at;
 #define BLINK_DELAY 1000UL
@@ -53,9 +55,8 @@ void ProcessCmd()
 
 void setup(void) 
 {
-	// RPUuno has no LED, but LED_BUILTIN is defined as pin 13 anyway.
-    pinMode(LED_BUILTIN,OUTPUT);
-    digitalWrite(LED_BUILTIN,HIGH);
+    pinMode(STATUS_LED,OUTPUT);
+    digitalWrite(STATUS_LED,HIGH);
     
     // Initialize Timers, ADC, and clear bootloader, Arduino does these with init() in wiring.c
     initTimers(); //Timer0 Fast PWM mode, Timer1 & Timer2 Phase Correct PWM mode.
@@ -96,7 +97,7 @@ void blink(void)
     unsigned long kRuntime = millis() - blink_started_at;
     if ( kRuntime > blink_delay)
     {
-        digitalToggle(LED_BUILTIN);
+        digitalToggle(STATUS_LED);
         
         // next toggle 
         blink_started_at += blink_delay; 

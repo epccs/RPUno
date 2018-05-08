@@ -28,10 +28,11 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../Uart/id.h"
 #include "../Digital/digital.h"
 #include "../Adc/analog.h"
+#include "../Adc/references.h"
 #include "../i2c-debug/i2c-scan.h"
 #include "../i2c-debug/i2c-cmd.h"
 #include "../DayNight/day_night.h"
-#include "../AmpHr/power_storage.h"
+#include "../AmpHr/chrg_accum.h"
 #include "power.h"
 
 // how fast does the charge and discharge reading change? (it can be fast)
@@ -44,7 +45,9 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #define ADC_DELAY_MILSEC 10UL
 static unsigned long adc_started_at;
 
-#define DAYNIGHT_STATUS_LED 4
+// 22mA current sources enabled with CS0_EN and CS1_EN which are defined in ../lib/pins_board.h
+#define STATUS_LED CS0_EN
+#define DAYNIGHT_STATUS_LED CS1_EN
 #define DAYNIGHT_BLINK 500UL
 static unsigned long day_status_blink_started_at;
 
@@ -62,10 +65,6 @@ void ProcessCmd()
     if ( (strcmp_P( command, PSTR("/vin")) == 0) && ( (arg_count == 1 ) ) )
     {
         VinPwr(); // ./power.c
-    }
-    if ( (strcmp_P( command, PSTR("/pulseloop")) == 0) && ( (arg_count == 1 ) ) )
-    {
-        PulseLoopPwr(); // ./power.c
     }
     if ( (strcmp_P( command, PSTR("/vin?")) == 0) && ( (arg_count == 0 ) ) )
     {
@@ -105,7 +104,7 @@ void ProcessCmd()
     }
     if ( (strcmp_P( command, PSTR("/charge?")) == 0) && ( (arg_count == 0 ) ) )
     {
-        Charge(); // ../AmpHr/power_storage.c
+        Charge(); // ../AmpHr/chrg_accum.c
     }
     if ( (strcmp_P( command, PSTR("/pinMode")) == 0) && ( (arg_count == 2 ) ) )
     {
@@ -130,7 +129,7 @@ void ProcessCmd()
 void callback_for_day_attach(void)
 {
     // setup AmpHr accumulators and load Adc calibration reference
-    if (!init_ChargAccumulation()) // ../AmpHr/power_storage.c
+    if (!init_ChargAccumulation(PWR_I)) // ../AmpHr/chrg_accum.c
     {
         blink_delay = BLINK_DELAY/4;
     }
@@ -138,11 +137,9 @@ void callback_for_day_attach(void)
 
 void setup(void) 
 {
-	// RPUuno has no LED, but the LED_BUILTIN is defined as digital 13 (SCK) anyway.
-    pinMode(LED_BUILTIN,OUTPUT);
-    digitalWrite(LED_BUILTIN,HIGH);
-
-    // A DayNight status LED is on digital pin 4
+    pinMode(STATUS_LED,OUTPUT);
+    digitalWrite(STATUS_LED,HIGH);
+    
     pinMode(DAYNIGHT_STATUS_LED,OUTPUT);
     digitalWrite(DAYNIGHT_STATUS_LED,HIGH);
 
@@ -174,9 +171,11 @@ void setup(void)
     blink_delay = BLINK_DELAY;
     
     // blink fast if a default address from RPU manager not found
-    if (rpu_addr == 0)
+    // blink fast if EEPROM does not have ADC calibration value
+    if ( (rpu_addr == 0) ||  ! LoadAnalogRefFromEEPROM() )
     {
         rpu_addr = '0';
+        // status in ../CurrSour/status.c needs a byte to set and reprot on UART 
         blink_delay = BLINK_DELAY/4;
     }
     
@@ -194,7 +193,7 @@ void blink(void)
     unsigned long kRuntime = millis() - blink_started_at;
     if ( kRuntime > blink_delay)
     {
-        digitalToggle(LED_BUILTIN);
+        digitalToggle(STATUS_LED);
         
         // next toggle 
         blink_started_at += blink_delay; 
@@ -275,7 +274,7 @@ int main(void)
         adc_burst();
 
         // check how much charge went into battery
-        CheckChrgAccumulation();
+        CheckChrgAccumulation(PWR_I); // ../AmpHr/chrg_accum.c
 
         // check if character is available to assemble a command, e.g. non-blocking
         if ( (!command_done) && uart0_available() ) // command_done is an extern from parse.h
@@ -296,12 +295,13 @@ int main(void)
             uart0_flush(); 
             initCommandBuffer();
             
-            // the command "vin DOWN" may have the charge control off and set the stable_power_needed flag.
-            digitalWrite(CC_SHUTDOWN,LOW);
-            pinMode(CC_SHUTDOWN, INPUT);
+            // the command "vin DOWN" needed to have stable power but the host has nuked the command.
             stable_power_needed = 0;
+            // should alt power turn on?
+            // digitalWrite(ALT_EN,HIGH);
+            // pinMode(ALT_EN, OUTPUT);
         }
-        
+
         // finish echo of the command line befor starting a reply (or the next part of a reply)
         if ( command_done && (uart0_availableForWrite() == UART_TX0_BUFFER_SIZE) )
         {

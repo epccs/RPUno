@@ -2,7 +2,7 @@
 
 ## Overview
 
-Use a red LED's photovoltaic voltage on ADC2 to approximately tell when it is day or night. 
+Use a red LED's photovoltaic voltage on ADC2 to approximately tell if it is day or night. 
 
 Note: use the Day_AttachDayWork() and Night_AttachWork() functions to set a callback that will be run at the start of each day. This framework is how I debuged the day-night stat machine, it is not expected to be useful.
 
@@ -20,7 +20,7 @@ make bootload
 avrdude done.  Thank you.
 ``` 
 
-Now connect with picocom (or ilk). Note I am often at another computer doing this through SSH. The Samba folder is for editing the files from Windows.
+Now connect with picocom (or ilk). 
 
 ``` 
 #exit is C-a, C-x

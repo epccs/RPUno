@@ -10,16 +10,21 @@ env:
     # git clone --depth=50 --branch=master https://github.com/epccs/RPUno.git epccs/RPUno
     # so the path to each Makefile is as follows
 
-    - APP_PATH="SelfTest"
-    - APP_PATH="BlinkLED"
-    - APP_PATH="Uart"
     - APP_PATH="Adc"
-    - APP_PATH="Digital"
+    - APP_PATH="AmpHr"
+    - APP_PATH="BlinkLED"
+    - APP_PATH="Bootloader"
+    - APP_PATH="Capture"
     - APP_PATH="CurrSour"
+    - APP_PATH="DayNight"
+    - APP_PATH="Digital"
+    - APP_PATH="Eeprom"
+    
+    - APP_PATH="SelfTest"
+    - APP_PATH="Uart"
     - APP_PATH="i2c-debug"
     - APP_PATH="SpiSlv"
-    - APP_PATH="AmpHr"
-    - APP_PATH="Capture"
+    - APP_PATH="PwrMgt"
 
 before_install:
   - sudo apt-get update -qq

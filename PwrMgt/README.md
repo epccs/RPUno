@@ -51,7 +51,7 @@ Identify is from ../Uart/id.h Id().
 
 ``` 
 /1/id?
-{"id":{"name":"PwrMgt","desc":"RPUno Board /w atmega328p and LT3652","avr-gcc":"4.9"}}
+{"id":{"name":"PwrMgt","desc":"RPUno (14140^9) Board /w atmega328p","avr-gcc":"5.4.0"}}
 ```
 
 ##  /0/vin DOWN|UP

@@ -26,7 +26,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/timers.h"
 #include "../lib/pin_num.h"
 #include "../lib/pins_board.h"
-#include "../AmpHr/power_storage.h"
+#include "../AmpHr/chrg_accum.h"
 #include "nightlight.h"
 
 //The EEPROM memory usage is as follows. 
@@ -68,10 +68,10 @@ typedef struct {
 
 //  LED STRING1 is at ledMap index zero not one.
 static const Led_Map ledMap[LEDSTRING_COUNT] = {
-    [0] = { .dio=3 }, // LED1 is controled with Digital IO3
-    [1] = { .dio=10 }, // LED2 is controled with Digital IO10
-    [2] = { .dio=11 }, // LED3 is controled with Digital IO11
-    [3] = { .dio=12 }, // LED4 is controled with Digital IO12
+    [0] = { .dio=CS0_EN }, // LED1 is controled with CS0
+    [1] = { .dio=CS1_EN }, // LED2 is controled with CS1
+    [2] = { .dio=CS2_EN }, // LED3 is controled with CS2
+    [3] = { .dio=CS3_EN }, // LED4 is controled with CS3
 };
 
 uint8_t uint8_from_arg0 (void)
@@ -725,7 +725,7 @@ void LedControl() {
                 led[i].cycle_millis_stop = millis(); // correction of -1 millis was added so timer shows expected value
                 led[i].cycle_state = LED_STATE_RESET;
             }
-            if (DischargeAccum() > led[i].mahr_stop) // Discharge is from ../AmpHr/power_storage.c, this test takes a lot o machine cycles on an AVR
+            if (ChargeAccum(PWR_I) > led[i].mahr_stop) // ChargeAccum is from ../AmpHr/chrg_accum.c
             {  
                 led[i].cycle_state = LED_STATE_RESET;
                 led[i].cycles = 0;

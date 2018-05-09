@@ -19,10 +19,12 @@ env:
     - APP_PATH="DayNight"
     - APP_PATH="Digital"
     - APP_PATH="Eeprom"
-    
+    # Hardware is not built like this
+    - APP_PATH="i2c-debug"
+    # lib has core files
+    - APP_PATH="NightLight"
     - APP_PATH="SelfTest"
     - APP_PATH="Uart"
-    - APP_PATH="i2c-debug"
     - APP_PATH="SpiSlv"
     - APP_PATH="PwrMgt"
 

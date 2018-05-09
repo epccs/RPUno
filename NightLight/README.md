@@ -2,37 +2,19 @@
 
 ## Overview
 
-__Do not use this program__ it was for RPUno^6 and does not work on ^7 (yet).
+RPUno has some current sources that can be used to light LED strings. CS0..CS3 are 22mA souces. Digital 13 is used for I2C status, and Digital 12 is used for Day-Night status. 
 
-RPUno has some current sources that can be used to light LED strings. Analog has two 22mA souces, Digital has one 22mA source and the ICP has a 17mA source. Use the pluggable Digital IO's 3,10,11,12 for LED control, i.e. to sink a current source. Most of the examples use digital 13 as an I2C status, and the Day-Night state machine is using digital 4 as a status. 
+Night light uses non-blocking timers to cycles through the led[1|2|3|4].cycle_state that is used to control the current sources. The settings are loaded from EEPROM each night with a callback that is given to DayNight's  Night_AttachWork callback registration function.
 
-The night light state machine uses non-blocking timers and cycles through the led[1|2|3|4].cycle_state for each controlled LED. The settings are loaded from EEPROM each night after the Day-Night state machine switches from an Evening debounce state to a Night state.
-
-Note: the Night_AttachWork() function is given a callback that is used to check if there was solar charge gain (> 100mAHr) and if so load the LED settings from EEPROM and StartLed each night. the Day_AttachWork() function is given a callback that is used to reset the solar charge accumulation values.
+Note: There is no way to check the solar charge gain. the Day_AttachWork() function is given a callback that is used to reset the accumulation values.
 
 
 # Wiring LED Strings to RPUno
 
 ![Wiring](./Setup/NightLightWiring.png)
 
-``` 
-RPUno   328p   (digital)    Function 
-------------------------
-J2.4    D4     (4)          DAYNIGHT_STATUS_LED
-J2.1    NA     (NA)         0V FOR DAYNIGHT_STATUS_LED
-J2.8    B5     (13)         LED_BUILTIN
-J2.1    NA     (NA)         0V FOR LED_BUILTIN
-J2.3    D3     (3)          LED STRING1 CURRENT SINK
-J4.1    NA     (NA)         22mA_A0 STRING1 CURRENT SOURCE
-J2.5    B2     (10)         LED STRING2 CURRENT SINK
-J4.5    NA     (NA)         22mA_A1 STRING2 CURRENT SOURCE
-J2.6    B3     (11)         LED STRING3 CURRENT SINK
-J2.2    NA     (NA)         22mA_DIO STRING3 CURRENT SOURCE
-J2.7    B3     (12)         LED STRING4 CURRENT SINK
-J3.1    NA     (NA)         17mA_ICP1 STRING4 CURRENT SOURCE
-``` 
 
-The RPUno has pluggable connectors with screw terminals on J2, J3, and J4. Digital 4 and 13 drive a LED directly through an onboard current limiting resistor and the level shift circuit. While Digital 3, 10, 11, and 12 sink current from the available current sources. The current sources drop a little over a diode voltage bellow the battery voltage, so the LED string needs to conduct at less than that (about 11V). When Digital 3, 10, 11, and 12 pinMode is set as an OUTPUT it can sink current with digitalWrite(3,LOW), and with aid from the level shift circuit it will block the current with digitalWrite(3,HIGH). 
+The current sources drop a little over a diode voltage bellow the battery voltage, so the LED string needs to conduct at less than that (four red conduct at about 9V, five at 11.3V). 
 
 
 # EEPROM Memory map 
@@ -49,8 +31,9 @@ mahr_stop           UINT32          214  234  254  274
 cycles              UINT16          218  238  258  278
 ```
 
-This works like Solenoid except the mAHr_stop replaces flow_stop, it will stop the LED once that much current has been used from the battery. Also, the LED's do not have a resource constraint (i.e. the Flow Meter), so all the LED's can be used at once.
+This works like [Solenoid] except the mAHr_stop replaces flow_stop, it will stop the LED once that much current has been used from the battery. Also, the LED's do not have a resource constraint (i.e. the Flow Meter), so all the LED's can be used at once.
 
+[Solenoid]: ../Solenoid
 
 # Firmware Upload
 

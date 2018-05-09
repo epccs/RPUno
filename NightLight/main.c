@@ -30,13 +30,15 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../i2c-debug/i2c-scan.h"
 #include "../i2c-debug/i2c-cmd.h"
 #include "../DayNight/day_night.h"
-#include "../AmpHr/power_storage.h"
+#include "../AmpHr/chrg_accum.h"
 #include "nightlight.h"
 
 #define ADC_DELAY_MILSEC 200UL
 static unsigned long adc_started_at;
 
-#define DAYNIGHT_STATUS_LED 4
+#define STATUS_LED DIO13
+
+#define DAYNIGHT_STATUS_LED DIO12
 #define DAYNIGHT_BLINK 500UL
 static unsigned long day_status_blink_started_at;
 
@@ -124,7 +126,7 @@ void ProcessCmd()
         }
         if ( (strcmp_P( command, PSTR("/charge?")) == 0) && ( (arg_count == 0 ) ) )
         {
-            Charge(); // ../AmpHr/power_storage.c
+            Charge(); // ../AmpHr/chrg_accum.c
         }
     }
     else
@@ -141,8 +143,8 @@ void ProcessCmd()
 //At start of each night load the LED control settings from EEPROM and operate them.
 void callback_for_night_attach(void)
 {
-    // If we did not have a charge gain of 100mAHr then skip running the LED's.
-    if ( (ChargeAccum() + RemainingAccum() - DischargeAccum() ) > 100.0) 
+    // If the battery did not reach charge voltage I should skip running the LED's.
+    if (true) 
     {
         for(uint8_t led = 1; led <= LEDSTRING_COUNT; led++)
         {
@@ -156,7 +158,7 @@ void callback_for_night_attach(void)
 void callback_for_day_attach(void)
 {
     // setup AmpHr accumulators and load Adc calibration reference
-    if (!init_ChargAccumulation()) // ../AmpHr/power_storage.c
+    if (!init_ChargAccumulation(PWR_I)) // ../AmpHr/chrg_accum.c
     {
         blink_delay = BLINK_DELAY/4;
     }
@@ -164,17 +166,11 @@ void callback_for_day_attach(void)
 
 void setup(void) 
 {
-	// RPUuno has no LED, but the LED_BUILTIN is defined as digital 13 (SCK) anyway.
-    pinMode(LED_BUILTIN,OUTPUT);
-    digitalWrite(LED_BUILTIN,HIGH);
-    
-    // A DayNight status LED is on digital pin 4
+    pinMode(STATUS_LED,OUTPUT);
+    digitalWrite(STATUS_LED,LOW);
+
     pinMode(DAYNIGHT_STATUS_LED,OUTPUT);
     digitalWrite(DAYNIGHT_STATUS_LED,HIGH);
-
-    // RPUno current sources for ADC's and ICP are controled with Digital 9 see define in ../lib/pins_board.h
-    pinMode(CURR_SOUR_EN,OUTPUT);
-    digitalWrite(CURR_SOUR_EN,HIGH);
 
     // Initialize Timers, ADC, and clear bootloader, Arduino does these with init() in wiring.c
     initTimers(); //Timer0 Fast PWM mode, Timer1 & Timer2 Phase Correct PWM mode.
@@ -221,7 +217,7 @@ void setup(void)
     Day_AttachWork(callback_for_day_attach);
     
     // setup AmpHr accumulators
-    if (!init_ChargAccumulation()) // ../AmpHr/power_storage.c
+    if (!init_ChargAccumulation(PWR_I)) // ../AmpHr/chrg_accum.c
     {
         blink_delay = BLINK_DELAY/4;
     }
@@ -232,7 +228,7 @@ void blink(void)
     unsigned long kRuntime = millis() - blink_started_at;
     if ( kRuntime > blink_delay)
     {
-        digitalToggle(LED_BUILTIN);
+        digitalToggle(STATUS_LED);
         
         // next toggle 
         blink_started_at += blink_delay; 
@@ -307,7 +303,7 @@ int main(void)
         adc_burst();
 
         // check how much charge went into battery
-        CheckChrgAccumulation();
+        CheckChrgAccumulation(PWR_I);
 
         // check if character is available to assemble a command, e.g. non-blocking
         if ( (!command_done) && uart0_available() ) // command_done is an extern from parse.h

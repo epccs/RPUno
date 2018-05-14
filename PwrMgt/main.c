@@ -100,7 +100,7 @@ void ProcessCmd()
     }
     if ( (strcmp_P( command, PSTR("/day?")) == 0) && ( (arg_count == 0 ) ) )
     {
-        Day(); // ../DayNight/day_night.c
+        Day(60000UL); // ../DayNight/day_night.c: show every 60 sec until terminated
     }
     if ( (strcmp_P( command, PSTR("/charge?")) == 0) && ( (arg_count == 0 ) ) )
     {

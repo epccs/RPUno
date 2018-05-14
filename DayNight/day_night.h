@@ -1,7 +1,7 @@
 #ifndef DayNight_H
 #define DayNight_H
 
-extern void Day(void);
+extern void Day(unsigned long);
 
 extern void CheckDayLight(void);
 extern uint8_t DayState(void);
@@ -9,6 +9,12 @@ extern uint8_t DayState(void);
 // Warning the pointer to function will be NULL if it is not set (registered) during initialization.
 extern void Day_AttachWork( void (*)(void) );
 extern void Night_AttachWork( void (*)(void) );
+
+extern uint8_t red_led_sensor;
+extern int morning_threshold;
+extern int evening_threshold;
+extern unsigned long evening_debouce;
+extern unsigned long morning_debouce;
 
 #define DAYNIGHT_START_STATE 0
 #define DAYNIGHT_DAY_STATE 1

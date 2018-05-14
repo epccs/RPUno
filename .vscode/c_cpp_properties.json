@@ -4,8 +4,8 @@
             "name": "AVR",
             "includePath": [
                 "${workspaceRoot}",
-                "Y:/lib/avr-libc/include",
-                "Y:/lib/gcc-avr/5.4.0/include"
+                "Z:/lib/avr-libc/include",
+                "Z:/lib/gcc-avr/5.4.0/include"
             ],
             "defines": [],
             "intelliSenseMode": "clang-x64",

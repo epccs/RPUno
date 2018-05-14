@@ -31,9 +31,9 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #define ADC_DELAY_MILSEC 200UL
 static unsigned long adc_started_at;
 
-// 22mA current sources enabled with CS0_EN and CS1_EN which are defined in ../lib/pins_board.h
-#define STATUS_LED CS0_EN
-#define DAYNIGHT_STATUS_LED CS1_EN
+//pins are defined in ../lib/pins_board.h
+#define STATUS_LED DIO13
+#define DAYNIGHT_STATUS_LED DIO12
 #define DAYNIGHT_BLINK 500UL
 static unsigned long day_status_blink_started_at;
 
@@ -50,7 +50,7 @@ void ProcessCmd()
     }
     if ( (strcmp_P( command, PSTR("/day?")) == 0) && ( (arg_count == 0 ) ) )
     {
-        Day(); // day_night.c
+        Day(5000UL); // day_night.c: show every 5 sec until terminated
     }
 }
 
@@ -112,9 +112,13 @@ void setup(void)
         blink_delay = BLINK_DELAY/4;
     }
     
-    // set callback(s). See Solenoid for another example, where it loads the EEPROM values used at the start of each day
+    // register callback(s) to do the work.
     Day_AttachWork(callback_for_day_attach);
     Night_AttachWork(callback_for_night_attach);
+
+    // default debounce is 15 min (e.g. 900,000 millis)
+    evening_debouce = 18000UL; // 18 sec
+    morning_debouce = 18000UL;
 }
 
 void blink(void)

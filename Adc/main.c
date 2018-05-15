@@ -48,7 +48,7 @@ void ProcessCmd()
     }
     if ( (strcmp_P( command, PSTR("/analog?")) == 0) && ( (arg_count >= 1 ) && (arg_count <= 5) ) )
     {
-        Analog();
+        Analog(2000UL); // analog.c: show every 2 sec until terminated
     }
     if ( (strcmp_P( command, PSTR("/avcc")) == 0) && (arg_count == 1) )
     {

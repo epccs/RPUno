@@ -34,7 +34,6 @@ static unsigned long chrgTmrStarted[ADC_CHANNELS];
 static unsigned long chrg_accum[ADC_CHANNELS];
 static unsigned long chrg_accum_fine[ADC_CHANNELS];
 
-#define SERIAL_PRINT_DELAY_MILSEC 60000UL
 static unsigned long serial_print_started_at;
 
 // scale accumulated adc*time to mAHr
@@ -60,7 +59,7 @@ float ChargeAccum(uint8_t channel)
     return temp;
 }
 
-void Charge(void)
+void Charge(unsigned long serial_print_delay_milsec)
 {  
     if ( (command_done == 10) )
     {
@@ -95,7 +94,7 @@ void Charge(void)
     else if ( (command_done == 18) ) 
     { // delay between JSON printing
         unsigned long kRuntime= millis() - serial_print_started_at;
-        if ((kRuntime) > ((unsigned long)SERIAL_PRINT_DELAY_MILSEC))
+        if ((kRuntime) > (serial_print_delay_milsec))
         {
             command_done = 10; /* This keeps looping output forever (until a Rx char anyway) */
         }

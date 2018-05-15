@@ -1,7 +1,7 @@
 #ifndef ChrgAccum_H
 #define ChrgAccum_H
 
-extern void Charge(void);
+extern void Charge(unsigned long);
 extern uint8_t ResetChargeAccum(void);
 
 extern void CheckChrgAccumulation(uint8_t);

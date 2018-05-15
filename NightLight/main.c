@@ -94,7 +94,7 @@ void ProcessCmd()
         }
         if ( (strcmp_P( command, PSTR("/analog?")) == 0) && ( (arg_count >= 1 ) && (arg_count <= 5) ) )
         {
-            Analog(); // ../Adc/analog.c
+            Analog(20000UL); // ../Adc/analog.c:show every 20 sec until terminated
         }
         if ( (strcmp_P( command, PSTR("/iscan?")) == 0) && (arg_count == 0) )
         {
@@ -126,7 +126,7 @@ void ProcessCmd()
         }
         if ( (strcmp_P( command, PSTR("/charge?")) == 0) && ( (arg_count == 0 ) ) )
         {
-            Charge(); // ../AmpHr/chrg_accum.c
+            Charge(60000UL); // ../AmpHr/chrg_accum.c: show every 60 sec until terminated
         }
     }
     else

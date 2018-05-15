@@ -28,13 +28,12 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "analog.h"
 #include "references.h"
 
-#define SERIAL_PRINT_DELAY_MILSEC 2000
 static unsigned long serial_print_started_at;
 
 static uint8_t adc_arg_index;
 
 /* return adc values */
-void Analog(void)
+void Analog(unsigned long serial_print_delay_milsec)
 {
     if ( (command_done == 10) )
     {
@@ -131,7 +130,7 @@ void Analog(void)
     else if ( (command_done == 13) ) 
     { // delay between JSON printing
         unsigned long kRuntime= millis() - serial_print_started_at;
-        if ((kRuntime) > ((unsigned long)SERIAL_PRINT_DELAY_MILSEC))
+        if ((kRuntime) > (serial_print_delay_milsec))
         {
             command_done = 10; /* This keeps looping output forever (until a Rx char anyway) */
         }

@@ -72,7 +72,9 @@ Identify is from ../Uart/id.h Id().
 
 ``` 
 /1/id?
-{"id":{"name":"NightLight","desc":"RPUno Board /w atmega328p and LT3652","avr-gcc":"4.9"}}
+{"err":"NotFinishLEDinit"}
+/1/id?
+{"id":{"name":"NightLight","desc":"RPUno (14140^9) Board /w atmega328p","avr-gcc":"5.4.0"}}
 ```
 
 ##  /0/runled led\[,cycles\] 
@@ -81,47 +83,16 @@ Start the led (1|2|3|4) operation, with option to override cycles (1..65635).
 
 If EEPROM settings have not been loaded the LED's retain the initialized values (delay_start = 1+(3*led), runtime = 1, delay = 3600, mahr_stop = MAHR_NOT_SET) that will cause each led to operate for a second after a delay_start time that spaces there operation out by 3 seconds each (it helps to test the setup).
 
-After a led has entered the delay state and let go of the mAHr meter resource another solenoid that is ready to use the meter will do so. Make sure to set the delay time long enough that all the other LED's can use their runtime, or the meter becomes a resource constraint and some will get shorted. For example set all the delay times to 360 and make sure the combined runtimes do not add up to 360 (i.e. 100, 80, 120).
 
 ```
 /1/runled 1,5000
 {"LED1":{"delay_start_sec":"1","runtime_sec":"1","delay_sec":"13","cycles":"5000"}}
 /1/runled 2,5000
-{"LED1":{"delay_start_sec":"1","runtime_sec":"1","delay_sec":"13","cycles":"5000"}}
+{"LED2":{"delay_start_sec":"4","runtime_sec":"1","delay_sec":"13","cycles":"5000"}}
 /1/runled 3,5000
-{"LED1":{"delay_start_sec":"1","runtime_sec":"1","delay_sec":"13","cycles":"5000"}}
+{"LED3":{"delay_start_sec":"7","runtime_sec":"1","delay_sec":"13","cycles":"5000"}}
 /1/runled 4,5000
-{"LED1":{"delay_start_sec":"1","runtime_sec":"1","delay_sec":"13","cycles":"5000"}}
-```
-
-##  /0/savled led,cycles 
-
-Save the led (1|2|3|4) with cycles (1..65635) to EEPROM. A callback function is used to attach the callback_for_night_attach routine that loads these values at the start of the night (i.e. Night_AttachWork).
-
-```
-/1/saveled 1,5000
-{"LED1":{"delay_start_sec":"1","runtime_sec":"4","delay_sec":"2","mahr_stop":"400","cycles":"5000"}}
-/1/saveled 2,5000
-{"LED2":{"delay_start_sec":"3","runtime_sec":"5","delay_sec":"2","mahr_stop":"600","cycles":"5000"}}
-/1/saveled 3,5000
-{"LED3":{"delay_start_sec":"5","runtime_sec":"4","delay_sec":"2","mahr_stop":"800","cycles":"5000"}}
-/1/saveled 4,5000
-{"LED4":{"delay_start_sec":"7","runtime_sec":"5","delay_sec":"2","mahr_stop":"1000","cycles":"5000"}}
-```
-
-##  /0/loadled led
-
-Load the led (1|2|3|4) from EEPROM. Use run to start it.
-
-```
-/1/loadled 1
-{"LED1":{"delay_start_sec":"1","runtime_sec":"4","delay_sec":"2","mahr_stop":"400","cycles":"5000"}}
-/1/loadled 2
-{"LED2":{"delay_start_sec":"3","runtime_sec":"5","delay_sec":"2","mahr_stop":"600","cycles":"5000"}}
-/1/loadled 3
-{"LED3":{"delay_start_sec":"5","runtime_sec":"4","delay_sec":"2","mahr_stop":"800","cycles":"5000"}}
-/1/loadled 4
-{"LED4":{"delay_start_sec":"7","runtime_sec":"5","delay_sec":"2","mahr_stop":"1000","cycles":"5000"}}
+{"LED4":{"delay_start_sec":"10","runtime_sec":"1","delay_sec":"13","cycles":"5000"}}
 ```
 
 
@@ -205,6 +176,36 @@ Set the led (1|2|3|4) max discharge in mAHr (1..86400, e.g. 86.4AHr). When the b
 {"LED4":{"mahr_stop":"1000"}}
 /1/runled 3,1
 {"LED3":{"delay_start_sec":"5","runtime_sec":"4","delay_sec":"2","cycles":"1","mahr_stop":"800"}}
+```
+
+##  /0/savled led,cycles 
+
+Save the led (1|2|3|4) with cycles (1..65635) to EEPROM. A callback function is used to attach the callback_for_night_attach routine that loads these values at the start of the night (i.e. Night_AttachWork).
+
+```
+/1/saveled 1,5000
+{"LED1":{"delay_start_sec":"1","runtime_sec":"4","delay_sec":"2","mahr_stop":"400","cycles":"5000"}}
+/1/saveled 2,5000
+{"LED2":{"delay_start_sec":"3","runtime_sec":"5","delay_sec":"2","mahr_stop":"600","cycles":"5000"}}
+/1/saveled 3,5000
+{"LED3":{"delay_start_sec":"5","runtime_sec":"4","delay_sec":"2","mahr_stop":"800","cycles":"5000"}}
+/1/saveled 4,5000
+{"LED4":{"delay_start_sec":"7","runtime_sec":"5","delay_sec":"2","mahr_stop":"1000","cycles":"5000"}}
+```
+
+##  /0/loadled led
+
+Load the led (1|2|3|4) from EEPROM. Use run to start it.
+
+```
+/1/loadled 1
+{"LED1":{"delay_start_sec":"1","runtime_sec":"4","delay_sec":"2","mahr_stop":"400","cycles":"5000"}}
+/1/loadled 2
+{"LED2":{"delay_start_sec":"3","runtime_sec":"5","delay_sec":"2","mahr_stop":"600","cycles":"5000"}}
+/1/loadled 3
+{"LED3":{"delay_start_sec":"5","runtime_sec":"4","delay_sec":"2","mahr_stop":"800","cycles":"5000"}}
+/1/loadled 4
+{"LED4":{"delay_start_sec":"7","runtime_sec":"5","delay_sec":"2","mahr_stop":"1000","cycles":"5000"}}
 ```
 
 

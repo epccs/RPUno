@@ -708,8 +708,7 @@ void LedControl() {
   
         if ((led[i].cycle_state == LED_STATE_SET)) 
         {
-            if(ledMap[i].dio < NUM_DIGITAL_PINS) // the compiler does not know if ledMap values are valid so test them 
-                digitalWrite(ledMap[i].dio,LOW); // Use a Digital IO to sink a current source;
+            digitalWrite(ledMap[i].dio,HIGH); // Enable a current source;
             led[i].started_at = millis(); //start timing runtime
             led[i].cycle_millis_start = millis(); 
             led[i].cycle_state = LED_STATE_RUNTIME;
@@ -735,8 +734,7 @@ void LedControl() {
 
         if ((led[i].cycle_state == LED_STATE_RESET)) 
         {
-            if(ledMap[i].dio < NUM_DIGITAL_PINS) 
-                digitalWrite(ledMap[i].dio,HIGH); // When a Digital IO with level shift goes high it opens the LED string and the current source saturates.
+            digitalWrite(ledMap[i].dio,LOW); // disable a current source.
             led[i].cycle_millis_bank += (led[i].cycle_millis_stop - led[i].cycle_millis_start);
             led[i].started_at = millis(); //start timing for  delay (if it is needed)
             led[i].cycle_state = LED_STATE_CYCCOUNT;
@@ -846,10 +844,7 @@ void init_Led(void)
 {
     for(int i = 0; i < LEDSTRING_COUNT; i++)
     {
-        if(ledMap[i].dio < NUM_DIGITAL_PINS) // the compiler does not know that ledMap values are valid so test them befor using
-        {
-            pinMode(ledMap[i].dio,OUTPUT);
-            digitalWrite(ledMap[i].dio,HIGH);
-        }
+        pinMode(ledMap[i].dio,OUTPUT);
+        digitalWrite(ledMap[i].dio,LOW); // disable a current source.
     }
 }

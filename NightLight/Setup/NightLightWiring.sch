@@ -682,7 +682,7 @@ http://www.dialight.com/Assets%5CBrochures_And_Catalogs%5CIndication%5CSMT_selec
 <text x="28.956" y="134.366" size="5.08" layer="98">NIGHT LIGHTS</text>
 </plain>
 <instances>
-<instance part="BM3" gate="G$1" x="45.72" y="114.3"/>
+<instance part="BM3" gate="G$1" x="45.72" y="116.84"/>
 <instance part="D18" gate="G$1" x="53.34" y="66.04"/>
 <instance part="D17" gate="G$1" x="45.72" y="71.12"/>
 <instance part="D1" gate="G$1" x="81.28" y="66.04"/>
@@ -701,23 +701,23 @@ http://www.dialight.com/Assets%5CBrochures_And_Catalogs%5CIndication%5CSMT_selec
 <instance part="D14" gate="G$1" x="33.02" y="73.66"/>
 <instance part="D15" gate="G$1" x="33.02" y="81.28"/>
 <instance part="D16" gate="G$1" x="33.02" y="88.9"/>
-<instance part="D19" gate="G$1" x="20.32" y="134.62" rot="R270"/>
+<instance part="D19" gate="G$1" x="20.32" y="137.16" rot="R270"/>
 </instances>
 <busses>
 </busses>
 <nets>
 <net name="SLP005-12U" class="0">
 <segment>
-<label x="71.12" y="114.3" size="1.778" layer="91" xref="yes"/>
+<label x="71.12" y="116.84" size="1.778" layer="91" xref="yes"/>
 <pinref part="BM3" gate="G$1" pin="ALT"/>
-<wire x1="71.12" y1="114.3" x2="66.04" y2="114.3" width="0.1524" layer="91"/>
+<wire x1="71.12" y1="116.84" x2="66.04" y2="116.84" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="12V_SLA" class="0">
 <segment>
-<label x="71.12" y="119.38" size="1.778" layer="91" xref="yes"/>
+<label x="71.12" y="121.92" size="1.778" layer="91" xref="yes"/>
 <pinref part="BM3" gate="G$1" pin="PWR"/>
-<wire x1="71.12" y1="119.38" x2="66.04" y2="119.38" width="0.1524" layer="91"/>
+<wire x1="71.12" y1="121.92" x2="66.04" y2="121.92" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="DAYNIGHT_STATUS_LED" class="0">
@@ -726,8 +726,10 @@ http://www.dialight.com/Assets%5CBrochures_And_Catalogs%5CIndication%5CSMT_selec
 <wire x1="45.72" y1="83.82" x2="40.64" y2="83.82" width="0.1524" layer="91"/>
 <wire x1="40.64" y1="83.82" x2="40.64" y2="99.06" width="0.1524" layer="91"/>
 <label x="41.91" y="63.246" size="1.27" layer="91" rot="R90"/>
-<pinref part="BM3" gate="G$1" pin="DIO12"/>
 <pinref part="D17" gate="G$1" pin="A"/>
+<pinref part="BM3" gate="G$1" pin="ADC3_17"/>
+<wire x1="38.1" y1="101.6" x2="38.1" y2="99.06" width="0.1524" layer="91"/>
+<wire x1="38.1" y1="99.06" x2="40.64" y2="99.06" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="STATUS_LED" class="0">
@@ -736,7 +738,7 @@ http://www.dialight.com/Assets%5CBrochures_And_Catalogs%5CIndication%5CSMT_selec
 <wire x1="53.34" y1="86.36" x2="53.34" y2="68.58" width="0.1524" layer="91"/>
 <label x="52.832" y="73.406" size="1.27" layer="91" rot="R90"/>
 <pinref part="BM3" gate="G$1" pin="DIO13"/>
-<wire x1="43.18" y1="86.36" x2="43.18" y2="99.06" width="0.1524" layer="91"/>
+<wire x1="43.18" y1="86.36" x2="43.18" y2="101.6" width="0.1524" layer="91"/>
 <pinref part="D18" gate="G$1" pin="A"/>
 </segment>
 </net>
@@ -752,7 +754,7 @@ http://www.dialight.com/Assets%5CBrochures_And_Catalogs%5CIndication%5CSMT_selec
 <junction x="53.34" y="60.96"/>
 <wire x1="38.1" y1="88.9" x2="38.1" y2="96.52" width="0.1524" layer="91"/>
 <wire x1="38.1" y1="96.52" x2="33.02" y2="96.52" width="0.1524" layer="91"/>
-<wire x1="33.02" y1="96.52" x2="33.02" y2="98.552" width="0.1524" layer="91"/>
+<wire x1="33.02" y1="96.52" x2="33.02" y2="101.092" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$4" class="0">
@@ -781,9 +783,9 @@ http://www.dialight.com/Assets%5CBrochures_And_Catalogs%5CIndication%5CSMT_selec
 <wire x1="76.2" y1="60.96" x2="76.2" y2="96.52" width="0.1524" layer="91"/>
 <pinref part="BM3" gate="G$1" pin="0V@3"/>
 <wire x1="76.2" y1="96.52" x2="55.88" y2="96.52" width="0.1524" layer="91"/>
-<wire x1="55.88" y1="96.52" x2="55.88" y2="99.06" width="0.1524" layer="91"/>
-<wire x1="55.88" y1="99.06" x2="55.626" y2="99.06" width="0.1524" layer="91"/>
-<junction x="55.88" y="99.06"/>
+<wire x1="55.88" y1="96.52" x2="55.88" y2="101.6" width="0.1524" layer="91"/>
+<wire x1="55.88" y1="101.6" x2="55.626" y2="101.6" width="0.1524" layer="91"/>
+<junction x="55.88" y="101.6"/>
 </segment>
 </net>
 <net name="BL" class="0">
@@ -791,6 +793,7 @@ http://www.dialight.com/Assets%5CBrochures_And_Catalogs%5CIndication%5CSMT_selec
 <pinref part="D4" gate="G$1" pin="A"/>
 <wire x1="81.28" y1="91.44" x2="81.28" y2="99.06" width="0.1524" layer="91"/>
 <wire x1="81.28" y1="99.06" x2="60.96" y2="99.06" width="0.1524" layer="91"/>
+<wire x1="60.96" y1="99.06" x2="60.96" y2="101.6" width="0.1524" layer="91"/>
 <label x="68.326" y="99.568" size="1.27" layer="91"/>
 <pinref part="BM3" gate="G$1" pin="CS0_EN5"/>
 </segment>
@@ -820,8 +823,8 @@ http://www.dialight.com/Assets%5CBrochures_And_Catalogs%5CIndication%5CSMT_selec
 <label x="66.802" y="93.726" size="1.27" layer="91" rot="R180"/>
 <wire x1="73.66" y1="60.96" x2="73.66" y2="93.98" width="0.1524" layer="91"/>
 <wire x1="73.66" y1="93.98" x2="53.34" y2="93.98" width="0.1524" layer="91"/>
-<wire x1="53.34" y1="93.98" x2="53.34" y2="96.52" width="0.1524" layer="91"/>
-<wire x1="53.34" y1="96.52" x2="55.626" y2="98.806" width="0.1524" layer="91"/>
+<wire x1="53.34" y1="93.98" x2="53.34" y2="99.06" width="0.1524" layer="91"/>
+<wire x1="53.34" y1="99.06" x2="55.626" y2="101.346" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="OG" class="0">
@@ -830,7 +833,7 @@ http://www.dialight.com/Assets%5CBrochures_And_Catalogs%5CIndication%5CSMT_selec
 <label x="54.61" y="91.694" size="1.27" layer="91"/>
 <pinref part="BM3" gate="G$1" pin="CS1_EN6"/>
 <wire x1="66.04" y1="91.44" x2="50.8" y2="91.44" width="0.1524" layer="91"/>
-<wire x1="50.8" y1="91.44" x2="50.8" y2="99.06" width="0.1524" layer="91"/>
+<wire x1="50.8" y1="91.44" x2="50.8" y2="101.6" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$14" class="0">
@@ -858,14 +861,14 @@ http://www.dialight.com/Assets%5CBrochures_And_Catalogs%5CIndication%5CSMT_selec
 <label x="17.018" y="87.63" size="1.27" layer="91" rot="R90"/>
 <wire x1="15.24" y1="60.96" x2="15.24" y2="93.98" width="0.1524" layer="91"/>
 <wire x1="15.24" y1="93.98" x2="17.78" y2="93.98" width="0.1524" layer="91"/>
-<wire x1="17.78" y1="93.98" x2="17.78" y2="99.06" width="0.1524" layer="91"/>
+<wire x1="17.78" y1="93.98" x2="17.78" y2="101.6" width="0.1524" layer="91"/>
 <pinref part="BM3" gate="G$1" pin="0V@5"/>
-<wire x1="17.78" y1="99.06" x2="20.32" y2="99.06" width="0.1524" layer="91"/>
+<wire x1="17.78" y1="101.6" x2="20.32" y2="101.6" width="0.1524" layer="91"/>
 <pinref part="D19" gate="G$1" pin="A"/>
-<wire x1="22.86" y1="134.62" x2="22.86" y2="127" width="0.1524" layer="91"/>
-<wire x1="22.86" y1="127" x2="17.78" y2="127" width="0.1524" layer="91"/>
-<wire x1="17.78" y1="127" x2="17.78" y2="99.06" width="0.1524" layer="91"/>
-<junction x="17.78" y="99.06"/>
+<wire x1="22.86" y1="137.16" x2="22.86" y2="129.54" width="0.1524" layer="91"/>
+<wire x1="22.86" y1="129.54" x2="17.78" y2="129.54" width="0.1524" layer="91"/>
+<wire x1="17.78" y1="129.54" x2="17.78" y2="101.6" width="0.1524" layer="91"/>
+<junction x="17.78" y="101.6"/>
 </segment>
 </net>
 <net name="N$18" class="0">
@@ -891,18 +894,18 @@ http://www.dialight.com/Assets%5CBrochures_And_Catalogs%5CIndication%5CSMT_selec
 <pinref part="D13" gate="G$1" pin="K"/>
 <wire x1="33.02" y1="60.96" x2="27.94" y2="60.96" width="0.1524" layer="91"/>
 <label x="29.718" y="89.408" size="1.27" layer="91" rot="R90"/>
-<wire x1="27.94" y1="60.96" x2="27.94" y2="96.52" width="0.1524" layer="91"/>
-<wire x1="27.94" y1="96.52" x2="30.48" y2="96.52" width="0.1524" layer="91"/>
+<wire x1="27.94" y1="60.96" x2="27.94" y2="99.06" width="0.1524" layer="91"/>
+<wire x1="27.94" y1="99.06" x2="30.48" y2="99.06" width="0.1524" layer="91"/>
 <pinref part="BM3" gate="G$1" pin="0V@6"/>
-<wire x1="30.48" y1="96.52" x2="33.02" y2="99.06" width="0.1524" layer="91"/>
-<wire x1="33.02" y1="99.06" x2="33.274" y2="99.06" width="0.1524" layer="91"/>
-<junction x="33.02" y="99.06"/>
+<wire x1="30.48" y1="99.06" x2="33.02" y2="101.6" width="0.1524" layer="91"/>
+<wire x1="33.02" y1="101.6" x2="33.274" y2="101.6" width="0.1524" layer="91"/>
+<junction x="33.02" y="101.6"/>
 </segment>
 </net>
 <net name="GN" class="0">
 <segment>
 <pinref part="D12" gate="G$1" pin="A"/>
-<wire x1="22.86" y1="99.06" x2="22.86" y2="93.98" width="0.1524" layer="91"/>
+<wire x1="22.86" y1="101.6" x2="22.86" y2="93.98" width="0.1524" layer="91"/>
 <wire x1="22.86" y1="93.98" x2="20.32" y2="93.98" width="0.1524" layer="91"/>
 <wire x1="20.32" y1="93.98" x2="20.32" y2="91.44" width="0.1524" layer="91"/>
 <label x="19.812" y="91.948" size="1.27" layer="91" rot="R90"/>
@@ -914,7 +917,7 @@ http://www.dialight.com/Assets%5CBrochures_And_Catalogs%5CIndication%5CSMT_selec
 <pinref part="D16" gate="G$1" pin="A"/>
 <wire x1="33.02" y1="91.44" x2="33.02" y2="93.98" width="0.1524" layer="91"/>
 <wire x1="33.02" y1="93.98" x2="35.56" y2="93.98" width="0.1524" layer="91"/>
-<wire x1="35.56" y1="93.98" x2="35.56" y2="99.06" width="0.1524" layer="91"/>
+<wire x1="35.56" y1="93.98" x2="35.56" y2="101.6" width="0.1524" layer="91"/>
 <label x="32.512" y="91.694" size="1.27" layer="91" rot="R90"/>
 <pinref part="BM3" gate="G$1" pin="CS3_EN4"/>
 </segment>
@@ -922,10 +925,10 @@ http://www.dialight.com/Assets%5CBrochures_And_Catalogs%5CIndication%5CSMT_selec
 <net name="LIGHT_SENSOR" class="0">
 <segment>
 <pinref part="D19" gate="G$1" pin="K"/>
-<wire x1="15.24" y1="134.62" x2="15.24" y2="96.52" width="0.1524" layer="91"/>
+<wire x1="15.24" y1="137.16" x2="15.24" y2="96.52" width="0.1524" layer="91"/>
 <wire x1="15.24" y1="96.52" x2="25.4" y2="96.52" width="0.1524" layer="91"/>
 <pinref part="BM3" gate="G$1" pin="ADC2_16"/>
-<wire x1="25.4" y1="96.52" x2="25.4" y2="99.06" width="0.1524" layer="91"/>
+<wire x1="25.4" y1="96.52" x2="25.4" y2="101.6" width="0.1524" layer="91"/>
 <label x="14.478" y="118.872" size="1.27" layer="91" rot="R90"/>
 </segment>
 </net>

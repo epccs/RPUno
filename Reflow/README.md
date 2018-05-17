@@ -6,13 +6,13 @@ __Not for multidrop use__ this firmware outputs to the serial after reset withou
 
 Controls a 20A Solid State Relay (SSR) and a buzzer. 
 
-Every two seconds a byte is taken from EEPROM to control the PWM rate of the SSR for the next two seconds. The thermocouple is not used for direct feedback control. The thermocouple is used to get the profile correct, but once set the profile is locked in. The idea is that any error in the software will show up each time, it will not be hidden by PID control logic. The starting condition of the oven needs to be near the same for each run, I find it takes at least fifteen minutes between runs.
+Every two seconds a byte is taken from EEPROM to control the on time of the SSR for the next two seconds. The thermocouple is not used for direct feedback control. The thermocouple is used to get the profile correct, but once set the profile is locked in. The idea is that any error in the software will show up each time, it will not be hidden by the PID control logic. The starting condition of the oven needs to be near the same for each run.
 
 Reads a Fluke 80TK Thermocouple Module (1mV/deg F) on channel zero. 
 
 ![Profile](https://raw.githubusercontent.com/epccs/RPUno/master/Reflow/profile/walmartBD,160622.png "Profile for Black & Decker Model NO. TO1303SB")
 
-Do not modify the oven, if you modify it and it burns down your house the insurance may deny payment. Turn the knobs so it is always on (as shown in the image) and set the temperature high enough that it will not turn off the oven. Now the Solid State Relay (SSR) can modulate power to the heating elements, the modulation does not need to be fast since they have a long thermal response, in fact, a two second PWM is more than enough. The SSR also needs to be placed in a certified electrical enclosure to improve the chance of getting insurance to pay (I'm not an expert, and there are always more rules). 
+Do not modify the oven, if you modify it and it burns down your house the insurance can deny payment. Turn the knobs so it is always on (as shown in the image) and set the temperature high enough that it will not turn off the oven. Now the Solid State Relay (SSR) can modulate power to the heating elements, the modulation does not need to be fast since they have a long thermal response, in fact, a two-second duty cycle is fast enough. The SSR should probably be placed in an electrical enclosure (I don't know the rules in your area). 
 
 ![Setup](https://raw.githubusercontent.com/epccs/RPUno/master/Reflow/profile/WalmartBD,TO1303SB.jpg "Setup of Black & Decker Model NO. TO1303SB")
 
@@ -44,7 +44,35 @@ pwm values used by Reflow start at address 42.
 
 # Profile
 
-The profile sub folder has the Python3 program that I use to load the profile. 
+The profile sub folder has the Python3 program that I use to load the profile one byte at a time. 
+
+``` 
+rsutherland@conversion:~/Samba/git/RPUno/Reflow/profile$ ./WalmartBD.py
+init:
+b'cmd echo: /1/id?'
+b'JSON: {"id":{"name":"Reflow","desc":"RPUno (14140^9) Board /w atmega328p","avr-gcc":"5.4.0"}}'
+Reflow fw found ready for command
+b'cmd echo: /1/ee? 42'
+b'JSON: {"EE[42]":{"r":"255"}}'
+b'cmd echo: /1/ee? 43'
+b'JSON: {"EE[43]":{"r":"255"}}'
+b'cmd echo: /1/ee 43,50'
+b'JSON: {"EE[43]":{"byte":"50","r":"50"}}'
+b'cmd echo: /1/ee? 44'
+b'JSON: {"EE[44]":{"r":"255"}}'
+b'cmd echo: /1/ee 44,127'
+b'JSON: {"EE[44]":{"byte":"127","r":"127"}}'
+...
+b'cmd echo: /1/ee? 306'
+b'JSON: {"EE[306]":{"r":"255"}}'
+b'cmd echo: /1/ee? 307'
+b'JSON: {"EE[307]":{"r":"255"}}'
+``` 
+
+
+# Starting The Profile
+
+I shine a battery powered light on D3, whcih is using the DayNight state machine to run event functions (a.k.a. callback functions). The event that starts the profile will load the command buffer with the "/reflow?" command which is sent back the the host (if one is connected). If the host sends a character it will stop the reflow just like if the host had started it. 
 
 
 # Notes
@@ -57,12 +85,12 @@ I Used a Fluke 80TK Thermocouple Module set to Fahrenheit scale so the output vo
 With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the Atmega328 board run 'make bootload' and it should compile and then flash the MCU.
 
 ``` 
-rsutherland@straightneck:~/Samba/RPUno/Reflow$ make bootload
+rsutherland@conversion:~/Samba/git/RPUno/Reflow$ make bootload
 ...
 avrdude done.  Thank you.
 ``` 
 
-Now connect with picocom (or ilk). Note I am often at another computer doing this through SSH. The Samba folder is for editing the files from Windows.
+Now connect with picocom (or ilk).
 
 ``` 
 #exit picocom with C-a, C-x

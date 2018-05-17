@@ -38,7 +38,7 @@ static unsigned long adc_started_at;
 
 #define STATUS_LED DIO13
 
-#define DAYNIGHT_STATUS_LED DIO12
+#define DAYNIGHT_STATUS_LED DIO17
 #define DAYNIGHT_BLINK 500UL
 static unsigned long day_status_blink_started_at;
 
@@ -290,14 +290,14 @@ int main(void)
 
     while(1) 
     { 
-        // use LED_BUILTIN to show if I2C has a bus manager
+        // use STATUS_LED to show if I2C has a bus manager
         blink();
         
         // use DAYNIGHT_STATUS_LED to show day_state
         blink_day_status();
 
         // Check Day Light is a function that operates a day-night state machine.
-        CheckDayLight(); // ../DayNight/day_night.c
+        CheckDayLight(ADC2); // ../DayNight/day_night.c
 
         // delay between ADC burst
         adc_burst();

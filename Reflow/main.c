@@ -28,11 +28,18 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../Uart/id.h"
 #include "../i2c-debug/i2c-scan.h"
 #include "../i2c-debug/i2c-cmd.h"
+#include "../DayNight/day_night.h"
 #include "../Eeprom/ee.h"
 #include "reflow.h"
 
 #define ADC_DELAY_MILSEC 100UL
 static unsigned long adc_started_at;
+
+#define STATUS_LED DIO13
+
+#define DAYNIGHT_STATUS_LED DIO17
+#define DAYNIGHT_BLINK 500UL
+static unsigned long day_status_blink_started_at;
 
 #define BLINK_DELAY 1000UL
 static unsigned long blink_started_at;
@@ -83,16 +90,34 @@ void ProcessCmd()
     }
 }
 
+//Start reflow when flashlight on LED has been removed
+void callback_for_night_attach(void)
+{
+    // this event will load a command and run the reflow profile.
+    if (uart0_available() == 0)
+    {
+        strcpy_P(command_buf, PSTR("/0/reflow?"));
+        command_buf[1] = rpu_addr; // hack the correct address onto the buffer
+        command_done = 1;
+        echo_on = 1;
+        printf_P(PSTR("%s\r\n"), command_buf);
+    }
+}
+
+//this event runs when the flashlight has gone through the morning debounce
+void callback_for_day_attach(void)
+{
+    // welp the light is on but I don't have a task?
+}
+
 void setup(void) 
 {
-	// RPUuno has no LED, but the LED_BUILTIN is defined as digital 13 (SCK).
-    pinMode(LED_BUILTIN,OUTPUT);
-    digitalWrite(LED_BUILTIN,HIGH);
-    
-    // RPUno current sources. see ../lib/pins_board.h
-    pinMode(CS_EN,OUTPUT);
-    digitalWrite(CS_EN,HIGH);
+    pinMode(STATUS_LED,OUTPUT);
+    digitalWrite(STATUS_LED,LOW);
 
+    pinMode(DAYNIGHT_STATUS_LED,OUTPUT);
+    digitalWrite(DAYNIGHT_STATUS_LED,HIGH);
+    
     // Initialize Timers, ADC, and clear bootloader, Arduino does these with init() in wiring.c
     initTimers(); //Timer0 Fast PWM mode, Timer1 & Timer2 Phase Correct PWM mode.
     init_ADC_single_conversion(INTERNAL_1V1); // warning AREF must not be connected to anything
@@ -125,16 +150,14 @@ void setup(void)
         rpu_addr = '0';
         blink_delay = BLINK_DELAY/4;
     }
-    
-    // this start up command runs a reflow profile after reset.
-    if (uart0_available() == 0)
-    {
-        strcpy_P(command_buf, PSTR("/0/reflow?"));
-        command_buf[1] = rpu_addr; // hack the correct address onto the buffer
-        command_done = 1;
-        echo_on = 1;
-        printf_P(PSTR("%s\r\n"), command_buf);
-    }
+
+    // register callback(s), e.g. please pass the pointer to a function.
+    Day_AttachWork(callback_for_day_attach);
+    Night_AttachWork(callback_for_night_attach);
+
+    // defaults for light sensor are 900,000 milli (e.g. 15 min), 3000 is more what I want
+    evening_debouce = 3000UL;
+    morning_debouce = 3000UL;
 }
 
 void blink(void)
@@ -142,10 +165,49 @@ void blink(void)
     unsigned long kRuntime = millis() - blink_started_at;
     if ( kRuntime > blink_delay)
     {
-        digitalToggle(LED_BUILTIN);
+        digitalToggle(STATUS_LED);
         
         // next toggle 
         blink_started_at += blink_delay; 
+    }
+}
+
+void blink_day_status(void)
+{
+    unsigned long kRuntime = millis() - day_status_blink_started_at;
+    uint8_t state = DayState();
+    if ( ( (state == DAYNIGHT_EVENING_DEBOUNCE_STATE) || \
+           (state == DAYNIGHT_MORNING_DEBOUNCE_STATE) ) && \
+           (kRuntime > (DAYNIGHT_BLINK/2) ) )
+    {
+        digitalToggle(DAYNIGHT_STATUS_LED);
+        
+        // set for next toggle 
+        day_status_blink_started_at += DAYNIGHT_BLINK/2; 
+    }
+    if ( ( (state == DAYNIGHT_DAY_STATE) ) && \
+           (kRuntime > (DAYNIGHT_BLINK) ) )
+    {
+        digitalWrite(DAYNIGHT_STATUS_LED,HIGH);
+        
+        // set for next toggle 
+        day_status_blink_started_at += DAYNIGHT_BLINK; 
+    }
+    if ( ( (state == DAYNIGHT_NIGHT_STATE) ) && \
+           (kRuntime > (DAYNIGHT_BLINK) ) )
+    {
+        digitalWrite(DAYNIGHT_STATUS_LED,LOW);
+        
+        // set for next toggle 
+        day_status_blink_started_at += DAYNIGHT_BLINK; 
+    }
+    if ( ( (state == DAYNIGHT_FAIL_STATE) ) && \
+           (kRuntime > (DAYNIGHT_BLINK/8) ) )
+    {
+        digitalToggle(DAYNIGHT_STATUS_LED);
+        
+        // set for next toggle 
+        day_status_blink_started_at += DAYNIGHT_BLINK/8; 
     }
 }
 
@@ -165,8 +227,14 @@ int main(void)
 
     while(1) 
     {
-        // use LED_BUILTIN to show if I2C has a bus manager
+        // use STATUS_LED to show if I2C has a bus manager
         blink();
+
+        // use DAYNIGHT_STATUS_LED to show day_state
+        blink_day_status();
+
+        // check light sensor
+        CheckDayLight(ADC2); // ../DayNight/day_night.c
 
         // delay between ADC reading
         adc_burst();

@@ -83,26 +83,41 @@ sio = serial.Serial("/dev/ttyUSB0",38400, timeout=3)
 # the bootloader takes about 2 seconds and a timeout of 3 seconds is provided
 reflow_echo = sio.readline().strip()
 
-# status for user to see
+# should be an empty buffer to show user
 print("init: " + reflow_echo[-10:].decode("utf-8")) 
 
-# checking if /reflow? command was printed 
-if ( reflow_echo[-7:] == b'reflow?'):
-    # stop the refow that should be running after reset
-    sio.write(("\n").encode('ascii'))
-    sleep(0.2)
-    command = "/"+rpu_addr
-    sio.write((command + "\n").encode('ascii'))
-    reflow_echo = sio.readline().strip()
-    print("echo: " + reflow_echo.decode("utf-8"))
-    while (not (reflow_echo == (command).encode('ascii') ) ) :
-        sleep(0.2)
-        print("miss catch of command prompt, trying again")
-        sio.write((command + "\n").encode('ascii'))
-        reflow_echo = sio.readline().strip()
-        print("echo: " + reflow_echo.decode("utf-8"))
 
-    print("Profile has been Stopped ready for command")
+# stop the running command (if any)
+sio.write(("\n").encode('ascii'))
+sleep(0.2)
+
+# checking id
+command = "/"+rpu_addr+"/id?"
+sio.write((command + "\n").encode('ascii'))
+
+# the command is sent back
+reflow_echo = sio.readline().strip()
+print("cmd echo: ".encode('ascii') + reflow_echo)
+
+# print("echo match: " + str(reflow_echo == (command).encode('ascii') ))
+while (not (reflow_echo == (command).encode('ascii') ) ) :
+    sleep(0.2)
+    print("miss catch of read command, trying again")
+    sio.write((command  + "\n").encode('ascii'))
+    reflow_echo = sio.readline().strip()
+    print("cmd echo: ".encode('ascii') + reflow_echo)
+
+ # JSON line after id command
+reflow_echo = sio.readline().strip()
+print ("JSON: ".encode('ascii') + reflow_echo)
+json_reply = reflow_echo.decode("utf-8")
+
+# deserialize the JSON (e.g. {"id":{"name":"Reflow"}} ) line into a python object
+data = json.loads(json_reply)
+id_name = data["id"]["name"]
+    
+if ( id_name[-6:] == 'Reflow'):
+    print("Reflow fw found ready for command")
 else:
     print("I did not see a /reflow? command running")
     exit()
@@ -131,7 +146,7 @@ for pwm in profile_pwm:
     json_reply = reflow_echo.decode("utf-8")
     
     # deserialize the JSON (e.g. {"EE[42]":{"r":"255"}} ) line into a python object
-    data = json.loads(json_reply) # this will cause an error if JSON is not valid
+    data = json.loads(json_reply)
     pwm_in_eeprom = data["EE["+str(eeprom_offset)+"]"]["r"]
     
     # don't write the same data again, note the /ee comand will check also
@@ -154,7 +169,7 @@ for pwm in profile_pwm:
         # deserialize the JSON (e.g. {"EE[42]":{"byte":"255","r":"255"}} ) line into a python object
         # byte: is what the mcu was sent
         # r: is the reading taken from EEPROM after writing was done, if it is different then EEPROM may have failed
-        data = json.loads(json_reply) # this will cause an error if JSON is not valid
+        data = json.loads(json_reply)
         pwm_in_eeprom = data["EE["+str(eeprom_offset)+"]"]["r"]
     eeprom_offset += 1 
 

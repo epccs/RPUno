@@ -4,7 +4,7 @@
 
 RPUno has some current sources that can be used to light LED strings. CS0..CS3 are 22mA souces. Digital 13 is used for I2C status, and Digital 12 is used for Day-Night status. 
 
-Night light uses non-blocking timers to cycles through the led[1|2|3|4].cycle_state that is used to control the current sources. The settings are loaded from EEPROM each night with a callback that is given to DayNight's  Night_AttachWork callback registration function.
+Night light uses non-blocking timers to cycle through the led[1|2|3|4].cycle_state that is used to control the current sources. The settings are loaded from EEPROM each night with a callback that is given to DayNight's  Night_AttachWork callback registration function.
 
 Note: There is no way to check the solar charge gain. the Day_AttachWork() function is given a callback that is used to reset the accumulation values.
 

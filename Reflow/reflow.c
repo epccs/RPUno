@@ -25,6 +25,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/adc.h"
 #include "../lib/timers.h"
 #include "../lib/pin_num.h"
+#include "../lib/pins_board.h"
 #include "../Eeprom/ee.h"
 #include "../Adc/references.h"
 #include "reflow.h"
@@ -32,10 +33,10 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #define REFLOW_ZONE_DELAY_MILSEC 2000UL
 static unsigned long reflow_zone_started_at;
 
-//Solid State Relay
-#define SSR 4
-#define BUZZER 3
-#define REFLOW_PWM_START 42
+//SSR is a Solid State Relay
+#define SSR CS3_EN
+#define BUZZER DIO15
+#define REFLOW_PWM_EE_START 42
 
 
 static uint16_t eeprom_offset;
@@ -59,7 +60,7 @@ void Reflow(void)
 
     if ( (command_done == 10) )
     {
-        eeprom_offset = REFLOW_PWM_START;
+        eeprom_offset = REFLOW_PWM_EE_START;
         pwm =0;
         last_pwm =0;
         reflow_zone_started_at = millis();

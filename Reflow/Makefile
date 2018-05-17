@@ -7,6 +7,7 @@ OBJECTS = main.o \
 	../Adc/references.o \
 	../i2c-debug/i2c-cmd.o \
 	../i2c-debug/i2c-scan.o \
+	../DayNight/day_night.o \
 	../Eeprom/ee.o \
 	../Uart/id.o \
 	$(LIBDIR)/timers.o \

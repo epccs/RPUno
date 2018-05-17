@@ -3,14 +3,13 @@
 
 extern void Day(unsigned long);
 
-extern void CheckDayLight(void);
+extern void CheckDayLight(uint8_t);
 extern uint8_t DayState(void);
 
 // Warning the pointer to function will be NULL if it is not set (registered) during initialization.
 extern void Day_AttachWork( void (*)(void) );
 extern void Night_AttachWork( void (*)(void) );
 
-extern uint8_t red_led_sensor;
 extern int morning_threshold;
 extern int evening_threshold;
 extern unsigned long evening_debouce;

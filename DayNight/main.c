@@ -33,7 +33,7 @@ static unsigned long adc_started_at;
 
 //pins are defined in ../lib/pins_board.h
 #define STATUS_LED DIO13
-#define DAYNIGHT_STATUS_LED DIO12
+#define DAYNIGHT_STATUS_LED DIO17
 #define DAYNIGHT_BLINK 500UL
 static unsigned long day_status_blink_started_at;
 
@@ -195,7 +195,7 @@ int main(void)
         day_status();
 
         // Check Day Light is a function that operates a day-night state machine.
-        CheckDayLight(); // day_night.c
+        CheckDayLight(ADC2); // day_night.c
 
         // delay between ADC burst
         adc_burst();

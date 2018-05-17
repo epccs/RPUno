@@ -26,8 +26,6 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/pins_board.h"
 #include "day_night.h"
 
-// Use a red LED to measure the light on ADC2
-#define RED_LED_SENSOR ADC2
 // analog reading of 20*5.0/1024.0 is about 0.1V
 // analog reading of 30*5.0/1024.0 is about 0.15V
 #define MORNING_THRESHOLD 30
@@ -52,7 +50,6 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #   error ADC hysteresis of 9 should be allowed
 #endif
 
-uint8_t red_led_sensor = RED_LED_SENSOR;
 int morning_threshold = MORNING_THRESHOLD;
 int evening_threshold = EVENING_THRESHOLD;
 unsigned long evening_debouce = (unsigned long)EVENING_DEBOUCE;
@@ -159,7 +156,7 @@ void Day(unsigned long serial_print_delay_milsec)
     6 = day_work: do day callback and set for day.
     7 = fail: fail state.
 */
-void CheckDayLight(void) 
+void CheckDayLight(uint8_t red_led_sensor) 
 { 
     if(dayState == DAYNIGHT_START_STATE) 
     { 

@@ -21,15 +21,15 @@ env:
     - APP_PATH="Eeprom"
     # Hardware is not built like this
     - APP_PATH="i2c-debug"
-    # lib has core files
+    # lib has the core files
     - APP_PATH="NightLight"
     - APP_PATH="Parsing"
     - APP_PATH="PwrMgt"
-    
+    - APP_PATH="Reflow"
     - APP_PATH="SelfTest"
-    - APP_PATH="Uart"
+    - APP_PATH="Solenoid"
     - APP_PATH="SpiSlv"
-
+    - APP_PATH="Uart"
 
 before_install:
   - sudo apt-get update -qq

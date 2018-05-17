@@ -35,7 +35,9 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #define ADC_DELAY_MILSEC 200UL
 static unsigned long adc_started_at;
 
-#define DAYNIGHT_STATUS_LED 4
+#define STATUS_LED DIO13
+
+#define DAYNIGHT_STATUS_LED DIO17
 #define DAYNIGHT_BLINK 500UL
 static unsigned long day_status_blink_started_at;
 
@@ -95,11 +97,11 @@ void ProcessCmd()
         }
         if ( (strcmp_P( command, PSTR("/day?")) == 0) && ( (arg_count == 0 ) ) )
         {
-            Day(); // ../DayNight/day_night.c
+            Day(60000UL); // ../DayNight/day_night.c: show every 60 sec until terminated
         }
         if ( (strcmp_P( command, PSTR("/analog?")) == 0) && ( (arg_count >= 1 ) && (arg_count <= 5) ) )
         {
-            Analog(); // ../Adc/analog.c
+            Analog(20000UL); // ../Adc/analog.c: show every 20 sec until terminated
         }
         if ( (strcmp_P( command, PSTR("/count?")) == 0) &&  ( (arg_count == 0) || ( (arg_count == 1) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
         {
@@ -141,11 +143,9 @@ void callback_for_day_attach(void)
 
 void setup(void) 
 {
-	// RPUuno has no LED, but the LED_BUILTIN is defined as digital 13 (SCK) anyway.
-    pinMode(LED_BUILTIN,OUTPUT);
-    digitalWrite(LED_BUILTIN,HIGH);
+    pinMode(STATUS_LED,OUTPUT);
+    digitalWrite(STATUS_LED,LOW);
     
-    // A DayNight status LED is on digital pin 4
     pinMode(DAYNIGHT_STATUS_LED,OUTPUT);
     digitalWrite(DAYNIGHT_STATUS_LED,HIGH);
     
@@ -194,7 +194,7 @@ void setup(void)
     Reset_All_K();
     solenoids_initalized = 0;
     
-    // set callback. See Solenoid for another example, where it loads the EEPROM values used at the start of each day
+    // register callback for the Day Work event  (note Night_AttachWork() defalt does nothing)
     Day_AttachWork(callback_for_day_attach);
 }
 
@@ -203,7 +203,7 @@ void blink(void)
     unsigned long kRuntime = millis() - blink_started_at;
     if ( kRuntime > blink_delay)
     {
-        digitalToggle(LED_BUILTIN);
+        digitalToggle(STATUS_LED);
         
         // next toggle 
         blink_started_at += blink_delay; 
@@ -265,14 +265,14 @@ int main(void)
 
     while(1) 
     { 
-        // use LED_BUILTIN to show if I2C has a bus manager
+        // use STATUS_LED to show if I2C has a bus manager
         blink();
         
         // use DAYNIGHT_STATUS_LED to show day_state
         blink_day_status();
 
         // Check Day Light is a function that operates a day-night state machine.
-        CheckDayLight(); // ../DayNight/day_night.c
+        CheckDayLight(ADC2); // ../DayNight/day_night.c
 
         // delay between ADC burst
         adc_burst();

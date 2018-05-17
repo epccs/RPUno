@@ -268,7 +268,7 @@ int main(void)
         blink_day_status();
 
         // Check Day Light is a function that operates a day-night state machine.
-        CheckDayLight(); // ../DayNight/day_night.c
+        CheckDayLight(ADC2); // ../DayNight/day_night.c
 
         // delay between ADC burst
         adc_burst();

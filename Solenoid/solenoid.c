@@ -30,12 +30,12 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "solenoid.h"
 
 // IO on RPUno used by the K3 board
-#define E3 3
-#define A0 10
-#define A1 11
-#define A2 12
-// 13 is used to blink I2C status in main()
-// 4 is used to blink Day-Night status in main()
+#define E3 DIO14
+#define A0 DIO10
+#define A1 DIO11
+#define A2 DIO12
+// DIO13 is used to blink I2C status in main()
+// DIO17 is used to blink Day-Night status in main()
 
 //The EEPROM memory usage is as follows. 
 #define EE_SOLENOID_BASE_ADDR 40

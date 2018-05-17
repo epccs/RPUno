@@ -94,7 +94,7 @@ void ProcessCmd()
         }
         if ( (strcmp_P( command, PSTR("/analog?")) == 0) && ( (arg_count >= 1 ) && (arg_count <= 5) ) )
         {
-            Analog(20000UL); // ../Adc/analog.c:show every 20 sec until terminated
+            Analog(20000UL); // ../Adc/analog.c: show every 20 sec until terminated
         }
         if ( (strcmp_P( command, PSTR("/iscan?")) == 0) && (arg_count == 0) )
         {

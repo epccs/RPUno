@@ -4,9 +4,9 @@ From <https://github.com/epccs/RPUno/>
 
 ## Overview
 
-A general purpose ATmega328p controller board with level shift IO and current sources that operate over the wide input voltage range.
+A general purpose ATmega328p controller board with level shift IO and current sources that operate over a wide input voltage range.
 
-The onboard bare metal is a well-known microcontroller and has several programming options (I use ISCP and bootloader). It is selected because the toolchain is available on a Raspberry Pi, and can be interfaced with 5V hardware (note that level shifting affects the push-pull high voltage). The header pins are directly connected to the microcontroller. I use the headers with my shields [RPUadpt], and [RPUpi] that connect the board to a multidrop serial bus. The board can measure input Voltage, and current and disconnect power to the shield's VIN pin. [RPUpi] wires that VIN pin power to an SMPS that powers the Raspberry Pi computer.
+The onboard bare metal is a well-known microcontroller and has several programming options. It is selected because a toolchain is available on a Raspberry Pi, and is 5V hardware though level shifting affects the push-pull voltage somewhat. The header pins are directly connected to the microcontroller. I use the headers with my shields [RPUadpt], and [RPUpi] that connect the board to a multidrop serial bus. The board can measure input Voltage, and current and disconnect power to the shield's VIN pin. [RPUpi] wires that VIN pin power to an SMPS that powers the Raspberry Pi computer.
 
 [RPUadpt]: https://github.com/epccs/RPUadpt
 [RPUpi]: https://github.com/epccs/RPUpi

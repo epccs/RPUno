@@ -30,21 +30,21 @@ The implementation is very flexible, for example, there are resources constraint
 ``` 
 RPUno   (digital)   K3 
 ------------------------
-PD3     (IO3)       E3
-PD4     (IO4)       DAYNIGHT_STATUS_LED
+PC0     (DIO14)     E3
+PC3     (DIO17)     DAYNIGHT_STATUS_LED
 0V       na         nE2
 0V       na         nE1
-PB2     (nSS/IO10)  A0
-PB3     (MOSI/IO11) A1
-PB4     (MISO/IO12) A2 
-PB5     (SCK/IO13)  LED_BUILTIN
+PB2     (DIO10)     A0
+PB3     (DIO11)     A1
+PB4     (DIO12)     A2 
+PB5     (DIO13)     STATUS_LED
 ``` 
 
-The RPUno has those I/O's wired to a pluggable onboard connector. They are level converted to 5V and will ouput 4V without a pullup (which is enough for a minimum high on 74HC logic). 
+![Wiring](./Setup/SolenoidWiring.png)
 
-The IO13 pin is used as LED_BUILTIN and blinks on and off for a second when an rpu_address is read over I2C (if I2C failed it blinks four times as fast). 
+The RPUno has the indicated DIO's wired to 3.5mm pads. They are level converted to 5V so will ouput about 4V without a pullup (which is enough for a minimum high on 74HC logic). 
 
-[![RPUno^5 With K3^0](http://rpubus.org/bb/download/file.php?id=25)](http://rpubus.org/Video/14140%5E5WithK3%5E0.mp4 "RPUno^5 With K3^0")
+The STATUS_LED blinks on and off for a second when an rpu_address is read over I2C (if I2C failed it blinks four times as fast). 
 
 
 # EEPROM Memory map 
@@ -69,7 +69,7 @@ The [day-night][../DayNight] state machine is used to load and run EEPROM values
 
 # Flow Sensor
 
-ICP1 is available through the [Capture][../Capture] commands.
+ICP1 is available through the [Capture][../Capture] commands. The differance in capture counts is held as flow data for each zone and its value is part of the flow report (see /flow? command).
 
 
 # Firmware Upload

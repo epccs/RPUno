@@ -146,7 +146,8 @@ void Day(unsigned long serial_print_delay_milsec)
 }
 
 /* check for daytime state durring program looping  
-    dayState 
+    adc_ch_with_red_led_sensor: ADC channel
+    dayState: range 0..7
     0 = default at startup, if above Evening Threshold set day, else set night.
     1 = day: wait for evening threshold, set for evening debounce.
     2 = evening_debounce: wait for debounce time, do night_work, however if debouce fails set back to day.
@@ -156,14 +157,15 @@ void Day(unsigned long serial_print_delay_milsec)
     6 = day_work: do day callback and set for day.
     7 = fail: fail state.
 */
-void CheckDayLight(uint8_t red_led_sensor) 
+void CheckDayLight(uint8_t adc_ch_with_red_led_sensor) 
 { 
+    int sensor_val = analogRead(adc_ch_with_red_led_sensor);
     if(dayState == DAYNIGHT_START_STATE) 
     { 
         unsigned long kRuntime= millis() - dayTmrStarted;
         if ((kRuntime) > ((unsigned long)STARTUP_DELAY)) 
         {
-            if(analogRead(red_led_sensor) > evening_threshold ) 
+            if(sensor_val > evening_threshold ) 
             {
                 dayState = DAYNIGHT_DAY_STATE; 
                 dayTmrStarted = millis();
@@ -179,7 +181,7 @@ void CheckDayLight(uint8_t red_led_sensor)
   
     if(dayState == DAYNIGHT_DAY_STATE) 
     { //day
-        if (analogRead(red_led_sensor) < evening_threshold ) 
+        if (sensor_val < evening_threshold ) 
         {
             dayState = DAYNIGHT_EVENING_DEBOUNCE_STATE;
             dayTmrStarted = millis();
@@ -195,7 +197,7 @@ void CheckDayLight(uint8_t red_led_sensor)
   
     if(dayState == DAYNIGHT_EVENING_DEBOUNCE_STATE) 
     { //evening_debounce
-        if (analogRead(red_led_sensor) < evening_threshold ) 
+        if (sensor_val < evening_threshold ) 
         {
             unsigned long kRuntime= millis() - dayTmrStarted;
             if ((kRuntime) > (evening_debouce)) 
@@ -221,7 +223,7 @@ void CheckDayLight(uint8_t red_led_sensor)
 
     if(dayState == DAYNIGHT_NIGHT_STATE) 
     { //night
-        if (analogRead(red_led_sensor) > morning_threshold ) 
+        if (sensor_val > morning_threshold ) 
         {
             dayState = DAYNIGHT_MORNING_DEBOUNCE_STATE;
             dayTmrStarted = millis();
@@ -237,7 +239,7 @@ void CheckDayLight(uint8_t red_led_sensor)
 
     if(dayState == DAYNIGHT_MORNING_DEBOUNCE_STATE) 
     { //morning_debounce
-        if (analogRead(red_led_sensor) > morning_threshold ) 
+        if (sensor_val > morning_threshold ) 
         {
             unsigned long kRuntime= millis() - dayTmrStarted;
             if ((kRuntime) > (morning_debouce)) 

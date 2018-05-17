@@ -201,7 +201,7 @@ http://creativecommons.org/licenses/by-sa/3.0</description>
 <wire x1="-12.7" y1="-13.462" x2="-14.224" y2="-13.462" width="0.254" layer="94"/>
 <pin name="TX" x="15.24" y="12.7" visible="pin" length="point" rot="R270"/>
 <pin name="RX" x="12.7" y="12.7" visible="pin" length="point" rot="R270"/>
-<text x="-23.622" y="5.08" size="1.9304" layer="94">RPUno with
+<text x="-23.622" y="5.08" size="1.9304" layer="94">RPUno^9 with
 ATmega328p</text>
 <pin name="I2C" x="10.16" y="12.7" visible="pin" length="point" rot="R270"/>
 <pin name="SPI" x="7.62" y="12.7" visible="pin" length="point" rot="R270"/>

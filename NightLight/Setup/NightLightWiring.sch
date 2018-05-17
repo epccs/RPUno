@@ -201,7 +201,7 @@ http://creativecommons.org/licenses/by-sa/3.0</description>
 <wire x1="-12.7" y1="-13.462" x2="-14.224" y2="-13.462" width="0.254" layer="94"/>
 <pin name="TX" x="15.24" y="12.7" visible="pin" length="point" rot="R270"/>
 <pin name="RX" x="12.7" y="12.7" visible="pin" length="point" rot="R270"/>
-<text x="-23.622" y="5.08" size="1.9304" layer="94">RPUno with
+<text x="-23.622" y="5.08" size="1.9304" layer="94">RPUno^9 with
 ATmega328p</text>
 <pin name="I2C" x="10.16" y="12.7" visible="pin" length="point" rot="R270"/>
 <pin name="SPI" x="7.62" y="12.7" visible="pin" length="point" rot="R270"/>
@@ -645,6 +645,376 @@ http://www.dialight.com/Assets%5CBrochures_And_Catalogs%5CIndication%5CSMT_selec
 </deviceset>
 </devicesets>
 </library>
+<library name="R-C">
+<description>&lt;pre&gt;CHIP RESISTOR
+NOTE: rounded pads... http://www.kemet.com/kemet/web/homepage/kfbk3.nsf/vaFeedbackFAQ/2209BDBA03843BBF85256BCD004EBC11/$file/f2100e.pdf
+See section on Tombstoneing. Lead free solder may not wet edges, and IPC does not allow exposed copper. 
+My (rsutherland@epccs) experience suggest highly rounded pads reduce solder beads that can be extruded along edges of larger capacitors (0805).
+
+USE AT YOUR OWN RISK...
+ 
+Copyright (C) 2013 Ronald Steven Sutherland
+Released under the Creative Commons 
+Attribution Share-Alike 3.0 License
+http://creativecommons.org/licenses/by-sa/3.0</description>
+<packages>
+<package name="C0402(1005)">
+<description>&lt;pre&gt;EIA 0402 (Metric Code Size 1005) Resistor Chip
+rounded pads are added in IPC 782 rev A, this pad was on Arduino Due and may have originated from smartprj.com
+http://www.kemet.com/kemet/web/homepage/kfbk3.nsf/vaFeedbackFAQ/2209BDBA03843BBF85256BCD004EBC11/$file/f2100e.pdf</description>
+<wire x1="-0.838" y1="0.483" x2="0.838" y2="0.483" width="0.0508" layer="39"/>
+<wire x1="0.838" y1="0.483" x2="0.838" y2="-0.483" width="0.0508" layer="39"/>
+<wire x1="0.838" y1="-0.483" x2="-0.838" y2="-0.483" width="0.0508" layer="39"/>
+<wire x1="-0.838" y1="-0.483" x2="-0.838" y2="0.483" width="0.0508" layer="39"/>
+<smd name="1" x="-0.4445" y="0" dx="0.508" dy="0.762" layer="1" roundness="90"/>
+<smd name="2" x="0.4445" y="0" dx="0.508" dy="0.762" layer="1" roundness="90"/>
+<text x="-0.635" y="0.762" size="0.6096" layer="25">&gt;NAME</text>
+<text x="-0.381" y="-0.127" size="0.254" layer="27">&gt;VALUE</text>
+<wire x1="-0.4572" y1="0.2286" x2="0.4572" y2="0.2286" width="0.1016" layer="51"/>
+<wire x1="0.4572" y1="0.2286" x2="0.4572" y2="-0.2286" width="0.1016" layer="51"/>
+<wire x1="0.4572" y1="-0.2286" x2="-0.4572" y2="-0.2286" width="0.1016" layer="51"/>
+<wire x1="-0.4572" y1="-0.2286" x2="-0.4572" y2="0.2286" width="0.1016" layer="51"/>
+</package>
+<package name="C0402(1005)K">
+<description>&lt;pre&gt;EIA 0402 (Metric Code Size 1005) Ceramic Chip
+Reflow solder: is a solder wave process so the part needs glue.
+Rounded edges reduces bridging, and no-lead
+solder needs all the help it can get.</description>
+<smd name="1" x="-0.6" y="0" dx="0.925" dy="0.74" layer="1" roundness="50"/>
+<smd name="2" x="0.6" y="0" dx="0.925" dy="0.74" layer="1" roundness="50"/>
+<text x="-0.5" y="0.679" size="0.6096" layer="25">&gt;NAME</text>
+<wire x1="0" y1="-0.127" x2="0" y2="0.127" width="0.2032" layer="35"/>
+<wire x1="-1.016" y1="0.508" x2="1.016" y2="0.508" width="0.127" layer="39"/>
+<wire x1="1.016" y1="0.508" x2="1.016" y2="-0.508" width="0.127" layer="39"/>
+<wire x1="1.016" y1="-0.508" x2="-1.016" y2="-0.508" width="0.127" layer="39"/>
+<wire x1="-1.016" y1="-0.508" x2="-1.016" y2="0.508" width="0.127" layer="39"/>
+<text x="-0.381" y="-0.127" size="0.254" layer="27">&gt;VALUE</text>
+<wire x1="-0.4572" y1="0.2286" x2="0.4572" y2="0.2286" width="0.1016" layer="51"/>
+<wire x1="0.4572" y1="0.2286" x2="0.4572" y2="-0.2286" width="0.1016" layer="51"/>
+<wire x1="0.4572" y1="-0.2286" x2="-0.4572" y2="-0.2286" width="0.1016" layer="51"/>
+<wire x1="-0.4572" y1="-0.2286" x2="-0.4572" y2="0.2286" width="0.1016" layer="51"/>
+</package>
+<package name="C0603(1608)">
+<description>&lt;pre&gt;EIA 0603 (Metric Code Size 1608) Ceramic Chip
+rounded pads are added in IPC 782 rev A
+http://www.kemet.com/kemet/web/homepage/kfbk3.nsf/vaFeedbackFAQ/2209BDBA03843BBF85256BCD004EBC11/$file/f2100e.pdf</description>
+<wire x1="-1.473" y1="0.729" x2="1.473" y2="0.729" width="0.0508" layer="39"/>
+<wire x1="1.473" y1="0.729" x2="1.473" y2="-0.729" width="0.0508" layer="39"/>
+<wire x1="1.473" y1="-0.729" x2="-1.473" y2="-0.729" width="0.0508" layer="39"/>
+<wire x1="-1.473" y1="-0.729" x2="-1.473" y2="0.729" width="0.0508" layer="39"/>
+<smd name="1" x="-0.889" y="0" dx="1.1" dy="0.8984" layer="1" roundness="80" rot="R90"/>
+<smd name="2" x="0.889" y="0" dx="1.1" dy="0.8984" layer="1" roundness="80" rot="R90"/>
+<text x="-0.889" y="0.889" size="0.6096" layer="25">&gt;NAME</text>
+<wire x1="-0.8128" y1="0.4318" x2="0.7874" y2="0.4318" width="0.1016" layer="51"/>
+<wire x1="0.7874" y1="0.4318" x2="0.7874" y2="-0.4318" width="0.1016" layer="51"/>
+<wire x1="0.7874" y1="-0.4318" x2="-0.8128" y2="-0.4318" width="0.1016" layer="51"/>
+<wire x1="-0.8128" y1="-0.4318" x2="-0.8128" y2="0.4318" width="0.1016" layer="51"/>
+<text x="-0.635" y="-0.254" size="0.4064" layer="27">&gt;VALUE</text>
+</package>
+<package name="C0603(1608)K">
+<description>&lt;pre&gt;EIA 0603 (Metric Code Size 1608) Ceramic Chip
+Reflow solder: is a solder wave process so the part needs glue.
+KEMET pad size, rounded edges reduces bridging, and no-lead
+solder needs all the help it can get.</description>
+<smd name="1" x="-0.875" y="0" dx="1.05" dy="1.08" layer="1" roundness="50"/>
+<smd name="2" x="0.875" y="0" dx="1.05" dy="1.08" layer="1" roundness="50"/>
+<text x="-0.8" y="0.65" size="0.6096" layer="25">&gt;NAME</text>
+<wire x1="0" y1="0.127" x2="0" y2="-0.127" width="0.2032" layer="35"/>
+<wire x1="-1.524" y1="0.508" x2="1.524" y2="0.508" width="0.127" layer="39"/>
+<wire x1="1.524" y1="0.508" x2="1.524" y2="-0.508" width="0.127" layer="39"/>
+<wire x1="1.524" y1="-0.508" x2="-1.524" y2="-0.508" width="0.127" layer="39"/>
+<wire x1="-1.524" y1="-0.508" x2="-1.524" y2="0.508" width="0.127" layer="39"/>
+<wire x1="-0.8128" y1="0.4318" x2="0.7874" y2="0.4318" width="0.1016" layer="51"/>
+<wire x1="0.7874" y1="0.4318" x2="0.7874" y2="-0.4318" width="0.1016" layer="51"/>
+<wire x1="0.7874" y1="-0.4318" x2="-0.8128" y2="-0.4318" width="0.1016" layer="51"/>
+<wire x1="-0.8128" y1="-0.4318" x2="-0.8128" y2="0.4318" width="0.1016" layer="51"/>
+<text x="-0.635" y="-0.254" size="0.4064" layer="27">&gt;VALUE</text>
+</package>
+<package name="C0805(2012)">
+<description>&lt;pre&gt;EIA 0805 (Metric Code Size 2012) Ceramic Chip
+rounded pads are added in IPC 782 rev A
+http://www.kemet.com/kemet/web/homepage/kfbk3.nsf/vaFeedbackFAQ/2209BDBA03843BBF85256BCD004EBC11/$file/f2100e.pdf</description>
+<wire x1="-1.973" y1="0.983" x2="1.973" y2="0.983" width="0.0508" layer="39"/>
+<wire x1="1.973" y1="-0.983" x2="-1.973" y2="-0.983" width="0.0508" layer="39"/>
+<wire x1="-1.973" y1="-0.983" x2="-1.973" y2="0.983" width="0.0508" layer="39"/>
+<wire x1="1.973" y1="0.983" x2="1.973" y2="-0.983" width="0.0508" layer="39"/>
+<smd name="1" x="-0.977" y="0" dx="1.3208" dy="1.651" layer="1" roundness="100"/>
+<smd name="2" x="0.977" y="0" dx="1.3208" dy="1.651" layer="1" roundness="100"/>
+<text x="-0.889" y="1.143" size="0.6096" layer="25">&gt;NAME</text>
+<wire x1="-1.0414" y1="0.6858" x2="1.0668" y2="0.6858" width="0.1016" layer="51"/>
+<wire x1="1.0668" y1="0.6858" x2="1.0668" y2="-0.6858" width="0.1016" layer="51"/>
+<wire x1="1.0668" y1="-0.6858" x2="-1.0414" y2="-0.6858" width="0.1016" layer="51"/>
+<wire x1="-1.0414" y1="-0.6858" x2="-1.0414" y2="0.6858" width="0.1016" layer="51"/>
+<text x="-0.889" y="-0.254" size="0.4064" layer="27">&gt;VALUE</text>
+</package>
+<package name="C0805(2012)K">
+<description>&lt;pre&gt;EIA 0805 (Metric Code Size 2012) Ceramic Chip
+Reflow solder: is a solder wave process so the part needs glue.
+KEMET pad size, rounded edges reduces bridging, and no-lead
+solder needs all the help it can get.</description>
+<smd name="1" x="-1" y="0" dx="1.3" dy="1.6" layer="1" roundness="50"/>
+<smd name="2" x="1" y="0" dx="1.3" dy="1.6" layer="1" roundness="50"/>
+<text x="-0.873" y="1.129" size="0.6096" layer="25">&gt;NAME</text>
+<wire x1="0" y1="0.381" x2="0" y2="-0.381" width="0.3048" layer="35"/>
+<wire x1="-1.524" y1="1.016" x2="1.524" y2="1.016" width="0.127" layer="39"/>
+<wire x1="1.524" y1="1.016" x2="1.524" y2="-1.016" width="0.127" layer="39"/>
+<wire x1="1.524" y1="-1.016" x2="-1.524" y2="-1.016" width="0.127" layer="39"/>
+<wire x1="-1.524" y1="-1.016" x2="-1.524" y2="1.016" width="0.127" layer="39"/>
+<wire x1="-1.0414" y1="0.6858" x2="1.0668" y2="0.6858" width="0.1016" layer="51"/>
+<wire x1="1.0668" y1="0.6858" x2="1.0668" y2="-0.6858" width="0.1016" layer="51"/>
+<wire x1="1.0668" y1="-0.6858" x2="-1.0414" y2="-0.6858" width="0.1016" layer="51"/>
+<wire x1="-1.0414" y1="-0.6858" x2="-1.0414" y2="0.6858" width="0.1016" layer="51"/>
+<text x="-0.889" y="-0.254" size="0.4064" layer="27">&gt;VALUE</text>
+</package>
+<package name="C1206(3216)">
+<description>&lt;pre&gt;EIA 1206 (Metric Code Size 3216) Ceramic Chip
+rounded pads are added in IPC 782 rev A.
+http://www.kemet.com/kemet/web/homepage/kfbk3.nsf/vaFeedbackFAQ/2209BDBA03843BBF85256BCD004EBC11/$file/f2100e.pdf</description>
+<wire x1="-2.473" y1="0.983" x2="2.473" y2="0.983" width="0.0508" layer="39"/>
+<wire x1="2.473" y1="-0.983" x2="-2.473" y2="-0.983" width="0.0508" layer="39"/>
+<wire x1="-2.473" y1="-0.983" x2="-2.473" y2="0.983" width="0.0508" layer="39"/>
+<wire x1="2.473" y1="0.983" x2="2.473" y2="-0.983" width="0.0508" layer="39"/>
+<smd name="1" x="-1.4" y="0" dx="1.6" dy="1.8" layer="1" roundness="100"/>
+<smd name="2" x="1.4" y="0" dx="1.6" dy="1.8" layer="1" roundness="100"/>
+<text x="-1.27" y="1.27" size="0.6096" layer="25">&gt;NAME</text>
+<wire x1="-1.524" y1="0.762" x2="1.524" y2="0.762" width="0.1016" layer="51"/>
+<wire x1="-1.524" y1="-0.762" x2="1.524" y2="-0.762" width="0.1016" layer="51"/>
+<wire x1="-1.524" y1="0.762" x2="-1.524" y2="-0.762" width="0.1016" layer="51"/>
+<wire x1="1.524" y1="0.762" x2="1.524" y2="-0.762" width="0.1016" layer="51"/>
+<text x="-1.016" y="-0.254" size="0.4064" layer="27">&gt;VALUE</text>
+</package>
+<package name="C1206(3216)K">
+<description>&lt;pre&gt;EIA 1206 (Metric Code Size 3216) Ceramic Chip Capacitor
+Reflow solder: is a solder wave process so the part needs glue.
+KEMET pad size, rounded edges reduces bridging, and no-lead
+solder needs all the help it can get.</description>
+<smd name="1" x="-1.5" y="0" dx="1.5" dy="2" layer="1" roundness="50"/>
+<smd name="2" x="1.5" y="0" dx="1.5" dy="2" layer="1" roundness="50"/>
+<text x="-1.473" y="1.227" size="0.6096" layer="25">&gt;NAME</text>
+<wire x1="0.381" y1="-0.381" x2="0.381" y2="0.381" width="0.3048" layer="35"/>
+<wire x1="-0.381" y1="0.381" x2="-0.381" y2="-0.381" width="0.3048" layer="35"/>
+<wire x1="-2.032" y1="1.016" x2="2.032" y2="1.016" width="0.127" layer="39"/>
+<wire x1="2.032" y1="1.016" x2="2.032" y2="-1.016" width="0.127" layer="39"/>
+<wire x1="2.032" y1="-1.016" x2="-2.032" y2="-1.016" width="0.127" layer="39"/>
+<wire x1="-2.032" y1="-1.016" x2="-2.032" y2="1.016" width="0.127" layer="39"/>
+<wire x1="-1.524" y1="0.762" x2="1.524" y2="0.762" width="0.1016" layer="51"/>
+<wire x1="-1.524" y1="-0.762" x2="1.524" y2="-0.762" width="0.1016" layer="51"/>
+<wire x1="-1.524" y1="0.762" x2="-1.524" y2="-0.762" width="0.1016" layer="51"/>
+<wire x1="1.524" y1="0.762" x2="1.524" y2="-0.762" width="0.1016" layer="51"/>
+<text x="-1.016" y="-0.254" size="0.4064" layer="27">&gt;VALUE</text>
+</package>
+<package name="C1210(3225)">
+<description>&lt;pre&gt;EIA 1210 (Metric Code Size 3225) Ceramic Chip
+rounded pads are added in IPC 782 rev A.
+http://www.kemet.com/kemet/web/homepage/kfbk3.nsf/vaFeedbackFAQ/2209BDBA03843BBF85256BCD004EBC11/$file/f2100e.pdf</description>
+<wire x1="-2.473" y1="1.483" x2="2.473" y2="1.483" width="0.0508" layer="39"/>
+<wire x1="2.473" y1="-1.483" x2="-2.473" y2="-1.483" width="0.0508" layer="39"/>
+<wire x1="-2.473" y1="-1.483" x2="-2.473" y2="1.483" width="0.0508" layer="39"/>
+<wire x1="2.473" y1="1.483" x2="2.473" y2="-1.483" width="0.0508" layer="39"/>
+<smd name="1" x="-1.4" y="0" dx="1.6" dy="2.7" layer="1" roundness="100"/>
+<smd name="2" x="1.4" y="0" dx="1.6" dy="2.7" layer="1" roundness="100"/>
+<text x="-1.524" y="1.651" size="0.6096" layer="25">&gt;NAME</text>
+<wire x1="-1.524" y1="1.27" x2="1.524" y2="1.27" width="0.1016" layer="51"/>
+<wire x1="-1.524" y1="-1.27" x2="1.524" y2="-1.27" width="0.1016" layer="51"/>
+<wire x1="-1.524" y1="1.27" x2="-1.524" y2="-1.27" width="0.1016" layer="51"/>
+<wire x1="1.524" y1="1.27" x2="1.524" y2="-1.27" width="0.1016" layer="51"/>
+<text x="-1.016" y="-0.254" size="0.4064" layer="27">&gt;VALUE</text>
+</package>
+<package name="C1210(3225)K">
+<description>&lt;pre&gt;EIA 1210 (Metric Code Size 3225) Ceramic Chip Capacitor
+Reflow solder: is a solder wave process so the part needs glue.
+KEMET pad size, rounded edges reduces bridging, and no-lead
+solder needs all the help it can get.</description>
+<smd name="1" x="-1.5" y="0" dx="1.5" dy="2.9" layer="1" roundness="50"/>
+<smd name="2" x="1.5" y="0" dx="1.5" dy="2.9" layer="1" roundness="50"/>
+<text x="-1.346" y="1.677" size="0.6096" layer="25">&gt;NAME</text>
+<wire x1="0.381" y1="0.889" x2="0.381" y2="-0.889" width="0.3048" layer="35"/>
+<wire x1="-0.381" y1="0.889" x2="-0.381" y2="-0.889" width="0.3048" layer="35"/>
+<wire x1="-2.032" y1="1.524" x2="2.032" y2="1.524" width="0.127" layer="39"/>
+<wire x1="2.032" y1="1.524" x2="2.032" y2="-1.524" width="0.127" layer="39"/>
+<wire x1="2.032" y1="-1.524" x2="-2.032" y2="-1.524" width="0.127" layer="39"/>
+<wire x1="-2.032" y1="-1.524" x2="-2.032" y2="1.524" width="0.127" layer="39"/>
+<wire x1="-1.524" y1="1.27" x2="1.524" y2="1.27" width="0.1016" layer="51"/>
+<wire x1="-1.524" y1="-1.27" x2="1.524" y2="-1.27" width="0.1016" layer="51"/>
+<wire x1="-1.524" y1="1.27" x2="-1.524" y2="-1.27" width="0.1016" layer="51"/>
+<wire x1="1.524" y1="1.27" x2="1.524" y2="-1.27" width="0.1016" layer="51"/>
+<text x="-1.016" y="-0.254" size="0.4064" layer="27">&gt;VALUE</text>
+</package>
+<package name="C1812(4532)">
+<description>&lt;pre&gt;EIA 1812 (Metric Code Size 4532) Ceramic Chip Capacitor
+rounded pads are added in IPC 782 rev A.
+http://www.kemet.com/kemet/web/homepage/kfbk3.nsf/vaFeedbackFAQ/2209BDBA03843BBF85256BCD004EBC11/$file/f2100e.pdf</description>
+<wire x1="-2.973" y1="1.983" x2="2.973" y2="1.983" width="0.0508" layer="39"/>
+<wire x1="2.973" y1="-1.983" x2="-2.973" y2="-1.983" width="0.0508" layer="39"/>
+<wire x1="-2.973" y1="-1.983" x2="-2.973" y2="1.983" width="0.0508" layer="39"/>
+<wire x1="2.973" y1="1.983" x2="2.973" y2="-1.983" width="0.0508" layer="39"/>
+<smd name="1" x="-1.95" y="0" dx="1.9" dy="3.4" layer="1" roundness="100"/>
+<smd name="2" x="1.95" y="0" dx="1.9" dy="3.4" layer="1" roundness="100"/>
+<text x="-1.778" y="2.159" size="0.6096" layer="25">&gt;NAME</text>
+<wire x1="-2.286" y1="1.524" x2="2.286" y2="1.524" width="0.1016" layer="51"/>
+<wire x1="-2.286" y1="-1.524" x2="2.286" y2="-1.524" width="0.1016" layer="51"/>
+<wire x1="-2.286" y1="1.524" x2="-2.286" y2="-1.524" width="0.1016" layer="51"/>
+<wire x1="2.286" y1="1.524" x2="2.286" y2="-1.524" width="0.1016" layer="51"/>
+<text x="-1.016" y="-0.254" size="0.4064" layer="27">&gt;VALUE</text>
+</package>
+<package name="C1812(4532)K">
+<description>&lt;pre&gt;EIA 1812 (Metric Code Size 4532) Ceramic Chip Capacitor
+Reflow solder: is a solder wave process so the part needs glue.
+KEMET pad size, rounded edges reduces bridging, and no-lead
+solder needs all the help it can get.</description>
+<smd name="1" x="-2.05" y="0" dx="1.8" dy="3.7" layer="1" roundness="50"/>
+<smd name="2" x="2.05" y="0" dx="1.8" dy="3.7" layer="1" roundness="50"/>
+<text x="-1.869" y="2.204" size="0.6096" layer="25">&gt;NAME</text>
+<wire x1="0.508" y1="0.889" x2="0.508" y2="-0.889" width="0.3048" layer="35"/>
+<wire x1="-0.508" y1="0.889" x2="-0.508" y2="-0.889" width="0.3048" layer="35"/>
+<wire x1="-2.794" y1="2.032" x2="2.794" y2="2.032" width="0.127" layer="39"/>
+<wire x1="2.794" y1="2.032" x2="2.794" y2="-2.032" width="0.127" layer="39"/>
+<wire x1="2.794" y1="-2.032" x2="-2.794" y2="-2.032" width="0.127" layer="39"/>
+<wire x1="-2.794" y1="-2.032" x2="-2.794" y2="2.032" width="0.127" layer="39"/>
+<wire x1="-2.286" y1="1.524" x2="2.286" y2="1.524" width="0.1016" layer="51"/>
+<wire x1="-2.286" y1="-1.524" x2="2.286" y2="-1.524" width="0.1016" layer="51"/>
+<wire x1="-2.286" y1="1.524" x2="-2.286" y2="-1.524" width="0.1016" layer="51"/>
+<wire x1="2.286" y1="1.524" x2="2.286" y2="-1.524" width="0.1016" layer="51"/>
+<text x="-1.016" y="-0.254" size="0.4064" layer="27">&gt;VALUE</text>
+</package>
+</packages>
+<symbols>
+<symbol name="R">
+<description>&lt;pre&gt;Resiistor American-style symbol</description>
+<wire x1="-2.54" y1="0" x2="-2.159" y2="1.016" width="0.2032" layer="94"/>
+<wire x1="-2.159" y1="1.016" x2="-1.524" y2="-1.016" width="0.2032" layer="94"/>
+<wire x1="-1.524" y1="-1.016" x2="-0.889" y2="1.016" width="0.2032" layer="94"/>
+<wire x1="-0.889" y1="1.016" x2="-0.254" y2="-1.016" width="0.2032" layer="94"/>
+<wire x1="-0.254" y1="-1.016" x2="0.381" y2="1.016" width="0.2032" layer="94"/>
+<wire x1="0.381" y1="1.016" x2="1.016" y2="-1.016" width="0.2032" layer="94"/>
+<wire x1="1.016" y1="-1.016" x2="1.651" y2="1.016" width="0.2032" layer="94"/>
+<wire x1="1.651" y1="1.016" x2="2.286" y2="-1.016" width="0.2032" layer="94"/>
+<wire x1="2.286" y1="-1.016" x2="2.54" y2="0" width="0.2032" layer="94"/>
+<text x="-3.81" y="1.4986" size="1.778" layer="95">&gt;NAME</text>
+<text x="-3.81" y="-3.302" size="1.27" layer="96">&gt;VALUE</text>
+<pin name="2" x="5.08" y="0" visible="off" length="short" direction="pas" swaplevel="1" rot="R180"/>
+<pin name="1" x="-5.08" y="0" visible="off" length="short" direction="pas" swaplevel="1"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="R" prefix="R" uservalue="yes">
+<description>&lt;pre&gt; Resiistor American-style symbol</description>
+<gates>
+<gate name="G$1" symbol="R" x="0" y="0"/>
+</gates>
+<devices>
+<device name="0402" package="C0402(1005)">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="0402K" package="C0402(1005)K">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="0603" package="C0603(1608)">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="0603K" package="C0603(1608)K">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="0805" package="C0805(2012)">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="0805K" package="C0805(2012)K">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="1206" package="C1206(3216)">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="1206K" package="C1206(3216)K">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="1210" package="C1210(3225)">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="1210K" package="C1210(3225)K">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="1812" package="C1812(4532)">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="1812K" package="C1812(4532)K">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -675,6 +1045,7 @@ http://www.dialight.com/Assets%5CBrochures_And_Catalogs%5CIndication%5CSMT_selec
 <part name="D15" library="D-LED" deviceset="LED" device="5MM" value="RD"/>
 <part name="D16" library="D-LED" deviceset="LED" device="5MM" value="RD"/>
 <part name="D19" library="D-LED" deviceset="LED" device="5MM" value="RD"/>
+<part name="R1" library="R-C" deviceset="R" device="0805" value="100k"/>
 </parts>
 <sheets>
 <sheet>
@@ -701,7 +1072,8 @@ http://www.dialight.com/Assets%5CBrochures_And_Catalogs%5CIndication%5CSMT_selec
 <instance part="D14" gate="G$1" x="33.02" y="73.66"/>
 <instance part="D15" gate="G$1" x="33.02" y="81.28"/>
 <instance part="D16" gate="G$1" x="33.02" y="88.9"/>
-<instance part="D19" gate="G$1" x="20.32" y="137.16" rot="R270"/>
+<instance part="D19" gate="G$1" x="20.32" y="142.24" rot="R270"/>
+<instance part="R1" gate="G$1" x="20.32" y="134.62" rot="R180"/>
 </instances>
 <busses>
 </busses>
@@ -865,10 +1237,14 @@ http://www.dialight.com/Assets%5CBrochures_And_Catalogs%5CIndication%5CSMT_selec
 <pinref part="BM3" gate="G$1" pin="0V@5"/>
 <wire x1="17.78" y1="101.6" x2="20.32" y2="101.6" width="0.1524" layer="91"/>
 <pinref part="D19" gate="G$1" pin="A"/>
-<wire x1="22.86" y1="137.16" x2="22.86" y2="129.54" width="0.1524" layer="91"/>
-<wire x1="22.86" y1="129.54" x2="17.78" y2="129.54" width="0.1524" layer="91"/>
+<wire x1="22.86" y1="142.24" x2="25.4" y2="142.24" width="0.1524" layer="91"/>
+<wire x1="25.4" y1="142.24" x2="25.4" y2="134.62" width="0.1524" layer="91"/>
+<wire x1="25.4" y1="134.62" x2="25.4" y2="129.54" width="0.1524" layer="91"/>
+<wire x1="25.4" y1="129.54" x2="17.78" y2="129.54" width="0.1524" layer="91"/>
 <wire x1="17.78" y1="129.54" x2="17.78" y2="101.6" width="0.1524" layer="91"/>
 <junction x="17.78" y="101.6"/>
+<pinref part="R1" gate="G$1" pin="1"/>
+<junction x="25.4" y="134.62"/>
 </segment>
 </net>
 <net name="N$18" class="0">
@@ -925,11 +1301,14 @@ http://www.dialight.com/Assets%5CBrochures_And_Catalogs%5CIndication%5CSMT_selec
 <net name="LIGHT_SENSOR" class="0">
 <segment>
 <pinref part="D19" gate="G$1" pin="K"/>
-<wire x1="15.24" y1="137.16" x2="15.24" y2="96.52" width="0.1524" layer="91"/>
+<wire x1="15.24" y1="142.24" x2="15.24" y2="134.62" width="0.1524" layer="91"/>
+<wire x1="15.24" y1="134.62" x2="15.24" y2="96.52" width="0.1524" layer="91"/>
 <wire x1="15.24" y1="96.52" x2="25.4" y2="96.52" width="0.1524" layer="91"/>
 <pinref part="BM3" gate="G$1" pin="ADC2_16"/>
 <wire x1="25.4" y1="96.52" x2="25.4" y2="101.6" width="0.1524" layer="91"/>
 <label x="14.478" y="118.872" size="1.27" layer="91" rot="R90"/>
+<pinref part="R1" gate="G$1" pin="2"/>
+<junction x="15.24" y="134.62"/>
 </segment>
 </net>
 </nets>

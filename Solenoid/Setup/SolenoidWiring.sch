@@ -258,7 +258,7 @@ http://creativecommons.org/licenses/by-sa/3.0</description>
 <wire x1="-12.7" y1="-13.462" x2="-14.224" y2="-13.462" width="0.254" layer="94"/>
 <pin name="TX" x="15.24" y="12.7" visible="pin" length="point" rot="R270"/>
 <pin name="RX" x="12.7" y="12.7" visible="pin" length="point" rot="R270"/>
-<text x="-23.622" y="5.08" size="1.9304" layer="94">RPUno with
+<text x="-23.622" y="5.08" size="1.9304" layer="94">RPUno^9 with
 ATmega328p</text>
 <pin name="I2C" x="10.16" y="12.7" visible="pin" length="point" rot="R270"/>
 <pin name="SPI" x="7.62" y="12.7" visible="pin" length="point" rot="R270"/>
@@ -378,6 +378,15 @@ LATCHING DRV</text>
 <wire x1="0" y1="10.16" x2="0" y2="8.382" width="0.1524" layer="94"/>
 <wire x1="-2.54" y1="10.16" x2="-2.54" y2="8.382" width="0.1524" layer="94"/>
 </symbol>
+<symbol name="FT">
+<pin name="PWR" x="0" y="5.08" visible="off" length="short" rot="R270"/>
+<wire x1="-2.54" y1="2.54" x2="5.08" y2="2.54" width="0.254" layer="94"/>
+<wire x1="5.08" y1="2.54" x2="5.08" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="5.08" y1="-2.54" x2="-2.54" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="-2.54" y1="-2.54" x2="-2.54" y2="2.54" width="0.254" layer="94"/>
+<text x="-0.254" y="-0.762" size="1.6764" layer="94">F T</text>
+<pin name="PL" x="2.54" y="5.08" visible="off" length="short" rot="R270"/>
+</symbol>
 </symbols>
 <devicesets>
 <deviceset name="PV" prefix="PV">
@@ -478,6 +487,22 @@ LATCHING DRV</text>
 <connect gate="G$1" pin="K3" pad="13"/>
 <connect gate="G$1" pin="SUPPLY" pad="14"/>
 <connect gate="G$1" pin="VCC" pad="15"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="FT">
+<gates>
+<gate name="G$1" symbol="FT" x="-2.54" y="0"/>
+</gates>
+<devices>
+<device name="" package="NA-30">
+<connects>
+<connect gate="G$1" pin="PL" pad="1"/>
+<connect gate="G$1" pin="PWR" pad="2"/>
 </connects>
 <technologies>
 <technology name=""/>
@@ -1676,6 +1701,7 @@ solder needs all the help it can get.</description>
 <part name="BM1" library="Documentation" deviceset="RPUNO" device=""/>
 <part name="D3" library="D-LED" deviceset="LED" device="5MM" value="RD"/>
 <part name="R1" library="R-C" deviceset="R" device="0805" value="100k"/>
+<part name="U$2" library="Documentation" deviceset="FT" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -1683,6 +1709,7 @@ solder needs all the help it can get.</description>
 <text x="13.97" y="73.66" size="1.27" layer="98" rot="R90">STATUS</text>
 <text x="20.828" y="67.564" size="1.27" layer="98" rot="R90">DAY-NIGHT</text>
 <text x="8.89" y="116.84" size="1.27" layer="98" rot="R90">LIGHT SENSOR</text>
+<text x="17.78" y="-8.89" size="1.27" layer="98">FLOW SENSOR</text>
 </plain>
 <instances>
 <instance part="PV4" gate="G$1" x="76.2" y="116.84"/>
@@ -1696,6 +1723,7 @@ solder needs all the help it can get.</description>
 <instance part="BM1" gate="G$1" x="40.64" y="109.22"/>
 <instance part="D3" gate="G$1" x="15.24" y="134.62" rot="R270"/>
 <instance part="R1" gate="G$1" x="15.24" y="127" rot="R180"/>
+<instance part="U$2" gate="G$1" x="12.7" y="-2.54" rot="R270"/>
 </instances>
 <busses>
 </busses>
@@ -1981,6 +2009,48 @@ solder needs all the help it can get.</description>
 <pinref part="BM1" gate="G$1" pin="ADC2_16"/>
 <wire x1="10.16" y1="91.44" x2="20.32" y2="91.44" width="0.1524" layer="91"/>
 <wire x1="20.32" y1="91.44" x2="20.32" y2="93.98" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="BN-WHT" class="0">
+<segment>
+<pinref part="BM1" gate="G$1" pin="ICP1"/>
+<wire x1="43.18" y1="93.98" x2="43.18" y2="91.44" width="0.1524" layer="91"/>
+<pinref part="U$2" gate="G$1" pin="PL"/>
+<wire x1="43.18" y1="91.44" x2="73.66" y2="91.44" width="0.1524" layer="91"/>
+<wire x1="73.66" y1="91.44" x2="73.66" y2="-5.08" width="0.1524" layer="91"/>
+<wire x1="73.66" y1="-5.08" x2="40.64" y2="-5.08" width="0.1524" layer="91"/>
+<wire x1="40.64" y1="-5.08" x2="38.1" y2="-2.54" width="0.1524" layer="91"/>
+<wire x1="38.1" y1="-2.54" x2="35.56" y2="-5.08" width="0.1524" layer="91"/>
+<wire x1="35.56" y1="-5.08" x2="33.02" y2="-2.54" width="0.1524" layer="91"/>
+<wire x1="33.02" y1="-2.54" x2="30.48" y2="-5.08" width="0.1524" layer="91"/>
+<wire x1="30.48" y1="-5.08" x2="27.94" y2="-2.54" width="0.1524" layer="91"/>
+<wire x1="27.94" y1="-2.54" x2="25.4" y2="-5.08" width="0.1524" layer="91"/>
+<wire x1="25.4" y1="-5.08" x2="22.86" y2="-2.54" width="0.1524" layer="91"/>
+<wire x1="22.86" y1="-2.54" x2="20.32" y2="-5.08" width="0.1524" layer="91"/>
+<wire x1="20.32" y1="-5.08" x2="17.78" y2="-5.08" width="0.1524" layer="91"/>
+<label x="75.438" y="68.326" size="1.27" layer="91" rot="R90"/>
+<label x="42.164" y="-7.112" size="1.27" layer="91"/>
+</segment>
+</net>
+<net name="BN" class="0">
+<segment>
+<pinref part="U$2" gate="G$1" pin="PWR"/>
+<wire x1="17.78" y1="-2.54" x2="20.32" y2="-2.54" width="0.1524" layer="91"/>
+<wire x1="20.32" y1="-2.54" x2="22.86" y2="-5.08" width="0.1524" layer="91"/>
+<wire x1="22.86" y1="-5.08" x2="25.4" y2="-2.54" width="0.1524" layer="91"/>
+<wire x1="25.4" y1="-2.54" x2="27.94" y2="-5.08" width="0.1524" layer="91"/>
+<wire x1="27.94" y1="-5.08" x2="30.48" y2="-2.54" width="0.1524" layer="91"/>
+<wire x1="30.48" y1="-2.54" x2="33.02" y2="-5.08" width="0.1524" layer="91"/>
+<wire x1="33.02" y1="-5.08" x2="35.56" y2="-2.54" width="0.1524" layer="91"/>
+<wire x1="35.56" y1="-2.54" x2="38.1" y2="-5.08" width="0.1524" layer="91"/>
+<wire x1="38.1" y1="-5.08" x2="40.64" y2="-2.54" width="0.1524" layer="91"/>
+<wire x1="40.64" y1="-2.54" x2="71.12" y2="-2.54" width="0.1524" layer="91"/>
+<wire x1="71.12" y1="-2.54" x2="71.12" y2="88.9" width="0.1524" layer="91"/>
+<pinref part="BM1" gate="G$1" pin="17MA_EN7"/>
+<wire x1="71.12" y1="88.9" x2="40.64" y2="88.9" width="0.1524" layer="91"/>
+<wire x1="40.64" y1="88.9" x2="40.64" y2="93.98" width="0.1524" layer="91"/>
+<label x="70.612" y="68.834" size="1.27" layer="91" rot="R90"/>
+<label x="43.18" y="-1.524" size="1.27" layer="91"/>
 </segment>
 </net>
 </nets>

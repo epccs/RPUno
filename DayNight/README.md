@@ -2,9 +2,14 @@
 
 ## Overview
 
-Use a red LED's photovoltaic voltage on ADC2 to approximately tell if it is day or night. 
+Use a red LED's photovoltaic voltage to approximately tell if it is day or night. 
 
 Note: use the Day_AttachDayWork() and Night_AttachWork() functions to register a callback that will be run at the start of each day. This framework is how I debuged the day-night stat machine.
+
+
+## Sensor
+
+CREE C503B-RCN-CW0Z0AA1 with a 100k load resistor. The LED works somewhat like a solar cell but it develops up to about 1.6V with red light and shorter wave lenghts. 
 
 
 ## Firmware Upload

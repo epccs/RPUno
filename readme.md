@@ -4,9 +4,9 @@ From <https://github.com/epccs/RPUno/>
 
 ## Overview
 
-A general purpose ATmega328p controller board with level shift IO and current sources that operate over the wide (7..36) input voltage range.
+A general purpose ATmega328p controller board with level shift IO and current sources that operate over the wide input voltage range.
 
-The bare metal microcontroller on this board is the same as an Arduino Uno. I use it to evaluate the examples Arduino has. Normally C is my preference so converting Arduino's C++ into C adds some overhead, the toolchain supports both but C causes fewer surprises in how it uses the limited hardware memory. The toolchain is available on most Linux distributions, a Raspberry Pi makes a nice remote computer (e.g. it does networking services). Logging into the remote computer is done with SSH and updates are done by pulling from GitHub and then using make to run the "Makefile" rules that compile and upload firmware over a serial link.  Mezzanine boards [RPUadpt] and [RPUpi] can be used to add multidrop serial. The mezzanine VIN pin can be disconnected with an on-board P-channel MOSFET to remove power from the Raspberry Pi computer.
+The bare metal microcontroller on this board is the same as an Arduino Uno. I use it to evaluate the examples Arduino has. Normally C is my preference so converting Arduino's C++ into C adds some overhead, the toolchain supports both but C causes fewer surprises since it is implemented with a stack-based memory system (C++ needs the heap for its features). The toolchain is available on most Linux distributions, a Raspberry Pi makes a nice remote computer and can handle networking services robustly. Logging into the remote computer is done with SSH and updates for the controller are done by pulling from GitHub and then using make to run the "Makefile" rules that compile and upload firmware over a serial link. Mezzanine boards [RPUadpt] and [RPUpi] can be used to add multidrop serial. The mezzanine VIN pin can be disconnected with an onboard P-channel MOSFET to remove power from the Raspberry Pi computer.
 
 [RPUadpt]: https://github.com/epccs/RPUadpt
 [RPUpi]: https://github.com/epccs/RPUpi

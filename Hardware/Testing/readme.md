@@ -45,19 +45,19 @@ This is a simplified In-Circuit Test (ICT). It could become more valuable if the
 
 ## Power Protection
 
-Apply a current limited (20mA) supply set with 5V to the PWR and 0V connector J8 in reverse and verify that the voltage does not get through. Adjust the supply to 36V and verify no current is passing.
+Apply a current limited (20mA) supply set with 5V to the PWR and 0V connector J7 in reverse and verify that the voltage does not get through. Adjust the supply to 36V and verify no current is passing.
 
 
 ## Power Without SMPS
 
-Apply a current limited (20mA) supply set with 7V to the PWR and 0V connector J8 and verify that the voltage does get through. Adjust the supply so the LED is on and stable and measure voltage, adjust supply to 30V measure input current. 
+Apply a current limited (20mA) supply set with 7V to the PWR and 0V connector J7 and verify that the voltage does get through. Adjust the supply so the LED is on and stable and measure voltage, adjust supply to 30V measure input current. 
 
 NOTE for referance the zener voltage on Q6 is 7.75V at 30V.
 
 ```
-{ "LEDON_V":[10.7,10.7,10.8,],
-  "PWR@7V_mA":[0.3,0.07,0.08,],
-  "PWR@30V_mA":[2.6,1.4,1.3,]}
+{ "LEDON_V":[10.7,10.7,10.8,10.7,10.7,],
+  "PWR@7V_mA":[0.3,0.07,0.08,0.07,0.07,],
+  "PWR@30V_mA":[2.6,1.4,1.3,1.3,1.3,]}
 ```
 
 
@@ -66,13 +66,15 @@ NOTE for referance the zener voltage on Q6 is 7.75V at 30V.
 Apply a 30mA current limited 5V source to +5V (J7). Check that the input current is for a blank MCU (e.g. less than 7mA). Turn off the power.
 
 ```
-{ "I_IN_BLANKMCU_mA":[4.7,2.2,3.1,]}
+{ "I_IN_BLANKMCU_mA":[4.7,2.2,3.1,3.5,3.3,]}
 ```
+
+Note: Internal clock/8 (=1MHz) and IO pins are floating (a test fixture is needed).
 
 
 ## Set MCU Fuse and Install Bootloader
 
-Install Git and AVR toolchain on Ubuntu (16.04, on an old computer try https://wiki.ubuntu.com/Lubuntu). 
+Install Git and AVR toolchain on Ubuntu (18.04, on an old computer try https://wiki.ubuntu.com/Lubuntu). 
 
 ```
 sudo apt-get install git gcc-avr binutils-avr gdb-avr avr-libc avrdude
@@ -101,7 +103,7 @@ make isp
 Disconnect the ICSP tool and measure the input current, wait for the power to be settled. Turn off the power.
 
 ```
-{ "I_IN_16MHZ_EXT_CRYST_mA":[12.7,11.2,11.1,]}
+{ "I_IN_16MHZ_EXT_CRYST_mA":[12.7,11.2,11.1,11.0,11.0]}
 ```
 
 Add U2 to the board now. Measurement of the input current is for referance (takes a long time to settle, 10mA ICP1 jumper is off).
@@ -109,14 +111,11 @@ Add U2 to the board now. Measurement of the input current is for referance (take
 
 ## Install SMPS
 
-Install U2 and measure its output voltage and input current with the supply set at 12.8V and a 30mA current limit. Check the SMPS recovers after low voltage dropout (e.g. normaly the +5V recovers at about 6V without load).
+Install U2 and measure its output voltage and input current with the supply set at 12.8V and a 30mA current limit.
 
 ```
-{ "+5V_V":[4.94,5.00,5.00,],
-  "PWR12V8_mA":[9.00,7.2,6.9,]}
+{ "+5V_V":[4.94,5.00,5.00,5.01,]}
 ```
-
-If the +5V does not recover at the expeced voltage then the wires from the power supply are most likely resonating with the +5V SMPS. Try a few thing: twist the wires to reduce inductance which changes the resonating frequancy. Add ferites to dampen. Finaly add bypass in one or more places along the wires to shift the nodes.
 
 
 ## Self Test

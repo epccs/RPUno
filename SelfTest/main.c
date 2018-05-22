@@ -33,7 +33,7 @@ along with the Arduino DigitalIO Library.  If not, see
 
 // Save the Value of the References for ADC converter 
 // measure AVCC and put it hear in uV 
-#define REF_EXTERN_AVCC 5007000UL
+#define REF_EXTERN_AVCC 4996300UL
 
 
 #define R1 33.333

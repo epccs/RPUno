@@ -2,13 +2,12 @@
 
 ## Overview
 
-ATmega328P based controller board with options for DIN mounts and 3.5mm pluggable connections. Eight digital I/O (10, 11, 12, 13, 14*, 15*, 16*, 17*) with level shift, the last four (*) are also analog channels (ADC0, ADC1, ADC2, ADC3). Four 22mA current source used with loop sensors are available with enables (5, 6, 3, 4). One 17mA current source for a pulse sensor and it has an enable (7). ICP1 is pulled down when enough current (>7mA) arrives from the pulse sensor. Alternate power input may be enabled (9), and power to the shield VIN pin may be disabled (2). Power with 7 thru 36V DC.
+ATmega328p based controller board with options for DIN mounts and 3.5mm spaced through-hole for user connections and headers. Eight level shifted (same as VIN range) digital I/O (10, 11, 12, 13, 14*, 15*, 16*, 17*), the last four (*) are analog channels (0, 1, 2, 3). Four 22mA current source used with loop sensors are available with enables (5, 6, 3, 4). One 17mA current source for a pulse sensor and it has an enable (7). ICP1 is pulled down when enough current (>7mA) arrives from the pulse sensor. Alternate power input may be enabled (9), and power to the shield VIN pin may be disabled (2). Power with 7 thru 36V DC.
 
-The ATmega328p can be programmed with the GCC based toolchain for AVR found in Debian packages (e.g. so it is available on, Ubuntu, Raspbian, Mac via brew, Windows via Windows Subsystem for Linux). Bootloader options include [optiboot] and [xboot]. Serial bootloaders can't change the hardware fuse setting which reduces programming errors that can accidentally brick the controller. Note that [optiboot] clears the watchdog so it will not get stuck in a watchdog loop.
+The ATmega328p can be programmed with the GCC based toolchain for AVR found in Debian packages (it is available on, Ubuntu, Raspbian, Mac via brew, Windows via Windows Subsystem for Linux). Bootloader options include [optiboot] and [xboot]. Serial bootloaders cannot change the hardware fuse setting which reduces the occurrence of accidentally bricking the controller (I recommend using a serial bootloader during application development). Note that [optiboot] clears the watchdog so it will not get stuck in a watchdog loop.
 
 [optiboot]: https://github.com/Optiboot/optiboot
 [xboot]: https://github.com/alexforencich/xboot
-
 
 
 ## Inputs/Outputs/Functions
@@ -46,8 +45,8 @@ The ATmega328p can be programmed with the GCC based toolchain for AVR found in D
 ## Notice
 
 ```
-        ADC4 and ADC5 are used for I2C exclusively and not connected to the analog header.
-        AREF from ATmega328p is not connected to the header.
+        ADC4 and ADC5 are used for I2C exclusively and not routed to the analog header.
+        AREF from ATmega328p is not routed to the header.
         3V3 is not present on the board, the header pin is not connected.
 ```
 

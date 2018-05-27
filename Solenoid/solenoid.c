@@ -691,15 +691,38 @@ void Stop(void)
             k[k_solenoid-1].delay_sec = 1;
             k[k_solenoid-1].flow_stop = FLOW_NOT_SET;
             k[k_solenoid-1].cycles = 1;
-            printf_P(PSTR("\"stop_time_sec\":\"3\""));
         }
-        else
-        {
-            printf_P(PSTR("\"stop_time_sec\":\"0\""));
-        }
+        printf_P(PSTR("\"delay_start_sec\":\"%lu\","),(k[k_solenoid-1].delay_start_sec));
         command_done = 12;
     }
     else if ( (command_done == 12) )
+    {  
+        uint8_t k_solenoid = atoi(arg[0]);
+        printf_P(PSTR("\"runtime_sec\":\"%lu\","),(k[k_solenoid-1].runtime_sec));
+        command_done = 13;
+    }
+    else if ( (command_done == 13) )
+    {  
+        uint8_t k_solenoid = atoi(arg[0]);
+        printf_P(PSTR("\"delay_sec\":\"%lu\","),(k[k_solenoid-1].delay_sec));
+        command_done = 14;
+    }
+    else if ( (command_done == 14) )
+    {  
+        uint8_t k_solenoid = atoi(arg[0]);
+        printf_P(PSTR("\"cycles\":\"%u\""),(k[k_solenoid-1].cycles));
+        command_done = 15;
+    }
+    else if ( (command_done == 15) )
+    {  
+        uint8_t k_solenoid = atoi(arg[0]);
+        if (k[k_solenoid-1].flow_stop != FLOW_NOT_SET)
+        {
+            printf_P(PSTR(",\"mahr_stop\":\"%lu\""),(k[k_solenoid-1].flow_stop));
+        }
+        command_done = 16;
+    }
+    else if ( (command_done == 16) )
     {
         printf_P(PSTR("}}\r\n"));
         initCommandBuffer();

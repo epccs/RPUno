@@ -2,17 +2,20 @@
 
 ## Future improvements (to do)
 
-__Do not use this program__ it was for RPUno^6 and does not work on ^7 (yet).
+__Do not use this program__ the updates need verified on ^9.
 
-use CURR_SOUR_EN
+turn on flow sensor current source CS_ICP1_EN. (done)
 
-Add a wiring diagram.
+Add a wiring diagram. (done)
 
-Stop report like led on DayNight {"K1":{"delay_start_sec":"1","runtime_sec":"1","delay_sec":"1","cycles":"1"}}
+report "stop" command like on DayNight 
+/1/stop 1 
+{"K1":{"delay_start_sec":"1","runtime_sec":"1","delay_sec":"1","cycles":"1"}}
+(done)
 
-Did the flow meter not stop when the valve was closed, try to close the valve again a few times. Set a status value for the command line to read, and sort out a way to do a service request, perhaps with the bus manager.
+Irrigation valve got stuck. Check if the flow meter has stopped when the valve was closed, try to close the valve again a few times. Set a status value for the command line to read, and sort out a way to do a service request, perhaps with the bus manager.
 
-Option to include some scaled time (or flow count) based on PV power received. In other words, keep the peak mA-Sec per hour charge rate and use it to scale the last measured hour of that value to add solenoid time (or flow count). 
+Plants need more water when they get more sun. Add an option to scale the mount of water based on integration of the light sensor. 
 
 ## Overview
 

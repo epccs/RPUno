@@ -1,6 +1,6 @@
 /*
-Solenoid is a command line controled demonstration of ATmega328p ... solenoid control
-Copyright (C) 2016 Ronald Sutherland
+Alternat is a CLI demonstration to show Alternat power input sending photovoltaic power to a battery.
+Copyright (C) 2018 Ronald Sutherland
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -23,16 +23,14 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/adc.h"
 #include "../lib/twi.h"
 #include "../lib/rpu_mgr.h"
-#include "../lib/icp1.h"
 #include "../lib/pin_num.h"
 #include "../lib/pins_board.h"
 #include "../Uart/id.h"
-#include "../DayNight/day_night.h"
 #include "../Adc/analog.h"
-#include "../Capture/capture.h"
-#include "solenoid.h"
+#include "../DayNight/day_night.h"
+#include "alternat.h"
 
-#define ADC_DELAY_MILSEC 200UL
+#define ADC_DELAY_MILSEC 100UL
 static unsigned long adc_started_at;
 
 #define STATUS_LED DIO13
@@ -45,109 +43,49 @@ static unsigned long day_status_blink_started_at;
 static unsigned long blink_started_at;
 static unsigned long blink_delay;
 static char rpu_addr;
-static uint8_t solenoids_initalized;
 
 void ProcessCmd()
 { 
-    if (solenoids_initalized) 
+    if ( (strcmp_P( command, PSTR("/id?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
     {
-        if ( (strcmp_P( command, PSTR("/id?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
-        {
-            Id("Solenoid"); // ../Uart/id.c
-        }
-        if ( (strcmp_P( command, PSTR("/pre")) == 0) && ( (arg_count == 2 ) ) )
-        {
-            DelayStart(); // solenoid.c
-        }
-        if ( (strcmp_P( command, PSTR("/runtime")) == 0) && ( (arg_count == 2 ) ) )
-        {
-            RunTime(); // solenoid.c
-        }
-        if ( (strcmp_P( command, PSTR("/delay")) == 0) && ( (arg_count == 2 ) ) )
-        {
-            Delay(); // solenoid.c
-        }
-        if ( (strcmp_P( command, PSTR("/fstop")) == 0) && ( (arg_count == 2 ) ) )
-        {
-            FlowStop(); // solenoid.c
-        }
-        if ( (strcmp_P( command, PSTR("/run")) == 0) && ( (arg_count == 1) || (arg_count == 2) ) )
-        {
-            Run(); // solenoid.c
-        }
-        if ( (strcmp_P( command, PSTR("/save")) == 0) && ( (arg_count == 2 ) ) )
-        {
-            Save(); // solenoid.c
-        }
-        if ( (strcmp_P( command, PSTR("/load")) == 0) && ( (arg_count == 1 ) ) )
-        {
-            Load(); // solenoid.c
-        }
-        if ( (strcmp_P( command, PSTR("/time?")) == 0) && ( (arg_count == 1 ) ) )
-        {
-            Time(); // solenoid.c
-        }
-        if ( (strcmp_P( command, PSTR("/flow?")) == 0) && ( (arg_count == 1 ) ) )
-        {
-            Flow(); // solenoid.c
-        }
-        if ( (strcmp_P( command, PSTR("/stop")) == 0) && ( (arg_count == 1 ) ) )
-        {
-            Stop(); // solenoid.c
-        }
-        if ( (strcmp_P( command, PSTR("/day?")) == 0) && ( (arg_count == 0 ) ) )
-        {
-            Day(60000UL); // ../DayNight/day_night.c: show every 60 sec until terminated
-        }
-        if ( (strcmp_P( command, PSTR("/analog?")) == 0) && ( (arg_count >= 1 ) && (arg_count <= 5) ) )
-        {
-            Analog(20000UL); // ../Adc/analog.c: show every 20 sec until terminated
-        }
-        if ( (strcmp_P( command, PSTR("/count?")) == 0) &&  ( (arg_count == 0) || ( (arg_count == 1) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
-        {
-            Count();
-        }
-        if ( (strcmp_P( command, PSTR("/capture?")) == 0) && ( (arg_count == 0 ) || ( (arg_count == 2) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
-        {
-            Capture();
-        }
-        if ( (strcmp_P( command, PSTR("/event?")) == 0) && ( (arg_count == 0 ) || ( (arg_count == 2) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
-        {
-            Event();
-        }
-        if ( (strcmp_P( command, PSTR("/initICP")) == 0) && ( ( (arg_count == 3) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
-        {
-            InitICP();
-        }
+        Id("Alternat"); // ../Uart/id.c
     }
-    else
+    if ( (strcmp_P( command, PSTR("/analog?")) == 0) && ( (arg_count >= 1 ) && (arg_count <= 5) ) )
     {
-        if (! solenoids_initalized)
-        {
-            printf_P(PSTR("{\"err\":\"NotFinishKinit\"}\r\n"));
-        }
-        initCommandBuffer();
-        return;
+        Analog(20000UL); // ../Adc/analog.c: show every 20 sec until terminated
+    }
+    if ( (strcmp_P( command, PSTR("/day?")) == 0) && ( (arg_count == 0 ) ) )
+    {
+        Day(60000UL); // ../DayNight/day_night.c: show every 60 sec until terminated
+    }
+    if ( (strcmp_P( command, PSTR("/alt")) == 0) && ( (arg_count == 0 ) ) )
+    {
+        EnableAlt(); // auxilary.c
     }
 }
 
-//At start of each day load the solenoid control settings from EEPROM and operate them.
+//At start of night turn off Alternat power input
+void callback_for_night_attach(void)
+{
+    alt_enable = 0;
+}
+
+//At start of day turn on Alternat power input
 void callback_for_day_attach(void)
 {
-    for(uint8_t solenoid = 1; solenoid <= SOLENOID_COUNT; solenoid++)
-    {
-        LoadSolenoidControlFromEEPROM(solenoid);
-        StartSolenoid(solenoid);
-    }
+    alt_enable = 1;
 }
 
 void setup(void) 
 {
     pinMode(STATUS_LED,OUTPUT);
-    digitalWrite(STATUS_LED,LOW);
-    
+    digitalWrite(STATUS_LED,HIGH);
+
     pinMode(DAYNIGHT_STATUS_LED,OUTPUT);
     digitalWrite(DAYNIGHT_STATUS_LED,HIGH);
+
+    pinMode(ALT_EN,OUTPUT);
+    digitalWrite(ALT_EN,LOW);
     
     // Initialize Timers, ADC, and clear bootloader, Arduino does these with init() in wiring.c
     initTimers(); //Timer0 Fast PWM mode, Timer1 & Timer2 Phase Correct PWM mode.
@@ -157,11 +95,6 @@ void setup(void)
     // put ADC in Auto Trigger mode and fetch an array of channels
     enable_ADC_auto_conversion(BURST_MODE);
     adc_started_at = millis();
-
-    /* Initialize Input Capture Unit (see ../lib/icp1.h) */
-    initIcp1(TRACK_RISING, ICP1_MCUDIV64) ;
-    pinMode(CS_ICP1_EN,OUTPUT);
-    digitalWrite(CS_ICP1_EN,HIGH);
 
     /* Initialize UART, it returns a pointer to FILE so redirect of stdin and stdout works*/
     stdout = stdin = uartstream0_init(BAUD);
@@ -176,7 +109,6 @@ void setup(void)
     sei(); 
     
     blink_started_at = millis();
-    day_status_blink_started_at = millis();
     
     rpu_addr = get_Rpu_address();
     blink_delay = BLINK_DELAY;
@@ -187,17 +119,14 @@ void setup(void)
         rpu_addr = '0';
         blink_delay = BLINK_DELAY/4;
     }
-    
-    // setup solenoid control
-    init_K();
-    
-    // solenoids may have been previously latched so this
-    // loads settings that will run a fast cycle
-    Reset_All_K();
-    solenoids_initalized = 0;
-    
-    // register callback for the Day Work event  (note Night_AttachWork() defalt does nothing)
+
+    // register callbacks for DayNight state machine events
+    Night_AttachWork(callback_for_night_attach);
     Day_AttachWork(callback_for_day_attach);
+    
+    // default debounce is 15 min (e.g. 900,000 millis)
+    evening_debouce = 18000UL; // 18 sec
+    morning_debouce = 18000UL;
 }
 
 void blink(void)
@@ -251,14 +180,19 @@ void blink_day_status(void)
     }
 }
 
-void adc_burst(void)
+uint8_t adc_burst(void)
 {
     unsigned long kRuntime= millis() - adc_started_at;
     if ((kRuntime) > ((unsigned long)ADC_DELAY_MILSEC))
     {
-        enable_ADC_auto_conversion(BURST_MODE); // ../lib/adc.c
+        enable_ADC_auto_conversion(BURST_MODE);
         adc_started_at += ADC_DELAY_MILSEC; 
+        return 1;
     } 
+    else
+    {
+        return 0;
+    }
 }
 
 int main(void) 
@@ -269,7 +203,7 @@ int main(void)
     { 
         // use STATUS_LED to show if I2C has a bus manager
         blink();
-        
+
         // use DAYNIGHT_STATUS_LED to show day_state
         blink_day_status();
 
@@ -277,7 +211,10 @@ int main(void)
         CheckDayLight(ADC2); // ../DayNight/day_night.c
 
         // delay between ADC burst
-        adc_burst();
+        if ( adc_burst() )
+        {
+            check_if_alt_should_be_on(PWR_V, 115.8/15.8, 13.6);
+        }
 
         // check if character is available to assemble a command, e.g. non-blocking
         if ( (!command_done) && uart0_available() ) // command_done is an extern from parse.h
@@ -289,7 +226,7 @@ int main(void)
             StartEchoWhenAddressed(rpu_addr);
         }
         
-        // check if a character is available, and if so flush transmit buffer and nuke the command in process.
+        // check if a character is available, and if so flush transmit buffer and stop any command that is running.
         // A multi-drop bus can have another device start transmitting after getting an address byte so
         // the first byte is used as a warning, it is the onlly chance to detect a possible collision.
         if ( command_done && uart0_available() )
@@ -323,27 +260,6 @@ int main(void)
                 {
                     initCommandBuffer();
                 }
-            }
-        }
-        
-        // Solenoid Control is a function that moves them through different states that are timed with millis() or icp1 flow count.
-        SolenoidControl();
-        
-        if (!solenoids_initalized)
-        {
-            // lets test if they are in use.
-            uint8_t solenoids_in_use = 0;
-            for(uint8_t solenoid = 1; solenoid <= SOLENOID_COUNT; solenoid++)
-            {
-                if (Live(solenoid))
-                {
-                    solenoids_in_use =1;
-                    break;
-                }
-            }
-            if (! solenoids_in_use) 
-            {
-                solenoids_initalized = 1;
             }
         }
     }        

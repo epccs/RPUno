@@ -39,6 +39,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #define REF_INTERN_1V1_MAX 1300000UL
 #define REF_INTERN_1V1_MIN 900000UL
 
+uint8_t ref_loaded;
 uint32_t ref_extern_avcc_uV;
 uint32_t ref_intern_1v1_uV;
 
@@ -124,11 +125,13 @@ uint8_t LoadAnalogRefFromEEPROM()
     if (id == 0x4144) // 'A' is 0x41 and 'D' is 0x44
     {
         ref_extern_avcc_uV = eeprom_read_dword((uint32_t*)(EE_ANALOG_BASE_ADDR+EE_ANALOG_REF_EXTERN_AVCC)); 
-        ref_intern_1v1_uV = eeprom_read_dword((uint32_t*)(EE_ANALOG_BASE_ADDR+EE_ANALOG_REF_INTERN_1V1));  
+        ref_intern_1v1_uV = eeprom_read_dword((uint32_t*)(EE_ANALOG_BASE_ADDR+EE_ANALOG_REF_INTERN_1V1));
+        ref_loaded = 1;
         return 1;
     }
     else
     {
+        ref_loaded = 0;
         return 0;
     }
 }

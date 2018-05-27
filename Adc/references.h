@@ -8,6 +8,7 @@ extern uint8_t WriteEeReferenceId();
 extern uint8_t WriteEeReferenceAvcc();
 extern uint8_t WriteEeReference1V1();
 
+extern uint8_t ref_loaded;
 extern uint32_t ref_extern_avcc_uV;
 extern uint32_t ref_intern_1v1_uV;
 

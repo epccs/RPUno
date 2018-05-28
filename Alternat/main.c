@@ -78,7 +78,7 @@ void callback_for_night_attach(void)
 void callback_for_day_attach(void)
 {
     alt_enable = 1;
-    alt_count = 0; // this value helps to tell if the batter got a full charge
+    alt_count = 0; // this value helps to tell if the battery got a full charge
 }
 
 void setup(void) 

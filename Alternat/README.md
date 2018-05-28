@@ -58,7 +58,7 @@ identify
 
 ##  /0/alt
 
-This will toggle the Alternat Power enalbe
+This will toggle the Alternat Power enable
 
 ``` 
 /1/alt
@@ -74,7 +74,7 @@ This gives the number of times the charging limit was reached, it is a clue abou
 {"alt_count":"2"}
 ``` 
 
-Example with limit set a 13.6V and 180mA solar pannel and 18AHr AGM battery. 
+Example with limit set at 13.6V and 180mA solar pannel and 18AHr AGM battery. 
 
 ``` 
 /1/alt

@@ -65,4 +65,48 @@ This will toggle the Alternat Power enalbe
 {"alt":"ON"}
 ```
 
+##  /0/altcnt
+
+This gives the number of times the charging limit was reached, it is a clue about how charged the battery is.
+
+``` 
+/1/altcnt
+{"alt_count":"2"}
+``` 
+
+Example with limit set a 13.6V and 180mA solar pannel and 18AHr AGM battery. 
+
+``` 
+/1/alt
+{"alt_en":"ON"}
+/1/altcnt
+{"alt_count":"0"}
+/1/analog? 6,7
+{"PWR_I":"0.019","PWR_V":"13.51"}
+{"PWR_I":"0.019","PWR_V":"13.58"}
+/1/altcnt
+{"alt_count":"1"}
+/1/analog? 6,7
+{"PWR_I":"0.017","PWR_V":"13.51"}
+{"PWR_I":"0.017","PWR_V":"13.47"}
+{"PWR_I":"0.017","PWR_V":"13.47"}
+{"PWR_I":"0.017","PWR_V":"13.47"}
+{"PWR_I":"0.017","PWR_V":"13.47"}
+{"PWR_I":"0.017","PWR_V":"13.51"}
+{"PWR_I":"0.017","PWR_V":"13.58"}
+/1/altcnt
+{"alt_count":"2"}
+/1/analog? 6,7
+{"PWR_I":"0.017","PWR_V":"13.51"}
+{"PWR_I":"0.017","PWR_V":"13.51"}
+{"PWR_I":"0.017","PWR_V":"13.47"}
+{"PWR_I":"0.017","PWR_V":"13.58"}
+{"PWR_I":"0.017","PWR_V":"13.51"}
+{"PWR_I":"0.017","PWR_V":"13.55"}
+{"PWR_I":"0.017","PWR_V":"13.47"}
+/1/altcnt
+{"alt_count":"3"}
+```
+
+
 ## [/0/analog? 0..7\[,0..7\[,0..7\[,0..7\[,0..7\]\]\]\]](../Adc#0analog-0707070707)

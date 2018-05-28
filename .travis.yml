@@ -11,6 +11,7 @@ env:
     # so the path to each Makefile is as follows
 
     - APP_PATH="Adc"
+    - APP_PATH="Alternat"
     - APP_PATH="AmpHr"
     - APP_PATH="BlinkLED"
     - APP_PATH="Bootloader"

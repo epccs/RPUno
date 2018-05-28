@@ -62,6 +62,10 @@ void ProcessCmd()
     {
         EnableAlt(); // auxilary.c
     }
+    if ( (strcmp_P( command, PSTR("/altcnt")) == 0) && ( (arg_count == 0 ) ) )
+    {
+        AltCount(); // auxilary.c
+    }
 }
 
 //At start of night turn off Alternat power input
@@ -74,6 +78,7 @@ void callback_for_night_attach(void)
 void callback_for_day_attach(void)
 {
     alt_enable = 1;
+    alt_count = 0; // this value helps to tell if the batter got a full charge
 }
 
 void setup(void) 
@@ -127,6 +132,8 @@ void setup(void)
     // default debounce is 15 min (e.g. 900,000 millis)
     evening_debouce = 18000UL; // 18 sec
     morning_debouce = 18000UL;
+    
+    alt_count = 0;
 }
 
 void blink(void)

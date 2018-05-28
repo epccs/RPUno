@@ -28,20 +28,18 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../Adc/references.h"
 #include "alternat.h"
 
-#define SERIAL_PRINT_DELAY_MILSEC 5000UL
-#define ALT_ENABLE_DELAY_MILSEC 22500UL
-static unsigned long serial_print_started_at;
-static unsigned long alt_tracking_started_at;
+#define ALT_LIMIT_DELAY_MILSEC 5000UL
+static unsigned long alt_limit_started_at;
 
 uint8_t alt_enable;
+unsigned int alt_count; // full charge when this has a count
+
 
 void EnableAlt(void)
 {
     if ( (command_done == 10) )
     {
         alt_enable = !alt_enable; // Toggle
-        alt_tracking_started_at = millis();
-        serial_print_started_at = millis();
         printf_P(PSTR("{\"alt_en\":"));
         command_done = 11;
     }
@@ -49,12 +47,13 @@ void EnableAlt(void)
     {
         if (alt_enable)
         {
-            printf_P(PSTR("{\"ON\""));
+            printf_P(PSTR("\"ON\""));
+            alt_count = 0;
         }
         else
         {
             digitalWrite(ALT_EN,LOW); // checking is blocked when !alt_enable so make sure the pin is off
-            printf_P(PSTR("{\"OFF\""));
+            printf_P(PSTR("\"OFF\""));
         }
         command_done = 12;
     }
@@ -66,6 +65,30 @@ void EnableAlt(void)
     else
     {
         printf_P(PSTR("{\"err\":\"EnAltCmdDnWTF\"}\r\n"));
+        initCommandBuffer();
+    }
+}
+
+void AltCount(void)
+{
+    if ( (command_done == 10) )
+    {
+        printf_P(PSTR("{\"alt_count\":"));
+        command_done = 11;
+    }
+    else if ( (command_done == 11) )
+    {
+        printf_P(PSTR("\"%u\""), alt_count); 
+        command_done = 12;
+    }
+    else if ( (command_done == 12) )
+    { 
+         printf_P(PSTR("}\r\n"));
+        initCommandBuffer();
+    }
+    else
+    {
+        printf_P(PSTR("{\"err\":\"AltCntCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
@@ -82,11 +105,20 @@ void check_if_alt_should_be_on(uint8_t mux_ch, float scale, float limit)
             float battery = analogRead(mux_ch)*((ref_extern_avcc_uV/1.0E6)/1024.0)*scale;
             if (battery >= limit)
             {
-                digitalWrite(ALT_EN,LOW);
+                unsigned long kRuntime= millis() - alt_limit_started_at;
+                if ((kRuntime) > ((unsigned long)ALT_LIMIT_DELAY_MILSEC))
+                {
+                    if (digitalRead(ALT_EN))
+                    {
+                        digitalWrite(ALT_EN,LOW);
+                        alt_count += 1; // count the number of times the battery is at the charge limit
+                    }
+                }
             }
             else if (battery < 0.99*limit)
             {
                 digitalWrite(ALT_EN,HIGH);
+                alt_limit_started_at = millis();
             }
         }
         else 

@@ -609,6 +609,19 @@ void Time(void)
     }
 }
 
+// led number one has values in its control array at index zero
+void StopLED(uint8_t led_num)
+{
+    if (led[led_num-1].cycle_state)
+    {
+        led[led_num-1].delay_start_sec = 1;
+        led[led_num-1].runtime_sec = 1; 
+        led[led_num-1].delay_sec = 1;
+        led[led_num-1].mahr_stop = MAHR_NOT_SET;
+        led[led_num-1].cycles = 1;
+    }
+}
+
 // arg[0] is led
 void Stop(void)
 {
@@ -626,14 +639,7 @@ void Stop(void)
     else if ( (command_done == 11) )
     {  
         uint8_t led_arg0 = atoi(arg[0]);
-        if (led[led_arg0-1].cycle_state)
-        {
-            led[led_arg0-1].delay_start_sec = 1;
-            led[led_arg0-1].runtime_sec = 1; 
-            led[led_arg0-1].delay_sec = 1;
-            led[led_arg0-1].mahr_stop = MAHR_NOT_SET;
-            led[led_arg0-1].cycles = 1;
-        }
+        StopLED(led_arg0);
         printf_P(PSTR("\"delay_start_sec\":\"%lu\","),(led[led_arg0-1].delay_start_sec));
         command_done = 12;
     }

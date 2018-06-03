@@ -30,8 +30,8 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "i2c-scan.h"
 #include "i2c-cmd.h"
 
-// 22mA current source enabled with CS0_EN which are defined in ../lib/pins_board.h
-#define STATUS_LED CS0_EN
+// see ../lib/pins_board.h
+#define STATUS_LED DIO13
 
 #define BLINK_DELAY 1000UL
 static unsigned long blink_started_at;

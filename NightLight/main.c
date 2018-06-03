@@ -31,9 +31,10 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../i2c-debug/i2c-cmd.h"
 #include "../DayNight/day_night.h"
 #include "../AmpHr/chrg_accum.h"
+#include "../Alternat/alternat.h"
 #include "nightlight.h"
 
-#define ADC_DELAY_MILSEC 200UL
+#define ADC_DELAY_MILSEC 100UL
 static unsigned long adc_started_at;
 
 #define STATUS_LED DIO13
@@ -128,6 +129,14 @@ void ProcessCmd()
         {
             Charge(60000UL); // ../AmpHr/chrg_accum.c: show every 60 sec until terminated
         }
+        if ( (strcmp_P( command, PSTR("/alt")) == 0) && ( (arg_count == 0 ) ) )
+        {
+            EnableAlt(); // ../Alternat/alternat.c
+        }
+        if ( (strcmp_P( command, PSTR("/altcnt?")) == 0) && ( (arg_count == 0 ) ) )
+        {
+            AltCount(); // ../Alternat/alternat.c
+        }
     }
     else
     {
@@ -140,15 +149,20 @@ void ProcessCmd()
     }
 }
 
-//At start of each night load the LED control settings from EEPROM and operate them.
+//At start of each night 
 void callback_for_night_attach(void)
 {
-    // If the battery did not reach charge voltage I should skip running the LED's.
-    if (true) 
+    //turn off alternat power input
+    alt_enable = 0; 
+    
+    // If the battery got charged.
+    if (alt_count > 5) 
     {
         for(uint8_t led = 1; led <= LEDSTRING_COUNT; led++)
         {
+            // load the LED control settings from EEPROM
             LoadLedControlFromEEPROM(led); // nightlight.c
+            // operate LED
             StartLed(led); // nightlight.c
         }
     }
@@ -157,10 +171,19 @@ void callback_for_night_attach(void)
 //At start of each day determine the remaining charge and zero the charge and discharge (bank) values.
 void callback_for_day_attach(void)
 {
+    alt_enable = 1; //turn on alternat power input
+    alt_count = 0; // this value is used to tell if the battery got a full charge
+    
     // setup AmpHr accumulators and load Adc calibration reference
     if (!init_ChargAccumulation(PWR_I)) // ../AmpHr/chrg_accum.c
     {
         blink_delay = BLINK_DELAY/4;
+    }
+    
+    // turn off the LED's
+    for (uint8_t led = 1; led <= LEDSTRING_COUNT; led++)
+    {
+        StopLED(led);
     }
 }
 
@@ -171,6 +194,9 @@ void setup(void)
 
     pinMode(DAYNIGHT_STATUS_LED,OUTPUT);
     digitalWrite(DAYNIGHT_STATUS_LED,HIGH);
+
+    pinMode(ALT_EN,OUTPUT);
+    digitalWrite(ALT_EN,LOW);
 
     // Initialize Timers, ADC, and clear bootloader, Arduino does these with init() in wiring.c
     initTimers(); //Timer0 Fast PWM mode, Timer1 & Timer2 Phase Correct PWM mode.
@@ -221,6 +247,12 @@ void setup(void)
     {
         blink_delay = BLINK_DELAY/4;
     }
+
+    // default debounce is 15 min (e.g. 900,000 millis)
+    evening_debouce = 18000UL; // 18 sec
+    morning_debouce = 18000UL;
+    
+    alt_count = 0;
 }
 
 void blink(void)
@@ -274,14 +306,19 @@ void blink_day_status(void)
     }
 }
 
-void adc_burst(void)
+uint8_t adc_burst(void)
 {
     unsigned long kRuntime= millis() - adc_started_at;
     if ((kRuntime) > ((unsigned long)ADC_DELAY_MILSEC))
     {
-        enable_ADC_auto_conversion(BURST_MODE); // ../lib/adc.c
+        enable_ADC_auto_conversion(BURST_MODE);
         adc_started_at += ADC_DELAY_MILSEC; 
+        return 1;
     } 
+    else
+    {
+        return 0;
+    }
 }
 
 int main(void) 
@@ -300,7 +337,10 @@ int main(void)
         CheckDayLight(ADC2); // ../DayNight/day_night.c
 
         // delay between ADC burst
-        adc_burst();
+        if ( adc_burst() )
+        {
+            check_if_alt_should_be_on(PWR_V, 115.8/15.8, 13.6);
+        }
 
         // check how much charge went into battery
         CheckChrgAccumulation(PWR_I);

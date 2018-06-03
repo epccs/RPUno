@@ -9,6 +9,7 @@ OBJECTS = main.o \
 	../i2c-debug/i2c-scan.o \
 	../DayNight/day_night.o \
 	../AmpHr/chrg_accum.o \
+	../Alternat/alternat.o \
 	../Uart/id.o \
 	$(LIBDIR)/timers.o \
 	$(LIBDIR)/uart.o \

@@ -268,6 +268,63 @@ ATmega328p</text>
 <pin name="0V@6" x="-12.7" y="-15.24" visible="pin" length="point" rot="R90"/>
 <text x="-19.812" y="1.27" size="1.27" layer="98">CSx 22mA CURR SOUR</text>
 </symbol>
+<symbol name="PV">
+<pin name="+PV" x="-2.54" y="0" visible="off" length="short"/>
+<wire x1="0" y1="-2.54" x2="0" y2="5.08" width="0.6096" layer="94"/>
+<polygon width="0.6096" layer="94">
+<vertex x="0.762" y="4.826"/>
+<vertex x="-0.762" y="2.032"/>
+<vertex x="1.524" y="2.032"/>
+<vertex x="3.048" y="4.826"/>
+</polygon>
+<polygon width="0.6096" layer="94">
+<vertex x="-2.794" y="4.826"/>
+<vertex x="-4.318" y="2.032"/>
+<vertex x="-2.032" y="2.032"/>
+<vertex x="-0.508" y="4.826"/>
+</polygon>
+<polygon width="0.6096" layer="94">
+<vertex x="-0.762" y="8.636"/>
+<vertex x="-2.286" y="5.842"/>
+<vertex x="0" y="5.842"/>
+<vertex x="1.524" y="8.636"/>
+</polygon>
+<polygon width="0.6096" layer="94">
+<vertex x="2.794" y="8.636"/>
+<vertex x="1.27" y="5.842"/>
+<vertex x="3.556" y="5.842"/>
+<vertex x="5.08" y="8.636"/>
+</polygon>
+<circle x="-5.334" y="8.636" radius="1.016" width="2.54" layer="94"/>
+<wire x1="-5.334" y1="8.636" x2="-1.524" y2="8.636" width="0.254" layer="94"/>
+<wire x1="-5.334" y1="8.636" x2="-2.54" y2="9.906" width="0.254" layer="94"/>
+<wire x1="-5.334" y1="8.636" x2="-2.54" y2="11.684" width="0.254" layer="94"/>
+<wire x1="-5.334" y1="8.636" x2="-4.064" y2="11.938" width="0.254" layer="94"/>
+<wire x1="-5.334" y1="8.636" x2="-5.334" y2="12.954" width="0.254" layer="94"/>
+<wire x1="-5.334" y1="4.064" x2="-5.334" y2="8.636" width="0.254" layer="94"/>
+<wire x1="-3.048" y1="7.62" x2="-5.334" y2="8.636" width="0.254" layer="94"/>
+<wire x1="-4.318" y1="6.096" x2="-5.334" y2="8.636" width="0.254" layer="94"/>
+<wire x1="-3.302" y1="6.604" x2="-5.334" y2="8.636" width="0.254" layer="94"/>
+<wire x1="-6.604" y1="5.334" x2="-5.334" y2="8.636" width="0.254" layer="94"/>
+<wire x1="-8.128" y1="7.366" x2="-5.334" y2="8.636" width="0.254" layer="94"/>
+<wire x1="-8.128" y1="5.588" x2="-5.334" y2="8.636" width="0.254" layer="94"/>
+<wire x1="-8.382" y1="8.636" x2="-5.334" y2="8.636" width="0.254" layer="94"/>
+<wire x1="-5.334" y1="8.636" x2="-8.128" y2="9.652" width="0.254" layer="94"/>
+<wire x1="-5.334" y1="8.636" x2="-8.128" y2="11.176" width="0.254" layer="94"/>
+<wire x1="-5.334" y1="8.636" x2="-6.604" y2="11.43" width="0.254" layer="94"/>
+<pin name="-PV" x="-2.54" y="-2.54" visible="off" length="short"/>
+<text x="0.762" y="-0.762" size="1.778" layer="94">+</text>
+</symbol>
+<symbol name="BAT">
+<pin name="+BAT" x="7.62" y="2.54" visible="off" length="short" rot="R180"/>
+<wire x1="-2.54" y1="5.08" x2="5.08" y2="5.08" width="0.254" layer="94"/>
+<wire x1="5.08" y1="5.08" x2="5.08" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="5.08" y1="-2.54" x2="-2.54" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="-2.54" y1="-2.54" x2="-2.54" y2="5.08" width="0.254" layer="94"/>
+<text x="-1.778" y="0.508" size="1.6764" layer="94">BAT</text>
+<text x="3.048" y="1.778" size="1.6764" layer="94">+</text>
+<pin name="-BAT" x="7.62" y="0" visible="off" length="short" rot="R180"/>
+</symbol>
 </symbols>
 <devicesets>
 <deviceset name="RPUNO" prefix="BM" uservalue="yes">
@@ -306,6 +363,38 @@ ATmega328p</text>
 <connect gate="G$1" pin="SHLD_VOUT" pad="7"/>
 <connect gate="G$1" pin="SPI" pad="4"/>
 <connect gate="G$1" pin="TX" pad="1"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="PV" prefix="PV">
+<gates>
+<gate name="G$1" symbol="PV" x="2.54" y="0"/>
+</gates>
+<devices>
+<device name="" package="NA-30">
+<connects>
+<connect gate="G$1" pin="+PV" pad="1"/>
+<connect gate="G$1" pin="-PV" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="BAT">
+<gates>
+<gate name="G$1" symbol="BAT" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="NA-30">
+<connects>
+<connect gate="G$1" pin="+BAT" pad="1"/>
+<connect gate="G$1" pin="-BAT" pad="2"/>
 </connects>
 <technologies>
 <technology name=""/>
@@ -1046,11 +1135,17 @@ solder needs all the help it can get.</description>
 <part name="D16" library="D-LED" deviceset="LED" device="5MM" value="RD"/>
 <part name="D19" library="D-LED" deviceset="LED" device="5MM" value="RD"/>
 <part name="R1" library="R-C" deviceset="R" device="0805" value="100k"/>
+<part name="PV4" library="Documentation" deviceset="PV" device=""/>
+<part name="U$7" library="Documentation" deviceset="BAT" device=""/>
 </parts>
 <sheets>
 <sheet>
 <plain>
-<text x="28.956" y="134.366" size="5.08" layer="98">NIGHT LIGHTS</text>
+<text x="34.036" y="134.366" size="5.08" layer="98">NIGHT 
+LIGHTS</text>
+<text x="87.884" y="106.172" size="2.54" layer="98" rot="R90">18AHr</text>
+<text x="91.186" y="122.936" size="2.54" layer="98" rot="R90">SLP003-12U OR
+17Vmp@180mA</text>
 </plain>
 <instances>
 <instance part="BM3" gate="G$1" x="45.72" y="116.84"/>
@@ -1074,24 +1169,12 @@ solder needs all the help it can get.</description>
 <instance part="D16" gate="G$1" x="33.02" y="88.9"/>
 <instance part="D19" gate="G$1" x="20.32" y="142.24" rot="R270"/>
 <instance part="R1" gate="G$1" x="20.32" y="134.62" rot="R180"/>
+<instance part="PV4" gate="G$1" x="76.2" y="134.62"/>
+<instance part="U$7" gate="G$1" x="81.28" y="109.22" rot="R90"/>
 </instances>
 <busses>
 </busses>
 <nets>
-<net name="SLP005-12U" class="0">
-<segment>
-<label x="71.12" y="116.84" size="1.778" layer="91" xref="yes"/>
-<pinref part="BM3" gate="G$1" pin="ALT"/>
-<wire x1="71.12" y1="116.84" x2="66.04" y2="116.84" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="12V_SLA" class="0">
-<segment>
-<label x="71.12" y="121.92" size="1.778" layer="91" xref="yes"/>
-<pinref part="BM3" gate="G$1" pin="PWR"/>
-<wire x1="71.12" y1="121.92" x2="66.04" y2="121.92" width="0.1524" layer="91"/>
-</segment>
-</net>
 <net name="DAYNIGHT_STATUS_LED" class="0">
 <segment>
 <wire x1="45.72" y1="73.66" x2="45.72" y2="83.82" width="0.1524" layer="91"/>
@@ -1309,6 +1392,33 @@ solder needs all the help it can get.</description>
 <label x="14.478" y="118.872" size="1.27" layer="91" rot="R90"/>
 <pinref part="R1" gate="G$1" pin="2"/>
 <junction x="15.24" y="134.62"/>
+</segment>
+</net>
+<net name="N$1" class="0">
+<segment>
+<pinref part="U$7" gate="G$1" pin="+BAT"/>
+<wire x1="78.74" y1="116.84" x2="78.74" y2="121.92" width="0.1524" layer="91"/>
+<wire x1="78.74" y1="121.92" x2="66.04" y2="121.92" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$42" class="0">
+<segment>
+<pinref part="PV4" gate="G$1" pin="-PV"/>
+<pinref part="U$7" gate="G$1" pin="-BAT"/>
+<wire x1="73.66" y1="132.08" x2="73.66" y2="124.46" width="0.1524" layer="91"/>
+<wire x1="73.66" y1="124.46" x2="81.28" y2="124.46" width="0.1524" layer="91"/>
+<wire x1="81.28" y1="124.46" x2="81.28" y2="119.38" width="0.1524" layer="91"/>
+<wire x1="81.28" y1="119.38" x2="81.28" y2="116.84" width="0.1524" layer="91"/>
+<wire x1="66.04" y1="119.38" x2="81.28" y2="119.38" width="0.1524" layer="91"/>
+<junction x="81.28" y="119.38"/>
+</segment>
+</net>
+<net name="N$50" class="0">
+<segment>
+<pinref part="PV4" gate="G$1" pin="+PV"/>
+<wire x1="71.12" y1="116.84" x2="71.12" y2="134.62" width="0.1524" layer="91"/>
+<wire x1="71.12" y1="134.62" x2="73.66" y2="134.62" width="0.1524" layer="91"/>
+<wire x1="71.12" y1="116.84" x2="66.04" y2="116.84" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>

@@ -1,12 +1,19 @@
 # Night Light
 
+## known bugs
+
+If the sun is up after an MCU reset or power up then alternate power is not enabled until the next day. The workaround is to cover light sensor during reset or power up.
+
+
 ## Overview
 
 RPUno has some current sources that can be used to light LED strings. CS0..CS3 are 22mA souces. Digital 13 is used for I2C status, and Digital 12 is used for Day-Night status. 
 
-Night light uses non-blocking timers to cycle through the led[1|2|3|4].cycle_state that is used to control the current sources. The settings are loaded from EEPROM each night with a callback that is given to DayNight's  Night_AttachWork callback registration function.
+NightLight uses non-blocking timers to cycle through the led[1|2|3|4].cycle_state that is used to control the current sources. Each night the Night_AttachWork event runs. I have it disable the alternate power input and if the battery got charged load values from EEPROM to operate an LED non-blocking timer state machine. Each day the Day_AttachWork event runs. I have this enable the alternate power input and clear counters.
 
-Note: There is no way to check the solar charge gain. the Day_AttachWork() function is given a callback that is used to reset the accumulation values.
+A 12V AGM LA battery is connected to the main power input. A solar panel is connected to the Alternate power input to allow charging the battery.  The Day_AttachWork() function is given a callback that is used to reset the accumulation values.
+
+The solar panel short-circuit current needs to be less than about 1.5A so an SLP020-12U with Isc 1.3A should work, however an SLP030-12U with Isc 1.93 is too much. The battery should charge at 0.1C so for an SLP020-12U it needs to be at least 13AHr. If the charging is about 50% efficient then I will only get back about 3.25AHr of the 6.5AHr that was put in during a 5Hr charging time (that is about what I see). For a reasonable life expectancy, the battery should not discharge more than about 20%, so a minimum size that will do several hundred charge cycles is 16.25AHr.
 
 
 # Wiring LED Strings to RPUno
@@ -40,12 +47,14 @@ This works like [Solenoid] except the mAHr_stop replaces flow_stop, it will stop
 With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
 
 ``` 
-rsutherland@conversion:~/Samba/RPUno/NightLight$ make bootload
+git clone https://github.com/epccs/RPUno/
+cd /RPUno/NightLight
+make bootload
 ...
 avrdude done.  Thank you.
 ``` 
 
-Now connect with picocom (or ilk). Note I am often at another computer doing this through SSH. The Samba folder is for editing the files from Windows.
+Now connect with picocom (or ilk). 
 
 ``` 
 #exit is C-a, C-x
@@ -240,3 +249,9 @@ Report the led (1|2|3|4) runtime in millis.
 
 
 ## [/0/day?](../DayNight#0day)
+
+
+## [/0/alt](../Alternat#0alt)
+
+
+## [/0/altcnt?](../Alternat#0altcnt)

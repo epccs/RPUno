@@ -60,11 +60,11 @@ void ProcessCmd()
     }
     if ( (strcmp_P( command, PSTR("/alt")) == 0) && ( (arg_count == 0 ) ) )
     {
-        EnableAlt(); // auxilary.c
+        EnableAlt(); // alternat.c
     }
-    if ( (strcmp_P( command, PSTR("/altcnt")) == 0) && ( (arg_count == 0 ) ) )
+    if ( (strcmp_P( command, PSTR("/altcnt?")) == 0) && ( (arg_count == 0 ) ) )
     {
-        AltCount(); // auxilary.c
+        AltCount(); // alternat.c
     }
 }
 
@@ -114,6 +114,7 @@ void setup(void)
     sei(); 
     
     blink_started_at = millis();
+    day_status_blink_started_at = millis();
     
     rpu_addr = get_Rpu_address();
     blink_delay = BLINK_DELAY;

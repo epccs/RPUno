@@ -1,22 +1,25 @@
 #ifndef Solenoid_H
 #define Solenoid_H
 
-extern void DelayStart(void);
-extern void RunTime(void);
-extern void Delay(void);
-extern void FlowStop(void);
-extern void Run(void);
-extern void Save(void);
-extern void Load(void);
-extern void Time(void);
-extern void Flow(void);
-extern void Stop(void);
+// CLI commands
+extern void KDelayStart(void);
+extern void KRunTime(void);
+extern void KDelay(void);
+extern void KFlowStop(void);
+extern void KRun(void);
+extern void KSave(void);
+extern void KLoad(void);
+extern void KTime(void);
+extern void KFlow(void);
+extern void KStop(void);
 
-extern void SolenoidControl(void);
+// functions for main() or others
+extern void KControl(void);
 extern void Reset_All_K(void);
-extern uint8_t LoadSolenoidControlFromEEPROM(uint8_t);
-extern uint8_t Live(uint8_t);
-extern uint8_t StartSolenoid(uint8_t);
+extern void StopK(uint8_t);
+extern uint8_t LoadKControlFromEEPROM(uint8_t);
+extern uint8_t KLive(uint8_t);
+extern uint8_t StartK(uint8_t);
 extern void init_K(void);
 
 #define SOLENOID_COUNT 3

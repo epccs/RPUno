@@ -3,11 +3,15 @@ TARGET = Solenoid
 LIBDIR = ../lib
 OBJECTS = main.o \
 	solenoid.o \
-	../Uart/id.o \
-	../DayNight/day_night.o \
 	../Adc/analog.o \
 	../Adc/references.o \
+	../i2c-debug/i2c-cmd.o \
+	../i2c-debug/i2c-scan.o \
 	../Capture/capture.o \
+	../DayNight/day_night.o \
+	../AmpHr/chrg_accum.o \
+	../Alternat/alternat.o \
+	../Uart/id.o \
 	$(LIBDIR)/timers.o \
 	$(LIBDIR)/uart.o \
 	$(LIBDIR)/icp_buf.o \

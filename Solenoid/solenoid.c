@@ -120,7 +120,7 @@ unsigned long ul_from_arg1 (unsigned long max)
 }
 
 // arg[0] is solenoid, arg[1] is delay_start
-void DelayStart(void)
+void KDelayStart(void)
 {
     if ( (command_done == 10) )
     {
@@ -167,7 +167,7 @@ void DelayStart(void)
 }
 
 // arg[0] is solenoid, arg[1] is runtime
-void RunTime(void)
+void KRunTime(void)
 {
     if ( (command_done == 10) )
     {
@@ -214,7 +214,7 @@ void RunTime(void)
 }
 
 // arg[0] is solenoid, arg[1] is delay
-void Delay(void)
+void KDelay(void)
 {
     if ( (command_done == 10) )
     {
@@ -261,7 +261,7 @@ void Delay(void)
 }
 
 // arg[0] is solenoid, arg[1] is flow_stop
-void FlowStop(void)
+void KFlowStop(void)
 {
     if ( (command_done == 10) )
     {
@@ -308,7 +308,7 @@ void FlowStop(void)
 }
 
 // arg[0] is solenoid, [arg[1] is cycles]
-void Run(void)
+void KRun(void)
 {
     if ( (command_done == 10) )
     {
@@ -392,7 +392,7 @@ void Run(void)
 }
 
 // arg[0] is solenoid, arg[1] is cycles
-void Save(void)
+void KSave(void)
 {
     if ( (command_done == 10) )
     {
@@ -499,7 +499,7 @@ void Save(void)
 }
 
 // arg[0] is solenoid
-void Load(void)
+void KLoad(void)
 {
     if ( (command_done == 10) )
     {
@@ -519,7 +519,7 @@ void Load(void)
         }
         if ( eeprom_is_ready() )
         {
-            if (LoadSolenoidControlFromEEPROM(k_solenoid))
+            if (LoadKControlFromEEPROM(k_solenoid))
             {
                 k[k_solenoid-1].flow_cnt_bank = 0;
                 k[k_solenoid-1].cycle_millis_bank = 0;
@@ -580,7 +580,7 @@ void Load(void)
 }
 
 // arg[0] is solenoid
-void Time(void)
+void KTime(void)
 {
     if ( (command_done == 10) )
     {
@@ -624,7 +624,7 @@ void Time(void)
 }
 
 // arg[0] is solenoid
-void Flow(void)
+void KFlow(void)
 {
     if ( (command_done == 10) )
     {
@@ -667,8 +667,21 @@ void Flow(void)
     }
 }
 
+// solenoid number one has values in its control array at index zero
+void StopK(uint8_t solenoid_num)
+{
+    if (k[solenoid_num-1].cycle_state)
+    {
+        k[solenoid_num-1].delay_start_sec = 1;
+        k[solenoid_num-1].runtime_sec = 1; 
+        k[solenoid_num-1].delay_sec = 1;
+        k[solenoid_num-1].flow_stop = FLOW_NOT_SET;
+        k[solenoid_num-1].cycles = 1;
+    }
+}
+
 // arg[0] is solenoid
-void Stop(void)
+void KStop(void)
 {
     if ( (command_done == 10) )
     {
@@ -684,14 +697,7 @@ void Stop(void)
     else if ( (command_done == 11) )
     {  
         uint8_t k_solenoid = atoi(arg[0]);
-        if (k[k_solenoid-1].cycle_state)
-        {
-            k[k_solenoid-1].delay_start_sec = 1;
-            k[k_solenoid-1].runtime_sec = 1; 
-            k[k_solenoid-1].delay_sec = 1;
-            k[k_solenoid-1].flow_stop = FLOW_NOT_SET;
-            k[k_solenoid-1].cycles = 1;
-        }
+        StopK(k_solenoid);
         printf_P(PSTR("\"delay_start_sec\":\"%lu\","),(k[k_solenoid-1].delay_start_sec));
         command_done = 12;
     }
@@ -839,7 +845,7 @@ void reset_solenoid(uint8_t k_indx)
     10 = wait for SOLENOID_CLOSE time, then measure flow count, if cycles is set then state 0.
     11 = wait for delay time, then loop to cycle_state = 1 (backdate so delay_start_sec is not used in each loop).
 */ 
-void SolenoidControl() {
+void KControl() {
     for(int i = 0; i < SOLENOID_COUNT; i++){
         // active, wait for start time (delay_start_sec), then start a Boost charge.
         if ((k[i].cycle_state == SOLENOID_STATE_PRESTART) && !boostInUse && !flowInUse) 
@@ -1028,7 +1034,7 @@ void Reset_All_K() {
     }
 }
 
-uint8_t LoadSolenoidControlFromEEPROM(uint8_t solenoid) 
+uint8_t LoadKControlFromEEPROM(uint8_t solenoid) 
 {
     uint16_t i = solenoid-1;
     if (!k[i].cycle_state)
@@ -1058,7 +1064,7 @@ uint8_t LoadSolenoidControlFromEEPROM(uint8_t solenoid)
 }
 
 // return the solenoid cycle_state (e.g. tells if it is running)
-uint8_t Live(uint8_t solenoid) 
+uint8_t KLive(uint8_t solenoid) 
 {
     uint16_t i = solenoid-1;
     if (i<SOLENOID_COUNT)
@@ -1069,7 +1075,7 @@ uint8_t Live(uint8_t solenoid)
 }
 
 // start the solenoid if it is not running and return cycle state
-uint8_t StartSolenoid(uint8_t solenoid) 
+uint8_t StartK(uint8_t solenoid) 
 {
     uint16_t i = solenoid-1;
     if (i<SOLENOID_COUNT )

@@ -149,7 +149,7 @@ void ProcessCmd()
     }
 }
 
-//At start of each night 
+//At start of each night.
 void callback_for_night_attach(void)
 {
     //turn off alternat power input
@@ -168,7 +168,7 @@ void callback_for_night_attach(void)
     }
 }
 
-//At start of each day determine the remaining charge and zero the charge and discharge (bank) values.
+//At start of each day.
 void callback_for_day_attach(void)
 {
     alt_enable = 1; //turn on alternat power input
@@ -209,7 +209,7 @@ void setup(void)
 
     /* Initialize UART, it returns a pointer to FILE so redirect of stdin and stdout works*/
     stdout = stdin = uartstream0_init(BAUD);
-    
+
     /* Initialize I2C. note: I2C scan will stop without a pull-up on the bus */
     twi_init(TWI_PULLUP);
 
@@ -218,30 +218,30 @@ void setup(void)
 
     // Enable global interrupts to start TIMER0 and UART ISR's
     sei(); 
-    
+
     blink_started_at = millis();
     day_status_blink_started_at = millis();
-    
+
     rpu_addr = get_Rpu_address();
     blink_delay = BLINK_DELAY;
-    
+
     // blink fast if a default address from RPU manager not found
     if (rpu_addr == 0)
     {
         rpu_addr = '0';
         blink_delay = BLINK_DELAY/4;
     }
-    
+
     // setup Led string control
     init_Led();
-    
+
     Reset_All_LED();
     leds_initalized = 0;
-    
-    // set callbacks for DayNight state machine
+
+    // register callbacks for DayNight events
     Night_AttachWork(callback_for_night_attach);
     Day_AttachWork(callback_for_day_attach);
-    
+
     // setup AmpHr accumulators
     if (!init_ChargAccumulation(PWR_I)) // ../AmpHr/chrg_accum.c
     {
@@ -251,7 +251,7 @@ void setup(void)
     // default debounce is 15 min (e.g. 900,000 millis)
     evening_debouce = 18000UL; // 18 sec
     morning_debouce = 18000UL;
-    
+
     alt_count = 0;
 }
 

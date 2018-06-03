@@ -11,11 +11,11 @@ extern void Save(void);
 extern void Load(void);
 extern void Time(void);
 extern void Stop(void);
-extern void LedControl(void);
-extern void Reset_All_LED(void);
 
 // functions for main() or others
-extern void StopLED(uint8_t led);
+extern void LedControl(void);
+extern void Reset_All_LED(void);
+extern void StopLED(uint8_t);
 extern uint8_t LoadLedControlFromEEPROM(uint8_t);
 extern uint8_t Live(uint8_t);
 extern uint8_t StartLed(uint8_t);

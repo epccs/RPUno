@@ -27,12 +27,16 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/pin_num.h"
 #include "../lib/pins_board.h"
 #include "../Uart/id.h"
-#include "../DayNight/day_night.h"
 #include "../Adc/analog.h"
+#include "../i2c-debug/i2c-scan.h"
+#include "../i2c-debug/i2c-cmd.h"
+#include "../DayNight/day_night.h"
+#include "../AmpHr/chrg_accum.h"
+#include "../Alternat/alternat.h"
 #include "../Capture/capture.h"
 #include "solenoid.h"
 
-#define ADC_DELAY_MILSEC 200UL
+#define ADC_DELAY_MILSEC 100UL
 static unsigned long adc_started_at;
 
 #define STATUS_LED DIO13
@@ -55,45 +59,45 @@ void ProcessCmd()
         {
             Id("Solenoid"); // ../Uart/id.c
         }
-        if ( (strcmp_P( command, PSTR("/pre")) == 0) && ( (arg_count == 2 ) ) )
+        if ( (strcmp_P( command, PSTR("/kpre")) == 0) && ( (arg_count == 2 ) ) )
         {
-            DelayStart(); // solenoid.c
+            KDelayStart(); // solenoid.c
         }
-        if ( (strcmp_P( command, PSTR("/runtime")) == 0) && ( (arg_count == 2 ) ) )
+        if ( (strcmp_P( command, PSTR("/krunt")) == 0) && ( (arg_count == 2 ) ) )
         {
-            RunTime(); // solenoid.c
+            KRunTime(); // solenoid.c
         }
-        if ( (strcmp_P( command, PSTR("/delay")) == 0) && ( (arg_count == 2 ) ) )
+        if ( (strcmp_P( command, PSTR("/kdelay")) == 0) && ( (arg_count == 2 ) ) )
         {
-            Delay(); // solenoid.c
+            KDelay(); // solenoid.c
         }
-        if ( (strcmp_P( command, PSTR("/fstop")) == 0) && ( (arg_count == 2 ) ) )
+        if ( (strcmp_P( command, PSTR("/kfstop")) == 0) && ( (arg_count == 2 ) ) )
         {
-            FlowStop(); // solenoid.c
+            KFlowStop(); // solenoid.c
         }
-        if ( (strcmp_P( command, PSTR("/run")) == 0) && ( (arg_count == 1) || (arg_count == 2) ) )
+        if ( (strcmp_P( command, PSTR("/krun")) == 0) && ( (arg_count == 1) || (arg_count == 2) ) )
         {
-            Run(); // solenoid.c
+            KRun(); // solenoid.c
         }
-        if ( (strcmp_P( command, PSTR("/save")) == 0) && ( (arg_count == 2 ) ) )
+        if ( (strcmp_P( command, PSTR("/ksave")) == 0) && ( (arg_count == 2 ) ) )
         {
-            Save(); // solenoid.c
+            KSave(); // solenoid.c
         }
-        if ( (strcmp_P( command, PSTR("/load")) == 0) && ( (arg_count == 1 ) ) )
+        if ( (strcmp_P( command, PSTR("/kload")) == 0) && ( (arg_count == 1 ) ) )
         {
-            Load(); // solenoid.c
+            KLoad(); // solenoid.c
         }
-        if ( (strcmp_P( command, PSTR("/time?")) == 0) && ( (arg_count == 1 ) ) )
+        if ( (strcmp_P( command, PSTR("/ktime?")) == 0) && ( (arg_count == 1 ) ) )
         {
-            Time(); // solenoid.c
+            KTime(); // solenoid.c
         }
-        if ( (strcmp_P( command, PSTR("/flow?")) == 0) && ( (arg_count == 1 ) ) )
+        if ( (strcmp_P( command, PSTR("/kflow?")) == 0) && ( (arg_count == 1 ) ) )
         {
-            Flow(); // solenoid.c
+            KFlow(); // solenoid.c
         }
-        if ( (strcmp_P( command, PSTR("/stop")) == 0) && ( (arg_count == 1 ) ) )
+        if ( (strcmp_P( command, PSTR("/kstop")) == 0) && ( (arg_count == 1 ) ) )
         {
-            Stop(); // solenoid.c
+            KStop(); // solenoid.c
         }
         if ( (strcmp_P( command, PSTR("/day?")) == 0) && ( (arg_count == 0 ) ) )
         {
@@ -105,19 +109,19 @@ void ProcessCmd()
         }
         if ( (strcmp_P( command, PSTR("/count?")) == 0) &&  ( (arg_count == 0) || ( (arg_count == 1) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
         {
-            Count();
+            Count(); // ../Capture/capture.c
         }
         if ( (strcmp_P( command, PSTR("/capture?")) == 0) && ( (arg_count == 0 ) || ( (arg_count == 2) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
         {
-            Capture();
+            Capture(); // ../Capture/capture.c
         }
         if ( (strcmp_P( command, PSTR("/event?")) == 0) && ( (arg_count == 0 ) || ( (arg_count == 2) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
         {
-            Event();
+            Event(); // ../Capture/capture.c
         }
         if ( (strcmp_P( command, PSTR("/initICP")) == 0) && ( ( (arg_count == 3) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
         {
-            InitICP();
+            InitICP(); // ../Capture/capture.c
         }
     }
     else
@@ -131,13 +135,37 @@ void ProcessCmd()
     }
 }
 
-//At start of each day load the solenoid control settings from EEPROM and operate them.
+//At start of each night 
+void callback_for_night_attach(void)
+{
+    //turn off alternat power input
+    alt_enable = 0;
+    
+    // turn off the Solenoid's
+    for (uint8_t solenoid = 1; solenoid <= SOLENOID_COUNT; solenoid++)
+    {
+        StopK(solenoid);
+    }
+}
+
+//At start of each day.
 void callback_for_day_attach(void)
 {
+    alt_enable = 1; //turn on alternat power input
+    alt_count = 0; // this value is used to tell if the battery got a full charge
+
+    // setup AmpHr accumulators and load Adc calibration reference
+    if (!init_ChargAccumulation(PWR_I)) // ../AmpHr/chrg_accum.c
+    {
+        blink_delay = BLINK_DELAY/4;
+    }
+
     for(uint8_t solenoid = 1; solenoid <= SOLENOID_COUNT; solenoid++)
     {
-        LoadSolenoidControlFromEEPROM(solenoid);
-        StartSolenoid(solenoid);
+        // load the solenoid control settings from EEPROM
+        LoadKControlFromEEPROM(solenoid);
+        // operate them
+        StartK(solenoid);
     }
 }
 
@@ -145,10 +173,16 @@ void setup(void)
 {
     pinMode(STATUS_LED,OUTPUT);
     digitalWrite(STATUS_LED,LOW);
-    
+
     pinMode(DAYNIGHT_STATUS_LED,OUTPUT);
     digitalWrite(DAYNIGHT_STATUS_LED,HIGH);
-    
+
+    pinMode(ALT_EN,OUTPUT);
+    digitalWrite(ALT_EN,LOW);
+
+    pinMode(CS_ICP1_EN,OUTPUT);
+    digitalWrite(CS_ICP1_EN,HIGH);
+
     // Initialize Timers, ADC, and clear bootloader, Arduino does these with init() in wiring.c
     initTimers(); //Timer0 Fast PWM mode, Timer1 & Timer2 Phase Correct PWM mode.
     init_ADC_single_conversion(EXTERNAL_AVCC); // warning AREF must not be connected to anything
@@ -160,12 +194,10 @@ void setup(void)
 
     /* Initialize Input Capture Unit (see ../lib/icp1.h) */
     initIcp1(TRACK_RISING, ICP1_MCUDIV64) ;
-    pinMode(CS_ICP1_EN,OUTPUT);
-    digitalWrite(CS_ICP1_EN,HIGH);
 
     /* Initialize UART, it returns a pointer to FILE so redirect of stdin and stdout works*/
     stdout = stdin = uartstream0_init(BAUD);
-    
+
     /* Initialize I2C. note: I2C scan will stop without a pull-up on the bus */
     twi_init(TWI_PULLUP);
 
@@ -174,30 +206,43 @@ void setup(void)
 
     // Enable global interrupts to start TIMER0 and UART ISR's
     sei(); 
-    
+
     blink_started_at = millis();
     day_status_blink_started_at = millis();
-    
+
     rpu_addr = get_Rpu_address();
     blink_delay = BLINK_DELAY;
-    
+
     // blink fast if a default address from RPU manager not found
     if (rpu_addr == 0)
     {
         rpu_addr = '0';
         blink_delay = BLINK_DELAY/4;
     }
-    
+
     // setup solenoid control
     init_K();
-    
+
     // solenoids may have been previously latched so this
-    // loads settings that will run a fast cycle
+    // loads settings that will run a quick cycle to home the hardware
     Reset_All_K();
     solenoids_initalized = 0;
-    
-    // register callback for the Day Work event  (note Night_AttachWork() defalt does nothing)
+
+    // register callbacks for DayNight events
+    Night_AttachWork(callback_for_night_attach);
     Day_AttachWork(callback_for_day_attach);
+
+    // setup AmpHr accumulators
+    if (!init_ChargAccumulation(PWR_I)) // ../AmpHr/chrg_accum.c
+    {
+        blink_delay = BLINK_DELAY/4;
+    }
+
+    // default debounce is 15 min (e.g. 900,000 millis)
+    evening_debouce = 18000UL; // 18 sec
+    morning_debouce = 18000UL;
+
+    alt_count = 0;
 }
 
 void blink(void)
@@ -251,14 +296,19 @@ void blink_day_status(void)
     }
 }
 
-void adc_burst(void)
+uint8_t adc_burst(void)
 {
     unsigned long kRuntime= millis() - adc_started_at;
     if ((kRuntime) > ((unsigned long)ADC_DELAY_MILSEC))
     {
-        enable_ADC_auto_conversion(BURST_MODE); // ../lib/adc.c
+        enable_ADC_auto_conversion(BURST_MODE);
         adc_started_at += ADC_DELAY_MILSEC; 
+        return 1;
     } 
+    else
+    {
+        return 0;
+    }
 }
 
 int main(void) 
@@ -277,7 +327,13 @@ int main(void)
         CheckDayLight(ADC2); // ../DayNight/day_night.c
 
         // delay between ADC burst
-        adc_burst();
+        if ( adc_burst() )
+        {
+            check_if_alt_should_be_on(PWR_V, 115.8/15.8, 13.6);
+        }
+
+        // check how much charge went into battery
+        CheckChrgAccumulation(PWR_I);
 
         // check if character is available to assemble a command, e.g. non-blocking
         if ( (!command_done) && uart0_available() ) // command_done is an extern from parse.h
@@ -327,7 +383,7 @@ int main(void)
         }
         
         // Solenoid Control is a function that moves them through different states that are timed with millis() or icp1 flow count.
-        SolenoidControl();
+        KControl();
         
         if (!solenoids_initalized)
         {
@@ -335,7 +391,7 @@ int main(void)
             uint8_t solenoids_in_use = 0;
             for(uint8_t solenoid = 1; solenoid <= SOLENOID_COUNT; solenoid++)
             {
-                if (Live(solenoid))
+                if (KLive(solenoid))
                 {
                     solenoids_in_use =1;
                     break;

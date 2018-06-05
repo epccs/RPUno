@@ -7,20 +7,37 @@ This shows the setup and method used for evaluation of RPUno.
 
 # Table Of Contents:
 
-15. [^5 Flow Meter](#5-flow-meter)
-13. [^6 AGM Battery](#6-agm-battery)
-12. [^6 Power Example](#6-power-example)
-11. [^5 Power Management](#5-power-management)
-10. [^5 Day Night](#5-day-night)
-9. [^5 Flow Meter](#5-flow-meter)
-8. [^5 Solenoid FW Operates K3](#5-solenoid-fw-operates-k3)
-7. [^5 ADC and DIO](#5-adc-and-dio)
-6. [^5 Heat No Longer Problem](#5-heat-no-longer-problem)
-5. [^4 Heat Wick](#4-heat-wick)
-4. [^2 Log CCtest](#2-log-cctest)
-3. [^2 Log PV_IN and PWR for a day](#2-log-pv_in-and-pwr-for-a-day)
-2. [^2 20mA Loop With Open Collector To ICP1](#2-20ma-loop-with-open-collector-to-icp1)
+1. [^9 NightLight setup](#9-nightlight-setup)
+1. [^5 Flow Meter](#5-flow-meter)
+1. [^6 AGM Battery](#6-agm-battery)
+1. [^6 Power Example](#6-power-example)
+1. [^5 Power Management](#5-power-management)
+1. [^5 Day Night](#5-day-night)
+1. [^5 Flow Meter](#5-flow-meter)
+1. [^5 Solenoid FW Operates K3](#5-solenoid-fw-operates-k3)
+1. [^5 ADC and DIO](#5-adc-and-dio)
+1. [^5 Heat No Longer Problem](#5-heat-no-longer-problem)
+1. [^4 Heat Wick](#4-heat-wick)
+1. [^2 Log CCtest](#2-log-cctest)
+1. [^2 Log PV_IN and PWR for a day](#2-log-pv_in-and-pwr-for-a-day)
+1. [^2 20mA Loop With Open Collector To ICP1](#2-20ma-loop-with-open-collector-to-icp1)
 1. [^1 Mounting](#1-mounting)
+
+## ^9 NightLight setup
+
+Schooling has a note regarding ^6 Solar. After removing the LT3652 and a few board revision latter I have a setup that can charge the battery directly from an alternate power supply. To evaluate this I had to get the software working for the new revion. On the bench I am using a supply set with a 200mA constant current mode. A 12V LA type battery is connected to the main power and the on board P-Channel MOSFET disconnects the supply when the batter is charged. Other details can be seen in the application source code and its notes. 
+
+![NightLight_Setup](./RPUno^9+RPUadpt^5+K3^hack2_NightLight+Solenoid.jpg "NightLight Setup")
+
+The RPUno^9 board has four current sources which can be enabled with the MCU digital pins (3..6). After the current goes through a string of LED it returns to the boards ground plane. 
+
+The version of [NightLight] I am working with.
+
+[NightLight]: (https://github.com/epccs/RPUno/tree/aeb3867bd7fa23a57e8a018410b56a7247100e4a/NightLight)
+
+While building the LED strings I accidentally added a short to the wiring on a few strings and then hot glue and shrink wrap the short into a less than fun rework task. Fortunately, the current sources did their job with the battery voltage at about 13V so nothing smoked on the board. I am really liking the current source idea as a safety neet. 
+
+Note that in the image K3 is also connected, but that is for sorting out the Solenoid firmware.
 
 
 ## ^5 Flow Meter

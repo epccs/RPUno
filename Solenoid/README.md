@@ -2,20 +2,10 @@
 
 ## Future improvements (to do)
 
-__Do not use this program__ the updates need verified on ^9.
-
-turn on flow sensor current source CS_ICP1_EN. (done)
-
-Add a wiring diagram. (done)
-
-report "stop" command like on DayNight 
-/1/stop 1 
-{"K1":{"delay_start_sec":"1","runtime_sec":"1","delay_sec":"1","cycles":"1"}}
-(done)
-
 Irrigation valve got stuck. Check if the flow meter has stopped when the valve was closed, try to close the valve again a few times. Set a status value for the command line to read, and sort out a way to do a service request, perhaps with the bus manager.
 
 Plants need more water when they get more sun. Add an option to scale the mount of water based on integration of the light sensor. 
+
 
 ## Overview
 
@@ -70,7 +60,7 @@ cycles              UINT8           58  78  98
 
 # Start of Day 
 
-The [day-night][../DayNight] state machine is used to load and run EEPROM values after the morning debounce. This means the valves will start to cycle after the delay_start time has elapsed each morning.
+The [day-night][../DayNight] state machine is used to load and run EEPROM values after the morning debounce. The valves will start to cycle after the delay_start time has elapsed each morning.
 
 
 # Flow Sensor
@@ -119,7 +109,7 @@ Identify is from ../Uart/id.h Id().
 
 ``` 
 /1/id?
-{"id":{"name":"Solenoid","desc":"RPUno Board /w atmega328p and LT3652","avr-gcc":"4.9"}}
+{"id":{"name":"Solenoid","desc":"RPUno (14140^9) Board /w atmega328p","avr-gcc":"5.4.0"}}
 ```
 
 
@@ -149,11 +139,11 @@ Saved settings are loaded and operated at the start of each day.
 
 ```
 /1/ksave 1,10
-{"K1":{"delay_start_sec":"3","runtime_Sec":"10","delay_Sec":"40","cycles":"10"}}
+{"K1":{"delay_start_sec":"1","runtime_sec":"150","delay_sec":"3450","cycles":"10"}}
 /1/ksave 2,10
-{"K2":{"delay_start_sec":"16","runtime_Sec":"10","delay_Sec":"40","cycles":"10"}}
+{"K2":{"delay_start_sec":"600","runtime_sec":"150","delay_sec":"3450","cycles":"10"}}
 /1/ksave 3,10
-{"K3":{"delay_start_sec":"29","runtime_Sec":"10","delay_Sec":"40","cycles":"10"}}
+{"K3":{"delay_start_sec":"1200","runtime_sec":"150","delay_sec":"3450","cycles":"10"}}
 ```
 
 ##  /0/kload k
@@ -162,11 +152,11 @@ Load the solenoid k (1|2|3) from EEPROM. Use run to start it.
 
 ```
 /1/kload 1
-{"K1":{"delay_start_sec":"10","runtime_Sec":"15","delay_Sec":"60","cycles":"10"}}
+{"K1":{"delay_start_sec":"1","runtime_sec":"150","delay_sec":"3450","cycles":"10"}}
 /1/kload 2
-{"K2":{"delay_start_sec":"30","runtime_Sec":"15","delay_Sec":"60","cycles":"10"}}
+{"K2":{"delay_start_sec":"600","runtime_sec":"150","delay_sec":"3450","cycles":"10"}}
 /1/kload 3
-{"K3":{"delay_start_sec":"50","runtime_Sec":"15","delay_Sec":"60","cycles":"10"}}
+{"K3":{"delay_start_sec":"1200","runtime_sec":"150","delay_sec":"3450","cycles":"10"}}
 ```
 
 
@@ -187,14 +177,14 @@ To change the solenoids setting use /stop, then /load, and change the desired se
 Set the solenoid k (1|2|3) one time delay befor cycles run (1..21600, e.g. 6hr max). 
 
 ``` 
-/1/kpre 1,3
-{"K1":{"delay_start_sec":"3"}}
-/1/kpre 2,16
-{"K2":{"delay_start_sec":"16"}}
-/1/kpre 3,29
-{"K3":{"delay_start_sec":"29"}}
-/1/krun 2,1
-{"K2":{"delay_start_sec":"16","runtime_sec":"10","delay_sec":"40","cycles":"1"}}
+/1/kpre 1,1
+{"K1":{"delay_start_sec":"1"}}
+/1/kpre 2,600
+{"K2":{"delay_start_sec":"600"}}
+/1/kpre 3,1200
+{"K3":{"delay_start_sec":"1200"}}
+/1/krun 1,1
+{"K1":{"delay_start_sec":"1","runtime_sec":"1","delay_sec":"3600","cycles":"1"}}
 ``` 
 
 
@@ -203,14 +193,14 @@ Set the solenoid k (1|2|3) one time delay befor cycles run (1..21600, e.g. 6hr m
 Set the solenoid k (1|2|3) run time (1..21600, e.g. 6hr max). 
 
 ``` 
-/1/krunt 1,10
-{"K1":{"runtime_sec":"10"}}
-/1/krunt 2,10
-{"K2":{"runtime_sec":"10"}}
-/1/krunt 3,10
-{"K3":{"runtime_sec":"10"}}
+/1/krunt 1,150
+{"K1":{"runtime_sec":"150",}}
+/1/krunt 2,150
+{"K2":{"runtime_sec":"150",}}
+/1/krunt 3,150
+{"K3":{"runtime_sec":"150",}}
 /1/krun 1,1
-{"K1":{"delay_start_sec":"2","runtime_sec":"10","delay_sec":"40","cycles":"1"}}
+{"K1":{"delay_start_sec":"1","runtime_sec":"150","delay_sec":"3600","cycles":"1"}}
 ```
 
 
@@ -219,14 +209,14 @@ Set the solenoid k (1|2|3) run time (1..21600, e.g. 6hr max).
 Set the solenoid k (1|2|3) delay between runs (1..86400, e.g. 24 hr max). 
 
 ```
-/1/kdelay 1,40
-{"K1":{"delay_sec":"40"}}
-/1/kdelay 2,40
-{"K2":{"delay_sec":"40"}}
-/1/kdelay 3,40
-{"K3":{"delay_sec":"40"}}
-/1/krun 3,1
-{"K3":{"delay_start_sec":"7","runtime_sec":"1","delay_sec":"40","cycles":"1"}}
+/1/kdelay 1,3450
+{"K1":{"delay_sec":"3450"}}
+/1/kdelay 2,3450
+{"K2":{"delay_sec":"3450"}}
+/1/kdelay 3,3450
+{"K3":{"delay_sec":"3450"}}
+/1/krun 1,1
+{"K1":{"delay_start_sec":"1","runtime_sec":"150","delay_sec":"3450","cycles":"1"}}
 ```
 
 
@@ -235,11 +225,13 @@ Set the solenoid k (1|2|3) delay between runs (1..86400, e.g. 24 hr max).
 Set the solenoid k (1|2|3) flow_stop (1..0xFFFFFFFF) that also stops the solenoid (e.g. when flow count is reached).
 
 ``` 
-/1/kfstop 3,500
-{"K3":{"flow_stop":"500"}}
-/1/krun 3,1
-{"K3":{"delay_start_sec":"10","runtime_sec":"20","delay_sec":"40","cycles":"1","flow_stop":"500"}}
+/1/kfstop 1,500
+{"K1":{"flow_stop":"500"}}
+/1/krun 1,1
+{"K1":{"delay_start_sec":"1","runtime_sec":"150","delay_sec":"3450","cycles":"1","flow_stop":"500"}}
 ``` 
+
+__May Not Work__ This has had limited testing. 
 
 
 ##  /0/kflow? k
@@ -280,10 +272,13 @@ Report the solenoid k (1|2|3) runtime in millis.
 ## [/0/iwrite](../i2c-debug#0iwrite)
 
 
-## [/0/charge?](../AmpHr#0charge)
+## [/0/iread?](../i2c-debug#0iread)
 
 
 ## [/0/day?](../DayNight#0day)
+
+
+## [/0/charge?](../AmpHr#0charge)
 
 
 ## [/0/alt](../Alternat#0alt)

@@ -7,6 +7,7 @@ This shows the setup and method used for evaluation of RPUno.
 
 # Table Of Contents:
 
+1. [^9 Solenoid setup](#9-solenoid-setup)
 1. [^9 NightLight setup](#9-nightlight-setup)
 1. [^5 Flow Meter](#5-flow-meter)
 1. [^6 AGM Battery](#6-agm-battery)
@@ -23,6 +24,18 @@ This shows the setup and method used for evaluation of RPUno.
 1. [^2 20mA Loop With Open Collector To ICP1](#2-20ma-loop-with-open-collector-to-icp1)
 1. [^1 Mounting](#1-mounting)
 
+
+## ^9 Solenoid setup
+
+Testing shows that the K3 drivers are working as expected. The back ported functions from NightLight seem to be working. This shows the setup that was used. 
+
+![Solenoid_Setup](./RPUno^9+RPUadpt^5+K3^hack2_NightLight+Solenoid.jpg "Solenoid Setup")
+
+The wiring detaials are (ICP1 not tested on bench, but it has not changed):
+
+![Solenoid_On^9](https://raw.githubusercontent.com/epccs/RPUno/aeb3867bd7fa23a57e8a018410b56a7247100e4a/Solenoid/Setup/SolenoidWiring.png "Solenoid On RPUno^9")
+
+
 ## ^9 NightLight setup
 
 Schooling has a note regarding ^6 Solar. After removing the LT3652 and a few board revision latter I have a setup that can charge the battery directly from an alternate power supply. To evaluate this I had to get the software working for the new revion. On the bench I am using a supply set with a 200mA constant current mode. A 12V LA type battery is connected to the main power and the on board P-Channel MOSFET disconnects the supply when the batter is charged. Other details can be seen in the application source code and its notes. 
@@ -31,9 +44,9 @@ Schooling has a note regarding ^6 Solar. After removing the LT3652 and a few boa
 
 The RPUno^9 board has four current sources which can be enabled with the MCU digital pins (3..6). After the current goes through a string of LED it returns to the boards ground plane. 
 
-The version of [NightLight] I am working with.
+The version of [NightLight_On^9] I am working with.
 
-[NightLight]: (https://github.com/epccs/RPUno/tree/aeb3867bd7fa23a57e8a018410b56a7247100e4a/NightLight)
+[NightLight_On^9]: (https://github.com/epccs/RPUno/tree/aeb3867bd7fa23a57e8a018410b56a7247100e4a/NightLight)
 
 While building the LED strings I accidentally added a short to the wiring on a few strings and then hot glue and shrink wrap the short into a less than fun rework task. Fortunately, the current sources did their job with the battery voltage at about 13V so nothing smoked on the board. I am really liking the current source idea as a safety neet. 
 

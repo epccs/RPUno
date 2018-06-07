@@ -245,6 +245,9 @@ Report the led (1|2|3|4) runtime in millis.
 ## [/0/iwrite](../i2c-debug#0iwrite)
 
 
+## [/0/iread?](../i2c-debug#0iread)
+
+
 ## [/0/charge?](../AmpHr#0charge)
 
 

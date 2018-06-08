@@ -85,46 +85,12 @@ static solenoidTimer k[SOLENOID_COUNT];
 static uint8_t boostInUse; // 0 if free, 1 thru SOLENOID_COUNT and is the solenoid using boost
 static uint8_t flowInUse; // 0 only one solenoid can be active so its flow count can be measured
 
-uint8_t k_solenoid_from_arg0 (void)
-{
-    // check that arg[0] is a digit 
-    if ( ( !( isdigit(arg[0][0]) ) ) )
-    {
-        printf_P(PSTR("{\"err\":\"%sKNaN\"}\r\n"),command[1]);
-        return 0;
-    }
-    uint8_t k_solenoid = atoi(arg[0]);
-    if ( ( k_solenoid < 1) || (k_solenoid > SOLENOID_COUNT) )
-    {
-        printf_P(PSTR("{\"err\":\"%sKOtOfRng\"}\r\n"),command[1]);
-        return 0;
-    }
-    return k_solenoid;
-}
-
-unsigned long ul_from_arg1 (unsigned long max)
-{
-    // check that arg[1] is a digit 
-    if ( ( !( isdigit(arg[1][0]) ) ) )
-    {
-        printf_P(PSTR("{\"err\":\"%s1NaN\"}\r\n"),command[1]);
-        return 0;
-    }
-    unsigned long ul = strtoul(arg[1], (char **)NULL, 10);
-    if ( ( ul < 1) || (ul > max) )
-    {
-        printf_P(PSTR("{\"err\":\"%s1OtOfRng\"}\r\n"),command[1]);
-        return 0;
-    }
-    return ul;
-}
-
 // arg[0] is solenoid, arg[1] is delay_start
 void KDelayStart(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t k_solenoid = k_solenoid_from_arg0();
+        uint8_t k_solenoid = uint8_from_arg0(SOLENOID_COUNT);
         if (! k_solenoid)
         {
             initCommandBuffer();
@@ -161,7 +127,6 @@ void KDelayStart(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"DlyStCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
@@ -171,7 +136,7 @@ void KRunTime(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t k_solenoid = k_solenoid_from_arg0();
+        uint8_t k_solenoid = uint8_from_arg0(SOLENOID_COUNT);
         if (! k_solenoid)
         {
             initCommandBuffer();
@@ -208,7 +173,6 @@ void KRunTime(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"RunTmCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
@@ -218,7 +182,7 @@ void KDelay(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t k_solenoid = k_solenoid_from_arg0();
+        uint8_t k_solenoid = uint8_from_arg0(SOLENOID_COUNT);
         if (! k_solenoid)
         {
             initCommandBuffer();
@@ -255,7 +219,6 @@ void KDelay(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"DelayCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
@@ -265,7 +228,7 @@ void KFlowStop(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t k_solenoid = k_solenoid_from_arg0();
+        uint8_t k_solenoid = uint8_from_arg0(SOLENOID_COUNT);
         if (! k_solenoid)
         {
             initCommandBuffer();
@@ -302,7 +265,6 @@ void KFlowStop(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"FlwStpCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
@@ -312,7 +274,7 @@ void KRun(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t k_solenoid = k_solenoid_from_arg0();
+        uint8_t k_solenoid = uint8_from_arg0(SOLENOID_COUNT);
         if (! k_solenoid)
         {
             initCommandBuffer();
@@ -386,7 +348,6 @@ void KRun(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"RunCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
@@ -396,7 +357,7 @@ void KSave(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t k_solenoid = k_solenoid_from_arg0();
+        uint8_t k_solenoid = uint8_from_arg0(SOLENOID_COUNT);
         if (! k_solenoid)
         {
             initCommandBuffer();
@@ -493,7 +454,6 @@ void KSave(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"SavCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
@@ -503,7 +463,7 @@ void KLoad(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t k_solenoid = k_solenoid_from_arg0();
+        uint8_t k_solenoid = uint8_from_arg0(SOLENOID_COUNT);
         if (! k_solenoid)
         {
             initCommandBuffer();
@@ -574,7 +534,6 @@ void KLoad(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"LdCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
@@ -584,7 +543,7 @@ void KTime(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t k_solenoid = k_solenoid_from_arg0();
+        uint8_t k_solenoid = uint8_from_arg0(SOLENOID_COUNT);
         if (! k_solenoid)
         {
             initCommandBuffer();
@@ -628,7 +587,7 @@ void KFlow(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t k_solenoid = k_solenoid_from_arg0();
+        uint8_t k_solenoid = uint8_from_arg0(SOLENOID_COUNT);
         if (! k_solenoid)
         {
             initCommandBuffer();
@@ -662,7 +621,6 @@ void KFlow(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"FlwCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
@@ -685,7 +643,7 @@ void KStop(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t k_solenoid = k_solenoid_from_arg0();
+        uint8_t k_solenoid = uint8_from_arg0(SOLENOID_COUNT);
         if (! k_solenoid)
         {
             initCommandBuffer();
@@ -735,7 +693,6 @@ void KStop(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"StpCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }

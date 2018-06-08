@@ -64,7 +64,6 @@ void EnableAlt(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"EnAltCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
@@ -88,7 +87,6 @@ void AltCount(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"AltCntCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }

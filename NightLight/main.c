@@ -59,39 +59,39 @@ void ProcessCmd()
         }
         if ( (strcmp_P( command, PSTR("/preled")) == 0) && ( (arg_count == 2 ) ) )
         {
-            DelayStart(); // nightlight.c
+            NLDelayStart(); // nightlight.c
         }
         if ( (strcmp_P( command, PSTR("/runtimeled")) == 0) && ( (arg_count == 2 ) ) )
         {
-            RunTime(); // nightlight.c
+            NLRunTime(); // nightlight.c
         }
         if ( (strcmp_P( command, PSTR("/delayled")) == 0) && ( (arg_count == 2 ) ) )
         {
-            Delay(); // nightlight.c
+            NLDelay(); // nightlight.c
         }
         if ( (strcmp_P( command, PSTR("/mahrled")) == 0) && ( (arg_count == 2 ) ) )
         {
-            AHrStop(); // nightlight.c
+            NLAHrStop(); // nightlight.c
         }
         if ( (strcmp_P( command, PSTR("/runled")) == 0) && ( (arg_count == 1) || (arg_count == 2) ) )
         {
-            Run(); // nightlight.c
+            NLRun(); // nightlight.c
         }
         if ( (strcmp_P( command, PSTR("/saveled")) == 0) && ( (arg_count == 2 ) ) )
         {
-            Save(); // nightlight.c
+            NLSave(); // nightlight.c
         }
         if ( (strcmp_P( command, PSTR("/loadled")) == 0) && ( (arg_count == 1 ) ) )
         {
-            Load(); // nightlight.c
+            NLLoad(); // nightlight.c
         }
         if ( (strcmp_P( command, PSTR("/led?")) == 0) && ( (arg_count == 1 ) ) )
         {
-            Time(); // nightlight.c
+            NLTime(); // nightlight.c
         }
         if ( (strcmp_P( command, PSTR("/stopled")) == 0) && ( (arg_count == 1 ) ) )
         {
-            Stop(); // nightlight.c
+            NLStop(); // nightlight.c
         }
         if ( (strcmp_P( command, PSTR("/analog?")) == 0) && ( (arg_count >= 1 ) && (arg_count <= 5) ) )
         {

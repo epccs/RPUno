@@ -2,15 +2,15 @@
 #define NightLight_H
 
 // CLI commands
-extern void DelayStart(void);
-extern void RunTime(void);
-extern void Delay(void);
-extern void AHrStop(void);
-extern void Run(void);
-extern void Save(void);
-extern void Load(void);
-extern void Time(void);
-extern void Stop(void);
+extern void NLDelayStart(void);
+extern void NLRunTime(void);
+extern void NLDelay(void);
+extern void NLAHrStop(void);
+extern void NLRun(void);
+extern void NLSave(void);
+extern void NLLoad(void);
+extern void NLTime(void);
+extern void NLStop(void);
 
 // functions for main() or others
 extern void LedControl(void);

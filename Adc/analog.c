@@ -40,9 +40,8 @@ void Analog(unsigned long serial_print_delay_milsec)
         // check that arguments are digit in the range 0..7
         for (adc_arg_index=0; adc_arg_index < arg_count; adc_arg_index++) 
         {
-            if ( ( !( isdigit(arg[adc_arg_index][0]) ) ) || (atoi(arg[adc_arg_index]) < 0) || (atoi(arg[adc_arg_index]) > ADC_CHANNELS) )
+            if ( ! is_arg_in_uint8_range(adc_arg_index,ADC0,ADC_CHANNELS) )
             {
-                printf_P(PSTR("{\"err\":\"AdcChOutOfRng\"}\r\n"));
                 initCommandBuffer();
                 return;
             }
@@ -137,7 +136,6 @@ void Analog(unsigned long serial_print_delay_milsec)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"AdcCmdDoneWTF\"}\r\n"));
         initCommandBuffer();
     }
 }

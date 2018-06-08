@@ -68,7 +68,6 @@ void Count(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"CntCmdDoneWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
@@ -201,7 +200,6 @@ void Capture(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"IcpCmdDoneWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
@@ -298,7 +296,6 @@ void Event(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"IcpCmdDoneWTF\"}\r\n"));
         initCommandBuffer();
     }
 }

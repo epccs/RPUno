@@ -74,46 +74,12 @@ static const Led_Map ledMap[LEDSTRING_COUNT] = {
     [3] = { .dio=CS3_EN }, // LED4 is controled with CS3
 };
 
-uint8_t uint8_from_arg0 (void)
-{
-    // check that arg[0] is a digit 
-    if ( ( !( isdigit(arg[0][0]) ) ) )
-    {
-        printf_P(PSTR("{\"err\":\"%sArg0_NaN\"}\r\n"),command[1]);
-        return 0;
-    }
-    uint8_t arg0 = atoi(arg[0]);
-    if ( ( arg0 < 1) || (arg0 > LEDSTRING_COUNT) )
-    {
-        printf_P(PSTR("{\"err\":\"%sArg0_OutOfRng\"}\r\n"),command[1]);
-        return 0;
-    }
-    return arg0;
-}
-
-unsigned long ul_from_arg1 (unsigned long max)
-{
-    // check that arg[1] is a digit 
-    if ( ( !( isdigit(arg[1][0]) ) ) )
-    {
-        printf_P(PSTR("{\"err\":\"%s1NaN\"}\r\n"),command[1]);
-        return 0;
-    }
-    unsigned long ul = strtoul(arg[1], (char **)NULL, 10);
-    if ( ( ul < 1) || (ul > max) )
-    {
-        printf_P(PSTR("{\"err\":\"%s1OtOfRng\"}\r\n"),command[1]);
-        return 0;
-    }
-    return ul;
-}
-
 // arg[0] is led, arg[1] is delay_start
-void DelayStart(void)
+void NLDelayStart(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t led_arg0 = uint8_from_arg0();
+        uint8_t led_arg0 = uint8_from_arg0(LEDSTRING_COUNT);
         if (! led_arg0)
         {
             initCommandBuffer();
@@ -150,17 +116,16 @@ void DelayStart(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"DlyStCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
 
 // arg[0] is led, arg[1] is runtime
-void RunTime(void)
+void NLRunTime(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t led_arg0 = uint8_from_arg0();
+        uint8_t led_arg0 = uint8_from_arg0(LEDSTRING_COUNT);
         if (! led_arg0)
         {
             initCommandBuffer();
@@ -197,17 +162,16 @@ void RunTime(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"RunTmCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
 
 // arg[0] is led, arg[1] is delay
-void Delay(void)
+void NLDelay(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t led_arg0 = uint8_from_arg0();
+        uint8_t led_arg0 = uint8_from_arg0(LEDSTRING_COUNT);
         if (! led_arg0)
         {
             initCommandBuffer();
@@ -244,17 +208,16 @@ void Delay(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"DelayCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
 
 // arg[0] is led, arg[1] is mahr_stop
-void AHrStop(void)
+void NLAHrStop(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t led_arg0 = uint8_from_arg0();
+        uint8_t led_arg0 = uint8_from_arg0(LEDSTRING_COUNT);
         if (! led_arg0)
         {
             initCommandBuffer();
@@ -291,17 +254,16 @@ void AHrStop(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"AHrStpCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
 
 // arg[0] is led, [arg[1] is cycles]
-void Run(void)
+void NLRun(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t led_arg0 = uint8_from_arg0();
+        uint8_t led_arg0 = uint8_from_arg0(LEDSTRING_COUNT);
         if (! led_arg0)
         {
             initCommandBuffer();
@@ -374,17 +336,16 @@ void Run(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"RunCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
 
 // arg[0] is led, arg[1] is cycles
-void Save(void)
+void NLSave(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t led_arg0 = uint8_from_arg0();
+        uint8_t led_arg0 = uint8_from_arg0(LEDSTRING_COUNT);
         if (! led_arg0)
         {
             initCommandBuffer();
@@ -480,17 +441,16 @@ void Save(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"SavCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
 
 // arg[0] is led
-void Load(void)
+void NLLoad(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t led_arg0 = uint8_from_arg0();
+        uint8_t led_arg0 = uint8_from_arg0(LEDSTRING_COUNT);
         if (! led_arg0)
         {
             initCommandBuffer();
@@ -560,17 +520,16 @@ void Load(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"LdCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
 
 // arg[0] is led
-void Time(void)
+void NLTime(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t led_arg0 = uint8_from_arg0();
+        uint8_t led_arg0 = uint8_from_arg0(LEDSTRING_COUNT);
         if (! led_arg0)
         {
             initCommandBuffer();
@@ -604,7 +563,6 @@ void Time(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"TmCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }
@@ -623,11 +581,11 @@ void StopLED(uint8_t led_num)
 }
 
 // arg[0] is led
-void Stop(void)
+void NLStop(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t led_arg0 = uint8_from_arg0();
+        uint8_t led_arg0 = uint8_from_arg0(LEDSTRING_COUNT);
         if (! led_arg0)
         {
             initCommandBuffer();
@@ -677,7 +635,6 @@ void Stop(void)
     }
     else
     {
-        printf_P(PSTR("{\"err\":\"StpCmdDnWTF\"}\r\n"));
         initCommandBuffer();
     }
 }

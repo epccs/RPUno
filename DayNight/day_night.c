@@ -95,7 +95,7 @@ void Day(unsigned long serial_print_delay_milsec)
 
         if (state == DAYNIGHT_START_STATE) 
         {
-            printf_P(PSTR("\"START\""));
+            printf_P(PSTR("\"STRT\""));
         }
 
         if (state == DAYNIGHT_DAY_STATE) 
@@ -105,27 +105,27 @@ void Day(unsigned long serial_print_delay_milsec)
 
         if (state == DAYNIGHT_EVENING_DEBOUNCE_STATE) 
         {
-            printf_P(PSTR("\"EVENING\""));
+            printf_P(PSTR("\"EVE\""));
         }
 
        if (state == DAYNIGHT_NIGHTWORK_STATE) 
         {
-            printf_P(PSTR("\"NIGHTWORK\""));
+            printf_P(PSTR("\"NEVT\""));
         }
 
         if (state == DAYNIGHT_NIGHT_STATE) 
         {
-            printf_P(PSTR("\"NIGHT\""));
+            printf_P(PSTR("\"NGHT\""));
         }
 
         if (state == DAYNIGHT_MORNING_DEBOUNCE_STATE) 
         {
-            printf_P(PSTR("\"MORNING\""));
+            printf_P(PSTR("\"MORN\""));
         }
 
         if (state == DAYNIGHT_DAYWORK_STATE) 
         {
-            printf_P(PSTR("\"DAYWORK\""));
+            printf_P(PSTR("\"DEVT\""));
         }
 
         if (state == DAYNIGHT_FAIL_STATE) 

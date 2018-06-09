@@ -17,7 +17,7 @@ extern void LedControl(void);
 extern void Reset_All_LED(void);
 extern void StopLED(uint8_t);
 extern uint8_t LoadLedControlFromEEPROM(uint8_t);
-extern uint8_t Live(uint8_t);
+extern uint8_t NLLive(uint8_t);
 extern uint8_t StartLed(uint8_t);
 extern void init_Led(void);
 

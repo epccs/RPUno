@@ -34,12 +34,6 @@ static uint8_t returnCode;
    can use result to potentially get other status off the I2C bus, see twi.c   */
 void I2c_scan(void)
 {
-    if (arg_count != 0)
-    {
-        printf_P(PSTR("{\"err\":\"I2cScanNeeds0Arg\"}\r\n"));
-        initCommandBuffer();
-        return;
-    }
     if (command_done == 10)
     {
         start_address = 0x8; // 0-0x7 is reserved (e.g. general call, CBUS, Hs-mode...)
@@ -87,7 +81,6 @@ void I2c_scan(void)
 
     else
     {
-        printf_P(PSTR("{\"err\":\"I2cCmdDoneWTF\"}\r\n"));
         initCommandBuffer();
     }
 }

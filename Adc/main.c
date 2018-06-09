@@ -32,8 +32,8 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #define ADC_DELAY_MILSEC 200UL
 static unsigned long adc_started_at;
 
-// 22mA current source enabled with CS0_EN which are defined in ../lib/pins_board.h
-#define STATUS_LED CS0_EN
+// pins are in ../lib/pins_board.h
+#define STATUS_LED DIO13
 
 #define BLINK_DELAY 1000UL
 static unsigned long blink_started_at;

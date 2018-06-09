@@ -90,14 +90,14 @@ void KDelayStart(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t k_solenoid = uint8_from_arg0(SOLENOID_COUNT);
+        uint8_t k_solenoid = is_arg_in_uint8_range(0,1,SOLENOID_COUNT);
         if (! k_solenoid)
         {
             initCommandBuffer();
             return;
         }
         // and arg[1] value is 1..SEC_IN_6HR 
-        unsigned long delay_start = ul_from_arg1(SEC_IN_6HR);
+        unsigned long delay_start = is_arg_in_ul_range(1,1,SEC_IN_6HR);
         if (! delay_start)
         {
             initCommandBuffer();
@@ -136,14 +136,14 @@ void KRunTime(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t k_solenoid = uint8_from_arg0(SOLENOID_COUNT);
+        uint8_t k_solenoid = is_arg_in_uint8_range(0,1,SOLENOID_COUNT);
         if (! k_solenoid)
         {
             initCommandBuffer();
             return;
         }
         // and arg[1] value is 1..SEC_IN_6HR 
-        unsigned long runtime = ul_from_arg1(SEC_IN_6HR);
+        unsigned long runtime = is_arg_in_ul_range(1,1,SEC_IN_6HR);
         if (! runtime)
         {
             initCommandBuffer();
@@ -182,14 +182,14 @@ void KDelay(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t k_solenoid = uint8_from_arg0(SOLENOID_COUNT);
+        uint8_t k_solenoid = is_arg_in_uint8_range(0,1,SOLENOID_COUNT);
         if (! k_solenoid)
         {
             initCommandBuffer();
             return;
         }
         // and arg[1] value is 1..SEC_IN_DAY 
-        unsigned long delay = ul_from_arg1(SEC_IN_DAY);
+        unsigned long delay = is_arg_in_ul_range(1,1,SEC_IN_DAY);
         if (! delay)
         {
             initCommandBuffer();
@@ -228,14 +228,14 @@ void KFlowStop(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t k_solenoid = uint8_from_arg0(SOLENOID_COUNT);
+        uint8_t k_solenoid = is_arg_in_uint8_range(0,1,SOLENOID_COUNT);
         if (! k_solenoid)
         {
             initCommandBuffer();
             return;
         }
         // and arg[1] value is 1..FLOW_NOT_SET 
-        unsigned long flow_stop = ul_from_arg1(FLOW_NOT_SET);
+        unsigned long flow_stop = is_arg_in_ul_range(1,1,FLOW_NOT_SET);
         if (! flow_stop)
         {
             initCommandBuffer();
@@ -274,7 +274,7 @@ void KRun(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t k_solenoid = uint8_from_arg0(SOLENOID_COUNT);
+        uint8_t k_solenoid = is_arg_in_uint8_range(0,1,SOLENOID_COUNT);
         if (! k_solenoid)
         {
             initCommandBuffer();
@@ -282,10 +282,11 @@ void KRun(void)
         }
         
         uint8_t cycles = k[k_solenoid-1].cycles;
-        if (arg[1]!=NULL)
+        uint8_t arg1 = is_arg_in_uint8_range(1,1,0xFF);
+        if (arg1)
         {
             // and arg[1] value is 1..0xFF 
-            cycles = (uint8_t) (ul_from_arg1(0xFF));
+            cycles =arg1;
             if (! cycles)
             {
                 initCommandBuffer();
@@ -357,14 +358,14 @@ void KSave(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t k_solenoid = uint8_from_arg0(SOLENOID_COUNT);
+        uint8_t k_solenoid = is_arg_in_uint8_range(0,1,SOLENOID_COUNT);
         if (! k_solenoid)
         {
             initCommandBuffer();
             return;
         }
         // and arg[1] value is 1..0xFF 
-        unsigned long cycles = ul_from_arg1(0xFF);
+        uint8_t cycles = is_arg_in_uint8_range(1,1,0xFF);
         if (! cycles)
         {
             initCommandBuffer();
@@ -380,7 +381,7 @@ void KSave(void)
         if ( eeprom_is_ready() )
         {
             k[k_solenoid-1].cycle_state = 0;
-            k[k_solenoid-1].cycles = (uint8_t)cycles;
+            k[k_solenoid-1].cycles = cycles;
             k[k_solenoid-1].flow_cnt_bank = 0;
             k[k_solenoid-1].cycle_millis_bank = 0;
             uint16_t value = ((uint16_t) (k_solenoid)) + 0x4B30; //ascii bytes for 'K1', 'K2'...
@@ -463,7 +464,7 @@ void KLoad(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t k_solenoid = uint8_from_arg0(SOLENOID_COUNT);
+        uint8_t k_solenoid = is_arg_in_uint8_range(0,1,SOLENOID_COUNT);
         if (! k_solenoid)
         {
             initCommandBuffer();
@@ -543,7 +544,7 @@ void KTime(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t k_solenoid = uint8_from_arg0(SOLENOID_COUNT);
+        uint8_t k_solenoid = is_arg_in_uint8_range(0,1,SOLENOID_COUNT);
         if (! k_solenoid)
         {
             initCommandBuffer();
@@ -587,7 +588,7 @@ void KFlow(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t k_solenoid = uint8_from_arg0(SOLENOID_COUNT);
+        uint8_t k_solenoid = is_arg_in_uint8_range(0,1,SOLENOID_COUNT);
         if (! k_solenoid)
         {
             initCommandBuffer();
@@ -643,7 +644,7 @@ void KStop(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t k_solenoid = uint8_from_arg0(SOLENOID_COUNT);
+        uint8_t k_solenoid = is_arg_in_uint8_range(0,1,SOLENOID_COUNT);
         if (! k_solenoid)
         {
             initCommandBuffer();

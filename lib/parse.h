@@ -16,9 +16,7 @@ extern void AssembleCommand(char);
 extern uint8_t findArgument(uint8_t);
 extern uint8_t findCommand(void);
 extern unsigned long is_arg_in_ul_range (uint8_t, unsigned long, unsigned long);
-extern unsigned long ul_from_arg1 (unsigned long);
 extern uint8_t is_arg_in_uint8_range (uint8_t, uint8_t, uint8_t);
-extern uint8_t uint8_from_arg0 (uint8_t);
 
 extern uint8_t command_done;
 extern uint8_t echo_on;

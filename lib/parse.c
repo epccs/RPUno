@@ -274,13 +274,6 @@ unsigned long is_arg_in_ul_range (uint8_t arg_num, unsigned long min, unsigned l
     return ul;
 }
 
-unsigned long ul_from_arg1 (unsigned long max)
-{
-    // make sure arg[0] is a digit in range 1 to max
-     unsigned long arg1 = is_arg_in_ul_range(0,1,max);
-     return arg1;
-}
-
 uint8_t is_arg_in_uint8_range (uint8_t arg_num, uint8_t min, uint8_t max)
 {
     // check that arg[arg_num] is a digit 
@@ -289,19 +282,12 @@ uint8_t is_arg_in_uint8_range (uint8_t arg_num, uint8_t min, uint8_t max)
         printf_P(PSTR("{\"err\":\"%sArg%d_NaN\"}\r\n"),command[1],arg_num);
         return 0;
     }
-    uint8_t arg0 = atoi(arg[arg_num]);
-    if ( ( arg0 < min) || (arg0 > max) )
+    uint8_t argument = atoi(arg[arg_num]);
+    if ( ( argument < min) || (argument > max) )
     {
         printf_P(PSTR("{\"err\":\"%sArg%d_OutOfRng\"}\r\n"),command[1],arg_num);
         return 0;
     }
-    return arg0;
-}
-
-uint8_t uint8_from_arg0 (uint8_t max)
-{
-    // make sure arg[0] is a digit in range 1 to max
-     uint8_t arg0 = is_arg_in_uint8_range(0,1,max);
-     return arg0;
+    return argument;
 }
 

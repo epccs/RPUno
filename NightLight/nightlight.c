@@ -79,14 +79,14 @@ void NLDelayStart(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t led_arg0 = uint8_from_arg0(LEDSTRING_COUNT);
+        uint8_t led_arg0 = is_arg_in_uint8_range(0,1,LEDSTRING_COUNT);
         if (! led_arg0)
         {
             initCommandBuffer();
             return;
         }
         // and arg[1] value is 1..SEC_IN_6HR 
-        unsigned long delay_start = ul_from_arg1(SEC_IN_6HR);
+        unsigned long delay_start = is_arg_in_ul_range(1,1,SEC_IN_6HR);
         if (! delay_start)
         {
             initCommandBuffer();
@@ -125,14 +125,14 @@ void NLRunTime(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t led_arg0 = uint8_from_arg0(LEDSTRING_COUNT);
+        uint8_t led_arg0 = is_arg_in_uint8_range(0,1,LEDSTRING_COUNT);
         if (! led_arg0)
         {
             initCommandBuffer();
             return;
         }
         // and arg[1] value is 1..SEC_IN_6HR 
-        unsigned long runtime = ul_from_arg1(SEC_IN_6HR);
+        unsigned long runtime = is_arg_in_ul_range(1,1,SEC_IN_6HR);
         if (! runtime)
         {
             initCommandBuffer();
@@ -171,14 +171,14 @@ void NLDelay(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t led_arg0 = uint8_from_arg0(LEDSTRING_COUNT);
+        uint8_t led_arg0 = is_arg_in_uint8_range(0,1,LEDSTRING_COUNT);
         if (! led_arg0)
         {
             initCommandBuffer();
             return;
         }
         // and arg[1] value is 1..SEC_IN_DAY 
-        unsigned long delay = ul_from_arg1(SEC_IN_DAY);
+        unsigned long delay = is_arg_in_ul_range(1,1,SEC_IN_DAY);
         if (! delay)
         {
             initCommandBuffer();
@@ -217,14 +217,14 @@ void NLAHrStop(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t led_arg0 = uint8_from_arg0(LEDSTRING_COUNT);
+        uint8_t led_arg0 = is_arg_in_uint8_range(0,1,LEDSTRING_COUNT);
         if (! led_arg0)
         {
             initCommandBuffer();
             return;
         }
         // and arg[1] value is 1..MAHR_NOT_SET 
-        unsigned long mahr_stop = ul_from_arg1(MAHR_NOT_SET);
+        unsigned long mahr_stop = is_arg_in_ul_range(1,1,MAHR_NOT_SET);
         if (! mahr_stop)
         {
             initCommandBuffer();
@@ -263,7 +263,7 @@ void NLRun(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t led_arg0 = uint8_from_arg0(LEDSTRING_COUNT);
+        uint8_t led_arg0 = is_arg_in_uint8_range(0,1,LEDSTRING_COUNT);
         if (! led_arg0)
         {
             initCommandBuffer();
@@ -274,7 +274,7 @@ void NLRun(void)
         if (arg[1]!=NULL)
         {
             // valid arg[1] value is 1..0xFFFF
-            cycles = (uint16_t) (ul_from_arg1(0xFFFF));
+            cycles = (uint16_t) (is_arg_in_ul_range(1,1,0xFFFF));
             if (! cycles)
             {
                 initCommandBuffer();
@@ -345,14 +345,14 @@ void NLSave(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t led_arg0 = uint8_from_arg0(LEDSTRING_COUNT);
+        uint8_t led_arg0 = is_arg_in_uint8_range(0,1,LEDSTRING_COUNT);
         if (! led_arg0)
         {
             initCommandBuffer();
             return;
         }
         // valid arg[1] value is 1..0xFFFF 
-        uint16_t cycles = ul_from_arg1(0xFFFF);
+        uint16_t cycles = is_arg_in_ul_range(1,1,0xFFFF);
         if (! cycles)
         {
             initCommandBuffer();
@@ -450,7 +450,7 @@ void NLLoad(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t led_arg0 = uint8_from_arg0(LEDSTRING_COUNT);
+        uint8_t led_arg0 = is_arg_in_uint8_range(0,1,LEDSTRING_COUNT);
         if (! led_arg0)
         {
             initCommandBuffer();
@@ -529,7 +529,7 @@ void NLTime(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t led_arg0 = uint8_from_arg0(LEDSTRING_COUNT);
+        uint8_t led_arg0 = is_arg_in_uint8_range(0,1,LEDSTRING_COUNT);
         if (! led_arg0)
         {
             initCommandBuffer();
@@ -585,7 +585,7 @@ void NLStop(void)
 {
     if ( (command_done == 10) )
     {
-        uint8_t led_arg0 = uint8_from_arg0(LEDSTRING_COUNT);
+        uint8_t led_arg0 = is_arg_in_uint8_range(0,1,LEDSTRING_COUNT);
         if (! led_arg0)
         {
             initCommandBuffer();
@@ -780,7 +780,7 @@ uint8_t LoadLedControlFromEEPROM(uint8_t led_string)
 }
 
 // return the cycle_state (e.g. tells if it is running)
-uint8_t Live(uint8_t led_string) 
+uint8_t NLLive(uint8_t led_string) 
 {
     uint16_t i = led_string-1;
     if (i<LEDSTRING_COUNT)

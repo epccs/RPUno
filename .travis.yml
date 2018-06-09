@@ -22,6 +22,7 @@ env:
     - APP_PATH="Eeprom"
     # Hardware is not built like this
     - APP_PATH="i2c-debug"
+    - APP_PATH="KNL"
     # lib has the core files
     - APP_PATH="NightLight"
     - APP_PATH="Parsing"

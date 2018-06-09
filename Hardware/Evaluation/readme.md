@@ -7,6 +7,7 @@ This shows the setup and method used for evaluation of RPUno.
 
 # Table Of Contents:
 
+1. [^9 KNL setup](#9-knl-setup)
 1. [^9 Solenoid setup](#9-solenoid-setup)
 1. [^9 NightLight setup](#9-nightlight-setup)
 1. [^5 Flow Meter](#5-flow-meter)
@@ -24,6 +25,11 @@ This shows the setup and method used for evaluation of RPUno.
 1. [^2 20mA Loop With Open Collector To ICP1](#2-20ma-loop-with-open-collector-to-icp1)
 1. [^1 Mounting](#1-mounting)
 
+## ^9 KNL setup
+
+Twisted the firmware's avr (it is not an ARM, soon I hope) to get most things to fit in memory, but I did have to nix the Capture CLI commands. I think this is going to control some valves in the garden.
+
+Link to the working code TBD
 
 ## ^9 Solenoid setup
 

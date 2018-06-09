@@ -1,5 +1,5 @@
 /*
-NightLight is a command line controled demonstration of LED control
+Solenoid is a command line controled demonstration of ATmega328p ... solenoid control
 Copyright (C) 2016 Ronald Sutherland
 
 This program is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/adc.h"
 #include "../lib/twi.h"
 #include "../lib/rpu_mgr.h"
+#include "../lib/icp1.h"
 #include "../lib/pin_num.h"
 #include "../lib/pins_board.h"
 #include "../Uart/id.h"
@@ -32,7 +33,9 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../DayNight/day_night.h"
 #include "../AmpHr/chrg_accum.h"
 #include "../Alternat/alternat.h"
-#include "nightlight.h"
+#include "../Capture/capture.h"
+#include "../Solenoid/solenoid.h"
+#include "../NightLight/nightlight.h"
 
 #define ADC_DELAY_MILSEC 100UL
 static unsigned long adc_started_at;
@@ -47,51 +50,92 @@ static unsigned long day_status_blink_started_at;
 static unsigned long blink_started_at;
 static unsigned long blink_delay;
 static char rpu_addr;
+static uint8_t solenoids_initalized;
 static uint8_t leds_initalized;
 
 void ProcessCmd()
 { 
-    if (leds_initalized) 
+    if (solenoids_initalized) 
     {
         if ( (strcmp_P( command, PSTR("/id?")) == 0) && ( (arg_count == 0) || (arg_count == 1)) )
         {
-            Id("NightLight"); // ../Uart/id.c
+            Id("KNL"); // ../Uart/id.c
+        }
+        if ( (strcmp_P( command, PSTR("/kpre")) == 0) && ( (arg_count == 2 ) ) )
+        {
+            KDelayStart(); // ../Solenoid/solenoid.c
+        }
+        if ( (strcmp_P( command, PSTR("/krunt")) == 0) && ( (arg_count == 2 ) ) )
+        {
+            KRunTime(); // ../Solenoid/solenoid.c
+        }
+        if ( (strcmp_P( command, PSTR("/kdelay")) == 0) && ( (arg_count == 2 ) ) )
+        {
+            KDelay(); // ../Solenoid/solenoid.c
+        }
+        if ( (strcmp_P( command, PSTR("/kfstop")) == 0) && ( (arg_count == 2 ) ) )
+        {
+            KFlowStop(); // ../Solenoid/solenoid.c
+        }
+        if ( (strcmp_P( command, PSTR("/krun")) == 0) && ( (arg_count == 1) || (arg_count == 2) ) )
+        {
+            KRun(); // ../Solenoid/solenoid.c
+        }
+        if ( (strcmp_P( command, PSTR("/ksave")) == 0) && ( (arg_count == 2 ) ) )
+        {
+            KSave(); // ../Solenoid/solenoid.c
+        }
+        if ( (strcmp_P( command, PSTR("/kload")) == 0) && ( (arg_count == 1 ) ) )
+        {
+            KLoad(); // ../Solenoid/solenoid.c
+        }
+        if ( (strcmp_P( command, PSTR("/ktime?")) == 0) && ( (arg_count == 1 ) ) )
+        {
+            KTime(); // ../Solenoid/solenoid.c
+        }
+        if ( (strcmp_P( command, PSTR("/kflow?")) == 0) && ( (arg_count == 1 ) ) )
+        {
+            KFlow(); // ../Solenoid/solenoid.c
+        }
+        if ( (strcmp_P( command, PSTR("/kstop")) == 0) && ( (arg_count == 1 ) ) )
+        {
+            KStop(); // ../Solenoid/solenoid.c
         }
         if ( (strcmp_P( command, PSTR("/preled")) == 0) && ( (arg_count == 2 ) ) )
         {
-            NLDelayStart(); // nightlight.c
+            NLDelayStart(); // ../NightLight/nightlight.c
         }
         if ( (strcmp_P( command, PSTR("/runtimeled")) == 0) && ( (arg_count == 2 ) ) )
         {
-            NLRunTime(); // nightlight.c
+            NLRunTime(); // ../NightLight/nightlight.c
         }
         if ( (strcmp_P( command, PSTR("/delayled")) == 0) && ( (arg_count == 2 ) ) )
         {
-            NLDelay(); // nightlight.c
+            NLDelay(); // ../NightLight/nightlight.c
         }
         if ( (strcmp_P( command, PSTR("/mahrled")) == 0) && ( (arg_count == 2 ) ) )
         {
-            NLAHrStop(); // nightlight.c
+            NLAHrStop(); // ../NightLight/nightlight.c
         }
         if ( (strcmp_P( command, PSTR("/runled")) == 0) && ( (arg_count == 1) || (arg_count == 2) ) )
         {
-            NLRun(); // nightlight.c
+            NLRun(); // ../NightLight/nightlight.c
         }
         if ( (strcmp_P( command, PSTR("/saveled")) == 0) && ( (arg_count == 2 ) ) )
         {
-            NLSave(); // nightlight.c
+            NLSave(); // ../NightLight/nightlight.c
         }
         if ( (strcmp_P( command, PSTR("/loadled")) == 0) && ( (arg_count == 1 ) ) )
         {
-            NLLoad(); // nightlight.c
+            NLLoad(); // ../NightLight/nightlight.c
         }
         if ( (strcmp_P( command, PSTR("/led?")) == 0) && ( (arg_count == 1 ) ) )
         {
-            NLTime(); // nightlight.c
+            NLTime(); // ../NightLight/nightlight.c
         }
         if ( (strcmp_P( command, PSTR("/stopled")) == 0) && ( (arg_count == 1 ) ) )
         {
-            NLStop(); // nightlight.c
+            NLStop(); // ../NightLight/nightlight.c
         }
         if ( (strcmp_P( command, PSTR("/analog?")) == 0) && ( (arg_count >= 1 ) && (arg_count <= 5) ) )
         {
@@ -137,23 +181,47 @@ void ProcessCmd()
         {
             AltCount(); // ../Alternat/alternat.c
         }
+        /*
+        if ( (strcmp_P( command, PSTR("/count?")) == 0) &&  ( (arg_count == 0) || ( (arg_count == 1) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
+        {
+            Count(); // ../Capture/capture.c
+        }
+        if ( (strcmp_P( command, PSTR("/capture?")) == 0) && ( (arg_count == 0 ) || ( (arg_count == 2) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
+        {
+            Capture(); // ../Capture/capture.c
+        }
+        if ( (strcmp_P( command, PSTR("/event?")) == 0) && ( (arg_count == 0 ) || ( (arg_count == 2) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
+        {
+            Event(); // ../Capture/capture.c
+        }
+        if ( (strcmp_P( command, PSTR("/initICP")) == 0) && ( ( (arg_count == 3) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
+        {
+            InitICP(); // ../Capture/capture.c
+        }
+        */
     }
     else
     {
-        if (! leds_initalized)
+        if (! solenoids_initalized)
         {
-            printf_P(PSTR("{\"err\":\"NotFinishLEDinit\"}\r\n"));
+            printf_P(PSTR("{\"err\":\"NotFinishKinit\"}\r\n"));
         }
         initCommandBuffer();
         return;
     }
 }
 
-//At start of each night.
+//At start of each night 
 void callback_for_night_attach(void)
 {
     //turn off alternat power input
-    alt_enable = 0; 
+    alt_enable = 0;
+    
+    // turn off the Solenoid's
+    for (uint8_t solenoid = 1; solenoid <= SOLENOID_COUNT; solenoid++)
+    {
+        StopK(solenoid);
+    }
     
     // If the battery got charged.
     if (alt_count > 5) 
@@ -173,17 +241,26 @@ void callback_for_day_attach(void)
 {
     alt_enable = 1; //turn on alternat power input
     alt_count = 0; // this value is used to tell if the battery got a full charge
-    
+
     // setup AmpHr accumulators and load Adc calibration reference
     if (!init_ChargAccumulation(PWR_I)) // ../AmpHr/chrg_accum.c
     {
         blink_delay = BLINK_DELAY/4;
     }
-    
+
     // turn off the LED's
     for (uint8_t led = 1; led <= LEDSTRING_COUNT; led++)
     {
         StopLED(led);
+    }
+
+    // water the garden
+    for(uint8_t solenoid = 1; solenoid <= SOLENOID_COUNT; solenoid++)
+    {
+        // load the solenoid control settings from EEPROM
+        LoadKControlFromEEPROM(solenoid);
+        // operate them
+        StartK(solenoid);
     }
 }
 
@@ -198,6 +275,9 @@ void setup(void)
     pinMode(ALT_EN,OUTPUT);
     digitalWrite(ALT_EN,LOW);
 
+    pinMode(CS_ICP1_EN,OUTPUT);
+    digitalWrite(CS_ICP1_EN,HIGH);
+
     // Initialize Timers, ADC, and clear bootloader, Arduino does these with init() in wiring.c
     initTimers(); //Timer0 Fast PWM mode, Timer1 & Timer2 Phase Correct PWM mode.
     init_ADC_single_conversion(EXTERNAL_AVCC); // warning AREF must not be connected to anything
@@ -206,6 +286,9 @@ void setup(void)
     // put ADC in Auto Trigger mode and fetch an array of channels
     enable_ADC_auto_conversion(BURST_MODE);
     adc_started_at = millis();
+
+    /* Initialize Input Capture Unit (see ../lib/icp1.h) */
+    initIcp1(TRACK_RISING, ICP1_MCUDIV64) ;
 
     /* Initialize UART, it returns a pointer to FILE so redirect of stdin and stdout works*/
     stdout = stdin = uartstream0_init(BAUD);
@@ -232,9 +315,13 @@ void setup(void)
         blink_delay = BLINK_DELAY/4;
     }
 
+    // setup solenoid control
+    init_K();
+    Reset_All_K();
+    solenoids_initalized = 0;
+
     // setup Led string control
     init_Led();
-
     Reset_All_LED();
     leds_initalized = 0;
 
@@ -389,6 +476,27 @@ int main(void)
                 {
                     initCommandBuffer();
                 }
+            }
+        }
+        
+        // Solenoid Control is a function that moves them through different states that are timed with millis() or icp1 flow count.
+        KControl();
+        
+        if (!solenoids_initalized)
+        {
+            // lets test if they are in use.
+            uint8_t solenoids_in_use = 0;
+            for(uint8_t solenoid = 1; solenoid <= SOLENOID_COUNT; solenoid++)
+            {
+                if (KLive(solenoid))
+                {
+                    solenoids_in_use =1;
+                    break;
+                }
+            }
+            if (! solenoids_in_use) 
+            {
+                solenoids_initalized = 1;
             }
         }
         

@@ -336,8 +336,8 @@ void setup(void)
     }
 
     // default debounce is 15 min (e.g. 900,000 millis)
-    evening_debouce = 18000UL; // 18 sec
-    morning_debouce = 18000UL;
+    // evening_debouce = 18000UL; // 18 sec
+    // morning_debouce = 18000UL;
 
     alt_count = 0;
 }

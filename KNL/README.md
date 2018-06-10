@@ -2,7 +2,7 @@
 
 __Warning__ This program may be to big, and not fit, check for [Irrigate7] updates or shake the tree with a GitHub issue to.
 
-[Irrigate7]: 
+[Irrigate7]: https://github.com/epccs/Irrigate7
 
 ## known bugs
 
@@ -87,7 +87,10 @@ The [day-night] state machine is used to load and run [NightLight] LED EEPROM va
 
 # Flow Sensor
 
-ICP1 is available through the [Capture][../Capture] commands. The differance in capture counts (between valve start and stop time) is held as the flow data for each zone and its value is can be reported with the /flow? command.
+ICP1 is available to the solenoid control but the [Capture] commands do not fit in memory. The differance in capture counts (between valve start and stop time) is held as the flow data for each zone and its value is can be reported with the [Solenoid] /flow? command.
+
+[Capture]: ../Capture
+[Solenoid]: ../Solenoid
 
 
 # Firmware Upload
@@ -109,7 +112,7 @@ Data:       1127 bytes (55.0% Full)
 avrdude done.  Thank you.
 ``` 
 
-__Warning__ verify that the size is less than 98% the bootloader takes about 2%.
+__Warning__ verify that your compile size is less than 98%. The bootloader takes about 2%.
 
 Now connect with picocom (or ilk).
 

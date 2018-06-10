@@ -27,9 +27,22 @@ This shows the setup and method used for evaluation of RPUno.
 
 ## ^9 KNL setup
 
-Twisted the firmware's avr (it is not an ARM, soon I hope) to get most things to fit in memory, but I did have to nix the Capture CLI commands. I think this is going to control some valves in the garden.
+Twisted the firmware's AVR (it is not an ARM, which I hope to try soon) to get most things to fit in memory, but I did have to nix the Capture CLI commands. I think this is ready to run some valves in the garden.
 
-Link to the working code TBD
+[KNL](https://github.com/epccs/RPUno/tree/master/KNL)
+
+So I replaced the RPUno^5 that was beeing using to irrigate a few zones (SxSWEncl)
+
+![RPUno^9+K3^2+RPUadpt^5](./RPUno^9+K3^2+RPUadpt^5_wValvesLedStringsPvBat.jpg "RPUno^9+K3^2+RPUadpt^5 ")
+
+The RPUno^5 did good and so did the K3 it operated, I got to see a lot of data from it ([K3^2+RPUno^5_log]).
+
+[K3^2+RPUno^5_log]: https://github.com/epccs/Driver/blob/master/K3/Evaluation/K3%5E2%2BRPUno%5E5_log.txt
+
+One thing is clear the Orbit valves do not get stuck when operated like this. I was having a problem where they would get stuck open, most likely that was caused by the hard water mineral build. Perhaps the frequent operation dislodges the buildup before it reaches a critical level. Unfortunately, the valve is no longer on the mainstream market. It received a lot of complaints about sticking (which were true from my experience). Having said that I still like the valve design, it is incredibly fast acting and is clearly durable when used with a frequency beyond what the controller it was sold with did. There are other valve options I will explore when I can.
+
+Every day each of the three valves operated ten times for over a year. When I looked at the data I would cut and past it into the log. That was when I found a number of issues, some were the battery, some were damaged/broken/separated drip lines and the pressure regulators. Basically, the flow count tells me that I need to look for an issue.  Zone 3 is going wild, but the emitters seem to be working and nothing I have looked at has failed, so I think the pressure regulator on it is having problems.
+
 
 ## ^9 Solenoid setup
 

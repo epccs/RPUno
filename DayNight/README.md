@@ -316,3 +316,4 @@ Some readings on ADC2 with the red LED and a 100k Ohm burden
 {"PWR_I":"0.032","PWR_V":"13.55","ADC2":"0.64"}
 ```
 
+Over a very short time, the sun moved through the LED focus. Adding a diffuser reduced this effect and extended the day/night debounce to a more appropriate time.

@@ -218,10 +218,10 @@ void callback_for_night_attach(void)
     alt_enable = 0;
     
     // turn off the Solenoid's
-    for (uint8_t solenoid = 1; solenoid <= SOLENOID_COUNT; solenoid++)
-    {
-        StopK(solenoid);
-    }
+    //for (uint8_t solenoid = 1; solenoid <= SOLENOID_COUNT; solenoid++)
+    //{
+    //    StopK(solenoid);
+    //}
     
     // If the battery got charged.
     if (alt_count > 5) 

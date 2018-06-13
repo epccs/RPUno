@@ -31,7 +31,7 @@ Twisted the firmware's AVR (it is not an ARM, which I hope to try soon) to get m
 
 [KNL](https://github.com/epccs/RPUno/tree/master/KNL)
 
-So I replaced the RPUno^5 that was beeing using to irrigate a few zones (SxSWEncl)
+So I replaced the RPUno^5 that was being used to irrigate a few zones (SxSWEncl).
 
 ![RPUno^9+K3^2+RPUadpt^5](./RPUno^9+K3^2+RPUadpt^5_wValvesLedStringsPvBat.jpg "RPUno^9+K3^2+RPUadpt^5 ")
 

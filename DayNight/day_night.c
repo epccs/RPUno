@@ -26,11 +26,11 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/pins_board.h"
 #include "day_night.h"
 
-// analog reading of 20*5.0/1024.0 is about 0.1V
-// analog reading of 30*5.0/1024.0 is about 0.15V
-#define MORNING_THRESHOLD 30
+// analog reading of 5*5.0/1024.0 is about 0.024V
+// analog reading of 10*5.0/1024.0 is about 0.049V
+#define MORNING_THRESHOLD 10
 #define STARTUP_DELAY 1000UL
-#define EVENING_THRESHOLD 20
+#define EVENING_THRESHOLD 5
 // 900,000 millis is 15 min
 #define EVENING_DEBOUCE 900000UL
 #define MORNING_DEBOUCE 900000UL
@@ -46,8 +46,8 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #   error ADC maxim size is 0x3FF 
 #endif
 
-#if MORNING_THRESHOLD - EVENING_THRESHOLD < 0x09
-#   error ADC hysteresis of 9 should be allowed
+#if MORNING_THRESHOLD - EVENING_THRESHOLD < 0x04
+#   error ADC hysteresis of 4 should be allowed
 #endif
 
 int morning_threshold = MORNING_THRESHOLD;

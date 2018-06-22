@@ -31,6 +31,7 @@ CPPFLAGS = -DF_CPU=$(F_CPU) -DBAUD=$(BAUD) -I.
 ## Cross-compilation
 CC = avr-gcc
 OBJCOPY = avr-objcopy
+OBJDUMP = avr-objdump
 SIZE = avr-size
 
 # FTDI's USB to serial bridge shows as /dev/ttyUSB0, 
@@ -60,13 +61,12 @@ LDFLAGS += -Wl,--gc-sections
 ## warning this takes about 2k of program space
 LDFLAGS += -Wl,-u,vfprintf -lprintf_flt -lm
 
-all: $(TARGET).hex
+all: $(TARGET).hex $(TARGET).lst
 
 $(TARGET): $(TARGET).hex
 
 $(TARGET).hex: $(TARGET).elf
 	$(OBJCOPY) -j .text -j .data -O ihex $< $@
-	rm -f $(TARGET).elf
 
 ## works with optiboot which erases flash without being told (e.g. -e )
 bootload: $(TARGET).hex
@@ -78,5 +78,7 @@ $(TARGET).elf: $(OBJECTS)
 	rm -f $(TARGET).o $(OBJECTS)
 
 clean: 
-	rm -f $(TARGET).hex $(TARGET).map
+	rm -f $(TARGET).hex $(TARGET).map $(TARGET).elf $(TARGET).lst
  
+%.lst: %.elf
+	$(OBJDUMP) -h -S $< > $@ 

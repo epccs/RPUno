@@ -88,7 +88,7 @@ void setup(void)
     twi_init(TWI_PULLUP);
 
     /* Initialize SPI*/
-    spi_init(DIO16);
+    spi_init();
 
     /* Clear and setup the command buffer, (probably not needed at this point) */
     initCommandBuffer();

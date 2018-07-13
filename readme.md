@@ -11,7 +11,7 @@ The bare metal microcontroller on this board is the same as an Arduino Uno. I us
 [RPUadpt]: https://github.com/epccs/RPUadpt
 [RPUpi]: https://github.com/epccs/RPUpi
 
-[Forum](http://rpubus.org/bb/viewforum.php?f=6)
+[Forum](https://rpubus.org/bb/viewforum.php?f=6)
 
 [HackaDay](https://hackaday.io/project/12784-rpuno)
 
@@ -98,11 +98,11 @@ sudo apt-get install git gcc-avr binutils-avr gdb-avr avr-libc avrdude
 git clone https://github.com/epccs/RPUno
 ```
 
-* [gcc-avr](http://packages.ubuntu.com/search?keywords=gcc-avr)
-* [binutils-avr](http://packages.ubuntu.com/search?keywords=binutils-avr)
-* [gdb-avr](http://packages.ubuntu.com/search?keywords=gdb-avr)
-* [avr-libc](http://packages.ubuntu.com/search?keywords=avr-libc)
-* [avrdude](http://packages.ubuntu.com/search?keywords=avrdude)
+* [gcc-avr](https://packages.ubuntu.com/search?keywords=gcc-avr)
+* [binutils-avr](https://packages.ubuntu.com/search?keywords=binutils-avr)
+* [gdb-avr](https://packages.ubuntu.com/search?keywords=gdb-avr)
+* [avr-libc](https://packages.ubuntu.com/search?keywords=avr-libc)
+* [avrdude](https://packages.ubuntu.com/search?keywords=avrdude)
 
 I like to place a [Bootloader] on the bare metal microcontroler with an ISP tool. 
 

@@ -95,6 +95,10 @@ sleep(0.2)
 command = "/"+rpu_addr+"/id?"
 sio.write((command + "\n").encode('ascii'))
 
+# note: if the command will not encode with ascii then use bytes e.g.
+# command = b"/"+bytes([192])+b"/id?"
+# at this time the rpubus address above 128 are for host disconnect events.
+
 # the command is sent back
 reflow_echo = sio.readline().strip()
 print("cmd echo: ".encode('ascii') + reflow_echo)

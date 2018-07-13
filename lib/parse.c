@@ -35,7 +35,11 @@ uint8_t arg_count;
 // command loopback happons from the addressed device
 uint8_t echo_on;
 
-
+// Hold the command in the buffer and spin loop until the chunks of JSON 
+// are done outputting. Each chunk should be less than 32 bytes since that 
+// is the AVR UART buffer size. The main spin loop continues running until 
+// the uart is available for write (e.g. buffer is empty) and then the buffer is 
+// loaded with the next JSON chunk (a over full buffer will block execution)
 void initCommandBuffer(void) 
 {
     command_buf[1] = '\0';  // best to set the address as a null value

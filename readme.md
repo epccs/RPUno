@@ -94,7 +94,7 @@ At present, I'm using [I2Cdebug] to set the manager bootload address.
 The core files for this board are in the /lib folder. Each example has its files and a Makefile in its own folder. The toolchain packages that I use are available on Ubuntu and Raspbian. 
 
 ```
-sudo apt-get install git gcc-avr binutils-avr gdb-avr avr-libc avrdude
+sudo apt-get install make git gcc-avr binutils-avr gdb-avr avr-libc avrdude
 git clone https://github.com/epccs/RPUno
 ```
 

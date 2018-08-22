@@ -55,9 +55,9 @@ Apply a current limited (20mA) supply set with 7V to the PWR and 0V connector J7
 NOTE for referance the zener voltage on Q6 is 7.75V at 30V.
 
 ```
-{ "LEDON_V":[10.7,10.7,10.8,10.7,10.7,],
-  "PWR@7V_mA":[0.3,0.07,0.08,0.07,0.07,],
-  "PWR@30V_mA":[2.6,1.4,1.3,1.3,1.3,]}
+{ "LEDON_V":[10.7,10.7,10.8,10.7,10.7,10.7,10.7,10.7,],
+  "PWR@7V_mA":[0.3,0.07,0.08,0.07,0.07,0.07,0.07,0.07,],
+  "PWR@30V_mA":[2.6,1.4,1.3,1.3,1.3,1.3,1.3,1.3,]}
 ```
 
 
@@ -66,7 +66,7 @@ NOTE for referance the zener voltage on Q6 is 7.75V at 30V.
 Apply a 30mA current limited 5V source to +5V (J7). Check that the input current is for a blank MCU (e.g. less than 7mA). Turn off the power.
 
 ```
-{ "I_IN_BLANKMCU_mA":[4.7,2.2,3.1,3.5,3.3,]}
+{ "I_IN_BLANKMCU_mA":[4.7,2.2,3.1,3.5,3.3,2.3,2.5,2.1,]}
 ```
 
 Note: Internal clock/8 (=1MHz) and IO pins are floating (a test fixture is needed).
@@ -103,7 +103,7 @@ make isp
 Disconnect the ICSP tool and measure the input current, wait for the power to be settled. Turn off the power.
 
 ```
-{ "I_IN_16MHZ_EXT_CRYST_mA":[12.7,11.2,11.1,11.0,11.0]}
+{ "I_IN_16MHZ_EXT_CRYST_mA":[12.7,11.2,11.1,11.0,11.0,10.8,10.6,10.7,]}
 ```
 
 Add U2 to the board now. Measurement of the input current is for referance (takes a long time to settle, 10mA ICP1 jumper is off).
@@ -114,7 +114,7 @@ Add U2 to the board now. Measurement of the input current is for referance (take
 Install U2 and measure its output voltage and input current with the supply set at 12.8V and a 30mA current limit.
 
 ```
-{ "+5V_V":[4.94,5.00,5.00,5.01,]}
+{ "+5V_V":[4.94,5.00,5.00,5.01,4.9760,4.9900,49595]}
 ```
 
 

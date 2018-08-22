@@ -73,7 +73,7 @@ Turn on (or off) 17mA current source for ICP1
 
 ##  /0/showstat ON|OFF
 
-A current source can be used to show status, but it is not ON by default.  
+A current source can be used to show status, but it is not ON by default.
 
 ``` 
 /1/showstat ON

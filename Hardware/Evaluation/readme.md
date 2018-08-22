@@ -33,7 +33,7 @@ Twisted the firmware's AVR (it is not an ARM, which I hope to try soon) to get m
 
 So I replaced the RPUno^5 that was being used to irrigate a few zones (SxSWEncl).
 
-![RPUno^9+K3^2+RPUadpt^5](./RPUno^9+K3^2+RPUadpt^5_wValvesLedStringsPvBat.jpg "RPUno^9+K3^2+RPUadpt^5 ")
+![RPUno^9+K3^2+RPUadpt^5](./RPUno^9+K3^2+RPUadpt^5_wValvesLedStringsPvBat.jpg "RPUno^9+K3^2+RPUadpt^5")
 
 The RPUno^5 did good and so did the K3 it operated, I got to see a lot of data from it ([K3^2+RPUno^5_log]).
 

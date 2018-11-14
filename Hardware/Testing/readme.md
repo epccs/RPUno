@@ -88,7 +88,7 @@ git clone https://github.com/epccs/RPUno
 cd ~/RPUno/Bootloader
 ```
 
-Connect a 5V supply with CC mode set at 30mA to +5V (J7). Connect the ICSP tool (J11). The MCU needs its fuses set, so run the Makefile rule to do that. 
+Connect a 5V supply with CC mode set at 30mA to +5V (J7). Connect the ISP tool (J11). The MCU needs its fuses set, so run the Makefile rule to do that. 
 
 ```
 make fuse

@@ -94,10 +94,10 @@
 #define ADC4 4
 #define ADC5 5
 
-// ADC6 voltage is analogRead(PWR_I)*(<referance>/1024.0)/(0.018*50.0)
+// ADC6 voltage is analogRead(PWR_I)*(<referance>/1024.0)/(0.068*50.0)
 #define PWR_I 6 
 
-// ADC7 or input voltage is analogRead(PWR_V)*(<referance>/1024.0)*(101.5/1.5)
+// ADC7 or input voltage is analogRead(PWR_V)*(<referance>/1024.0)*(115.8/15.8)
 #define PWR_V 7
 
 // note ADC6 and ADC7 do not have digital hardware on a 328p so can only be used as analog channels

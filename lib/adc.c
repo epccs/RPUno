@@ -114,6 +114,8 @@ void init_ADC_single_conversion(uint8_t reference)
 	#endif
 	// enable a2d conversions
 	ADCSRA |= (1<<ADEN);
+#else
+#   error missing ADCSRA register which is used to set the prescaler range
 #endif
     ADC_auto_conversion = 0;
 }

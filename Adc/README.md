@@ -4,7 +4,7 @@
 
 Adc is an interactive command line program that demonstrates control of an Analog-to-Digital Converter from pins PC0 through PC7 on an ATmega328p. 
 
-Arduino Uno is marked as A0 though A5, which is sometimes confused as PA0. The ADMUX register is set to 0 when selecting ADC channel 0.  The analog channel has nothing to do with the digital pin number used by the [Wiring]. The pin used by ADC channel 0 has been assigned the number 14 for the digital Wiring functions (used with pinMod, digitalRead...), however for analogRead the ADC channel number is used.
+The ADMUX register is used when selecting ADC channels.  The analog channel has nothing to do with the digital pin number used by [Wiring]. The pin used by ADC channel 0 has been assigned the number 14 for the digital Wiring functions (e.g. pinMod, digitalRead...), however for analogRead the ADC channel number is used.
 
 [Wiring]: https://arduinohistory.github.io/
 
@@ -41,7 +41,7 @@ make bootload
 avrdude done.  Thank you.
 ``` 
 
-Now connect with picocom (or ilk). Note I am often at another computer doing this through SSH. The Samba folder is for editing the files from Windows.
+Now connect with picocom (or ilk).
 
 
 ``` 
@@ -79,7 +79,7 @@ identify
 
 ##  /0/analog? 0..7\[,0..7\[,0..7\[,0..7\[,0..7\]\]\]\]    
 
-Analog-to-Digital Converter reading from up to 5 ADMUX channels. The reading repeats every 60 Seconds until the Rx buffer gets a character. On RPUno channel 7 is the input voltage (PWR_V), channel 6 is the input current (PWR_I), channel 3 is a voltage divider on the channel 2 input, channel 2,  1, and channel 0 inputs can read up to 3.5V (higher voltages are blocked by a level shift).  Note channel 4 and 5 are used for I2C on RPUno.
+Analog-to-Digital Converter reading from up to 5 ADMUX channels. The reading repeats every 60 Seconds until the Rx buffer gets a character. On RPUno channel 7 is the input voltage (PWR_V), channel 6 is the input current (PWR_I), channel 3, 2,  1, and 0 inputs can read up to 3.5V (higher voltages are blocked by a level shift).  Note channel 4 and 5 are used for I2C on RPUno.
 
 ``` 
 /1/analog? 6,7

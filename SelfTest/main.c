@@ -208,7 +208,7 @@ void test(void)
     digitalWrite(CS1_EN,HIGH);
     _delay_ms(100); // busy-wait delay
     
-    // R1 hos CS1 on it
+    // CS1 drives R1 direct (e.g. goes through no LED)
     float adc0_cs1_v = analogRead(ADC0)*((ref_extern_avcc_uV/1.0E6)/1024.0);
     float adc0_cs1_i = adc0_cs1_v / R1;
     printf_P(PSTR("CS1 source on R1: %1.3f A\r\n"), adc0_cs1_i);
@@ -222,7 +222,6 @@ void test(void)
         passing = 0; 
         printf_P(PSTR(">>> CS1 curr is to high.\r\n"));
     }
-    // CS1 drives R1 direct (e.g. goes through no LED)
 
     //This is a good place to swap ADC referances and find the band-gap voltage
     init_ADC_single_conversion(INTERNAL_1V1); 
@@ -370,7 +369,7 @@ void test(void)
     pinMode(DIO13,INPUT);
     _delay_ms(100); // busy-wait delay
 
-    // ICP1_TERM hos CS_ICP1 on it
+    // ICP1_TERM has CS_ICP1 on it
     float adc1_cs_icp1_v = analogRead(ADC1)*((ref_extern_avcc_uV/1.0E6)/1024.0);
     float adc1_cs_icp1_i = adc1_cs_icp1_v / ICP1_TERM;
     printf_P(PSTR("CS_ICP1 in UUT PL input: %1.3f A\r\n"), adc1_cs_icp1_i);

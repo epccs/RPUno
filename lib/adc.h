@@ -47,8 +47,8 @@ extern volatile uint8_t analog_reference;
 #define ADREFSMASK (1<<REFS1) | (1<<REFS0)
 #define EXTERNAL_AREF 0
 #define EXTERNAL_AVCC (1<<REFS0)
-#define INTERNAL1V1 (1<<REFS1)
-#define INTERNAL2V56 (1<<REFS1) | (1<<REFS0)
+#define INTERNAL_1V1 (1<<REFS1)
+#define INTERNAL_2V56 (1<<REFS1) | (1<<REFS0)
 #endif
 
 #if defined (__AVR_ATmega328P__) || defined (__AVR_ATmega328__) || (__AVR_ATmega168P__) || defined (__AVR_ATmega168__)

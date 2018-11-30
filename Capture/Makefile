@@ -2,7 +2,7 @@
 TARGET = Capture
 LIBDIR = ../lib
 OBJECTS = main.o \
-	pwm.o \
+	toggleicp.o \
 	capture.o \
 	../Uart/id.o \
 	$(LIBDIR)/timers.o \

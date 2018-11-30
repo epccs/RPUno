@@ -307,7 +307,7 @@ void InitICP(void)
         // call with arg[0] == icp1 and three arguments
         int prescale = atoi(arg[2]);
 
-        if ((prescale < 0) || (prescale > 0x7) )
+        if ((prescale < 0) || (prescale > 0x5) )
         {
             printf_P(PSTR("{\"err\":\"IcpPrescalBad\"}\r\n"));
             initCommandBuffer();

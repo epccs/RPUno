@@ -27,11 +27,11 @@ http://www.gnu.org/licenses/gpl-2.0.html
 #include "../lib/pin_num.h"
 #include "../lib/pins_board.h"
 #include "../Uart/id.h"
-#include "pwm.h"
+#include "toggleicp.h"
 #include "capture.h"
 
-// 22mA current source enabled with CS0_EN which are defined in ../lib/pins_board.h
-#define STATUS_LED CS0_EN
+// pins are defined in ../lib/pins_board.h
+#define STATUS_LED DIO13
 
 #define BLINK_DELAY 1000UL
 static unsigned long blink_started_at;
@@ -44,9 +44,9 @@ void ProcessCmd()
     {
         Id("Capture");
     }
-    if ( (strcmp_P( command, PSTR("/pwm")) == 0) )
+    if ( (strcmp_P( command, PSTR("/toggleicp")) == 0) )
     {
-        Pwm();
+        ToggleICP();
     }
     if ( (strcmp_P( command, PSTR("/count?")) == 0) &&  ( (arg_count == 0) || ( (arg_count == 1) && (strcmp_P( arg[0], PSTR("icp1")) == 0) ) ) )
     {

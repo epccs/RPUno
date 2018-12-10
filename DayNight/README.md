@@ -7,14 +7,22 @@ Use a red LED's photovoltaic voltage to approximately tell if it is day or night
 Note: use the Day_AttachDayWork() and Night_AttachWork() functions to register a callback that will be run at the start of each day. This framework is how I debuged the day-night stat machine.
 
 
-## Sensor
+## Wiring Needed for Light Sensor
 
-CREE C503B-RCN-CW0Z0AA1 with a 100k load resistor. The LED works somewhat like a solar cell but it develops up to about 1.6V with red light and shorter wave lenghts. 
+![Wiring](./Setup/LightSensorWiring.png)
+
+The LED is a CREE C503B-RCN-CW0Z0AA1. The LED works somewhat like a solar cell but it develops up to 1.6V with red light and shorter wavelengths. The LED will act as a current source to the NPN transistor base which will then do [common emitter current gain] which can be measured with ADC1 on R4. Over a very short time, the sun will move through the LED focus. Adding a diffuser reduces this effect and extends the day/night debounce to more appropriate times.
+
+[common emitter current gain]: https://en.wikipedia.org/wiki/Bipolar_junction_transistor#Transistor_parameters:_alpha_(%CE%B1)_and_beta_(%CE%B2)
+
+With a solar panel use a [voltage divider].
+
+[voltage divider]: https://en.wikipedia.org/wiki/Voltage_divider
 
 
 ## Firmware Upload
 
-With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
+With a serial port connection (set the BOOTLOAD_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
 
 ``` 
 sudo apt-get install git gcc-avr binutils-avr gdb-avr avr-libc avrdude
@@ -80,240 +88,3 @@ WaterTheGarden
 {"day_state":"DAY"}
 {"day_state":"FAIL"}
 ```
-
-
-# Notes
-
-Some readings on ADC2 with the red LED and a 100k Ohm burden
-
-```
-#Morning 8:30AM 6/10/18 battery was near full at start
-/1/altcnt?
-{"alt_count":"2"}
-/1/analog? 6,7,2
-{"PWR_I":"0.023","PWR_V":"13.55","ADC2":"0.21"}
-#Morning 9:30AM 6/10/18
-{"PWR_I":"0.033","PWR_V":"13.51","ADC2":"0.25"}
-#Morning 10:40AM 6/10/18
-{"PWR_I":"0.033","PWR_V":"13.55","ADC2":"0.51"}
-#Peak was at about 11:50AM 6/10/18, sample every 20 sec
-{"PWR_I":"0.033","PWR_V":"13.51","ADC2":"0.60"}
-{"PWR_I":"0.033","PWR_V":"13.51","ADC2":"0.60"}
-{"PWR_I":"0.033","PWR_V":"13.47","ADC2":"0.60"}
-{"PWR_I":"0.033","PWR_V":"13.47","ADC2":"0.61"}
-{"PWR_I":"0.033","PWR_V":"13.51","ADC2":"0.61"}
-{"PWR_I":"0.033","PWR_V":"13.55","ADC2":"0.62"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"0.63"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"0.64"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"0.65"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"0.66"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"0.67"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"0.68"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"0.68"}
-{"PWR_I":"0.033","PWR_V":"13.51","ADC2":"0.69"}
-{"PWR_I":"0.033","PWR_V":"13.55","ADC2":"0.71"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"0.72"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"0.73"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"0.74"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"0.75"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"0.77"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"0.78"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"0.81"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"0.82"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"0.85"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"0.86"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"0.88"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"0.89"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"0.91"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"0.92"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"0.93"}
-{"PWR_I":"0.033","PWR_V":"13.47","ADC2":"0.95"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"0.96"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"0.97"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"0.99"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"1.00"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"1.03"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"1.02"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"1.04"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.04"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"1.04"}
-{"PWR_I":"0.033","PWR_V":"13.47","ADC2":"1.07"}
-{"PWR_I":"0.033","PWR_V":"13.40","ADC2":"1.07"}
-{"PWR_I":"0.033","PWR_V":"13.51","ADC2":"1.10"}
-{"PWR_I":"0.033","PWR_V":"13.62","ADC2":"1.11"}
-{"PWR_I":"0.033","PWR_V":"13.47","ADC2":"1.12"}
-{"PWR_I":"0.033","PWR_V":"13.47","ADC2":"1.14"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"1.16"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"1.17"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"1.19"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"1.20"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"1.22"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"1.23"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"1.24"}
-{"PWR_I":"0.033","PWR_V":"13.47","ADC2":"1.25"}
-{"PWR_I":"0.033","PWR_V":"13.47","ADC2":"1.26"}
-{"PWR_I":"0.033","PWR_V":"13.51","ADC2":"1.28"}
-{"PWR_I":"0.033","PWR_V":"13.55","ADC2":"1.29"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.30"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"1.32"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"1.33"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"1.33"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"1.34"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"1.35"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"1.36"}
-{"PWR_I":"0.033","PWR_V":"13.51","ADC2":"1.36"}
-{"PWR_I":"0.033","PWR_V":"13.55","ADC2":"1.37"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.37"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.38"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.38"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.38"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"1.39"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"1.39"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"1.39"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"1.40"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"1.40"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"1.40"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"1.40"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.41"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.41"}
-{"PWR_I":"0.022","PWR_V":"13.55","ADC2":"1.41"}
-{"PWR_I":"0.022","PWR_V":"13.51","ADC2":"1.42"}
-{"PWR_I":"0.022","PWR_V":"13.51","ADC2":"1.42"}
-{"PWR_I":"0.023","PWR_V":"13.47","ADC2":"1.42"}
-{"PWR_I":"0.022","PWR_V":"13.47","ADC2":"1.42"}
-{"PWR_I":"0.022","PWR_V":"13.51","ADC2":"1.42"}
-{"PWR_I":"0.022","PWR_V":"13.55","ADC2":"1.42"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"1.43"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"1.43"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"1.43"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"1.43"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"1.44"}
-{"PWR_I":"0.033","PWR_V":"13.47","ADC2":"1.44"}
-{"PWR_I":"0.033","PWR_V":"13.47","ADC2":"1.44"}
-{"PWR_I":"0.033","PWR_V":"13.51","ADC2":"1.44"}
-{"PWR_I":"0.033","PWR_V":"13.55","ADC2":"1.44"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.44"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.44"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"1.45"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"1.45"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"1.45"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"1.45"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"1.45"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"1.45"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"1.45"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.45"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.45"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.45"}
-{"PWR_I":"0.033","PWR_V":"13.55","ADC2":"1.45"}
-{"PWR_I":"0.033","PWR_V":"13.51","ADC2":"1.45"}
-{"PWR_I":"0.023","PWR_V":"13.55","ADC2":"1.45"}
-{"PWR_I":"0.023","PWR_V":"13.58","ADC2":"1.45"}
-{"PWR_I":"0.023","PWR_V":"13.55","ADC2":"1.45"}
-{"PWR_I":"0.023","PWR_V":"13.51","ADC2":"1.45"}
-{"PWR_I":"0.022","PWR_V":"13.47","ADC2":"1.45"}
-{"PWR_I":"0.023","PWR_V":"13.47","ADC2":"1.45"}
-{"PWR_I":"0.024","PWR_V":"13.51","ADC2":"1.45"}
-{"PWR_I":"0.022","PWR_V":"13.55","ADC2":"1.45"}
-{"PWR_I":"0.022","PWR_V":"13.58","ADC2":"1.45"}
-{"PWR_I":"0.022","PWR_V":"13.58","ADC2":"1.45"}
-{"PWR_I":"0.022","PWR_V":"13.58","ADC2":"1.45"}
-{"PWR_I":"0.022","PWR_V":"13.51","ADC2":"1.45"}
-{"PWR_I":"0.022","PWR_V":"13.51","ADC2":"1.45"}
-{"PWR_I":"0.022","PWR_V":"13.47","ADC2":"1.45"}
-{"PWR_I":"0.022","PWR_V":"13.47","ADC2":"1.45"}
-{"PWR_I":"0.022","PWR_V":"13.51","ADC2":"1.45"}
-{"PWR_I":"0.022","PWR_V":"13.55","ADC2":"1.45"}
-{"PWR_I":"0.022","PWR_V":"13.58","ADC2":"1.45"}
-{"PWR_I":"0.022","PWR_V":"13.58","ADC2":"1.45"}
-{"PWR_I":"0.022","PWR_V":"13.55","ADC2":"1.45"}
-{"PWR_I":"0.022","PWR_V":"13.51","ADC2":"1.45"}
-{"PWR_I":"0.022","PWR_V":"13.47","ADC2":"1.45"}
-{"PWR_I":"0.022","PWR_V":"13.47","ADC2":"1.45"}
-{"PWR_I":"0.022","PWR_V":"13.55","ADC2":"1.45"}
-{"PWR_I":"0.022","PWR_V":"13.58","ADC2":"1.44"}
-{"PWR_I":"0.022","PWR_V":"13.51","ADC2":"1.44"}
-{"PWR_I":"0.022","PWR_V":"13.40","ADC2":"1.43"}
-{"PWR_I":"0.022","PWR_V":"13.51","ADC2":"1.43"}
-{"PWR_I":"0.022","PWR_V":"13.55","ADC2":"1.45"}
-{"PWR_I":"0.022","PWR_V":"13.58","ADC2":"1.44"}
-{"PWR_I":"0.022","PWR_V":"13.62","ADC2":"1.44"}
-{"PWR_I":"0.023","PWR_V":"13.51","ADC2":"1.45"}
-{"PWR_I":"0.023","PWR_V":"13.51","ADC2":"1.44"}
-{"PWR_I":"0.023","PWR_V":"13.47","ADC2":"1.44"}
-{"PWR_I":"0.023","PWR_V":"13.47","ADC2":"1.44"}
-{"PWR_I":"0.023","PWR_V":"13.55","ADC2":"1.44"}
-{"PWR_I":"0.023","PWR_V":"13.55","ADC2":"1.44"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.44"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.44"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.44"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.44"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"1.44"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"1.44"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"1.44"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"1.44"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"1.44"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"1.44"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.43"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.43"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.43"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"1.43"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"1.43"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"1.43"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"1.43"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"1.43"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"1.43"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"1.42"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"1.42"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"1.42"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"1.42"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"1.42"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"1.41"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"1.41"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"1.41"}
-{"PWR_I":"0.033","PWR_V":"13.51","ADC2":"1.41"}
-{"PWR_I":"0.033","PWR_V":"13.55","ADC2":"1.40"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"1.40"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"1.40"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"1.39"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"1.39"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"1.38"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"1.38"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"1.38"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"1.37"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"1.36"}
-{"PWR_I":"0.033","PWR_V":"13.51","ADC2":"1.35"}
-{"PWR_I":"0.033","PWR_V":"13.55","ADC2":"1.34"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.33"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.33"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"1.32"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"1.31"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"1.29"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"1.27"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"1.25"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"1.21"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"1.18"}
-{"PWR_I":"0.033","PWR_V":"13.55","ADC2":"1.14"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.12"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.08"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.04"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"1.00"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"0.97"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"0.94"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"0.90"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"0.88"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"0.84"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"0.82"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"0.79"}
-{"PWR_I":"0.032","PWR_V":"13.58","ADC2":"0.77"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"0.75"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"0.72"}
-{"PWR_I":"0.033","PWR_V":"13.58","ADC2":"0.70"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"0.69"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"0.67"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"0.66"}
-{"PWR_I":"0.032","PWR_V":"13.47","ADC2":"0.65"}
-{"PWR_I":"0.032","PWR_V":"13.51","ADC2":"0.65"}
-{"PWR_I":"0.032","PWR_V":"13.55","ADC2":"0.64"}
-```
-
-Over a very short time, the sun moved through the LED focus. Adding a diffuser reduced this effect and extended the day/night debounce to a more appropriate time.

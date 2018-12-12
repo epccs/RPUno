@@ -4,6 +4,8 @@
 
 Adc is an interactive command line program that demonstrates control of an Analog-to-Digital Converter from pins PC0 through PC7 on an ATmega328p. 
 
+A customized library routine is used to operate the AVR's ADC, it has an ISR that is started with the enable_ADC_auto_conversion function to read the channels in a burst (free running is also an option). In this case, the bare metal loop starts the burst at timed intervals of 200 milliseconds. The ADC clock runs at 125kHz and it takes 25 of its clocks to complete a conversion, thus a burst takes 1.6 milliseconds (e.g. 8*25*(1/125000)) to scan the eight channels. The ADC is turned off after each burst so some power is saved, but barely enough to bother.
+
 The ADMUX register is used when selecting ADC channels.  The analog channel has nothing to do with the digital pin number used by [Wiring]. The pin used by ADC channel 0 has been assigned the number 14 for the digital Wiring functions (e.g. pinMod, digitalRead...), however for analogRead the ADC channel number is used.
 
 [Wiring]: https://arduinohistory.github.io/

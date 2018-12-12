@@ -13,25 +13,34 @@ function                    type        ee_addr:
 Adc::id                     UINT16      30
 Adc::ref_extern_avcc        UINT32      32
 Adc::ref_intern_1v1         UINT32      36
-Solenoid::id                UINT16      40  60  80
-Solenoid::delay_start_sec   UINT32      42  62  82
-Solenoid::runtime_sec       UINT32      46  66  86
-Solenoid::delay_sec         UINT32      50  70  90
-Solenoid::flow_stop         UINT32      54  74  94
-Solenoid::cycles            UINT8       58  78  98
+Solenoid::id                UINT16      40   60   80
+Solenoid::delay_start_sec   UINT32      42   62   82
+Solenoid::runtime_sec       UINT32      46   66   86
+Solenoid::delay_sec         UINT32      50   70   90
+Solenoid::flow_stop         UINT32      54   74   94
+Solenoid::cycles            UINT8       58   78   98
+NightLight::id              UINT16      200  220  240  260
+NightLight::delay_start_sec UINT32      202  222  242  262
+NightLight::runtime_sec     UINT32      206  226  246  266
+NightLight::delay_sec       UINT32      210  230  250  270
+NightLight::mahr_stop       UINT32      214  234  254  274
+NightLight::cycles          UINT16      218  238  258  278
 ```
 
 ## Firmware Upload
 
-With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
+With a serial port connection (set the BOOTLOAD_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
 
 ``` 
-rsutherland@conversion:~/Samba/RPUno/Eeprom$ make bootload
+sudo apt-get install git gcc-avr binutils-avr gdb-avr avr-libc avrdude
+git clone https://github.com/epccs/RPUno/
+cd /RPUno/Eeprom
+make bootload
 ...
 avrdude done.  Thank you.
 ``` 
 
-Now connect with picocom (or ilk). Note I am often at another computer doing this through SSH. The Samba folder is for editing the files from Windows.
+Now connect with picocom (or ilk).
 
 ``` 
 #exit is C-a, C-x

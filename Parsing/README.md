@@ -6,15 +6,18 @@ Demonstration of command parsing with the redirected stdio functions (e.g. print
 
 ## Firmware Upload
 
-With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
+With a serial port connection (set the BOOTLOAD_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
 
-``` 
-rsutherland@straightneck:~/Samba/RPUno/Parsing$ make bootload
+```
+sudo apt-get install git gcc-avr binutils-avr gdb-avr avr-libc avrdude
+git clone https://github.com/epccs/RPUno/
+cd /RPUno/Parsing
+make bootload
 ...
 avrdude done.  Thank you.
 ``` 
 
-Now connect with picocom (or ilk). Note I am often at another computer doing this through SSH. The Samba folder is for editing the files from Windows.
+Now connect with picocom (or ilk).
 
 ``` 
 #exit is C-a, C-x

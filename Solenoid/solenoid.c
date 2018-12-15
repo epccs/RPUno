@@ -1,5 +1,5 @@
 /*
-solenoid is part of Solenoid, it is a serial command interface to some solenoid control functions, 
+solenoid is part of Solenoid
 Copyright (C) 2016 Ronald Sutherland
 
 This program is free software; you can redistribute it and/or

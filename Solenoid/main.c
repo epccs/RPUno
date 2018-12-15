@@ -1,5 +1,5 @@
 /*
-Solenoid is a command line controled demonstration of ATmega328p ... solenoid control
+Solenoid is a CLI demonstration for timing latching type devices while measuring a flow meter
 Copyright (C) 2016 Ronald Sutherland
 
 This program is free software; you can redistribute it and/or

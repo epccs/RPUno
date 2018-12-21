@@ -275,8 +275,13 @@ void setup(void)
     }
 
     // default debounce is 15 min (e.g. 900,000 millis)
-    evening_debouce = 18000UL; // 18 sec
-    morning_debouce = 18000UL;
+    evening_debouce = 1200000UL; // 20 min
+    morning_debouce = 1200000UL;
+    // analog reading of 5*5.0/1024.0 is about 0.024V
+    // analog reading of 10*5.0/1024.0 is about 0.049V
+    // analog reading of 20*5.0/1024.0 is about 0.098V
+    evening_threshold = 10; // SLP003 with 10k and 100k divider
+    morning_threshold = 20;
 
     alt_count = 0;
 }

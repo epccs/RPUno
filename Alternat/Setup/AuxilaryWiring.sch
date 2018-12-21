@@ -1120,7 +1120,7 @@ solder needs all the help it can get.</description>
 <part name="PV4" library="Documentation" deviceset="PV" device=""/>
 <part name="U$7" library="Documentation" deviceset="BAT" device=""/>
 <part name="BM1" library="Documentation" deviceset="RPUNO" device=""/>
-<part name="D1" library="D-LED" deviceset="LED" device="5MM" value="RD"/>
+<part name="R2" library="R-C" deviceset="R" device="0805" value="10k"/>
 </parts>
 <sheets>
 <sheet>
@@ -1132,16 +1132,17 @@ PWR INPUT WIRING</text>
 14V8@200mA</text>
 <text x="57.404" y="78.232" size="1.778" layer="98" rot="R90">STATUS</text>
 <text x="32.004" y="70.612" size="1.778" layer="98" rot="R90">DAYNIGHT_STATUS</text>
-<text x="6.35" y="121.92" size="1.778" layer="98">SENSOR</text>
+<text x="13.97" y="88.9" size="1.778" layer="98" rot="R180">LIGHT
+SENSOR</text>
 </plain>
 <instances>
-<instance part="R1" gate="G$1" x="10.16" y="106.68" rot="R180"/>
+<instance part="R1" gate="G$1" x="12.7" y="111.76" rot="R270"/>
 <instance part="D8" gate="G$1" x="38.1" y="83.82"/>
 <instance part="D7" gate="G$1" x="48.26" y="83.82"/>
 <instance part="PV4" gate="G$1" x="76.2" y="127"/>
 <instance part="U$7" gate="G$1" x="81.28" y="101.6" rot="R90"/>
 <instance part="BM1" gate="G$1" x="45.72" y="109.22"/>
-<instance part="D1" gate="G$1" x="12.7" y="116.84" rot="R270"/>
+<instance part="R2" gate="G$1" x="12.7" y="101.6" rot="R270"/>
 </instances>
 <busses>
 </busses>
@@ -1170,34 +1171,35 @@ PWR INPUT WIRING</text>
 <net name="N$50" class="0">
 <segment>
 <pinref part="PV4" gate="G$1" pin="+PV"/>
-<wire x1="71.12" y1="109.22" x2="71.12" y2="127" width="0.1524" layer="91"/>
+<wire x1="71.12" y1="109.22" x2="71.12" y2="124.46" width="0.1524" layer="91"/>
+<wire x1="71.12" y1="124.46" x2="71.12" y2="127" width="0.1524" layer="91"/>
 <wire x1="71.12" y1="127" x2="73.66" y2="127" width="0.1524" layer="91"/>
 <wire x1="71.12" y1="109.22" x2="66.04" y2="109.22" width="0.1524" layer="91"/>
 <pinref part="BM1" gate="G$1" pin="ALT"/>
+<pinref part="R1" gate="G$1" pin="1"/>
+<wire x1="12.7" y1="116.84" x2="12.7" y2="124.46" width="0.1524" layer="91"/>
+<wire x1="12.7" y1="124.46" x2="71.12" y2="124.46" width="0.1524" layer="91"/>
+<junction x="71.12" y="124.46"/>
 </segment>
 </net>
 <net name="N$1" class="0">
 <segment>
 <pinref part="BM1" gate="G$1" pin="0V@5"/>
-<wire x1="20.32" y1="93.98" x2="15.24" y2="93.98" width="0.1524" layer="91"/>
-<pinref part="R1" gate="G$1" pin="1"/>
-<wire x1="15.24" y1="93.98" x2="15.24" y2="106.68" width="0.1524" layer="91"/>
-<pinref part="D1" gate="G$1" pin="A"/>
-<wire x1="15.24" y1="106.68" x2="15.24" y2="116.84" width="0.1524" layer="91"/>
-<junction x="15.24" y="106.68"/>
+<wire x1="20.32" y1="93.98" x2="12.7" y2="93.98" width="0.1524" layer="91"/>
+<pinref part="R2" gate="G$1" pin="2"/>
+<wire x1="12.7" y1="93.98" x2="12.7" y2="96.52" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$2" class="0">
 <segment>
-<pinref part="D1" gate="G$1" pin="K"/>
 <pinref part="R1" gate="G$1" pin="2"/>
-<wire x1="7.62" y1="116.84" x2="5.08" y2="116.84" width="0.1524" layer="91"/>
-<wire x1="5.08" y1="116.84" x2="5.08" y2="106.68" width="0.1524" layer="91"/>
-<wire x1="5.08" y1="106.68" x2="5.08" y2="91.44" width="0.1524" layer="91"/>
-<junction x="5.08" y="106.68"/>
+<wire x1="12.7" y1="106.68" x2="7.62" y2="106.68" width="0.1524" layer="91"/>
+<wire x1="7.62" y1="106.68" x2="7.62" y2="91.44" width="0.1524" layer="91"/>
 <pinref part="BM1" gate="G$1" pin="ADC2_16"/>
-<wire x1="5.08" y1="91.44" x2="25.4" y2="91.44" width="0.1524" layer="91"/>
+<wire x1="7.62" y1="91.44" x2="25.4" y2="91.44" width="0.1524" layer="91"/>
 <wire x1="25.4" y1="91.44" x2="25.4" y2="93.98" width="0.1524" layer="91"/>
+<pinref part="R2" gate="G$1" pin="1"/>
+<junction x="12.7" y="106.68"/>
 </segment>
 </net>
 <net name="N$3" class="0">

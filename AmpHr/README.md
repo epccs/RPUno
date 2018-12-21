@@ -9,19 +9,18 @@ Use ADC reading to Accumulate at timed intervals from a sense resistor. This is 
 
 # Firmware Upload
 
-With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUlux run 'make bootload' and it should compile and then flash the MCU.
+With a serial port connection (set the BOOTLOAD_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
 
 ``` 
 sudo apt-get install git gcc-avr binutils-avr gdb-avr avr-libc avrdude
-git clone https://github.com/epccs/RPUlux/
-cd /RPUux/AmpHr
+git clone https://github.com/epccs/RPUno/
+cd /RPUno/AmpHr
 make bootload
 ...
 avrdude done.  Thank you.
 ``` 
 
-Now connect with picocom (or ilk). Note I am often at another computer doing this through SSH. The Samba folder is for editing the files from Windows.
-
+Now connect with picocom (or ilk). 
 
 ``` 
 #exit is C-a, C-x

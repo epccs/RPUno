@@ -18,9 +18,10 @@ The hardware for this lacks training wheels, it is going to take some time to re
 
 # Firmware Upload
 
-With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUlux run 'make bootload' and it should compile and then flash the MCU.
+With a serial port connection (set the BOOTLOAD_PORT in Makefile) and optiboot installed on the RPUlux run 'make bootload' and it should compile and then flash the MCU.
 
 ``` 
+sudo apt-get install git gcc-avr binutils-avr gdb-avr avr-libc avrdude
 git clone https://github.com/epccs/RPUno/
 cd /RPUno/Alternat
 make bootload

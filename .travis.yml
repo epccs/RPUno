@@ -1,6 +1,6 @@
 # This file is used to configure Travis CI
 language: c
-dist: trusty
+dist: xenial
 sudo: required
 
 env:

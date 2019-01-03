@@ -104,7 +104,7 @@ git clone https://github.com/epccs/RPUno
 * [avr-libc](https://packages.ubuntu.com/search?keywords=avr-libc)
 * [avrdude](https://packages.ubuntu.com/search?keywords=avrdude)
 
-I like to place a [Bootloader] on the bare metal microcontroler with an ISP tool. 
+I place a [Bootloader] on the bare metal microcontroller with a fuse step and a step that uploads using an ISP tool. 
 
 [Bootloader]: https://github.com/epccs/RPUno/tree/master/Bootloader
 
@@ -115,7 +115,7 @@ make fuse
 make isp
 ```
 
-The other applications are loaded through the bootloader using the host serial port. 
+The other applications are loaded through the bootloader using the host serial port. Note that the fuse cannot be changed with the bootloader thus reducing user issues with an application upload.
 
 ```
 cd ~/RPUno/Adc
@@ -123,22 +123,27 @@ cd ~/RPUno/Adc
 make bootload
 ```
 
-The software is a guide, it is in C because that is my preference when lacking an operating system.
+The software is a guide, it is in C because that is my preference for microcontrollers. If you want additional software please add a Github issue to this repository where we can discuss it. 
 
 
 ## Continuous Integration
 
-Continuous Integration (CI) is the practice of automatically compiling and testing each time the mainline source is updated (e.g. git push). Travis CI is using a painfully out of date version of Ubuntu (14.04) as there host environment for doing the test build. The build machine allows pulling in any packages I want including the AVR cross compiler. I don't do anything fancy, just run make. A rule like "make test" could be used if the test build machine had hardware connected (e.g. "make bootload" and then "make test") to the machine, but that is not practical in the foreseeable future. This board was painless to set up for Travis because the ATmega328p was in production and Arduino was so popular at that time.
+Continuous Integration (CI) is the practice of automatically compiling and testing each time the mainline source is updated (e.g. git push). Travis CI is using a version of Ubuntu as there host environment for doing the test build. The build machine allows pulling in any packages I want including the AVR cross compiler. I don't do anything fancy, just run make. A rule like "make test" could be used if the test build machine had hardware connected (e.g. "make bootload" and then "make test") to the machine, but that is not practical in the foreseeable future. This was fairly simple to set up for Travis because the ATmega328p was in production at the time the Ubuntu toolchain was done.
 
 [https://travis-ci.org/epccs/RPUno](https://travis-ci.org/epccs/RPUno)
 
+Update: Travis has Ubuntu [Xenial] 16.04.
 
-## Arduino IDE
+[Xenial]: https://docs.travis-ci.com/user/reference/xenial/
 
-The Arduino IDE can use the [Uno's AVR core] files that are included (my [core] files are C rather than C++), just remember to look at the schematic to see how the "Uno" is connected. I do not use the Arduino core or C++.
 
-[Uno's AVR core]: https://github.com/arduino/Arduino/tree/master/hardware/arduino/avr/cores/arduino
-[core]: https://github.com/epccs/RPUlux/tree/master/lib
+## Arduino IDE with Arduino 328p Core
+
+The Arduino [IDE] can use the [Uno's AVR core] files that are included (my [core] files are C rather than C++), just remember to look at the schematic to see how the "Uno" is connected.  I do not use the Arduino IDE or C++ (I am a hardware designer,.and have only enough intrest in software to do what I want).
+
+[IDE]: https://www.arduino.cc/
+[Uno's AVR core]: https://github.com/arduino/ArduinoCore-avr
+[core]: https://github.com/epccs/RPUno/tree/master/lib
 
 
 ## Visual Studio Code

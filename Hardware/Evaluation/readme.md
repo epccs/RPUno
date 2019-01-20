@@ -7,6 +7,7 @@ This shows the setup and method used for evaluation of RPUno.
 
 # Table Of Contents:
 
+1. [^9 KNL data log](#9-knl-data-log)
 1. [^9 KNL setup](#9-knl-setup)
 1. [^9 Solenoid setup](#9-solenoid-setup)
 1. [^9 NightLight setup](#9-nightlight-setup)
@@ -24,6 +25,13 @@ This shows the setup and method used for evaluation of RPUno.
 1. [^2 Log PV_IN and PWR for a day](#2-log-pv_in-and-pwr-for-a-day)
 1. [^2 20mA Loop With Open Collector To ICP1](#2-20ma-loop-with-open-collector-to-icp1)
 1. [^1 Mounting](#1-mounting)
+
+
+## ^9 KNL data log
+
+The RPUno^9 with K3^2 did good and operated from 6/10/18 to1/18/19 (e.g. for 222 days each vallve operated 10 times), I got some data for it ([K3^2+RPUno^9+fwKNL_log]).
+
+[K3^2+RPUno^5_log]: https://github.com/epccs/Driver/blob/master/K3/Evaluation/K3%5E2%2BRPUno%5E9%2BfwKNL_log
 
 ## ^9 KNL setup
 

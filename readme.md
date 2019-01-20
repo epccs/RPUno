@@ -17,7 +17,7 @@ The bare metal microcontroller on this board is the same as an Arduino Uno. I us
 
 ## Status
 
-Available through [Tindie](https://www.tindie.com/products/8862/)
+[Available](https://rpubus.org/Order_Form.html)
 
 [![Build Status](https://travis-ci.org/epccs/RPUno.svg?branch=master)](https://travis-ci.org/epccs/RPUno)
 

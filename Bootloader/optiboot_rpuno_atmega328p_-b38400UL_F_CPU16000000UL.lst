@@ -1,5 +1,5 @@
 
-optiboot_rpuno_atmega328p_-b115200_F_CPU16000000L.elf:     file format elf32-avr
+optiboot_rpuno_atmega328p_-b38400UL_F_CPU16000000UL.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
@@ -48,7 +48,7 @@ void pre_main(void) {
     7e26:	80 93 c1 00 	sts	0x00C1, r24	; 0x8000c1 <__TEXT_REGION_LENGTH__+0x7e00c1>
     7e2a:	86 e0       	ldi	r24, 0x06	; 6
     7e2c:	80 93 c2 00 	sts	0x00C2, r24	; 0x8000c2 <__TEXT_REGION_LENGTH__+0x7e00c2>
-    7e30:	80 e1       	ldi	r24, 0x10	; 16
+    7e30:	83 e3       	ldi	r24, 0x33	; 51
     7e32:	80 93 c4 00 	sts	0x00C4, r24	; 0x8000c4 <__TEXT_REGION_LENGTH__+0x7e00c4>
     7e36:	8f e0       	ldi	r24, 0x0F	; 15
     7e38:	a1 d0       	rcall	.+322    	; 0x7f7c <watchdogConfig>

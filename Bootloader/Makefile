@@ -4,8 +4,8 @@ OBJECTS = main.o
 
 ## Chip and project-specific global definitions
 MCU = atmega328p
-F_CPU = 16000000L
-BAUD = 115200
+F_CPU = 16000000UL
+BAUD = 38400UL
 LED = B5
 LED_START_FLASHES = 0
 BOOT_FLASH_SECTION_START = 0x7e00

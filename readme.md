@@ -6,7 +6,7 @@ From <https://github.com/epccs/RPUno/>
 
 A general purpose ATmega328p controller board with level shift IO and current sources that operate over the wide input voltage range.
 
-The bare metal microcontroller on this board is the same as an Arduino Uno. I use it to evaluate the examples Arduino has. Normally C is my preference so converting Arduino's C++ into C adds some overhead, the toolchain supports both but C causes fewer surprises since it is implemented with a stack-based memory system (C++ needs the heap for its features). The toolchain is available on most Linux distributions, a Raspberry Pi makes a nice remote computer and can handle networking services robustly. Logging into the remote computer is done with SSH and updates for the controller are done by pulling from GitHub and then using make to run the "Makefile" rules that compile and upload firmware over a serial link. Mezzanine boards [RPUadpt] and [RPUpi] can be used to add multidrop serial. The mezzanine VIN pin can be disconnected with an onboard P-channel MOSFET to remove power from the Raspberry Pi computer.
+The bare metal microcontroller on this board is the same as an Arduino Uno, I use it to evaluate the examples. Normally C is my preference so converting Arduino's C++ into C adds some overhead, the toolchain supports both but find fewer surprises with C. The toolchain is available on most Linux distributions, a Raspberry Pi makes a nice remote computer and can handle networking services robustly. I use SSH to log in to the remote Raspberry Pi and then I can pull updates from GitHub and run the "Makefile" rules that compile and upload the firmware. The mezzanine board [RPUadpt] or [RPUpi] can be used to add a multidrop serial (rpubus). This controller can turn off its shield VIN pin to power down the Raspberry Pi on RPUpi.
 
 [RPUadpt]: https://github.com/epccs/RPUadpt
 [RPUpi]: https://github.com/epccs/RPUpi
@@ -17,11 +17,11 @@ The bare metal microcontroller on this board is the same as an Arduino Uno. I us
 
 ## Status
 
-[Available](https://rpubus.org/Order_Form.html)
+Note: bootloader speed has changed from 115.2k to 38.4k bps due to upload errors with the new transceiver on RPUpi^4. Command line serial speed was changed to 38.4k bps some time ago. I have no clue how the bootload upload was working.
 
 [![Build Status](https://travis-ci.org/epccs/RPUno.svg?branch=master)](https://travis-ci.org/epccs/RPUno)
 
-![Status](./Hardware/status_icon.png "Status")
+[Options](./Hardware#bill-of-materials)
 
 ## [Hardware](./Hardware)
 
@@ -29,7 +29,7 @@ Hardware files and notes for referance.
 
 ## Example with RPU BUS
 
-This example shows a multidrop serial bus that has several microcontroller boards connected to a single Raspberry Pi computer. Linux on the single board computer controls a hardware UART (/dev/ttyAMA0) that has serial lines connected to a transceiver and its differental pairs. The remote boards have an [RPUadpt] mezzanine board and CAT5 cable daisy-chain between them. 
+This example shows a multidrop serial bus that has several microcontroller boards connected to a single Raspberry Pi computer. Linux on the single board computer controls a hardware UART (/dev/ttyAMA0) that has serial lines connected to a transceiver and its differential pairs. The remote boards have a [RPUadpt] mezzanine board and CAT5 cable daisy-chain between them. 
 
 [Irrigate7]: https://github.com/epccs/Irrigate7
 
@@ -39,11 +39,11 @@ The transceivers are automatically activated, so common serial programs (e.g. av
 
 I rely on a Command Line Interface (CLI) to the controllers. The CLI responds to commands terminated with a newline (inspired by console), press enter (which sends a newline) to start a command. The command includes an address with the first two bytes, but echo starts after the second byte is sent. The first byte will cause any transmitting device to stop and dump its outgoing buffer which prevents collisions in the data from the controllers to the host. The command length is also limited to allow the use of optimized buffer size.
 
-As a short example, I'll connect with SSH (e.g. from a Windows 1803 build) to a Raspberry Pi Zero board. These machines have matching usernames, with configured SSH keys and known host file from a previous session. Once on the armv61 machine, I use picocom to interact with two different control boards. They are on the same serial bus at addresses '/1' and '/0' (note that ASCII '1' is 0x31, and ASCII '0' is 0x30, so they have an address that looks good on picocom but is probably not what was expected).
+As a short example, I'll connect with SSH (e.g. from a Windows 1809 build) to a Raspberry Pi Zero board. These machines have matching usernames, with configured SSH keys and known host file from a previous session. Once on the armv61 machine, I use picocom to interact with two different control boards. They are on the same serial bus at addresses '/1' and '/0' (note that ASCII '1' is 0x31, and ASCII '0' is 0x30, so they have an address that looks good on picocom but is probably not what was expected).
 
 ```
 C:\Users\rsutherland>ssh pi1.local
-Linux pi1 4.14.34+ #1110 Mon Apr 16 14:51:42 BST 2018 armv6l
+Linux pi1 4.14.79+ #1159 Sun Nov 4 17:28:08 GMT 2018 armv6l
 
 The programs included with the Debian GNU/Linux system are free software;
 the exact distribution terms for each program are described in the
@@ -51,7 +51,7 @@ individual files in /usr/share/doc/*/copyright.
 
 Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
 permitted by applicable law.
-Last login: Thu May 17 23:58:20 2018 from 192.168.0.19
+Last login: Sat Feb 16 12:24:59 2019 from 192.168.4.6
 rsutherland@pi1:~ $ picocom -b 38400 /dev/ttyAMA0
 picocom v1.7
 

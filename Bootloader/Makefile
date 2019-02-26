@@ -85,8 +85,14 @@ oem:
 
 # the Uno (with ArduinoISP sketch) is used as ICSP tool
 # https://github.com/arduino/Arduino/blob/master/build/shared/examples/11.ArduinoISP/ArduinoISP/ArduinoISP.ino
+# save the eeprom so it can be put back after bootloader install. Note the -e will set all EEPROM addresses to '0xFF'.
 isp: $(TARGET)_$(MCU)_-b$(BAUD)_F_CPU$(F_CPU).hex
+	avrdude -v -p $(MCU) -c stk500v1 -P $(ISP_PORT) -b 19200 -U eeprom:r:$(TARGET)_$(MCU)_eeprom.hex:i
 	avrdude -v -p $(MCU) -c stk500v1 -P $(ISP_PORT) -b 19200 -e -U flash:w:$(TARGET)_$(MCU)_-b$(BAUD)_F_CPU$(F_CPU).hex -U lock:w:$(LOCK_FUSE):m
+
+# recover a saved eeprom
+ recoveree:
+	avrdude -v -p $(MCU) -c stk500v1 -P $(ISP_PORT) -b 19200 -U eeprom:w:$(TARGET)_$(MCU)_eeprom.hex
 
 clean:
 	rm -f *.o *.elf *.lst *.map *.sym *.lss *.eep *.srec *.bin *.hex *.tmp.sh

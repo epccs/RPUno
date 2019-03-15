@@ -3,6 +3,7 @@
 /*
 Serial bootloader for RPUno
 Copyright 2017 by Ronald Sutherland 
+
 This program is free software; you can redistribute it
 and/or modify it under the terms of the GNU General
 Public License as published by the Free Software 
@@ -23,7 +24,7 @@ to the Free Software Foundation, Inc.,
 Licence can be viewed at
 http://www.fsf.org/licenses/gpl.txt
 
-Based on Arduino's optiboot which is GPL and 
+Based on optiboot which is GPL and 
 Copyright 2013-2015 by Bill Westfield. 
 Copyright 2010 by Peter Knight. 
 

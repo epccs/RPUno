@@ -14,6 +14,10 @@ GNU General Public License for more details.
 
 For a copy of the GNU General Public License use
 http://www.gnu.org/licenses/gpl-2.0.html
+
+I believe the LGPL is used in things like libraries and allows you to include them in 
+application code without the need to release that application source while GPL (e.g. *this) requires 
+that all modifications be provided as source when distributed.
 */
 #include <avr/pgmspace.h>
 #include <util/atomic.h>

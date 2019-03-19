@@ -2,7 +2,7 @@
 
 ## Overview
 
-SPI slave with an interactive command line program. CS0 is used to operate a status LED. DIO16 (ADC2) is used to drive nSS (which is on DIO10) to enable slave functions (Note: nSS is not connected on the RPUpi board).
+SPI slave is an interactive command line program. CS0 is used to operate a status LED. nSS must be connected to Raspberry PI nCE00 pin (fixed on RPUpi^5).
 
 
 ## Pi SPI
@@ -45,7 +45,7 @@ FF DE AD BE EF BA
 AD F0
 ``` 
 
-Note: The output is offset a byte since it was sent back from the AVR. I see errors at 1MHz and 2MHz. The RPUpi^3 has a 74LVC07 buffer that pulls down through a 10kOhm resistor on SCK and MOSI. The circuit between that resistor and the AVR has some capacitance which will limit the speed (if there is a need for higher speed it may be possible to use a 1k resistor).
+Note: The output is offset a byte since it was sent back from the AVR. 
 
 
 ## Wiring Setup
@@ -55,29 +55,33 @@ Note: The output is offset a byte since it was sent back from the AVR. I see err
 
 ## Firmware Upload
 
-With a serial port connection (set the BOOT_PORT in Makefile) and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
+If the host computer is a Raspberry Pi the rpubus manager needs set so that it can bootload. Connect with picocom (or ilk).
 
 ``` 
-rsutherland@pi1:~/Samba/RPUno/SpiSlv$ make bootload
-...
-avrdude done.  Thank you.
-``` 
-
-Now connect with picocom (or ilk). Note I am using a Headless Pi Zero (e.g. through SSH). The Samba folder is for editing the files from Windows.
-
-``` 
-#exit is C-a, C-x
 picocom -b 38400 /dev/ttyAMA0
-# setup bus manager using sneaky mode (requires I2C commands in firmware)
 /1/iaddr 41
 {"address":"0x29"}
+#set a rpubus bootload address
 /1/ibuff 3,49
 {"txBuffer[2]":[{"data":"0x3"},{"data":"0x31"}]}
 /1/iread? 2
 {"rxBuffer":[{"data":"0x3"},{"data":"0x31"}]}
+#clear the bus manager status bits so the host can bootload
 /1/ibuff 7,0
 {"txBuffer[2]":[{"data":"0x7"},{"data":"0x0"}]}
 /1/iread? 2
+#exit is C-a, C-x
+``` 
+
+With a serial port connection and optiboot installed on the RPUno run 'make bootload' and it should compile and then flash the MCU.
+
+``` 
+sudo apt-get install make git gcc-avr binutils-avr gdb-avr avr-libc avrdude
+git clone https://github.com/epccs/RPUno/
+cd /RPUno/SpiSlv
+make bootload
+...
+avrdude done.  Thank you.
 ``` 
 
 # Commands

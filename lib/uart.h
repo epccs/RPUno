@@ -67,7 +67,6 @@ extern void init_uart0_after_bootloader(void);
 
 extern void uart0_init(uint16_t baudrate);
 extern uint16_t uart0_getc(void);
-extern uint16_t uart0_peek(void);
 extern void uart0_putc(uint8_t data);
 extern void uart0_flush(void);
 extern uint16_t uart0_available(void);
@@ -76,7 +75,6 @@ extern FILE *uartstream0_init(uint32_t baudrate);
 
 extern void uart1_init(uint16_t baudrate);
 extern uint16_t uart1_getc(void);
-extern uint16_t uart1_peek(void);
 extern void uart1_putc(uint8_t data);
 extern void uart1_flush(void);
 extern uint16_t uart1_available(void);
@@ -85,7 +83,6 @@ extern FILE *uartstream1_init(uint32_t baudrate);
 
 extern void uart2_init(uint16_t baudrate);
 extern uint16_t uart2_getc(void);
-extern uint16_t uart2_peek(void);
 extern void uart2_putc(uint8_t data);
 extern void uart2_flush(void);
 extern uint16_t uart2_available(void);
@@ -94,7 +91,6 @@ extern FILE *uartstream2_init(uint32_t baudrate);
 
 extern void uart3_init(uint16_t baudrate);
 extern uint16_t uart3_getc(void);
-extern uint16_t uart3_peek(void);
 extern void uart3_putc(uint8_t data);
 extern void uart3_flush(void);
 extern uint16_t uart3_available(void);

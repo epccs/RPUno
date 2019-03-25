@@ -478,26 +478,6 @@ uint16_t uart0_getc(void)
 
 } /* uart0_getc */
 
-/*  Return next byte (character) of incoming UART data without removing it 
-     from the ring buffer. */
-uint16_t uart0_peek(void)
-{
-    uint16_t tmptail;
-    uint8_t data;
-
-    if ( UART0_RxHead == UART0_RxTail ) {
-        return UART_NO_DATA;   /* no data available */
-    }
-
-    tmptail = (UART0_RxTail + 1) & UART_RX0_BUFFER_MASK;
-
-    /* get data from receive buffer */
-    data = UART_RxBuf[tmptail];
-
-    return (UART0_LastRxError << 8) + data;
-
-} /* uart0_peek */
-
 void uart0_putc(uint8_t data)
 {
     uint16_t tmphead;
@@ -665,25 +645,6 @@ uint16_t uart1_getc(void)
     return (UART1_LastRxError << 8) + data;
 
 } /* uart1_getc */
-
-/*next character from UART data without removing it from the ring buffer. */
-uint16_t uart1_peek(void)
-{
-    uint16_t tmptail;
-    uint8_t data;
-
-    if ( UART1_RxHead == UART1_RxTail ) {
-        return UART_NO_DATA;   /* no data available */
-    }
-
-    tmptail = (UART1_RxTail + 1) & UART_RX1_BUFFER_MASK;
-
-    /* get data from receive buffer */
-    data = UART1_RxBuf[tmptail];
-
-    return (UART1_LastRxError << 8) + data;
-
-} /* uart1_peek */
 
 /* write byte to ringbuffer for transmitting via UART */
 void uart1_putc(uint8_t data)
@@ -860,25 +821,6 @@ uint16_t uart2_getc(void)
 
 } /* uart2_getc */
 
-/* returns the next byte of incoming UART data without removing it from the ring buffer */
-uint16_t uart2_peek(void)
-{
-    uint16_t tmptail;
-    uint8_t data;
-
-    if ( UART2_RxHead == UART2_RxTail ) {
-        return UART_NO_DATA;   /* no data available */
-    }
-
-    tmptail = (UART2_RxTail + 1) & UART_RX2_BUFFER_MASK;
-
-    /* get data from receive buffer */
-    data = UART2_RxBuf[tmptail];
-
-    return (UART2_LastRxError << 8) + data;
-
-} /* uart2_peek */
-
 /* write byte to ring buffer for transmitting via UART */
 void uart2_putc(uint8_t data)
 {
@@ -1050,25 +992,6 @@ uint16_t uart3_getc(void)
     return (UART3_LastRxError << 8) + data;
 
 } /* uart3_getc */
-
-/* returns next byte of incoming UART data without removing it from ring buffer */
-uint16_t uart3_peek(void)
-{
-    uint16_t tmptail;
-    uint8_t data;
-
-    if ( UART3_RxHead == UART3_RxTail ) {
-        return UART_NO_DATA;   /* no data available */
-    }
-
-    tmptail = (UART3_RxTail + 1) & UART_RX3_BUFFER_MASK;
-
-    /* get data from receive buffer */
-    data = UART3_RxBuf[tmptail];
-
-    return (UART3_LastRxError << 8) + data;
-
-} /* uart3_peek */
 
 /* write byte to ringbuffer for transmitting */
 void uart3_putc(uint8_t data)

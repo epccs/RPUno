@@ -1,7 +1,7 @@
 #define FUNC_READ 1
 #define FUNC_WRITE 1
 /*
-Serial bootloader for RPUno
+Serial bootloader
 Copyright 2017 by Ronald Sutherland 
 
 This program is free software; you can redistribute it

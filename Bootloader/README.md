@@ -4,8 +4,6 @@
 
 AVR microcontrollers are usually programmed through an In-circuit Serial Programmer (ICSP/ISP), however with this firmware loaded in your microcontroller programing can be done over a serial interface (TX/RX) without the ICSP programmer. This is called serial bootloading. 
 
-![Simplified Core Logic](./SimplifiedCoreLogic.png "Simplified Core Logic")
-
 Unfortunalty to install a serial bootloader requires an ICSP tool. Arduino has an [ArduinoISP] sketch that I load into a Arduino Uno to use as an ICSP tool.
 
 [ArduinoISP]: https://github.com/arduino/Arduino/blob/master/build/shared/examples/11.ArduinoISP/ArduinoISP/ArduinoISP.ino
@@ -19,6 +17,7 @@ It is a two step process. First run "make fuse" which will unlock the boot flash
 With ISP tool connected.
 
 ``` 
+sudo apt-get install make git gcc-avr binutils-avr gdb-avr avr-libc avrdude
 git clone https://github.com/epccs/RPUno/
 cd /RPUno/Bootloader
 make fuse

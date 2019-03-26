@@ -1,4 +1,4 @@
-/* RPUno DigitalIO Library
+/* DigitalIO Library
   Copyright (C) 2019 Ronald Sutherland
  
   This library is free software; you can redistribute it and/or

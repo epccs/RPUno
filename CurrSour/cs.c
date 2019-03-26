@@ -1,5 +1,5 @@
 /*
-cs is a library that controsl current sources.
+cs is a library that controls current sources.
 Copyright (C) 2019 Ronald Sutherland
 
   This library is free software; you can redistribute it and/or

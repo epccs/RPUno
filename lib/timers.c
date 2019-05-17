@@ -1,5 +1,5 @@
 /*
-  Initialize ATmega328p Timers  
+  Initialize AVR Timers  
   Copyright (c) 2016 Ronald S,. Sutherland
 
   This library is free software; you can redistribute it and/or

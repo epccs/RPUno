@@ -52,17 +52,23 @@ SIZE = avr-size
 # Pi Zero on chip hardware serial shows as /dev/ttyAMA0 (hardware UART on a Linux system)
 ISP_PORT = /dev/ttyACM0
 
-## Compiler/linker options
+## set the environment variable used for compiler and linker options for a baudcheck to be done
+# https://wiki.gentoo.org/wiki/GCC_optimization
 CFLAGS  = -g -Wall -Os -fno-split-wide-types -mrelax -fno-caller-saves 
 
 TARGET_ARCH = -mmcu=$(MCU)
 
+# bootloader flags, e.g. omit the interrupt vector table and optiboot does not use a stack frame
+# https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html
+# https://gcc.gnu.org/onlinedocs/gcc/AVR-Options.html#AVR-Options
 LDFLAGS = -Wl,--section-start=.text=$(BOOT_FLASH_SECTION_START) -Wl,--section-start=.version=$(VERSION_PLACED_AT_FLASH_LOCATION) -Wl,--relax -nostartfiles -nostdlib
 #-Wl,--gc-sections
-
+# tbd: does the new option "-flto" have advantage over such things as "-ffunction-sections -fdata-sections" with "-Wl,--gc-sections -Wl,--print-gc-sections"
+# issue with stack on some compiler versions: https://github.com/Optiboot/optiboot/issues/160
 
 all: $(TARGET)_$(MCU)_-b$(BAUD)_F_CPU$(F_CPU).hex $(TARGET)_$(MCU)_-b$(BAUD)_F_CPU$(F_CPU).lst
 
+# use the C preprocessor to make a shell script which bash can run to check the baudrate
 baudcheck: 
 	- @$(CC) --version
 	- @$(CC) $(CFLAGS) -DF_CPU=$(F_CPU) -DBAUD=$(BAUD) -E baudcheck.c -o baudcheck.tmp.sh

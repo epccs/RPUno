@@ -53,7 +53,7 @@ $(TARGET).hex: $(TARGET).elf
 	$(OBJCOPY) -j .text -j .data -O ihex $< $@
 
 ## works with optiboot which erases flash without being told (e.g. -e )
-bootload: $(TARGET).hex
+bootload:
 	avrdude -v -p $(MCU) -c arduino -P $(BOOTLOAD_PORT) -b 38400 -U flash:w:$(TARGET).hex
 
 $(TARGET).elf: $(OBJECTS)

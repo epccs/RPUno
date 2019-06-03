@@ -406,27 +406,44 @@ ISR(UART0_TRANSMIT_INTERRUPT)
 
 void uart0_init(uint16_t baudrate)
 {
+    /* UART glitch: how to avoid, this is how optiboot does it.
+          UART0_STATUS = _BV(U2X0); //Double speed mode 
+          UART0_CONTROL = _BV(RXEN0) | _BV(TXEN0); // enable TX and RX glitch free
+          UCSR0C = (1<<UCSZ00) | (1<<UCSZ01); // control frame format
+          UBRR0L = (uint8_t)( (F_CPU + BAUD * 4L) / (BAUD * 8L) - 1 );
+    */
+    
     UART0_TxHead = 0;
     UART0_TxTail = 0;
     UART0_RxHead = 0;
     UART0_RxTail = 0;
 
-#if defined( AT90_UART ) 
-    /* set baud rate */
-    UBRR = (uint8_t)baudrate;
-
-    /* enable UART receiver and transmitter and receive complete interrupt */
-    UART0_CONTROL = (1<<RXCIE)|(1<<RXEN)|(1<<TXEN);
-
-#elif defined (ATMEGA_USART)
-    /* Set baud rate */
+//Double speed mode if needed
+#if defined( ATMEGA_USART ) 
     if ( baudrate & 0x8000 ) {
         UART0_STATUS = (1<<U2X);  //Enable 2x speed
         baudrate &= ~0x8000;
     }
-    UBRRH = (uint8_t)(baudrate>>8);
-    UBRRL = (uint8_t) baudrate;
+#elif defined ( ATMEGA_USART0 )
+    if ( baudrate & 0x8000 ) {
+        UART0_STATUS = (1<<U2X0);  //Enable 2x speed
+        baudrate &= ~0x8000;
+    }
+#elif defined ( ATMEGA_UART )
+    if ( baudrate & 0x8000 ) {
+        UART0_STATUS = (1<<U2X);  //Enable 2x speed
+        baudrate &= ~0x8000;
+    }
+#endif
+    
+#if defined( AT90_UART ) 
+    /* enable UART receiver and transmitter and receive complete interrupt */
+    UART0_CONTROL = (1<<RXCIE)|(1<<RXEN)|(1<<TXEN);
 
+    /* set baud rate */
+    UBRR = (uint8_t)baudrate;
+
+#elif defined (ATMEGA_USART)
     /* Enable USART receiver and transmitter and receive complete interrupt */
     UART0_CONTROL = (1<<RXCIE)|(1<<RXEN)|(1<<TXEN);
 
@@ -437,15 +454,11 @@ void uart0_init(uint16_t baudrate)
     UCSRC = (3<<UCSZ0);
 #endif /* defined( URSEL ) */
 
-#elif defined ( ATMEGA_USART0 )
-    /* Set baud rate */
-    if ( baudrate & 0x8000 ) {
-        UART0_STATUS = (1<<U2X0);  //Enable 2x speed
-        baudrate &= ~0x8000;
-    }
-    UBRR0H = (uint8_t)(baudrate>>8);
-    UBRR0L = (uint8_t) baudrate;
+    /* Set ATMEGA_USART baud rate */
+    UBRRH = (uint8_t)(baudrate>>8);
+    UBRRL = (uint8_t) baudrate;
 
+#elif defined ( ATMEGA_USART0 )
     /* Enable USART receiver and transmitter and receive complete interrupt */
     UART0_CONTROL = (1<<RXCIE0)|(1<<RXEN0)|(1<<TXEN0);
 
@@ -456,17 +469,17 @@ void uart0_init(uint16_t baudrate)
     UCSR0C = (3<<UCSZ00);
 #endif /* defined( ATMEGA_USART0 ) */
 
-#elif defined ( ATMEGA_UART )
-    /* set baud rate */
-    if ( baudrate & 0x8000 ) {
-        UART0_STATUS = (1<<U2X);  //Enable 2x speed
-        baudrate &= ~0x8000;
-    }
-    UBRRHI = (uint8_t)(baudrate>>8);
-    UBRR   = (uint8_t) baudrate;
+    /* Set ATMEGA_USART0 baud rate */
+    UBRR0H = (uint8_t)(baudrate>>8);
+    UBRR0L = (uint8_t) baudrate;
 
+#elif defined ( ATMEGA_UART )
     /* Enable UART receiver and transmitter and receive complete interrupt */
     UART0_CONTROL = (1<<RXCIE)|(1<<RXEN)|(1<<TXEN);
+
+    /* set ATMEGA_UART baud rate */
+    UBRRHI = (uint8_t)(baudrate>>8);
+    UBRR   = (uint8_t) baudrate;
 
 #endif  /* defined( ATMEGA_UART ) */
 
@@ -620,13 +633,11 @@ void uart1_init(uint16_t baudrate)
     UART1_RxHead = 0;
     UART1_RxTail = 0;
 
-    /* Set baud rate */
+    /* Double speed mode if needed */
     if ( baudrate & 0x8000 ) {
         UART1_STATUS = (1<<U2X1);  //Enable 2x speed
         baudrate &= ~0x8000;
     }
-    UBRR1H = (uint8_t)(baudrate>>8);
-    UBRR1L = (uint8_t) baudrate;
 
     /* Enable USART receiver and transmitter and receive complete interrupt */
     UART1_CONTROL = (1<<RXCIE1)|(1<<RXEN1)|(1<<TXEN1);
@@ -637,6 +648,10 @@ void uart1_init(uint16_t baudrate)
 #else
     UCSR1C = (3<<UCSZ10);
 #endif
+
+    /* Set baud rate */
+    UBRR1H = (uint8_t)(baudrate>>8);
+    UBRR1L = (uint8_t) baudrate;
 } /* uart_init */
 
 /* byte from ring buffer */
@@ -793,14 +808,11 @@ void uart2_init(uint16_t baudrate)
     UART2_RxHead = 0;
     UART2_RxTail = 0;
 
-
-    /* Set baud rate */
+    /* Double speed mode if needed */
     if ( baudrate & 0x8000 ) {
         UART2_STATUS = (1<<U2X2);  //Enable 2x speed
         baudrate &= ~0x8000;
     }
-    UBRR2H = (uint8_t)(baudrate>>8);
-    UBRR2L = (uint8_t) baudrate;
 
     /* Enable USART receiver and transmitter and receive complete interrupt */
     UART2_CONTROL = (1<<RXCIE2)|(1<<RXEN2)|(1<<TXEN2);
@@ -811,6 +823,10 @@ void uart2_init(uint16_t baudrate)
 #else
     UCSR2C = (3<<UCSZ20);
 #endif
+
+    /* Set baud rate */
+    UBRR2H = (uint8_t)(baudrate>>8);
+    UBRR2L = (uint8_t) baudrate;
 } /* uart_init */
 
 
@@ -966,13 +982,11 @@ void uart3_init(uint16_t baudrate)
     UART3_RxHead = 0;
     UART3_RxTail = 0;
 
-    /* Set baud rate */
+    /* Double speed mode if needed */
     if ( baudrate & 0x8000 ) {
         UART3_STATUS = (1<<U2X3);  //Enable 2x speed
         baudrate &= ~0x8000;
     }
-    UBRR3H = (uint8_t)(baudrate>>8);
-    UBRR3L = (uint8_t) baudrate;
 
     /* Enable USART receiver and transmitter and receive complete interrupt */
     UART3_CONTROL = (1<<RXCIE3)|(1<<RXEN3)|(1<<TXEN3);
@@ -983,6 +997,10 @@ void uart3_init(uint16_t baudrate)
 #else
     UCSR3C = (3<<UCSZ30);
 #endif
+
+    /* Set baud rate */
+    UBRR3H = (uint8_t)(baudrate>>8);
+    UBRR3L = (uint8_t) baudrate;
 } /* uart_init */
 
 

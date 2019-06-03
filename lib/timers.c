@@ -97,6 +97,8 @@ unsigned long micros() {
 
     SREG = oldSREG;
     
+    // 32 MHz, 24 MHz, 16 MHz, 8 MHz, 4 MHz, 1 MHz
+    // for other speeds see https://github.com/MCUdude/MiniCore/blob/master/avr/cores/MCUdude_corefiles/wiring.c
     return ((m << 8) + t) * (64 / clockCyclesPerMicrosecond());
 }
 

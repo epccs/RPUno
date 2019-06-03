@@ -98,11 +98,23 @@ sudo apt-get install make git gcc-avr binutils-avr gdb-avr avr-libc avrdude
 git clone https://github.com/epccs/RPUno
 ```
 
+packages on ubuntu are from Debain
+
 * [gcc-avr](https://packages.ubuntu.com/search?keywords=gcc-avr)
 * [binutils-avr](https://packages.ubuntu.com/search?keywords=binutils-avr)
 * [gdb-avr](https://packages.ubuntu.com/search?keywords=gdb-avr)
 * [avr-libc](https://packages.ubuntu.com/search?keywords=avr-libc)
 * [avrdude](https://packages.ubuntu.com/search?keywords=avrdude)
+
+The repository of binutils-avr for Debian is at
+
+https://salsa.debian.org/debian/binutils-avr
+
+The upstream where it was started from is 
+
+https://www.gnu.org/software/binutils/
+
+I don't see any AVR stuff in the upstream. Atmel must have forked it, and Debian is just patching critical material on the fork. Sadly I get the idea that these build tools are the last thing Microchip wants to mess with, I do not blame them it is a cluster, but it could be improved if they would start a public Github or Gitlab repository for these tools so I could have a place to contribute. Ideally, these updates would be added to the upstream, but I suspect that is not practical. Arduino uses these tools also, but they mainly want responsibility for there IDE. 
 
 I place a [Bootloader] on the bare metal microcontroller with a fuse step and a step that uploads using an ISP tool. 
 

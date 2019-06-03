@@ -4,17 +4,69 @@ Some lessons I learned doing RPUno.
 
 # Table Of Contents:
 
-11. [^6 Solar](#6-solar)
-10. [^5 LT3652 NTC 10k](#5-lt3652-ntc-10k)
-9. [^5 Baud Rate Framing Error](#5-baud-rate-framing-error)
-8. [^5 Current Source Power Off](#5-current-source-power-off)
-7. [^5 ADC6 to Anode](#5-adc6-to-anode)
-6. [^5 ADC7 is .333 of PWR](#5-adc7-is-333-of-pwr)
-5. [^4 Pull-down on IO2](#4-pull-down-on-io2)
-4. [^2 Reduce EMI](#2-reduce-emi)
-3. [^1 Reduce Current Sense Noise](#1-reduce-current-sense-noise)
-2. [^1 Battery Connector Polarity](#1-battery-connector-polarity)
-1. [^0 Add Reversed Battery Protection](#0-add-reversed-battery-protection)
+1. ^9 Bootloader at 38.4k bps
+1. ^9 Callback's In twi.c Should Have Default
+1. ^6 Solar
+1. ^5 LT3652 NTC 10k
+1. ^5 Baud Rate Framing Error
+1. ^5 Current Source Power Off
+1. ^5 ADC6 to Anode
+1. ^5 ADC7 is .333 of PWR
+1. ^4 Pull-down on IO2
+1. ^2 Reduce EMI
+1. ^1 Reduce Current Sense Noise
+1. ^1 Battery Connector Polarity
+1. ^0 Add Reversed Battery Protection
+
+
+## ^9 Bootloader at 38.4k bps
+
+The RPUpi^4 has a new transceiver that has a little to much delay to allow optiboot to work at 115.2k bps over a RPUBUS. This has been a known ugliness, I was not able to make the serial work with other software at that speed, but somehow avrdude and optiboot did, but now I see it was living on the edge. So I changed the bootloader and all the applications that use it.
+
+https://github.com/epccs/RPUno/commit/b94c6fbb768734822ea4217d3d13e5bbf71325fa
+
+Then I uploaded the bootloader and found that the EEPROM was gone. I ran the Selftest to setup the EEPROM again. Then for the next board, I have the Makefile save the EEPROM so I can recover it. So the next boards do that.
+
+https://github.com/epccs/RPUno/commit/c95269384cfe22e797f67dceb4cef9e78d54bb28
+
+In my mind, this is evidence that going with a Makefile rather than hacking an IDE was the right choice. How would I do this if I had used ether AS7 or Arduino's IDE? I wish Microchip would put effort into keeping the toolchain up to date and making it easy to package for Debian. I am not going to use MPLAB any more than I have AS7 so in my eyes, Microchip is wasting time on things that have little value. Besides, VScode is the new gold standard for working with source code, and every OS seems to have a subsystem (WSL) to brew (homebrew) packages.
+
+
+## ^9 Callback's In twi.c Should Have Default
+
+```
+// used to initalize the Transmit functions in case they are not used.
+void transmit_default(void)
+{
+    return;
+}
+
+typedef void (*PointerToTransmit)(void);
+
+// used to initalize the Receive functions in case they are not used.
+void receive_default(void)
+{
+    return;
+}
+
+typedef void (*PointerToReceive)(uint8_t*, int);
+
+static PointerToTransmit twi_onSlaveTransmit = transmit_default;
+static PointerToReceive twi_onSlaveReceive = receive_default;
+```
+
+The twi_onSlaveReceive callback looks to be run once after an I2C stop or repeated-start event is seen in the ISR. So that means the slave will get the data in a chunk and have to prep any outgoing buffer before it is needed (e.g. the twi_onSlaveTransmit callback).
+
+twi_onSlaveTransmit and twi_onSlaveReceive are under the Arduino C++ wrappers which may ensure a default callback is set (I did not look since it does not matter for my usage). It is easy to forget to set a callback in C so adding a default is a good idea to prevent a program from trying to run code at the address of an uninitialized pointer.
+
+https://github.com/epccs/RPUno/commit/9ebda222c3d6504993c60f48dfba18a497c539f3#diff-d9d11c95cdc55b4e98bd32bfc0204bc0
+
+
+## ^7 Unused Fuse Bits Return "1" For avrdude 6.3 -c stk500v1
+
+One of the first upload methods was stk500v1 and it returned zero for unused fuse bits, but that was backward from most other methods or what the Atmel tools show, so the Makefile needed to change when I started to use Ubuntu 17.10.
+
+https://github.com/epccs/RPUno/commit/0715fdc9bf4d24b3f520e8fd89b0ae84b6b076a1#diff-4090823bc12f8ce382920f2970f7a371
 
 
 ## ^6 Solar

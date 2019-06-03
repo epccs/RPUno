@@ -42,6 +42,14 @@ TIMEOUT_MS: Bootloader timeout period, in milliseconds. 500,1000,2000,4000,8000 
  UART: UART number (0..n) for devices with more than one hardware uart (644P, 1284P, etc) 
 */
 
+/*  fuses could be set in the code rather than makefile https://www.avrfreaks.net/forum/how-embed-fuses-c-xmega
+FUSES = {
+          .low =      0xFF,
+          .high =     0xDE,
+          .extended = 0xFD,
+        };
+*/
+
 #define OPTIBOOT_MAJVER 6
 #define OPTIBOOT_MINVER 2
 

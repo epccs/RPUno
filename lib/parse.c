@@ -15,7 +15,11 @@ Copyright (C) 2019 Ronald Sutherland
     You should have received a copy of the GNU Lesser General Public
     License along with this library; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
+/*
+avr-libc may have some String tokenization in C 
+https://onebyezero.blogspot.com/2018/12/string-tokenization-in-c.html
 */
 #include <ctype.h>
 #include <avr/pgmspace.h>

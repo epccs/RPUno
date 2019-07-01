@@ -40,7 +40,7 @@ void setup(void)
 {
     // Turn Off Current Sources
     pinMode(CS0_EN,OUTPUT);
-    digitalWrite(CS0_EN,LOW);
+    digitalWrite(CS0_EN,LOW); // Red LED
     pinMode(CS1_EN,OUTPUT);
     digitalWrite(CS1_EN,LOW);
     pinMode(CS2_EN,OUTPUT);
@@ -48,17 +48,14 @@ void setup(void)
     pinMode(CS3_EN,OUTPUT);
     digitalWrite(CS3_EN,LOW);
     pinMode(CS_ICP1_EN,OUTPUT);
-    digitalWrite(CS_ICP1_EN,LOW);
+    digitalWrite(CS_ICP1_EN,LOW); // Green LED
     
     // Turn Off VOUT to shield (e.g. disconnect VIN from shield)
     pinMode(SHLD_VIN_EN,OUTPUT);
     digitalWrite(SHLD_VIN_EN,LOW);
 
-    // ADC2 and ADC3 have LED that may show a voltage if light is on them
-    // sink ADC3 with DIO10
     pinMode(DIO10,OUTPUT);
     digitalWrite(DIO10,LOW);
-    // sink ADC2 with DIO13
     pinMode(DIO13,OUTPUT);
     digitalWrite(DIO13,LOW);
 
@@ -107,6 +104,51 @@ void test(void)
         return;
     }
 
+    // SMBus needs connected to RPUno for testing, it works a little different than I2C
+    uint8_t smbus_address = 0x2A;
+    uint8_t length = 2;
+    uint8_t wait = 1;
+    uint8_t sendStop = 1; // see write_i2c_block_data from https://git.kernel.org/pub/scm/utils/i2c-tools/i2c-tools.git/tree/py-smbus/smbusmodule.c
+    uint8_t txBuffer[2] = {0x00,0x00}; //comand 0x00 should Read the mulit-drop bus addr;
+    uint8_t twi_returnCode = twi_writeTo(smbus_address, txBuffer, length, wait, sendStop); 
+    if (twi_returnCode != 0)
+    {
+        passing = 0; 
+        printf_P(PSTR(">>> SMBus write failed, twi_returnCode: %d\r\n"), twi_returnCode);
+        return;
+    }
+    
+    //  https://git.kernel.org/pub/scm/utils/i2c-tools/i2c-tools.git/tree/py-smbus/smbusmodule.c
+    uint8_t cmd_length = 1; // one byte command is sent befor read with the read_i2c_block_data
+    sendStop = 0; // the data is taken after the command is sent and a repeated start happens
+    txBuffer[0] = 0x00; //comand 0x00 matches the above write command
+    twi_returnCode = twi_writeTo(smbus_address, txBuffer, cmd_length, wait, sendStop); 
+    if (twi_returnCode != 0)
+    {
+        passing = 0; 
+        printf_P(PSTR(">>> SMBus read cmd fail, twi_returnCode: %d\r\n"), twi_returnCode);
+        return;
+    }
+    uint8_t rxBuffer[2];
+    sendStop = 1;
+    uint8_t bytes_read = twi_readFrom(smbus_address, rxBuffer, length, sendStop);
+    if ( bytes_read != length )
+    {
+        passing = 0; 
+        printf_P(PSTR(">>> SMBus read missing %d bytes \r\n"), (length-bytes_read) );
+        return;
+    }
+    if (rxBuffer[1] == '1')
+    {
+        printf_P(PSTR("SMBUS provided address 0x31 from manager\r\n"));
+    } 
+    else  
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> SMBUS gave wrong address. e.g., not 0x31\r\n"));
+        return;
+    }
+
     // The Transceiver Test is WIP
 
     // final test status
@@ -125,7 +167,7 @@ void led_setup_after_test(void)
 {
     // Turn Off Curr Sources
     pinMode(CS0_EN,OUTPUT);
-    digitalWrite(CS0_EN,LOW);
+    digitalWrite(CS0_EN,LOW); // Red LED
     pinMode(CS1_EN,OUTPUT);
     digitalWrite(CS1_EN,LOW);
     pinMode(CS2_EN,OUTPUT);
@@ -133,7 +175,7 @@ void led_setup_after_test(void)
     pinMode(CS3_EN,OUTPUT);
     digitalWrite(CS3_EN,LOW);
     pinMode(CS_ICP1_EN,OUTPUT);
-    digitalWrite(CS_ICP1_EN,LOW);
+    digitalWrite(CS_ICP1_EN,LOW); // Green LED
 
     pinMode(DIO10,OUTPUT);
     digitalWrite(DIO10,LOW);
@@ -150,12 +192,12 @@ void led_setup_after_test(void)
     
     if (passing)
     {
-        digitalWrite(CS_ICP1_EN,HIGH);
+        digitalWrite(CS_ICP1_EN,HIGH); // Green LED
         pinMode(DIO13,INPUT);
     }
     else
     {
-        digitalWrite(CS0_EN,HIGH);
+        digitalWrite(CS0_EN,HIGH); // Red LED
         pinMode(DIO11,INPUT);
     }
 }
@@ -167,11 +209,11 @@ void blink(void)
     {
         if (passing)
         {
-            digitalToggle(CS_ICP1_EN);
+            digitalToggle(CS_ICP1_EN); // Green LED
         }
         else
         {
-            digitalToggle(CS0_EN);
+            digitalToggle(CS0_EN); // Red LED
         }
         
         // next toggle 

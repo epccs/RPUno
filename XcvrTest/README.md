@@ -22,7 +22,15 @@ Connect a power supply with CV and CC mode. Set CC at 200mA and CV at 12.8V.
 
 ## Firmware Upload
 
-With a serial port connected (e.g., [ICSP] or [USBuart]) to the RPUno's bootload port and optiboot installed run 'make' to build and then 'make bootload' to flash the MCU. Bootloading over the RPUbus is also an option but it would probably be a good idea to see a green light first. 
+The wiring shows two RPUpi (one is the DUT) and two RPUno. An R-Pi Zero is used as a host on the know good RPUno and its RPUpi. [Remote] has been loaded on the known good and DUT RPUpi's.
+
+[Remote]: https://github.com/epccs/RPUpi/tree/master/Remote
+
+The known good RPUno has been loaded with [i2c-debug]. 
+
+[i2c-debug]: https://github.com/epccs/RPUno/tree/master/i2c-debug
+
+Connect the bootload port of the RPUno that will be under the DUT with [USBuart] or [ICSP] and load this test firmware on it, run 'make' to build and then 'make bootload' to flash it. 
 
 [ICSP]: https://github.com/epccs/Driver/tree/master/ICSP
 [USBuart]: https://github.com/epccs/Driver/tree/master/USBuart
@@ -37,7 +45,7 @@ avrdude done.  Thank you.
 make clean
 ``` 
 
-Now connect with picocom (exit is C-a, C-x). 
+Now power down the RPUno with the loaded test firmware and plug in the DUT. When the power is applied the test will run and we can see the resutls on the Bootload port with [USBuart] and picocom (exit is C-a, C-x). 
 
 ``` 
 picocom -b 38400 /dev/ttyUSB0
@@ -49,6 +57,8 @@ avr-gcc --version: 5.4.0
 I2C provided address 0x31 from manager
 [PASS]
 ```
+
+The resutls can also be seen on the remote R-Pi host, but if something goes wrong the bootload port may be needed to see the test results.
 
 The test is not done, I will start working on it soon.
 

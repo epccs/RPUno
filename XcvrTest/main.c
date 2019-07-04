@@ -104,11 +104,13 @@ void test(void)
         return;
     }
 
-    // SMBus needs connected to RPUno for testing, it works a little different than I2C
+    // SMBus needs connected to RPUno I2C master for testing, it is for write_i2c_block_data and read_i2c_block_data from
+    //  https://git.kernel.org/pub/scm/utils/i2c-tools/i2c-tools.git/tree/py-smbus/smbusmodule.c
+    // write_i2c_block_data sends a command byte and data to the slave 
     uint8_t smbus_address = 0x2A;
     uint8_t length = 2;
     uint8_t wait = 1;
-    uint8_t sendStop = 1; // see write_i2c_block_data from https://git.kernel.org/pub/scm/utils/i2c-tools/i2c-tools.git/tree/py-smbus/smbusmodule.c
+    uint8_t sendStop = 1;
     uint8_t txBuffer[2] = {0x00,0x00}; //comand 0x00 should Read the mulit-drop bus addr;
     uint8_t twi_returnCode = twi_writeTo(smbus_address, txBuffer, length, wait, sendStop); 
     if (twi_returnCode != 0)
@@ -118,9 +120,9 @@ void test(void)
         return;
     }
     
-    //  https://git.kernel.org/pub/scm/utils/i2c-tools/i2c-tools.git/tree/py-smbus/smbusmodule.c
+    // read_i2c_block_data sends a command byte and then a repeated start followed by reading the data 
     uint8_t cmd_length = 1; // one byte command is sent befor read with the read_i2c_block_data
-    sendStop = 0; // the data is taken after the command is sent and a repeated start happens
+    sendStop = 0; // a repeated start happens after the command byte is sent
     txBuffer[0] = 0x00; //comand 0x00 matches the above write command
     twi_returnCode = twi_writeTo(smbus_address, txBuffer, cmd_length, wait, sendStop); 
     if (twi_returnCode != 0)
@@ -138,16 +140,54 @@ void test(void)
         printf_P(PSTR(">>> SMBus read missing %d bytes \r\n"), (length-bytes_read) );
         return;
     }
-    if (rxBuffer[1] == '1')
+    if ( (rxBuffer[0] == 0x0) && (rxBuffer[1] == '1') )
     {
-        printf_P(PSTR("SMBUS provided address 0x31 from manager\r\n"));
+        printf_P(PSTR("SMBUS cmd %d provided address %d from manager\r\n"), rxBuffer[0], rxBuffer[1]);
     } 
     else  
     { 
         passing = 0; 
-        printf_P(PSTR(">>> SMBUS gave wrong address. e.g., not 0x31\r\n"));
-        return;
+        printf_P(PSTR(">>> SMBUS wrong addr %d for cmd %d\r\n"), rxBuffer[1], rxBuffer[0]);
     }
+
+    // SPI loopback at R-Pi header. e.g., drive MISO/DIO12 to test MOSI/DIO11.
+    // with selft test wirring MISO/DIO12 can shunt the current from CS3 to bypass yellow LED D2
+    pinMode(MISO,OUTPUT);
+    digitalWrite(MISO,HIGH);
+    digitalWrite(CS3_EN,LOW);
+    // and MOSI/DIO11 can shunt the current from CS0 to bypass red LED D3
+    pinMode(MOSI,INPUT);
+    digitalWrite(MOSI,LOW); // turn off the weak pullup, the RPUpi board has a 3k pullup resistor 
+    digitalWrite(CS0_EN,LOW); // a HITH would drive the MOSI pin with Self-Test wiring
+    digitalWrite(CS1_EN,HIGH); // add bias to R1 so MOSI loopback can be seen
+    digitalWrite(CS2_EN,HIGH); // add more bias to R1 so MOSI loopback can be seen
+    _delay_ms(50) ; // busy-wait delay
+    uint8_t miso_rd = digitalRead(MISO);
+    uint8_t mosi_rd = digitalRead(MOSI);
+    if (miso_rd && mosi_rd) 
+    { 
+        printf_P(PSTR("MISO loopback to MOSI == HIGH\r\n"));
+    }
+    else 
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> MISO %d did not loopback to MOSI %d\r\n"), miso_rd, mosi_rd);
+    }
+
+    digitalWrite(MISO,LOW);
+    _delay_ms(50) ; // busy-wait delay
+    miso_rd = digitalRead(MISO);
+    mosi_rd = digitalRead(MOSI);
+    if ( (!miso_rd) && (!mosi_rd) ) 
+    { 
+        printf_P(PSTR("MISO loopback to MOSI == LOW\r\n"));
+    }
+    else 
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> MISO %d did not loopback to MOSI %d\r\n"), miso_rd, mosi_rd);
+    }
+    digitalWrite(CS3_EN,LOW);
 
     // The Transceiver Test is WIP
 
@@ -177,14 +217,14 @@ void led_setup_after_test(void)
     pinMode(CS_ICP1_EN,OUTPUT);
     digitalWrite(CS_ICP1_EN,LOW); // Green LED
 
-    pinMode(DIO10,OUTPUT);
+    pinMode(DIO10,INPUT); 
     digitalWrite(DIO10,LOW);
-    pinMode(DIO11,OUTPUT);
-    digitalWrite(DIO11,LOW);
-    pinMode(DIO12,OUTPUT);
-    digitalWrite(DIO12,LOW);
-    pinMode(DIO13,OUTPUT);
-    digitalWrite(DIO13,LOW);
+    pinMode(DIO11,INPUT);
+    digitalWrite(DIO11,LOW); // is MOSI in hi-z
+    pinMode(DIO12,INPUT);
+    digitalWrite(DIO12,LOW); // is MISO in hi-z
+    pinMode(DIO13,INPUT);
+    digitalWrite(DIO13,LOW); // is SCK in hi-z
     pinMode(DIO14,INPUT);
     pinMode(DIO15,INPUT);
     pinMode(DIO16,INPUT);
@@ -193,12 +233,10 @@ void led_setup_after_test(void)
     if (passing)
     {
         digitalWrite(CS_ICP1_EN,HIGH); // Green LED
-        pinMode(DIO13,INPUT);
     }
     else
     {
         digitalWrite(CS0_EN,HIGH); // Red LED
-        pinMode(DIO11,INPUT);
     }
 }
 

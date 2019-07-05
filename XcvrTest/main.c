@@ -187,8 +187,106 @@ void test(void)
         passing = 0; 
         printf_P(PSTR(">>> MISO %d did not loopback to MOSI %d\r\n"), miso_rd, mosi_rd);
     }
-    digitalWrite(CS3_EN,LOW);
+    digitalWrite(CS1_EN,LOW);
+    digitalWrite(CS2_EN,LOW);
 
+    // My R-Pi Shutdown is on BCM6 (pin31) and that loops back into SCK on the test header
+    pinMode(SCK,INPUT);
+    digitalWrite(SCK,LOW); // turn off the weak pullup, the RPUpi board has a 3k pullup resistor 
+    pinMode(DIO15,OUTPUT);
+    digitalWrite(DIO15,HIGH); // this will bias icp1 input over the self-test wiring so green D1 can allow digital voltage on SCK
+    digitalWrite(CS_ICP1_EN,LOW); // Green LED
+    _delay_ms(50) ; // busy-wait delay
+    uint8_t sck_rd = digitalRead(SCK);
+    if (sck_rd ) 
+    { 
+        printf_P(PSTR("SCK with Shutdown loopbakc == HIGH\r\n"));
+    }
+    else 
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> Shutdown HIGH did not loopback to SCK %d\r\n"), sck_rd);
+    }
+
+    // To cause a shutdown I can send the I2C command 5 with data 1
+    // note the RPUno can monitor its input power to verify the R-Pi is in shutdown and turn off power to the shield VIN    
+    uint8_t i2c_address = 0x29;
+    length = 2;
+    wait = 1;
+    sendStop = 0; // use a repeated start after write
+    txBuffer[0] = 0x05;
+    txBuffer[1] = 0x01; //comand 0x05 should pull Shutdown low
+    twi_returnCode = twi_writeTo(i2c_address, txBuffer, length, wait, sendStop); 
+    if (twi_returnCode != 0)
+    {
+        passing = 0; 
+        printf_P(PSTR(">>> I2C cmd 5 write fail, twi_returnCode: %d\r\n"), twi_returnCode);
+        return;
+    }
+    rxBuffer[0]=0;
+    rxBuffer[1]=0;
+    sendStop = 1;
+    bytes_read = twi_readFrom(i2c_address, rxBuffer, length, sendStop);
+    if ( bytes_read != length )
+    {
+        passing = 0; 
+        printf_P(PSTR(">>> I2C read missing %d bytes \r\n"), (length-bytes_read) );
+    }
+    if ( (txBuffer[0] == rxBuffer[0]) && (txBuffer[1] == rxBuffer[1]) )
+    {
+        printf_P(PSTR("I2C Shutdown cmd is clean {%d, %d}\r\n"), rxBuffer[0], rxBuffer[1]);
+    } 
+    else  
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> I2C Shutdown cmd echo bad {%d, %d}\r\n"), rxBuffer[0], rxBuffer[1]);
+    }
+
+    _delay_ms(50) ; // busy-wait delay
+    sck_rd = digitalRead(SCK);
+    if (!sck_rd) 
+    { 
+        printf_P(PSTR("SCK with Shutdown loopbakc == LOW\r\n"));
+    }
+    else 
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> Shutdown LOW did not loopback to SCK %d\r\n"), sck_rd);
+    }
+    pinMode(DIO15,INPUT);
+    digitalWrite(DIO15,LOW); 
+
+    // Manager should save the shutdown detected after SHUTDOWN_TIME timer runs (see rpubus_manager_state.h in Remote fw for value)
+    _delay_ms(1100) ; // busy-wait delay
+    sendStop = 0; // use a repeated start after write
+    txBuffer[0] = 0x04;
+    txBuffer[1] = 0xFF; //comand 0x04 will return the value 0x01 (0xff is a byte for the ISR to replace)
+    twi_returnCode = twi_writeTo(i2c_address, txBuffer, length, wait, sendStop);
+    if (twi_returnCode != 0)
+    {
+        passing = 0; 
+        printf_P(PSTR(">>> I2C cmd 4 write fail, twi_returnCode: %d\r\n"), twi_returnCode);
+        return;
+    }
+    rxBuffer[0]=0;
+    rxBuffer[1]=0;
+    sendStop = 1;
+    bytes_read = twi_readFrom(i2c_address, rxBuffer, length, sendStop);
+    if ( bytes_read != length )
+    {
+        passing = 0; 
+        printf_P(PSTR(">>> I2C read missing %d bytes \r\n"), (length-bytes_read) );
+    }
+    if ( (txBuffer[0] == rxBuffer[0]) && (0x1 == rxBuffer[1]) )
+    {
+        printf_P(PSTR("I2C Shutdown Detect cmd is clean {%d, %d}\r\n"), rxBuffer[0], rxBuffer[1]);
+    } 
+    else  
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> I2C Shutdown Detect cmd echo bad {%d, %d}\r\n"), rxBuffer[0], rxBuffer[1]);
+    }
+    
     // The Transceiver Test is WIP
 
     // final test status

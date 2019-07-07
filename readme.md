@@ -21,6 +21,8 @@ Note: bootloader speed has changed from 115.2k to 38.4k bps due to upload errors
 
 [![Build Status](https://travis-ci.org/epccs/RPUno.svg?branch=master)](https://travis-ci.org/epccs/RPUno)
 
+![Status](./Hardware/status_icon.png "Status")
+
 [Options](./Hardware#bill-of-materials)
 
 ## [Hardware](./Hardware)

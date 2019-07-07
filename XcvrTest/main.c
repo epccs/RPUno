@@ -286,7 +286,76 @@ void test(void)
         passing = 0; 
         printf_P(PSTR(">>> I2C Shutdown Detect cmd echo bad {%d, %d}\r\n"), rxBuffer[0], rxBuffer[1]);
     }
-    
+
+    // Set test mode which will save trancever control bits HOST_nRTS:HOST_nCTS:TX_nRE:TX_DE:DTR_nRE:DTR_DE:RX_nRE:RX_DE
+    sendStop = 0; // use a repeated start after write
+    txBuffer[0] = 0x30; // command 48 will save the trancever control bits
+    txBuffer[1] = 0x01; //data 0x01 is used to select the option, if 2 is returned it is trying to set test mode, a 3 means that data was not valid
+    twi_returnCode = twi_writeTo(i2c_address, txBuffer, length, wait, sendStop);
+    if (twi_returnCode != 0)
+    {
+        passing = 0; 
+        printf_P(PSTR(">>> I2C cmd 48 write fail, twi_returnCode: %d\r\n"), twi_returnCode);
+        return;
+    }
+    rxBuffer[0]=0;
+    rxBuffer[1]=0;
+    sendStop = 1;
+    bytes_read = twi_readFrom(i2c_address, rxBuffer, length, sendStop);
+    if ( bytes_read != length )
+    {
+        passing = 0; 
+        printf_P(PSTR(">>> I2C read missing %d bytes \r\n"), (length-bytes_read) );
+    }
+    uint8_t test_mode_clean = 0;
+    if ( (txBuffer[0] == rxBuffer[0]) && (txBuffer[1]  == rxBuffer[1]) )
+    {
+        test_mode_clean = 1;
+        // delay print until the UART can be used
+    } 
+    else  
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> I2C Start Test Mode cmd echo bad {%d, %d}\r\n"), rxBuffer[0], rxBuffer[1]);
+    }
+
+    _delay_ms(50) ; // busy-wait delay
+    // End test mode and have a look at the trancever control bits
+    sendStop = 0; // use a repeated start after write
+    txBuffer[0] = 0x31; // command 49 will recover the saved trancever control bits
+    txBuffer[1] = 0x01; //data 0x01 is used to select the option, trancever control bits are returned, but a zero tells that somthing went wrong
+    twi_returnCode = twi_writeTo(i2c_address, txBuffer, length, wait, sendStop);
+    if (twi_returnCode != 0)
+    {
+        passing = 0; 
+        printf_P(PSTR(">>> I2C Start Test Mode cmd was clean {48, 1}\r\n"));
+        printf_P(PSTR(">>> I2C cmd 49 write fail, twi_returnCode: %d\r\n"), twi_returnCode);
+        return;
+    }
+    if ( test_mode_clean )
+    {
+        printf_P(PSTR("I2C Start Test Mode cmd was clean {48, 1}\r\n"));
+    } 
+    rxBuffer[0]=0;
+    rxBuffer[1]=0;
+    sendStop = 1;
+    bytes_read = twi_readFrom(i2c_address, rxBuffer, length, sendStop);
+    if ( bytes_read != length )
+    {
+        passing = 0; 
+        printf_P(PSTR(">>> I2C read missing %d bytes \r\n"), (length-bytes_read) );
+    }
+    if ( (txBuffer[0] == rxBuffer[0]) )
+    {
+        printf_P(PSTR("I2C End Test Mode hex is Xcvr cntl bits {%d, 0x%X}\r\n"), rxBuffer[0], rxBuffer[1]);
+    } 
+    else  
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> I2C End Test Mode cmd echo bad {%d, %d}\r\n"), rxBuffer[0], rxBuffer[1]);
+    }
+
+
     // The Transceiver Test is WIP
 
     // final test status

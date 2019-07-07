@@ -52,7 +52,7 @@ picocom -b 38400 /dev/ttyUSB0
 picocom v2.2
 ...
 Terminal ready
-RPUpi Transceiver Test date: Jul  4 2019
+RPUpi Transceiver Test date: Jul  6 2019
 avr-gcc --version: 5.4.0
 I2C provided address 0x31 from manager
 SMBUS cmd 0 provided address 49 from manager
@@ -62,6 +62,8 @@ SCK with Shutdown loopbakc == HIGH
 I2C Shutdown cmd is clean {5, 1}
 SCK with Shutdown loopbakc == LOW
 I2C Shutdown Detect cmd is clean {4, 1}
+I2C Start Test Mode cmd was clean {48, 1}
+I2C End Test Mode hex is Xcvr cntl bits {49, 0xD5}
 [PASS]
 ```
 

@@ -35,6 +35,9 @@ static unsigned long blink_started_at;
 static unsigned long blink_delay;
 static char rpu_addr;
 static uint8_t passing;
+static uint8_t test_mode_clean;
+static uint8_t delayed_outputs;
+static uint8_t delayed_data[8];
 
 void setup(void) 
 {
@@ -86,6 +89,269 @@ void setup(void)
     }
 }
 
+void smbus_address(void)
+{
+    uint8_t smbus_address = 0x2A;
+    uint8_t length = 2;
+    uint8_t wait = 1;
+    uint8_t sendStop = 1;
+    uint8_t txBuffer[2] = {0x00,0x00}; //comand 0x00 should Read the mulit-drop bus addr;
+    uint8_t twi_returnCode = twi_writeTo(smbus_address, txBuffer, length, wait, sendStop); 
+    if (twi_returnCode != 0)
+    {
+        passing = 0; 
+        printf_P(PSTR(">>> SMBus write failed, twi_returnCode: %d\r\n"), twi_returnCode);
+    }
+    
+    // read_i2c_block_data sends a command byte and then a repeated start followed by reading the data 
+    uint8_t cmd_length = 1; // one byte command is sent befor read with the read_i2c_block_data
+    sendStop = 0; // a repeated start happens after the command byte is sent
+    txBuffer[0] = 0x00; //comand 0x00 matches the above write command
+    twi_returnCode = twi_writeTo(smbus_address, txBuffer, cmd_length, wait, sendStop); 
+    if (twi_returnCode != 0)
+    {
+        passing = 0; 
+        printf_P(PSTR(">>> SMBus read cmd fail, twi_returnCode: %d\r\n"), twi_returnCode);
+    }
+    uint8_t rxBuffer[2] = {0x00,0x00};
+    sendStop = 1;
+    uint8_t bytes_read = twi_readFrom(smbus_address, rxBuffer, length, sendStop);
+    if ( bytes_read != length )
+    {
+        passing = 0; 
+        printf_P(PSTR(">>> SMBus read missing %d bytes \r\n"), (length-bytes_read) );
+    }
+    if ( (rxBuffer[0] == 0x0) && (rxBuffer[1] == '1') )
+    {
+        printf_P(PSTR("SMBUS cmd %d provided address %d from manager\r\n"), rxBuffer[0], rxBuffer[1]);
+    } 
+    else  
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> SMBUS wrong addr %d for cmd %d\r\n"), rxBuffer[1], rxBuffer[0]);
+    }
+}
+
+void i2c_shutdown(void)
+{
+    uint8_t i2c_address = 0x29;
+    uint8_t length = 2;
+    uint8_t wait = 1;
+    uint8_t sendStop = 0; // use a repeated start after write
+    uint8_t txBuffer[2] = {0x05,0x01};
+    uint8_t twi_returnCode = twi_writeTo(i2c_address, txBuffer, length, wait, sendStop); 
+    if (twi_returnCode != 0)
+    {
+        passing = 0; 
+        printf_P(PSTR(">>> I2C cmd 5 write fail, twi_returnCode: %d\r\n"), twi_returnCode);
+        return;
+    }
+    uint8_t rxBuffer[2] = {0x00,0x00};
+    sendStop = 1;
+    uint8_t bytes_read = twi_readFrom(i2c_address, rxBuffer, length, sendStop);
+    if ( bytes_read != length )
+    {
+        passing = 0; 
+        printf_P(PSTR(">>> I2C read missing %d bytes \r\n"), (length-bytes_read) );
+    }
+    if ( (txBuffer[0] == rxBuffer[0]) && (txBuffer[1] == rxBuffer[1]) )
+    {
+        printf_P(PSTR("I2C Shutdown cmd is clean {%d, %d}\r\n"), rxBuffer[0], rxBuffer[1]);
+    } 
+    else  
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> I2C Shutdown cmd echo bad {%d, %d}\r\n"), rxBuffer[0], rxBuffer[1]);
+    }
+}
+
+void i2c_shutdown_detect(void)
+{
+    uint8_t i2c_address = 0x29;
+    uint8_t length = 2;
+    uint8_t wait = 1;
+    uint8_t sendStop = 0; // use a repeated start after write
+    uint8_t txBuffer[2] = {0x04, 0xFF}; //comand 0x04 will return the value 0x01 (0xff is a byte for the ISR to replace)
+    uint8_t twi_returnCode = twi_writeTo(i2c_address, txBuffer, length, wait, sendStop);
+    if (twi_returnCode != 0)
+    {
+        passing = 0; 
+        printf_P(PSTR(">>> I2C cmd 4 write fail, twi_returnCode: %d\r\n"), twi_returnCode);
+    }
+    uint8_t rxBuffer[2] = {0x00,0x00};
+    sendStop = 1;
+    uint8_t bytes_read = twi_readFrom(i2c_address, rxBuffer, length, sendStop);
+    if ( bytes_read != length )
+    {
+        passing = 0; 
+        printf_P(PSTR(">>> I2C read missing %d bytes \r\n"), (length-bytes_read) );
+    }
+    if ( (txBuffer[0] == rxBuffer[0]) && (0x1 == rxBuffer[1]) )
+    {
+        printf_P(PSTR("I2C Shutdown Detect cmd is clean {%d, %d}\r\n"), rxBuffer[0], rxBuffer[1]);
+    } 
+    else  
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> I2C Shutdown Detect cmd echo bad {%d, %d}\r\n"), rxBuffer[0], rxBuffer[1]);
+    }
+}
+
+void i2c_testmode_start(void)
+{
+    uint8_t i2c_address = 0x29;
+    uint8_t length = 2;
+    uint8_t wait = 1;
+    uint8_t sendStop = 0; // use a repeated start after write
+    uint8_t txBuffer[2] = {0x30, 0x01}; // preserve the trancever control bits
+    uint8_t twi_returnCode = twi_writeTo(i2c_address, txBuffer, length, wait, sendStop);
+    if (twi_returnCode != 0)
+    {
+        passing = 0; 
+        printf_P(PSTR(">>> I2C cmd 48 write fail, twi_returnCode: %d\r\n"), twi_returnCode);
+    }
+    uint8_t rxBuffer[2] = {0x00,0x00};
+    sendStop = 1;
+    uint8_t bytes_read = twi_readFrom(i2c_address, rxBuffer, length, sendStop);
+    if ( bytes_read != length )
+    {
+        passing = 0; 
+        printf_P(PSTR(">>> I2C read missing %d bytes \r\n"), (length-bytes_read) );
+    }
+    if ( (txBuffer[0] == rxBuffer[0]) && (txBuffer[1]  == rxBuffer[1]) )
+    {
+        test_mode_clean = 1;
+        // delay print until the UART can be used
+    } 
+    else  
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> I2C Start Test Mode cmd echo bad {%d, %d}\r\n"), rxBuffer[0], rxBuffer[1]);
+    }
+}
+
+void i2c_testmode_end(void)
+{
+    uint8_t i2c_address = 0x29;
+    uint8_t length = 2;
+    uint8_t wait = 1;
+    uint8_t sendStop = 0; // use a repeated start after write
+    uint8_t txBuffer[2] = {0x31, 0x01}; // recover trancever control bits and report values in data[1] byte
+    uint8_t twi_returnCode = twi_writeTo(i2c_address, txBuffer, length, wait, sendStop);
+    if ( test_mode_clean )
+    {
+        printf_P(PSTR("I2C Start Test Mode cmd was clean {48, 1}\r\n"));
+        test_mode_clean = 0;
+    }
+    if (twi_returnCode != 0)
+    {
+        passing = 0; 
+        printf_P(PSTR(">>> I2C cmd 49 write fail, twi_returnCode: %d\r\n"), twi_returnCode);
+    }
+    uint8_t rxBuffer[2] = {0x00,0x00};
+    sendStop = 1;
+    uint8_t bytes_read = twi_readFrom(i2c_address, rxBuffer, length, sendStop);
+    if ( bytes_read != length )
+    {
+        passing = 0; 
+        printf_P(PSTR(">>> I2C read missing %d bytes \r\n"), (length-bytes_read) );
+    }
+    if ( (txBuffer[0] == rxBuffer[0]) && (0xD5 == rxBuffer[1]) )
+    {
+        printf_P(PSTR("I2C End Test Mode hex is Xcvr cntl bits {%d, 0x%X}\r\n"), rxBuffer[0], rxBuffer[1]);
+    } 
+    else  
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> I2C problem /w End Test Mode {%d, %d}\r\n"), rxBuffer[0], rxBuffer[1]);
+    }
+}
+
+void i2c_testmode_test_xcvrbits(uint8_t xcvrbits)
+{
+    // do not use UART durring testmode
+    if ( test_mode_clean )
+    {
+        uint8_t i2c_address = 0x29;
+        uint8_t length = 2;
+        uint8_t wait = 1;
+        uint8_t sendStop = 0; // use a repeated start after write
+        uint8_t txBuffer[2] = {0x32, 0x01};
+
+        uint8_t twi_returnCode = twi_writeTo(i2c_address, txBuffer, length, wait, sendStop);
+        if (twi_returnCode != 0)
+        {
+            passing = 0;
+            delayed_outputs |= (1<<4); // >>> I2C cmd 50 write fail, twi_returnCode: %d\r\n
+            delayed_data[4] =  twi_returnCode;
+        }
+        uint8_t rxBuffer[2] = {0x00,0x00};
+        sendStop = 1;
+        uint8_t bytes_read = twi_readFrom(i2c_address, rxBuffer, length, sendStop);
+        if ( bytes_read != length )
+        {
+            passing = 0; 
+            delayed_outputs |= (1<<5); // >>> I2C read missing %d bytes \r\n
+            delayed_data[5] =  length-bytes_read;
+        }
+        if ( (txBuffer[0] == rxBuffer[0]) && (xcvrbits == rxBuffer[1]) )
+        { //0xe2 is 0b11100010
+            // HOST_nRTS:HOST_nCTS:TX_nRE:TX_DE:DTR_nRE:DTR_DE:RX_nRE:RX_DE
+            delayed_outputs |= (1<<6); // Testmode: read  Xcvr cntl bits {50, 0x%X}\r\n
+            delayed_data[6] =  rxBuffer[1];
+        } 
+        else  
+        { 
+            passing = 0;
+            delayed_outputs |= (1<<7); // >>> Xcvr cntl bits should be %x but report was %x
+            delayed_data[7] =  rxBuffer[1]; // used with second format output
+        }
+    }
+}
+
+void i2c_testmode_set_xcvrbits(uint8_t xcvrbits)
+{
+    // do not use UART durring testmode
+    if ( test_mode_clean )
+    {
+        uint8_t i2c_address = 0x29;
+        uint8_t length = 2;
+        uint8_t wait = 1;
+        uint8_t sendStop = 0; // use a repeated start after write
+        uint8_t txBuffer[2];
+        txBuffer[0] = 0x33;
+        txBuffer[1] = xcvrbits;
+        uint8_t twi_returnCode = twi_writeTo(i2c_address, txBuffer, length, wait, sendStop);
+        if (twi_returnCode != 0)
+        {
+            passing = 0;
+            delayed_outputs |= (1<<0); // >>> I2C cmd 51 write fail, twi_returnCode: %d\r\n
+            delayed_data[0] =  twi_returnCode;
+        }
+        uint8_t rxBuffer[2] = {0x00,0x00};
+        sendStop = 1;
+        uint8_t bytes_read = twi_readFrom(i2c_address, rxBuffer, length, sendStop);
+        if ( bytes_read != length )
+        {
+            passing = 0; 
+            delayed_outputs |= (1<<1); // >>> I2C read missing %d bytes \r\n
+            delayed_data[1] =  length-bytes_read;
+        }
+        if ( (txBuffer[0] == rxBuffer[0]) && (xcvrbits == rxBuffer[1]) )
+        { //0xe2 is 0b11100010
+            // HOST_nRTS:HOST_nCTS:TX_nRE:TX_DE:DTR_nRE:DTR_DE:RX_nRE:RX_DE
+            delayed_outputs |= (1<<2); // Testmode: set  Xcvr cntl bits {51, 0x%X}\r\n
+            delayed_data[2] =  rxBuffer[1];
+        } 
+        else  
+        { 
+            passing = 0;
+            delayed_outputs |= (1<<3); // >>> Xcvr cntl bits set as %x but report was %x
+            delayed_data[3] =  rxBuffer[1]; // used with second format output
+        }
+    }
+}
+
 void test(void)
 {
     // Info from some Predefined Macros
@@ -107,48 +373,7 @@ void test(void)
     // SMBus needs connected to RPUno I2C master for testing, it is for write_i2c_block_data and read_i2c_block_data from
     //  https://git.kernel.org/pub/scm/utils/i2c-tools/i2c-tools.git/tree/py-smbus/smbusmodule.c
     // write_i2c_block_data sends a command byte and data to the slave 
-    uint8_t smbus_address = 0x2A;
-    uint8_t length = 2;
-    uint8_t wait = 1;
-    uint8_t sendStop = 1;
-    uint8_t txBuffer[2] = {0x00,0x00}; //comand 0x00 should Read the mulit-drop bus addr;
-    uint8_t twi_returnCode = twi_writeTo(smbus_address, txBuffer, length, wait, sendStop); 
-    if (twi_returnCode != 0)
-    {
-        passing = 0; 
-        printf_P(PSTR(">>> SMBus write failed, twi_returnCode: %d\r\n"), twi_returnCode);
-        return;
-    }
-    
-    // read_i2c_block_data sends a command byte and then a repeated start followed by reading the data 
-    uint8_t cmd_length = 1; // one byte command is sent befor read with the read_i2c_block_data
-    sendStop = 0; // a repeated start happens after the command byte is sent
-    txBuffer[0] = 0x00; //comand 0x00 matches the above write command
-    twi_returnCode = twi_writeTo(smbus_address, txBuffer, cmd_length, wait, sendStop); 
-    if (twi_returnCode != 0)
-    {
-        passing = 0; 
-        printf_P(PSTR(">>> SMBus read cmd fail, twi_returnCode: %d\r\n"), twi_returnCode);
-        return;
-    }
-    uint8_t rxBuffer[2];
-    sendStop = 1;
-    uint8_t bytes_read = twi_readFrom(smbus_address, rxBuffer, length, sendStop);
-    if ( bytes_read != length )
-    {
-        passing = 0; 
-        printf_P(PSTR(">>> SMBus read missing %d bytes \r\n"), (length-bytes_read) );
-        return;
-    }
-    if ( (rxBuffer[0] == 0x0) && (rxBuffer[1] == '1') )
-    {
-        printf_P(PSTR("SMBUS cmd %d provided address %d from manager\r\n"), rxBuffer[0], rxBuffer[1]);
-    } 
-    else  
-    { 
-        passing = 0; 
-        printf_P(PSTR(">>> SMBUS wrong addr %d for cmd %d\r\n"), rxBuffer[1], rxBuffer[0]);
-    }
+    smbus_address();
 
     // SPI loopback at R-Pi header. e.g., drive MISO/DIO12 to test MOSI/DIO11.
     // with selft test wirring MISO/DIO12 can shunt the current from CS3 to bypass yellow LED D2
@@ -186,6 +411,7 @@ void test(void)
     { 
         passing = 0; 
         printf_P(PSTR(">>> MISO %d did not loopback to MOSI %d\r\n"), miso_rd, mosi_rd);
+        printf_P(PSTR(">>> POL pin needs 5V for loopback to work\r\n"), miso_rd, mosi_rd);
     }
     digitalWrite(CS1_EN,LOW);
     digitalWrite(CS2_EN,LOW);
@@ -210,37 +436,7 @@ void test(void)
 
     // To cause a shutdown I can send the I2C command 5 with data 1
     // note the RPUno can monitor its input power to verify the R-Pi is in shutdown and turn off power to the shield VIN    
-    uint8_t i2c_address = 0x29;
-    length = 2;
-    wait = 1;
-    sendStop = 0; // use a repeated start after write
-    txBuffer[0] = 0x05;
-    txBuffer[1] = 0x01; //comand 0x05 should pull Shutdown low
-    twi_returnCode = twi_writeTo(i2c_address, txBuffer, length, wait, sendStop); 
-    if (twi_returnCode != 0)
-    {
-        passing = 0; 
-        printf_P(PSTR(">>> I2C cmd 5 write fail, twi_returnCode: %d\r\n"), twi_returnCode);
-        return;
-    }
-    rxBuffer[0]=0;
-    rxBuffer[1]=0;
-    sendStop = 1;
-    bytes_read = twi_readFrom(i2c_address, rxBuffer, length, sendStop);
-    if ( bytes_read != length )
-    {
-        passing = 0; 
-        printf_P(PSTR(">>> I2C read missing %d bytes \r\n"), (length-bytes_read) );
-    }
-    if ( (txBuffer[0] == rxBuffer[0]) && (txBuffer[1] == rxBuffer[1]) )
-    {
-        printf_P(PSTR("I2C Shutdown cmd is clean {%d, %d}\r\n"), rxBuffer[0], rxBuffer[1]);
-    } 
-    else  
-    { 
-        passing = 0; 
-        printf_P(PSTR(">>> I2C Shutdown cmd echo bad {%d, %d}\r\n"), rxBuffer[0], rxBuffer[1]);
-    }
+    i2c_shutdown();
 
     _delay_ms(50) ; // busy-wait delay
     sck_rd = digitalRead(SCK);
@@ -258,103 +454,92 @@ void test(void)
 
     // Manager should save the shutdown detected after SHUTDOWN_TIME timer runs (see rpubus_manager_state.h in Remote fw for value)
     _delay_ms(1100) ; // busy-wait delay
-    sendStop = 0; // use a repeated start after write
-    txBuffer[0] = 0x04;
-    txBuffer[1] = 0xFF; //comand 0x04 will return the value 0x01 (0xff is a byte for the ISR to replace)
-    twi_returnCode = twi_writeTo(i2c_address, txBuffer, length, wait, sendStop);
-    if (twi_returnCode != 0)
-    {
-        passing = 0; 
-        printf_P(PSTR(">>> I2C cmd 4 write fail, twi_returnCode: %d\r\n"), twi_returnCode);
-        return;
-    }
-    rxBuffer[0]=0;
-    rxBuffer[1]=0;
-    sendStop = 1;
-    bytes_read = twi_readFrom(i2c_address, rxBuffer, length, sendStop);
-    if ( bytes_read != length )
-    {
-        passing = 0; 
-        printf_P(PSTR(">>> I2C read missing %d bytes \r\n"), (length-bytes_read) );
-    }
-    if ( (txBuffer[0] == rxBuffer[0]) && (0x1 == rxBuffer[1]) )
-    {
-        printf_P(PSTR("I2C Shutdown Detect cmd is clean {%d, %d}\r\n"), rxBuffer[0], rxBuffer[1]);
-    } 
-    else  
-    { 
-        passing = 0; 
-        printf_P(PSTR(">>> I2C Shutdown Detect cmd echo bad {%d, %d}\r\n"), rxBuffer[0], rxBuffer[1]);
-    }
+    i2c_shutdown_detect();
 
     // Set test mode which will save trancever control bits HOST_nRTS:HOST_nCTS:TX_nRE:TX_DE:DTR_nRE:DTR_DE:RX_nRE:RX_DE
-    sendStop = 0; // use a repeated start after write
-    txBuffer[0] = 0x30; // command 48 will save the trancever control bits
-    txBuffer[1] = 0x01; //data 0x01 is used to select the option, if 2 is returned it is trying to set test mode, a 3 means that data was not valid
-    twi_returnCode = twi_writeTo(i2c_address, txBuffer, length, wait, sendStop);
-    if (twi_returnCode != 0)
-    {
-        passing = 0; 
-        printf_P(PSTR(">>> I2C cmd 48 write fail, twi_returnCode: %d\r\n"), twi_returnCode);
-        return;
-    }
-    rxBuffer[0]=0;
-    rxBuffer[1]=0;
-    sendStop = 1;
-    bytes_read = twi_readFrom(i2c_address, rxBuffer, length, sendStop);
-    if ( bytes_read != length )
-    {
-        passing = 0; 
-        printf_P(PSTR(">>> I2C read missing %d bytes \r\n"), (length-bytes_read) );
-    }
-    uint8_t test_mode_clean = 0;
-    if ( (txBuffer[0] == rxBuffer[0]) && (txBuffer[1]  == rxBuffer[1]) )
-    {
-        test_mode_clean = 1;
-        // delay print until the UART can be used
-    } 
-    else  
-    { 
-        passing = 0; 
-        printf_P(PSTR(">>> I2C Start Test Mode cmd echo bad {%d, %d}\r\n"), rxBuffer[0], rxBuffer[1]);
-    }
-
+    test_mode_clean = 0;
+    delayed_outputs = 0; // each bit selects a output to print
+    printf_P(PSTR("\r\n"));
+    printf_P(PSTR("Testmode: default trancever control bits\r\n"));
+    i2c_testmode_start();
     _delay_ms(50) ; // busy-wait delay
-    // End test mode and have a look at the trancever control bits
-    sendStop = 0; // use a repeated start after write
-    txBuffer[0] = 0x31; // command 49 will recover the saved trancever control bits
-    txBuffer[1] = 0x01; //data 0x01 is used to select the option, trancever control bits are returned, but a zero tells that somthing went wrong
-    twi_returnCode = twi_writeTo(i2c_address, txBuffer, length, wait, sendStop);
-    if (twi_returnCode != 0)
-    {
-        passing = 0; 
-        printf_P(PSTR(">>> I2C Start Test Mode cmd was clean {48, 1}\r\n"));
-        printf_P(PSTR(">>> I2C cmd 49 write fail, twi_returnCode: %d\r\n"), twi_returnCode);
-        return;
-    }
-    if ( test_mode_clean )
-    {
-        printf_P(PSTR("I2C Start Test Mode cmd was clean {48, 1}\r\n"));
-    } 
-    rxBuffer[0]=0;
-    rxBuffer[1]=0;
-    sendStop = 1;
-    bytes_read = twi_readFrom(i2c_address, rxBuffer, length, sendStop);
-    if ( bytes_read != length )
-    {
-        passing = 0; 
-        printf_P(PSTR(">>> I2C read missing %d bytes \r\n"), (length-bytes_read) );
-    }
-    if ( (txBuffer[0] == rxBuffer[0]) )
-    {
-        printf_P(PSTR("I2C End Test Mode hex is Xcvr cntl bits {%d, 0x%X}\r\n"), rxBuffer[0], rxBuffer[1]);
-    } 
-    else  
-    { 
-        passing = 0; 
-        printf_P(PSTR(">>> I2C End Test Mode cmd echo bad {%d, %d}\r\n"), rxBuffer[0], rxBuffer[1]);
-    }
 
+    // check xcvr bits after start of testmode. Note printf is done after end of testmode.
+    uint8_t xcvrbits_after_testmode_start = 0xE2;
+    i2c_testmode_test_xcvrbits(xcvrbits_after_testmode_start);
+
+    // End test mode 
+    i2c_testmode_end();
+    
+    // show the delayed test results now that UART is on-line
+    if (delayed_outputs & (1<<4))
+    {
+        printf_P(PSTR(">>> I2C cmd 50 write fail, twi_returnCode: %d\r\n"), delayed_data[4]);
+    }
+    if (delayed_outputs & (1<<5))
+    {
+        printf_P(PSTR(">>> I2C read missing %d bytes \r\n"), delayed_data[5]);
+    }
+    if (delayed_outputs & (1<<6))
+    {
+        printf_P(PSTR("Testmode: read  Xcvr cntl bits {50, 0x%X}\r\n"), delayed_data[6]);
+    }
+    if (delayed_outputs & (1<<7))
+    {
+        printf_P(PSTR(">>> Xcvr cntl bits should be %x but report was %x\r\n"), xcvrbits_after_testmode_start, delayed_data[7]);
+    }
+    
+    // set CTS low and verify it loops back to RTS
+    // control bits  HOST_nRTS:HOST_nCTS:TX_nRE:TX_DE:DTR_nRE:DTR_DE:RX_nRE:RX_DE
+    test_mode_clean = 0;
+    delayed_outputs = 0; // each bit selects a output to print
+    printf_P(PSTR("\r\n"));
+    printf_P(PSTR("Testmode: nCTS loopback to nRTS\r\n"));
+    i2c_testmode_start();
+    _delay_ms(50) ; // busy-wait delay
+
+    // set nCTS durring testmode and check the loopback on nRTS. Note printf is done after end of testmode.
+    uint8_t xcvrbits_change_cts_bit_low = 0xA2; //0b10100010
+    i2c_testmode_set_xcvrbits(xcvrbits_change_cts_bit_low);
+    uint8_t xcvrbits_cts_loopback_to_rts = 0x22; //0b00100010)
+    i2c_testmode_test_xcvrbits(xcvrbits_cts_loopback_to_rts);
+
+    // End test mode 
+    i2c_testmode_end();
+    
+    // show the delayed test results now that UART is on-line
+    if (delayed_outputs & (1<<0))
+    {
+        printf_P(PSTR(">>> I2C cmd 51 write fail, twi_returnCode: %d\r\n"), delayed_data[0]);
+    }
+    if (delayed_outputs & (1<<1))
+    {
+        printf_P(PSTR(">>> I2C read missing %d bytes \r\n"), delayed_data[1]);
+    }
+    if (delayed_outputs & (1<<2))
+    {
+        printf_P(PSTR("Testmode: set  Xcvr cntl bits {51, 0x%X}\r\n"), delayed_data[2]);
+    }
+    if (delayed_outputs & (1<<3))
+    {
+        printf_P(PSTR(">>> Xcvr cntl bits should be %x but report was %x\r\n"), xcvrbits_change_cts_bit_low, delayed_data[3]);
+    }
+    if (delayed_outputs & (1<<4))
+    {
+        printf_P(PSTR(">>> I2C cmd 50 write fail, twi_returnCode: %d\r\n"), delayed_data[4]);
+    }
+    if (delayed_outputs & (1<<5))
+    {
+        printf_P(PSTR(">>> I2C read missing %d bytes \r\n"), delayed_data[5]);
+    }
+    if (delayed_outputs & (1<<6))
+    {
+        printf_P(PSTR("Testmode: read  Xcvr cntl bits {50, 0x%X}\r\n"), delayed_data[6]);
+    }
+    if (delayed_outputs & (1<<7))
+    {
+        printf_P(PSTR(">>> Xcvr cntl bits should be %x but report was %x\r\n"), xcvrbits_cts_loopback_to_rts, delayed_data[7]);
+    }
 
     // The Transceiver Test is WIP
 

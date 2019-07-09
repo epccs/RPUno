@@ -52,15 +52,15 @@ picocom -b 38400 /dev/ttyUSB0
 picocom v2.2
 ...
 Terminal ready
-RPUpi Transceiver Test date: Jul  8 2019
+RPUpi Transceiver Test date: Jul  9 2019
 avr-gcc --version: 5.4.0
 I2C provided address 0x31 from manager
 SMBUS cmd 0 provided address 49 from manager
 MISO loopback to MOSI == HIGH
 MISO loopback to MOSI == LOW
-SCK with Shutdown loopbakc == HIGH
+SCK with Shutdown loopback == HIGH
 I2C Shutdown cmd is clean {5, 1}
-SCK with Shutdown loopbakc == LOW
+SCK with Shutdown loopback == LOW
 I2C Shutdown Detect cmd is clean {4, 1}
 
 Testmode: default trancever control bits
@@ -75,21 +75,27 @@ I2C End Test Mode hex is Xcvr cntl bits {49, 0xD5}
 Testmode: set  Xcvr cntl bits {51, 0xA2}
 Testmode: read  Xcvr cntl bits {50, 0x22}
 
-Testmode: Enable TX driver
+Testmode: Enable TX pair driver
 I2C Start Test Mode cmd was clean {48, 1}
 I2C End Test Mode hex is Xcvr cntl bits {49, 0xD5}
 Testmode: set  Xcvr cntl bits {51, 0xF2}
 Testmode: read  Xcvr cntl bits {50, 0xF2}
-PWR_I /w TX_DE on using INTERNAL_1V1: 0.035 A
+PWR_I /w TX pair load: 0.035 A
 
-Testmode: Enable TX & RX driver
+Testmode: Enable TX & RX(loopback) pair drivers
 I2C Start Test Mode cmd was clean {48, 1}
 I2C End Test Mode hex is Xcvr cntl bits {49, 0xD5}
 Testmode: set  Xcvr cntl bits {51, 0xD1}
 Testmode: read  Xcvr cntl bits {50, 0xD1}
-PWR_I /w TX_DE and RX_DE on using INTERNAL_1V1: 0.050 A
-[PASS]
+PWR_I /w TX and RX pairs loaded: 0.050 A
 
+Testmode: Enable DTR pair driver
+I2C Start Test Mode cmd was clean {48, 1}
+I2C End Test Mode hex is Xcvr cntl bits {49, 0xD5}
+Testmode: set  Xcvr cntl bits {51, 0xE6}
+Testmode: read  Xcvr cntl bits {50, 0xE6}
+PWR_I /w DTR pair load: 0.035 A
+[PASS]
 ```
 
 The resutls can also be seen on the remote R-Pi host, but if something goes wrong the bootload port may be needed to see the test results.

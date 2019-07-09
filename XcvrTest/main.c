@@ -426,7 +426,7 @@ void test(void)
     uint8_t sck_rd = digitalRead(SCK);
     if (sck_rd ) 
     { 
-        printf_P(PSTR("SCK with Shutdown loopbakc == HIGH\r\n"));
+        printf_P(PSTR("SCK with Shutdown loopback == HIGH\r\n"));
     }
     else 
     { 
@@ -442,7 +442,7 @@ void test(void)
     sck_rd = digitalRead(SCK);
     if (!sck_rd) 
     { 
-        printf_P(PSTR("SCK with Shutdown loopbakc == LOW\r\n"));
+        printf_P(PSTR("SCK with Shutdown loopback == LOW\r\n"));
     }
     else 
     { 
@@ -557,7 +557,7 @@ void test(void)
     test_mode_clean = 0;
     delayed_outputs = 0; // each bit selects a output to print
     printf_P(PSTR("\r\n"));
-    printf_P(PSTR("Testmode: Enable TX driver\r\n"));
+    printf_P(PSTR("Testmode: Enable TX pair driver\r\n"));
     i2c_testmode_start();
     _delay_ms(50) ; // busy-wait delay
     UCSR0B &= ~( (1<<RXEN0)|(1<<TXEN0) ); // turn off UART 
@@ -612,23 +612,23 @@ void test(void)
     {
         printf_P(PSTR(">>> Xcvr cntl bits should be %x but report was %x\r\n"), xcvrbits_enable_xtde, delayed_data[7]);
     }
-    printf_P(PSTR("PWR_I /w TX_DE on using INTERNAL_1V1: %1.3f A\r\n"), load_txde_i);
+    printf_P(PSTR("PWR_I /w TX pair load: %1.3f A\r\n"), load_txde_i);
     if (load_txde_i > 0.045) 
     { 
         passing = 0; 
-        printf_P(PSTR(">>> TX_DE load curr is to high.\r\n"));
+        printf_P(PSTR(">>> TX pair load curr is to high.\r\n"));
     }
     if (load_txde_i < 0.028) 
     { 
         passing = 0; 
-        printf_P(PSTR(">>> TX_DE load curr is to low.\r\n"));
+        printf_P(PSTR(">>> TX pair load curr is to low.\r\n"));
     }
 
     // Enable TX and RX driver durring testmode and measure PWR_I.
     test_mode_clean = 0;
     delayed_outputs = 0; // each bit selects a output to print
     printf_P(PSTR("\r\n"));
-    printf_P(PSTR("Testmode: Enable TX & RX driver\r\n"));
+    printf_P(PSTR("Testmode: Enable TX & RX(loopback) pair drivers\r\n"));
     i2c_testmode_start();
     _delay_ms(50) ; // busy-wait delay
     UCSR0B &= ~( (1<<RXEN0)|(1<<TXEN0) ); // turn off UART 
@@ -684,21 +684,83 @@ void test(void)
     {
         printf_P(PSTR(">>> Xcvr cntl bits should be %x but report was %x\r\n"), xcvrbits_enable_xtrx, delayed_data[7]);
     }
-    printf_P(PSTR("PWR_I /w TX_DE and RX_DE on using INTERNAL_1V1: %1.3f A\r\n"), load_txrx_i);
+    printf_P(PSTR("PWR_I /w TX and RX pairs loaded: %1.3f A\r\n"), load_txrx_i);
     if (load_txrx_i > 0.065) 
     { 
         passing = 0; 
-        printf_P(PSTR(">>> TX_DE and RX_DE load curr is to high.\r\n"));
+        printf_P(PSTR(">>> TX and RX pairs load curr are too high.\r\n"));
     }
     if (load_txrx_i < 0.040) 
     { 
         passing = 0; 
-        printf_P(PSTR(">>> TX_DE and RX_DE load curr is to low.\r\n"));
+        printf_P(PSTR(">>> TX and RX pairs load curr are too low.\r\n"));
     }
 
+   // Enable DTR driver durring testmode and measure PWR_I.
+    test_mode_clean = 0;
+    delayed_outputs = 0; // each bit selects a output to print
+    printf_P(PSTR("\r\n"));
+    printf_P(PSTR("Testmode: Enable DTR pair driver\r\n"));
+    i2c_testmode_start();
+    _delay_ms(50) ; // busy-wait delay
 
+    // control bits  HOST_nRTS:HOST_nCTS:TX_nRE:TX_DE:DTR_nRE:DTR_DE:RX_nRE:RX_DE
+    // everything off except DTR_nRE stays on and DTR_DE is turned on
+    // when the i2c commad sees DTR_DE set high it turns off the UART and
+    // enables the DTR pair driver then pulls the DTR_TXD line low to load the DTR pair.
+    uint8_t xcvrbits_enable_dtr = 0xE6; //0b11100110
+    i2c_testmode_set_xcvrbits(xcvrbits_enable_dtr);
+    i2c_testmode_test_xcvrbits(xcvrbits_enable_dtr); // to be clear "...set..." does not verify the setting
+    _delay_ms(1000) ; // busy-wait delay
+    float load_dtr_i = analogRead(PWR_I)*((ref_intern_1v1_uV/1.0E6)/1024.0)/(0.068*50.0);
 
-    // The DTR Transceiver Test is WIP
+    // End test mode will setup the DTR_TXD line and enable the manager's UART as it recovers
+    i2c_testmode_end();
+    
+    // show the delayed test results now that UART is on-line
+    if (delayed_outputs & (1<<0))
+    {
+        printf_P(PSTR(">>> I2C cmd 51 write fail, twi_returnCode: %d\r\n"), delayed_data[0]);
+    }
+    if (delayed_outputs & (1<<1))
+    {
+        printf_P(PSTR(">>> I2C read missing %d bytes \r\n"), delayed_data[1]);
+    }
+    if (delayed_outputs & (1<<2))
+    {
+        printf_P(PSTR("Testmode: set  Xcvr cntl bits {51, 0x%X}\r\n"), delayed_data[2]);
+    }
+    if (delayed_outputs & (1<<3))
+    {
+        printf_P(PSTR(">>> Xcvr cntl bits should be %x but report was %x\r\n"), xcvrbits_enable_dtr, delayed_data[3]);
+    }
+    if (delayed_outputs & (1<<4))
+    {
+        printf_P(PSTR(">>> I2C cmd 50 write fail, twi_returnCode: %d\r\n"), delayed_data[4]);
+    }
+    if (delayed_outputs & (1<<5))
+    {
+        printf_P(PSTR(">>> I2C read missing %d bytes \r\n"), delayed_data[5]);
+    }
+    if (delayed_outputs & (1<<6))
+    {
+        printf_P(PSTR("Testmode: read  Xcvr cntl bits {50, 0x%X}\r\n"), delayed_data[6]);
+    }
+    if (delayed_outputs & (1<<7))
+    {
+        printf_P(PSTR(">>> Xcvr cntl bits should be %x but report was %x\r\n"), xcvrbits_enable_dtr, delayed_data[7]);
+    }
+    printf_P(PSTR("PWR_I /w DTR pair load: %1.3f A\r\n"), load_dtr_i);
+    if (load_dtr_i > 0.045) 
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> DTR load curr is to high.\r\n"));
+    }
+    if (load_dtr_i < 0.028) 
+    { 
+        passing = 0; 
+        printf_P(PSTR(">>> DTR load curr is to low.\r\n"));
+    }
 
     // final test status
     if (passing)

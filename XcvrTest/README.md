@@ -52,7 +52,7 @@ picocom -b 38400 /dev/ttyUSB0
 picocom v2.2
 ...
 Terminal ready
-RPUpi Transceiver Test date: Jul  7 2019
+RPUpi Transceiver Test date: Jul  8 2019
 avr-gcc --version: 5.4.0
 I2C provided address 0x31 from manager
 SMBUS cmd 0 provided address 49 from manager
@@ -67,13 +67,29 @@ Testmode: default trancever control bits
 I2C Start Test Mode cmd was clean {48, 1}
 I2C End Test Mode hex is Xcvr cntl bits {49, 0xD5}
 Testmode: read  Xcvr cntl bits {50, 0xE2}
+PWR_I /w no load using INTERNAL_1V1: 0.023 A
 
 Testmode: nCTS loopback to nRTS
 I2C Start Test Mode cmd was clean {48, 1}
 I2C End Test Mode hex is Xcvr cntl bits {49, 0xD5}
 Testmode: set  Xcvr cntl bits {51, 0xA2}
 Testmode: read  Xcvr cntl bits {50, 0x22}
+
+Testmode: Enable TX driver
+I2C Start Test Mode cmd was clean {48, 1}
+I2C End Test Mode hex is Xcvr cntl bits {49, 0xD5}
+Testmode: set  Xcvr cntl bits {51, 0xF2}
+Testmode: read  Xcvr cntl bits {50, 0xF2}
+PWR_I /w TX_DE on using INTERNAL_1V1: 0.035 A
+
+Testmode: Enable TX & RX driver
+I2C Start Test Mode cmd was clean {48, 1}
+I2C End Test Mode hex is Xcvr cntl bits {49, 0xD5}
+Testmode: set  Xcvr cntl bits {51, 0xD1}
+Testmode: read  Xcvr cntl bits {50, 0xD1}
+PWR_I /w TX_DE and RX_DE on using INTERNAL_1V1: 0.050 A
 [PASS]
+
 ```
 
 The resutls can also be seen on the remote R-Pi host, but if something goes wrong the bootload port may be needed to see the test results.

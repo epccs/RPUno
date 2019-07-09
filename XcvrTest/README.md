@@ -88,6 +88,7 @@ I2C End Test Mode hex is Xcvr cntl bits {49, 0xD5}
 Testmode: set  Xcvr cntl bits {51, 0xD1}
 Testmode: read  Xcvr cntl bits {50, 0xD1}
 PWR_I /w TX and RX pairs loaded: 0.050 A
+RX loopback checked
 
 Testmode: Enable DTR pair driver
 I2C Start Test Mode cmd was clean {48, 1}
@@ -96,6 +97,7 @@ Testmode: set  Xcvr cntl bits {51, 0xE6}
 Testmode: read  Xcvr cntl bits {50, 0xE6}
 PWR_I /w DTR pair load: 0.035 A
 [PASS]
+
 ```
 
 The resutls can also be seen on the remote R-Pi host, but if something goes wrong the bootload port may be needed to see the test results.

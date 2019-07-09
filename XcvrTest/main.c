@@ -643,6 +643,7 @@ void test(void)
     i2c_testmode_test_xcvrbits(xcvrbits_enable_xtrx); // to be clear "...set..." does not verify the setting
     _delay_ms(1000) ; // busy-wait delay
     float load_txrx_i = analogRead(PWR_I)*((ref_intern_1v1_uV/1.0E6)/1024.0)/(0.068*50.0);
+    uint8_t rx_loopback = digitalRead(RX); 
 
     // End test mode 
     digitalWrite(TX,HIGH); // strong pullup
@@ -694,6 +695,15 @@ void test(void)
     { 
         passing = 0; 
         printf_P(PSTR(">>> TX and RX pairs load curr are too low.\r\n"));
+    }
+    if (rx_loopback)
+    {
+        passing = 0;
+        printf_P(PSTR(">>> RX loopback should be LOW but was HIGH\r\n"));
+    }
+    else
+    {
+        printf_P(PSTR("RX loopback checked\r\n"));
     }
 
    // Enable DTR driver durring testmode and measure PWR_I.

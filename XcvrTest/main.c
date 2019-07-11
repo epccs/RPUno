@@ -613,12 +613,12 @@ void test(void)
         printf_P(PSTR(">>> Xcvr cntl bits should be %x but report was %x\r\n"), xcvrbits_enable_xtde, delayed_data[7]);
     }
     printf_P(PSTR("PWR_I /w TX pair load: %1.3f A\r\n"), load_txde_i);
-    if (load_txde_i > 0.045) 
+    if (load_txde_i > 0.055) 
     { 
         passing = 0; 
         printf_P(PSTR(">>> TX pair load curr is to high.\r\n"));
     }
-    if (load_txde_i < 0.028) 
+    if (load_txde_i < 0.038) 
     { 
         passing = 0; 
         printf_P(PSTR(">>> TX pair load curr is to low.\r\n"));
@@ -686,12 +686,12 @@ void test(void)
         printf_P(PSTR(">>> Xcvr cntl bits should be %x but report was %x\r\n"), xcvrbits_enable_xtrx, delayed_data[7]);
     }
     printf_P(PSTR("PWR_I /w TX and RX pairs loaded: %1.3f A\r\n"), load_txrx_i);
-    if (load_txrx_i > 0.065) 
+    if (load_txrx_i > 0.075) 
     { 
         passing = 0; 
         printf_P(PSTR(">>> TX and RX pairs load curr are too high.\r\n"));
     }
-    if (load_txrx_i < 0.040) 
+    if (load_txrx_i < 0.055) 
     { 
         passing = 0; 
         printf_P(PSTR(">>> TX and RX pairs load curr are too low.\r\n"));
@@ -761,12 +761,12 @@ void test(void)
         printf_P(PSTR(">>> Xcvr cntl bits should be %x but report was %x\r\n"), xcvrbits_enable_dtr, delayed_data[7]);
     }
     printf_P(PSTR("PWR_I /w DTR pair load: %1.3f A\r\n"), load_dtr_i);
-    if (load_dtr_i > 0.045) 
+    if (load_dtr_i > 0.055) 
     { 
         passing = 0; 
         printf_P(PSTR(">>> DTR load curr is to high.\r\n"));
     }
-    if (load_dtr_i < 0.028) 
+    if (load_dtr_i < 0.038) 
     { 
         passing = 0; 
         printf_P(PSTR(">>> DTR load curr is to low.\r\n"));

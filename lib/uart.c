@@ -284,6 +284,28 @@
     #define UART1_CONTROL  UCSR1B
     #define UART1_DATA     UDR1
     #define UART1_UDRIE    UDRIE1
+#elif defined(__AVR_ATmega324PB__)
+    #define ATMEGA_USART0
+    #define ATMEGA_USART1
+    #define ATMEGA_USART2
+    #define UART0_RECEIVE_INTERRUPT   USART0_RX_vect
+    #define UART1_RECEIVE_INTERRUPT   USART1_RX_vect
+    #define UART2_RECEIVE_INTERRUPT   USART2_RX_vect
+    #define UART0_TRANSMIT_INTERRUPT  USART0_UDRE_vect
+    #define UART1_TRANSMIT_INTERRUPT  USART1_UDRE_vect
+    #define UART2_TRANSMIT_INTERRUPT  USART2_UDRE_vect
+    #define UART0_STATUS   UCSR0A
+    #define UART0_CONTROL  UCSR0B
+    #define UART0_DATA     UDR0
+    #define UART0_UDRIE    UDRIE
+    #define UART1_STATUS   UCSR1A
+    #define UART1_CONTROL  UCSR1B
+    #define UART1_DATA     UDR1
+    #define UART1_UDRIE    UDRIE
+    #define UART2_STATUS   UCSR2A
+    #define UART2_CONTROL  UCSR2B
+    #define UART2_DATA     UDR2
+    #define UART2_UDRIE    UDRIE
 #else
     #error "no UART definition for MCU available"
 #endif

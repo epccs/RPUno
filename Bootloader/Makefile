@@ -47,9 +47,9 @@ OBJCOPY = avr-objcopy
 OBJDUMP = avr-objdump
 SIZE = avr-size
 
-# FTDI's USB to serial bridge shows as /dev/ttyUSB0, 
-# Uno's serial bridge (an ATmega16U2) shows as /dev/ttyACM0  (a modem,?)
-# Pi Zero on chip hardware serial shows as /dev/ttyAMA0 (hardware UART on a Linux system)
+# /dev/ttyUSB0 is for FTDI's USB to serial bridge which I do not use to load a bootloader 
+# /dev/ttyACM0 is (a modem?) for the ATmega16U2 on an Uno used as a serial bridge which I do use to load a bootloader    
+# /dev/ttyAMA0 is a hardware UART on Linux, a Pi Zero has one good hardware serial but I don't want to spoil your fishing trip
 ISP_PORT = /dev/ttyACM0
 
 ## set the environment variable used for compiler and linker options for a baudcheck to be done
@@ -83,7 +83,7 @@ baudcheck:
 	$(SIZE) -C --mcu=$(MCU) $@
 
 fuse: 
-	avrdude -v -p $(MCU) -c stk500v1 -P /dev/ttyACM0 -b 19200 -e -U lock:w:$(UNLOCK_FUSE):m -U lfuse:w:$(LOW_FUSE):m -U hfuse:w:$(HIGH_FUSE):m -U efuse:w:$(EXTENDED_FUSE):m
+	avrdude -v -p $(MCU) -c stk500v1 -P $(ISP_PORT) -b 19200 -e -U lock:w:$(UNLOCK_FUSE):m -U lfuse:w:$(LOW_FUSE):m -U hfuse:w:$(HIGH_FUSE):m -U efuse:w:$(EXTENDED_FUSE):m
 
 ## set fuse like they are from factory, i.e. 8MHz internal, B.O.D. disabled.
 oem: 
@@ -94,15 +94,15 @@ oem:
 # save the eeprom so it can be put back after bootloader install. Note the -e will set all EEPROM addresses to '0xFF'.
 isp:
 	avrdude -v -p $(MCU) -c stk500v1 -P $(ISP_PORT) -b 19200 -U eeprom:r:$(TARGET)_$(MCU)_eeprom.hex:i
-	avrdude -v -p $(MCU) -c stk500v1 -P $(ISP_PORT) -b 19200 -e -U flash:w:$(TARGET)_$(MCU)_-b$(BAUD)_F_CPU$(F_CPU).hex -U lock:w:$(LOCK_FUSE):m
+	avrdude -v -p $(MCU) -c stk500v1 -P $(ISP_PORT) -b 19200 -e -U lock:w:$(UNLOCK_FUSE):m -U lfuse:w:$(LOW_FUSE):m -U hfuse:w:$(HIGH_FUSE):m -U efuse:w:$(EXTENDED_FUSE):m
+	avrdude -v -p $(MCU) -c stk500v1 -P $(ISP_PORT) -b 19200 -U flash:w:$(TARGET)_$(MCU)_-b$(BAUD)_F_CPU$(F_CPU).hex -U lock:w:$(LOCK_FUSE):m
 
-# I am not sure where the avrdude in raspian is from but it may be this one
+# The avrdude in raspian is from
 # https://github.com/facchinm/avrdude
-# Raspian version is missing this change sudo for now 
-# https://github.com/facchinm/avrdude/commit/aa0d28f774147fb03f8b18cd065586c7a93a2b0b
 linuxspi:
 	sudo avrdude -v -p $(MCU) -c linuxspi -P /dev/spidev0.0 -U eeprom:r:$(TARGET)_$(MCU)_eeprom.hex:i
-	sudo avrdude -v -p $(MCU) -c linuxspi -P /dev/spidev0.0 -e -U flash:w:$(TARGET)_$(MCU)_-b$(BAUD)_F_CPU$(F_CPU).hex -U lock:w:$(LOCK_FUSE):m
+	sudo avrdude -v -p $(MCU) -c linuxspi -P /dev/spidev0.0 -e -U lock:w:$(UNLOCK_FUSE):m -U lfuse:w:$(LOW_FUSE):m -U hfuse:w:$(HIGH_FUSE):m -U efuse:w:$(EXTENDED_FUSE):m
+	sudo avrdude -v -p $(MCU) -c linuxspi -P /dev/spidev0.0 -U flash:w:$(TARGET)_$(MCU)_-b$(BAUD)_F_CPU$(F_CPU).hex -U lock:w:$(LOCK_FUSE):m
 
 # recover a saved eeprom
 recoveree:
@@ -110,7 +110,7 @@ recoveree:
 	rm $(TARGET)_$(MCU)_eeprom.hex
 	
 ree_linuxspi:
-	avrdude -v -p $(MCU) -c linuxspi -P /dev/spidev0.0 -U eeprom:w:$(TARGET)_$(MCU)_eeprom.hex
+	sudo avrdude -v -p $(MCU) -c linuxspi -P /dev/spidev0.0 -U eeprom:w:$(TARGET)_$(MCU)_eeprom.hex
 	rm $(TARGET)_$(MCU)_eeprom.hex
 
 clean:

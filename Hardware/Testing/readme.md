@@ -22,7 +22,7 @@ This is a list of Test preformed on each RPUno after assembly.
 
 These tests are for an assembled RPUno board 14140^9 which may be referred to as a Unit Under Test (UUT). If the UUT fails and can be reworked then do so, otherwise it needs to be scraped. 
 
-**Warning: never use a soldering iron to rework ceramic capacitors due to the thermal shock.**
+**Warning: never use a soldering iron to rework crystals or ceramic capacitors due to the thermal shock.**
     
 Items used for test.
 

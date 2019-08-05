@@ -1,10 +1,8 @@
-# AVR  Interrupt-Driven UART with stdio redirect
+# AVR Interrupt-Driven UART with stdio redirect
 
 ## Overview
 
-Uart is an interactive command line program that demonstrates stdio redirect of a minimalized interrupt-driven UART core. 
-
-Referance ATmega328 datasheet 20.0 USART0 Universal Synchronous and Asynchronous serial Receiver and Transmitter.
+Uart is an interactive command line program that demonstrates stdio redirect of a minimalized interrupt-driven UART for AVR. 
 
 ## Firmware Upload
 

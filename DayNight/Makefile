@@ -50,9 +50,9 @@ LDFLAGS += -Wl,--gc-sections
 ## warning this takes about 2k of program space
 LDFLAGS += -Wl,-u,vfprintf -lprintf_flt -lm
 
-all: $(TARGET).hex
+all: $(TARGET).hex $(TARGET).lst
 
-$(TARGET): $(TARGET).hex  $(TARGET).lst
+$(TARGET): $(TARGET).hex
 
 $(TARGET).hex: $(TARGET).elf
 	$(OBJCOPY) -j .text -j .data -O ihex $< $@

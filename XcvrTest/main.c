@@ -376,14 +376,14 @@ void test(void)
     smbus_address();
 
     // SPI loopback at R-Pi header. e.g., drive MISO/DIO12 to test MOSI/DIO11.
-    // with selft test wirring MISO/DIO12 can shunt the current from CS3 to bypass yellow LED D2
+    // with self test wirring MISO/DIO12 can shunt the current from CS3 to bypass yellow LED D2
     pinMode(MISO,OUTPUT);
     digitalWrite(MISO,HIGH);
     digitalWrite(CS3_EN,LOW);
     // and MOSI/DIO11 can shunt the current from CS0 to bypass red LED D3
     pinMode(MOSI,INPUT);
     digitalWrite(MOSI,LOW); // turn off the weak pullup, the RPUpi board has a 3k pullup resistor 
-    digitalWrite(CS0_EN,LOW); // a HITH would drive the MOSI pin with Self-Test wiring
+    digitalWrite(CS0_EN,LOW); // a HIGH would drive the MOSI pin with Self-Test wiring
     digitalWrite(CS1_EN,HIGH); // add bias to R1 so MOSI loopback can be seen
     digitalWrite(CS2_EN,HIGH); // add more bias to R1 so MOSI loopback can be seen
     _delay_ms(50) ; // busy-wait delay
@@ -411,7 +411,7 @@ void test(void)
     { 
         passing = 0; 
         printf_P(PSTR(">>> MISO %d did not loopback to MOSI %d\r\n"), miso_rd, mosi_rd);
-        printf_P(PSTR(">>> POL pin needs 5V for loopback to work\r\n"), miso_rd, mosi_rd);
+        printf_P(PSTR(">>> POL pin needs 5V for loopback to work\r\n"));
     }
     digitalWrite(CS1_EN,LOW);
     digitalWrite(CS2_EN,LOW);

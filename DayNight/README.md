@@ -72,16 +72,16 @@ Report status of the state machine.
 {"day_state":"DAY"}
 ... 11 hr
 {"day_state":"DAY"}
-{"day_state":"EVENING"}
+{"day_state":"EVE"}
 ... 15 min
-{"day_state":"EVENING"}
+{"day_state":"NEVT"}
 TurnOnLED's
-{"day_state":"NIGHT"}
+{"day_state":"NGHT"}
 ... 12 hr
-{"day_state":"NIGHT"}
-{"day_state":"MORNING"}
+{"day_state":"NGHT"}
+{"day_state":"MORN"}
 ... 15 min
-{"day_state":"MORNING"}
+{"day_state":"DEVT"}
 WaterTheGarden
 {"day_state":"DAY"}
 ... 20 hr (e.g. using an indoor lamp)

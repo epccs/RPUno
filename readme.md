@@ -153,7 +153,7 @@ Update: Travis has Ubuntu [Xenial] 16.04.
 
 ## Arduino IDE with Arduino 328p Core
 
-The Arduino [IDE] can use the [Uno's AVR core] files that are included (my [core] files are C rather than C++), just remember to look at the schematic to see how the "Uno" is connected.  I do not use the Arduino IDE or C++ (I am a hardware designer,.and have only enough intrest in software to do what I want).
+The Arduino [IDE] can use the [Uno's AVR core] files that are included (my [core] files are C rather than C++), just remember to look at the schematic to see how the "Uno" is connected.  I do not use the Arduino IDE or C++ (I am a hardware designer,.and have limited intrest in software).
 
 [IDE]: https://www.arduino.cc/
 [Uno's AVR core]: https://github.com/arduino/ArduinoCore-avr
@@ -162,9 +162,16 @@ The Arduino [IDE] can use the [Uno's AVR core] files that are included (my [core
 
 ## Visual Studio Code
 
-VSC is an editor with some IDE features, it is happy with Makefiles. The feature that is driving me to use VSC is [IntelliSense]. It is configured with JSON files in [.vscode]. 
+VSC is one of the editors I use, and it is happy with Makefiles. The feature I like most is [IntelliSense], which is configured with JSON files in [.vscode]. 
 
 [IntelliSense]: https://code.visualstudio.com/docs/editor/intellisense
 [.vscode]: https://github.com/epccs/RPUno/tree/master/.vscode
 
-IntelliSense needs access to the toolchain includes. The AVR toolchain has some in avr-libc (/usr/lib/avr/include), and gcc-avr (/usr/lib/gcc/avr/5.4.0/include). So I copy them into a Samba share for VSC to see (e.g. Y:/lib/avr-libc, and Y:/lib/gcc-avr) which is also where I edit the source (e.g. Y:/git/RPUno).
+The best way to use VSC with GCC (avr-gcc) is in an environment that just works, for me that is Linux, so I can enable [WSL] and install Ubuntu and then use the [Remote WSL].
+
+[WSL]: https://docs.microsoft.com/en-us/windows/wsl/install-win10
+[Remote WSL]: https://code.visualstudio.com/docs/remote/wsl
+
+or I can install Linux on a 64bit x86 machine and use [Remote SSH].
+
+[Remote SSH]: https://code.visualstudio.com/docs/remote/ssh

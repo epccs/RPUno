@@ -51,12 +51,15 @@ Copyright (C) 2019 Ronald Sutherland
 #   error ADC hysteresis of 4 should be allowed
 #endif
 
+// public
 int morning_threshold = MORNING_THRESHOLD;
 int evening_threshold = EVENING_THRESHOLD;
 unsigned long evening_debouce = (unsigned long)EVENING_DEBOUCE;
 unsigned long morning_debouce = (unsigned long)MORNING_DEBOUCE;
-uint8_t dayState = 0; 
-unsigned long dayTmrStarted;
+
+// local
+static uint8_t dayState = 0; 
+static unsigned long dayTmrStarted;
 
 // used to initalize the PointerToWork functions in case they are not used.
 void callback_default(void)
@@ -147,7 +150,7 @@ void Day(unsigned long serial_print_delay_milsec)
 }
 
 /* check for daytime state durring program looping  
-    adc_ch_with_red_led_sensor: ADC channel
+    adc_ch_with_light_sensor: ADC channel
     dayState: range 0..7
     0 = default at startup, if above Evening Threshold set day, else set night.
     1 = day: wait for evening threshold, set for evening debounce.
@@ -158,9 +161,9 @@ void Day(unsigned long serial_print_delay_milsec)
     6 = day_work: do day callback and set for day.
     7 = fail: fail state.
 */
-void CheckDayLight(uint8_t adc_ch_with_red_led_sensor) 
+void CheckDayLight(uint8_t adc_ch_with_light_sensor) 
 { 
-    int sensor_val = analogRead(adc_ch_with_red_led_sensor);
+    int sensor_val = analogRead(adc_ch_with_light_sensor);
     if(dayState == DAYNIGHT_START_STATE) 
     { 
         unsigned long kRuntime= millis() - dayTmrStarted;
